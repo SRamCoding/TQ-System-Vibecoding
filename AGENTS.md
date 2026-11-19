@@ -1,211 +1,137 @@
-# AGENTS.md — TechQuk Integral System
+# AGENTS.md — TechQuk MVP (modo rápido)
 
-ERP + CRM propio de Techquk S.A.C. (integrador tecnológico, Chiclayo). Reemplaza al ERP S10.
-La pregunta que justifica todo el sistema: **¿cuánto se gana realmente en cada proyecto?**
+Este repositorio es una copia del sistema de Techquk (repo `SRamCoding/TechQuk-IntegralSystem`, congelado el
+2026-11-19 en el commit `a5e5972`) para llegar **rápido** a un MVP funcional que se pueda ver y usar de punta a punta.
+El repo original sigue siendo el serio: aquí se trabaja para ver el producto terminado, no para dejarlo listo para
+producción.
 
-Este archivo es un mapa, no una enciclopedia. Lee solo lo que la tarea necesita.
+Lo trabaja **Sebastián solo**, con sus agentes: nadie más del equipo entra a este repositorio. Las decisiones son
+suyas y no hay áreas ni dueños que coordinar.
 
-## Stack
+La pregunta que justifica el sistema sigue siendo la misma: **¿cuánto se gana realmente en cada proyecto?** Todo lo
+que se construya tiene que poder responderla en pantalla al final.
 
-PHP 8.3+ · Laravel · Filament · PostgreSQL 16 · Pest · Docker. Monolito modular.
-Versiones exactas: `composer.json`, no los documentos de diseño.
+## Cómo se trabaja aquí
 
-## Comandos
+Sebastián decide y mira; el agente construye. El ciclo es siempre el mismo: Sebastián pide algo, el agente lo
+construye hasta que **se vea y funcione en la pantalla con datos de demostración**, se lo dice en pocas líneas con las
+direcciones (URL) que tiene que abrir, y Sebastián lo prueba y pide cambios. Nada más.
 
-```bash
-composer check:tarea      # lo de abajo, pero solo las pruebas de lo que cambió la rama. Al cerrar cada tarea
-composer check            # todo lo de abajo con todas las pruebas, en paralelo (~6 min). Una vez por etapa, al cerrarla
-vendor/bin/pint           # formato
-vendor/bin/phpstan analyse
-php scripts/verificar-migraciones.php
-php artisan test          # incluye tests/Arch (límites entre módulos y nombres)
-```
+Lo que **no** se hace en este repositorio:
 
-No existe `.env.testing`: `--env=testing` apunta a la base de desarrollo. Las pruebas migran su propia
-base (`RefreshDatabase`); nunca correr `migrate:fresh` a mano. Las de `tests/Concurrencia` lanzan procesos de verdad
-contra su propia base, `techquk_concurrencia`, que crean y reconstruyen ellas mismas (nunca otra).
+- No se escriben ni se corren pruebas (no hay carpeta `tests/`). Tampoco phpstan ni CI.
+- No hay planes en `docs/planes/`, ni entregas, ni ramas, ni PR. Se trabaja directo en `main`.
+- No se endurece la seguridad: el usuario de desarrollo tiene todos los permisos y basta con eso. Los permisos nuevos
+  se registran igual (las pantallas los piden), pero no se diseñan roles.
+- No se optimiza. Si funciona y se ve bien con los datos de demo, está listo.
 
-## Dónde está cada cosa
+Lo que **sí** se hace, porque sin eso la app deja de funcionar o deja de responder la pregunta del sistema:
+
+1. **Todo lo nuevo se ve.** Cada módulo o cambio llega con sus datos de demostración (seeder) para que Sebastián lo
+   vea lleno, no vacío. Los datos son inventados y creíbles: nombres de empresas, proyectos y personas ficticios,
+   montos en soles con dos decimales. Nunca datos reales ni nombres de personas reales de Techquk.
+2. **Se respeta cómo se ve el sistema.** Las pantallas nuevas copian los patrones que ya existen (cajas con buscador,
+   panel deslizante, portada con fotos, ficha con tablero, colores por área): `docs/convenciones/interfaz.md` y las
+   pantallas vecinas. Si Sebastián pide un cambio visual, se hace; si no, no se rediseña nada por iniciativa propia.
+3. **El dinero cuadra.** Montos en `decimal`, nunca `float`. Toda línea de costo cae en una partida de control o en
+   gasto directo con su centro de costo (usa el selector de imputación que ya existe). Los totales que muestra una
+   pantalla salen del mismo cálculo que usan las demás.
+4. **La estructura de siempre, sin ceremonia.** Módulos en `app/Modules/{Nucleo,Crm,Erp}/<Modulo>`, la lógica en
+   `Services/`, las pantallas en Filament llamando a esos servicios. Un módulo usa los servicios de otro, no sus
+   modelos. Nombres del dominio en español. Esto no es por pureza: es para que el agente siguiente encuentre las
+   cosas donde espera encontrarlas.
+5. **Las migraciones se editan libremente** (no hay producción). Si un cambio exige reconstruir la base, el agente
+   avisa antes, porque `migrate:fresh --seed` borra lo que Sebastián haya cargado a mano.
+6. **Los agentes nunca tocan producción** ni servidores de Techquk. Nada de `ssh`, nada de credenciales reales.
+7. **La IA no se llama de verdad en los datos de demo**: si una pantalla usa IA, el seeder deja resultados ya
+   «sugeridos» para que se vean. Llamarla en vivo desde la pantalla sí se puede, si Sebastián la configuró en su
+   `.env`.
+
+## Cuando algo no está decidido
+
+Mucho de lo que falta tiene preguntas abiertas (`docs/decisiones/pendientes.md`). En el repo original eso detenía
+el trabajo; aquí no. El agente hace **una** pregunta corta a Sebastián con dos o tres opciones y la que recomienda.
+Si Sebastián no está o dice «decide tú», el agente toma la más simple que siga mostrando el flujo completo, la
+construye y la anota en su ficha de traspaso, en «Supuestos sin confirmar», para revisarla después.
+
+Si la navegación de una pantalla no está clara, se pregunta (Sebastián quiere decidir cómo se navega).
+
+## Verificación mínima antes de decir «listo»
+
+No hay pruebas, pero el agente no entrega algo roto. Antes de avisar:
+
+- `php artisan migrate --seed` (o el seeder del módulo) corre sin error;
+- `php artisan route:list` no falla y `php artisan view:cache` compila las vistas;
+- las páginas tocadas responden: con `php artisan serve --port=8001` levantado, se pide cada URL nueva y no devuelve
+  error 500 (si hace falta sesión, revisar `storage/logs/laravel.log` después de que Sebastián la abra);
+- `vendor/bin/pint` sobre lo tocado (el hook ya formatea cada archivo PHP que se edita).
+
+Al terminar: la ficha de traspaso al día (ver abajo), commit en `main` con un mensaje claro en español (código y
+ficha en el mismo commit) y `git push`.
+
+## Traspaso al repo original (obligatorio)
+
+Lo que se construye aquí termina construyéndose en serio en el repo original, con pruebas y seguridad, **sin volver
+a decidir nada**. Para eso, todo lo que se aprende aquí queda escrito en `docs/traspaso/` (léelo: `README.md`). Es la
+única ceremonia de este repositorio y no se salta:
+
+- **Cada funcionalidad tiene su ficha** en `docs/traspaso/fichas/`, con `plantilla-ficha.md`, y su fila en
+  `indice.md`. Se abre al empezar, no al final.
+- **Cada pedido de Sebastián actualiza la ficha** en el mismo commit que el código: sus decisiones vigentes, la
+  navegación, las operaciones con sus campos, los datos, las reglas con números, los supuestos y los atajos.
+- **Los atajos se confiesan.** Cada vez que el agente hace algo rápido que en el repo original no pasaría (lógica en
+  la pantalla, un estado como texto, un permiso sin revisar, un cálculo repetido), lo anota en «Atajos tomados». Lo
+  que vale para todo va en `atajos-generales.md`.
+- **Cada decisión de Sebastián se registra con número** en `docs/traspaso/decisiones.md` (`MV-001`…), con sus
+  palabras, su alcance (ficha, cruza módulos o negocio) y el commit; la ficha la cita entre sus vigentes. El registro
+  **nunca se reescribe**: si Sebastián cambia de idea, va una decisión nueva y la vieja pasa a «reemplazada por». Así
+  el repo original tiene la historia completa, no solo el resultado. Lo que el agente eligió solo va en «Supuestos sin
+  confirmar» de la ficha, nunca en el registro: no se mezclan.
+- **Aprobar.** Cuando Sebastián dice que así le gusta, la ficha pasa a «aprobada» con fecha y commit, y el agente
+  crea y sube la etiqueta `aprobado/<ficha>-v<n>` (`git tag` y `git push origin <etiqueta>`). Si después se cambia
+  algo aprobado, la ficha sube de versión y dice qué cambió.
+- **Cierre del MVP.** Cuando Sebastián diga que está terminado, el agente hace la auditoría de cierre de
+  `docs/traspaso/COMO-IMPORTAR.md` antes de que se haga el zip: todo aprobado, nada en el código que no esté en una
+  ficha, los supuestos juntos. El zip va con `.git`. Nada de `docs/traspaso/` se sube al repo original antes de ese
+  día: la importación se hace una sola vez, al final.
+- **Sin código en las fichas.** Describen comportamiento (el repo original pasa a FastAPI y Vue): las operaciones
+  serán endpoints y la navegación será la del frontend.
+
+## Qué construir y en qué orden
+
+`docs/vibe/ruta-mvp.md`: lo que ya está, lo que falta en tramos y cómo se ve cada tramo cuando está listo.
+
+## Dónde está el «qué» (referencia, no proceso)
+
+La documentación del repo original viene completa y sirve para saber **qué** hace cada parte. Se lee solo lo que la
+tarea necesita, por partes:
 
 | Necesito… | Leer |
 |---|---|
-| En qué versión y estado está el análisis, y de dónde viene | `docs/analisis/` (empieza por su README) |
-| Qué construir ahora y en qué orden | `docs/planes/mapa-etapas.md` y `docs/planes/activos/` |
-| Cómo se organiza el código | `ARCHITECTURE.md` |
-| Reglas de tablas y migraciones | `docs/convenciones/base-de-datos.md` |
-| Reglas de PHP, servicios, efectos, acciones, concurrencia, pruebas | `docs/convenciones/codigo.md` |
-| Reglas de IA (prompts, costos, datos) | `docs/convenciones/ia.md` |
-| Colores e identidad visual de las pantallas | `docs/convenciones/interfaz.md` |
+| Qué hace un flujo del ERP | `docs/diseno/v4/parte-4-flujo-NN.md` y sus fichas en `parte-6-fichas-documentos.md` |
+| Qué hace el CRM y sus pantallas | `docs/diseno/v4/parte-2-crm.md` y `docs/analisis/bloques/crm-pantallas.md` |
+| Los números de ejemplo de cada flujo (sirven para los datos de demo) | `docs/diseno/v4/parte-8-criterios-aceptacion.md` |
+| Columnas de una tabla | `docs/diseno/techquk_modelo.dbml` |
+| Cómo está hecho el código existente | `ARCHITECTURE.md` y `docs/convenciones/codigo.md` |
+| Cómo se ve el sistema | `docs/convenciones/interfaz.md` |
 | Un término del negocio | `docs/glosario.md` |
-| Qué se decidió y qué falta decidir | `docs/decisiones/` |
-| Quién lleva cada área de la etapa 2 y cómo se hablan las áreas | `docs/decisiones/0020-costuras-etapa-2.md` |
-| La guía del equipo para leer fácil (HTML; se abre con doble clic). Repite lo de aquí: si no coinciden, manda este archivo | `docs/equipo/` |
-| El **qué** de un flujo | `docs/diseno/v4/parte-4-flujo-NN.md` + fichas en `parte-6` |
-| Las pantallas del CRM | `docs/analisis/bloques/crm-pantallas.md` (diseño del 13 oct 2026) |
-| Los números que una prueba debe dar | `docs/diseno/v4/parte-8-criterios-aceptacion.md` |
-| Permisos, aprobaciones, alertas, integraciones | `docs/diseno/v4/parte-7-transversal.md` |
-| Columnas de una tabla | `docs/diseno/techquk_modelo.dbml` (v2) |
-| Qué cambió respecto del análisis de agosto | `docs/diseno/00-Reconciliacion-con-v4.md` |
-| El paquete original de agosto o la evidencia de S10 (solo historia; no manda) | `docs/analisis/archivo/` |
-| Servidor, despliegue, respaldos, monitoreo | `docs/operaciones/` |
+| Lo que estaba pensado para tareas a medio planear | `docs/planes/activos/` (solo como idea de qué hacer) |
 
-No leas el PDF completo de `docs/diseno/fuentes/`: usa las partes en Markdown. Ahorra cupo.
+Las reglas de proceso de esos documentos (planes, entregas, pruebas por niveles, revisor de arquitectura, reparto
+por áreas, PR) **no aplican aquí**; manda este archivo.
 
-## Reglas que no se negocian
+## Lecciones del repo original que sí aplican (evitan horas de depuración)
 
-1. **Precedencia:** convenciones > decisiones aceptadas > especificación v4 > documentos de agosto.
-   Los fragmentos de código de los documentos de diseño son ilustrativos.
-2. **Un módulo no toca los modelos de otro.** Usa sus `Services/` o escucha sus eventos.
-3. **Toda línea de costo tiene destino:** una partida de control o el gasto directo con centro
-   de costo. Nunca una línea sin imputación.
-4. **Nunca `float`, nunca `char`, nunca código de negocio como PK, nunca `empresa_id`.**
-   Toda llave foránea lleva índice.
-5. **Si un dato importa, es `NOT NULL` y su unicidad se garantiza en la base.**
-6. **Estados y transiciones son datos; cada efecto es una pieza separada.** Un documento
-   aprobado no se edita; anular exige motivo y revierte los efectos de la última transición.
-7. **Toda acción de usuario está registrada con sus campos y se puede ejecutar sin la interfaz.**
-   La lógica vive en servicios, nunca en Filament.
-8. **Cada flujo tiene su escenario de aceptación del v4 como prueba, con los números exactos.**
-9. **La IA sugiere y una persona confirma.** Nada que mueva dinero se aprueba sin una persona.
-   Las pruebas nunca llaman al servicio real de IA.
-10. **Nada de datos reales** en el repositorio, en las pruebas ni en los registros. Nada de
-    datos sensibles (sueldos, salud) en registros ni mensajes de error.
-11. **Los agentes nunca tocan producción**: ni el servidor, ni sus credenciales, ni su base.
-12. **No inventes respuestas a lo pendiente.** Si la tarea depende de algo en
-    `docs/decisiones/pendientes.md`, detente y pregunta.
-
-## Cómo trabajar
-
-- **Entregas** (decisión del desarrollador, 2026-11-10; reemplaza «una tarea = una rama = un PR = una corrida
-  completa»). Una **entrega** es un grupo de tareas relacionadas que juntas dan algo usable; no sigue las cuatro áreas
-  del ADR 0020. Se define al empezar, con su lista de tareas. Se cierra cuando lo que agrupa se puede usar, o al llegar
-  a lo primero de: 6 tareas, 7 días de trabajo o ~60 archivos cambiados (lo que se revisa de una sentada). Esos números
-  se revisan después de 2 o 3 entregas.
-- **Una rama por entrega**, `entrega/<nombre>`; sus tareas se apilan en ella. Cada tarea sigue con su fila en el mapa,
-  su plan (que dice a qué entrega pertenece) y commit y push por paso con la bitácora al día. Una sesión por tarea.
-  Antes de escribir código: plan en `docs/planes/activos/` con `docs/planes/plantilla.md`. La bitácora del plan es el
-  punto de guardado: si la sesión se corta, la siguiente lee el plan y continúa.
-- **Nombres de ramas** (minúsculas, guiones, en español): `entrega/` (una entrega = un PR), `plan/` (solo el plan de
-  algo que no empezó), `spike/` (exploración que quizá nunca se fusione), `arreglo/` (un arreglo chico y urgente fuera
-  de una entrega). Una rama viva se renombra en un buen momento, nunca cortando una sesión a mitad de un paso.
-- Flujos de trabajo: `/nuevo-modulo`, `/nueva-migracion`, `/nuevo-documento`, `/nueva-accion`,
-  `/automatizacion-ia`, `/cerrar-tarea`.
-- **Pruebas por niveles** (decisión del desarrollador, 2026-11-12; antes, 2026-11-10, una corrida completa por
-  entrega, y 2026-10-27, una por tarea):
-  1. **En cada paso y commit:** solo los archivos de prueba de lo que se tocó (`php artisan test <archivos>`), pint y
-     phpstan.
-  2. **Al cerrar cada tarea:** `composer check:tarea`. Elige las pruebas con `scripts/pruebas-de-la-tarea.php`
-     (`--listar` dice cuáles) y prueba solo lo cambiado desde su última corrida verde en esa copia (o desde
-     `origin/main` si no hay una; con `--base=origin/main`, la rama entera). Si le tocan más de la cuarta parte de los
-     archivos de prueba (pasa al cambiar el núcleo), corre todas en paralelo: en un solo proceso, 175 archivos tardaron
-     una hora; las 227 en paralelo, media (desarrollador, 2026-11-15).
-  3. **Al cerrar la entrega, antes del PR:** `composer check:tarea` otra vez, en verde. Sin corrida completa.
-  4. **Al cerrar una etapa del mapa:** `composer check` completo, **una sola vez por etapa, en local**, en segundo
-     plano (en paralelo: 6 procesos, cada uno con su base `techquk_test_test_N`).
-  Si una tarea toca `tests/Pest.php`, `config/`, rutas o `composer.json`, `check:tarea` ya corre todas las pruebas
-  hasta su siguiente corrida verde: conviene evitarlos.
-  «La corrida completa ya no pues, solo lo que se cambió… hay que correrlo una vez por etapa» (desarrollador).
-  Nunca dos corridas a la vez **en la misma copia**, y antes de lanzar una, que no quede un proceso viejo vivo:
-  comparten la base y se rompen. Cada copia de trabajo tiene su propia base (ver «Varias sesiones en paralelo»), así
-  que una corrida de otra copia no te rompe la tuya.
-- Al terminar una tarea: `composer check:tarea` en verde, bitácora al día, y si cambió una regla, su documento. Al
-  terminar la entrega: `composer check:tarea` otra vez en verde (ver «Cada entrega» en «Trabajo en equipo»). Al
-  cerrar la etapa: `composer check` en verde.
-- Verificaciones (pint, phpstan, pruebas) y commit en comandos separados o encadenados con `&&`, nunca con `;`: el
-  2026-10-29 se subió un commit con pint fallando.
-- Un comando encadenado con `&&` no se pasa por `| tail` ni `| head`: la tubería devuelve el código del último comando y
-  el `&&` sigue aunque el primero haya fallado (pasó el 2026-11-05). Si hace falta recortar la salida, `set -o pipefail`.
-- Una dependencia que usa un solo método (o un comando) va como parámetro de ese método o de `handle()`, no en el
-  constructor: así no cierra ciclos en el contenedor, que cuelgan la app sin error (pasó el 2026-10-29).
-  `ContenedorSinCiclosTest` los vigila.
-  Excepción: un oyente que va en la cola (`ShouldQueue`) recibe solo el evento en `handle()` (`CallQueuedListener` no
-  inyecta más); ahí el servicio se pide con `app()` dentro de `handle()` (pasó el 2026-11-06, plan 2.21).
-- Una acción nueva suma su permiso a la lista exacta de `tests/Modules/Nucleo/CatalogosSeederTest.php`: si no, esa
-  prueba solo falla en la corrida completa (pasó el 2026-11-06).
-- Idioma: dominio en español (`cotizaciones`, `ImputacionService`); framework en su idioma.
-  Nombres de clase, archivo y carpeta con mayúsculas exactas: producción corre en Linux.
-- Las personas que nombra el v4 son personas reales de Techquk: en pruebas y ejemplos, nombres inventados, y nunca
-  atribuirles funciones (quién hace qué no está decidido).
-- Cada archivo de pruebas debe pasar solo: Pest comparte las funciones globales entre archivos, y una
-  prueba que usa una función de otro archivo pasa en el conjunto y falla sola.
-- En pantallas, la versión del bloqueo optimista se captura **al abrir** el formulario
-  (`Campo::deControl()` + `fillForm`), nunca al guardar: Filament relee la fila y el conflicto no saltaría.
-- Un selector que ofrece solo elementos activos incluye también el valor que el registro ya tiene: Filament
-  rechaza un valor que no está entre las opciones y el formulario no se podría guardar.
-- En los closures que recibe Filament (`modifyQueryUsing`, `defaultSort`, `color`…), los parámetros van con el
-  nombre que Filament inyecta (`$query`, `$record`, `$state`), no en español: con otro nombre, Filament pide la clase
-  al contenedor y llega un `Builder` vacío.
-- En un componente Livewire, `exception()` lleva los parámetros con el nombre que Livewire inyecta (`$e`,
-  `$stopPropagation`): con otro nombre los pide al contenedor, falla y la vuelve a llamar sin fin (la prueba se cuelga
-  sin decir por qué).
-- Para ocultar una acción de `AccionFilament::desde()` según la fila, `->hidden()`, nunca `->visible()`:
-  `visible()` reemplaza la comprobación de permiso que ya puso `AccionFilament`.
-- En pruebas, `Livewire::test()` no dibuja los componentes Livewire que hay dentro de una pantalla (las pestañas de
-  una ficha, su historial): prueba el componente hijo directamente. Si no, la prueba pasa sin revisar lo que dice.
-- En pruebas, una acción del encabezado de una sección se monta con la misma llamada que hace su botón:
-  `call('mountAction', '<nombre>', [], ['schemaComponent' => 'form.<clave>'])`. `TestAction::schemaComponent()` no
-  la encuentra y la prueba falla sin decir por qué.
-- Un reemplazo masivo de un nombre (`sed` sobre todo el repositorio) excluye `tests/Modules/Nucleo/SinModoNavegacionTest.php`:
-  su lista de palabras prohibidas no se renombra, o deja de vigilar la palabra que debía (pasó el 2026-10-27).
-- `@js()` escribe un texto con comillas simples (`'dark'`, no `"dark"`): en pruebas, lo esperado se arma con
-  `Js::from()`, no a mano.
-
-## Trabajo en equipo
-
-Desde la etapa 2 trabajan cuatro personas, cada una dueña de un área (ADR 0020): Sebastián (Presupuesto y costo),
-Ander (Comercial), Lennart (Contratos y abastecimiento) y Yair (Obra y personas). Todo lo que pasa queda en el
-repositorio:
-
-> **Reparto aplicado (2026-11-16, decidido por Sebastián):** se terminó el modo de trabajar solo. Cuatro personas, dos
-> a tiempo completo (Sebastián y Yair) y dos a tiempo parcial (Ander y Lennart); quién lleva qué está en el ADR 0020,
-> «El reparto aplicado». Cada sesión trabaja para su dueño y solo en su área; lo de otra área se le pide a su dueño por
-> la costura. El corte que lo precedió está en `docs/planes/completados/corte-reparto.md`.
-
-- **Dónde va cada cosa:** lo que se decide dentro del área, en la sección «Decisiones» del plan de la tarea; lo que
-  cruza áreas o crea o cambia una costura, en un ADR, decidido en equipo (la IA ayuda a proponer opciones) y avisando a
-  quien la usa; si no hay acuerdo, desempata Sebastián; lo que depende de la empresa, en
-  `docs/decisiones/pendientes.md` (y se pregunta, regla 12).
-- **Cada tarea:** su fila en el mapa con su responsable, su plan con «Responsable» y «Entrega», en la rama de su
-  entrega. Commit y push por paso, con la bitácora al día. Al terminar, `composer check:tarea` en verde.
-- **Cada entrega** (decisión del desarrollador, 2026-11-10; pruebas, 2026-11-12): al cerrarla, el revisor de arquitectura
-  (`revisor-arquitectura`) si hubo cambios de estructura, `composer check:tarea` en verde, y el agente sube la rama y
-  avisa con los enlaces a los planes. El PR se titula `Entrega <nombre>: <resumen>` y su descripción lista las tareas
-  y sus planes. El PR lo abre Sebastián y lo fusiona con un *merge commit*, y borra la rama. **Ningún agente abre ni
-  fusiona PR.** Las demás entregas vivas traen `main` con *merge*, nunca con *rebase*.
-- **Orden en el repositorio:** ninguna rama queda sin push al final del día; las ramas fusionadas se borran; las
-  copias de trabajo (`git worktree`) que no se usan se quitan con `git worktree remove` desde la carpeta principal y
-  se vuelven a crear con `php scripts/nueva-copia.php` cuando hacen falta.
-- **Lo que el agente aprende trabajando va a este archivo o a `docs/convenciones/`, nunca a la memoria personal del
-  agente:** esa memoria vive en la máquina de cada uno y los demás no la ven.
-- **Un cambio en un módulo de otra área** lo revisa su dueño, aunque el ADR 0020 asigne esa pieza a otro.
-- **Lo que se pospone deja su punto de extensión listo** (una interfaz, un registro ampliable, un servicio que la
-  etapa futura solo completa): anotarlo como deuda no basta. Va en «Preparado para lo diferido» del plan.
-- **Contenido festivo o decorativo:** respeta el cristianismo. Nada de Halloween ni nada contrario a la fe, y
-  tampoco santos. Valen Navidad, Semana Santa, Año Nuevo, Fiestas Patrias, Día de la Madre y del Padre, cumpleaños y
-  el aniversario de Techquk. Si una fecha es dudosa, se pregunta.
-- **Las pantallas siguen los patrones que ya tiene el sistema** (`docs/convenciones/interfaz.md`: cajas con buscador,
-  panel deslizante, los mismos componentes). Nadie rediseña la interfaz por su cuenta: la mejora visual se hace al
-  final, a cargo de Sebastián.
-- **Varias sesiones en paralelo** (plan 2026-11-04 «trabajo en paralelo»): cada sesión trabaja en su propia copia
-  (`git worktree`, hermana de la carpeta principal), creada con `php scripts/nueva-copia.php <nombre>` desde la
-  principal; la corre la persona, porque copia el `.env`. La carpeta principal queda para la app de Sebastián, en
-  `main`: ninguna sesión cambia de rama ahí. En una copia, `tests/bootstrap.php` usa su propia base de pruebas
-  (`techquk_test_<nombre>` y `techquk_concurrencia_<nombre>`). Las copias se coordinan solo por el repositorio:
-  después de cada fusión, cada una trae `main` a su rama con *merge*. Dos corridas completas de copias distintas no se rompen,
-  pero cargan la máquina: si `pgrep` muestra la de otra copia, mejor esperar o correr solo lo tocado.
-- **El organigrama está en espera** (desde 2026-11-03): la empresa está definiendo el actual. No se toca su
-  documentación, la fila «Organigrama real» de `pendientes.md` ni datos de unidades y puestos reales hasta que
-  Sebastián lo entregue. Se construye con datos de prueba.
-
-## Mantenimiento de este archivo
-
-Cada regla aquí viene de un error real o de una decisión registrada. Si un agente se equivoca de
-forma repetible, la corrección va aquí (si es breve) o en el documento que corresponda.
-
-Las reglas de los agentes son del equipo (desarrollador, 2026-11-04):
-
-- **Agregar una lección** (un error del agente y cómo evitarlo): en un PR, revisado por al menos un compañero.
-- **Cambiar o quitar una regla**, aquí, en `CLAUDE.md` o en `docs/convenciones/`, o tocar lo compartido de `.claude/`
-  (flujos, revisor, hooks, `settings.json`): se conversa en equipo antes, y el PR dice por qué cambió. Si no hay
-  acuerdo, desempata Sebastián.
-- `.claude/settings.local.json` es personal y no está en el repositorio: cada uno lo ajusta sin pasar por nadie.
+- Una dependencia que usa un solo método va como parámetro de ese método o de `handle()`, no en el constructor: así
+  no se cierran ciclos en el contenedor, que cuelgan la app sin error.
+- En los closures de Filament (`modifyQueryUsing`, `defaultSort`, `color`…), los parámetros se llaman como Filament
+  los inyecta (`$query`, `$record`, `$state`); con otro nombre llega un `Builder` vacío.
+- En Livewire, `exception()` lleva `$e` y `$stopPropagation`; con otro nombre la página se cuelga.
+- Un selector que ofrece solo activos incluye también el valor que el registro ya tiene, o el formulario no guarda.
+- Para ocultar una acción de `AccionFilament::desde()` según la fila, `->hidden()`, nunca `->visible()`.
+- La versión del bloqueo optimista se captura al abrir el formulario (`Campo::deControl()` + `fillForm`).
+- Una acción nueva necesita su permiso sembrado (lo hace `PermisosSeeder` con el registro de acciones); después,
+  `php artisan db:seed` se lo da al rol `desarrollo`. Si no, su botón no aparece.
+- Nombres de clase, archivo y carpeta con mayúsculas exactas: corre en Linux.
+- Contenido festivo o decorativo: nada de Halloween, nada contrario a la fe cristiana, sin santos.
+- El desarrollador trabaja en Windows con WSL2 o Docker: si hace falta un script, en PHP.

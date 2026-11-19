@@ -1,28 +1,26 @@
 {
   "permissions": {
     "allow": [
-      "Bash(composer check)",
       "Bash(composer install)",
       "Bash(composer dump-autoload)",
-      "Bash(php artisan test:*)",
-      "Bash(php artisan make:*)",
-      "Bash(php artisan route:list:*)",
+      "Bash(composer require:*)",
+      "Bash(php artisan:*)",
+      "Bash(npm:*)",
       "Bash(vendor/bin/pint:*)",
-      "Bash(vendor/bin/phpstan:*)",
-      "Bash(php scripts/verificar-migraciones.php)",
       "Bash(git status)",
       "Bash(git diff:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(git push origin main)",
+      "Bash(git tag:*)",
+      "Bash(git push origin aprobado/*)"
     ],
     "ask": [
-      "Bash(php artisan migrate:*)",
-      "Bash(php artisan db:seed:*)",
-      "Bash(composer require:*)",
-      "Bash(composer remove:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
       "Bash(php artisan migrate:fresh:*)",
       "Bash(php artisan db:wipe:*)",
+      "Bash(composer remove:*)",
       "Bash(docker compose down:*)"
     ],
     "deny": [

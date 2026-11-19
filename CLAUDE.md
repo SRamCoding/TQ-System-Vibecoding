@@ -2,20 +2,15 @@
 
 ## Específico de Claude Code
 
-- Flujos disponibles: `/nuevo-modulo`, `/nueva-migracion`, `/nuevo-documento`, `/nueva-accion`,
-  `/automatizacion-ia`, `/cerrar-tarea`.
-- Flujo de entregas (decisión del desarrollador, 2026-11-10; detalle en `AGENTS.md`, «Cómo trabajar»): las tareas
-  se apilan en la rama `entrega/<nombre>`. `composer check` completo, solo una vez por etapa. Al cerrar cada tarea, `composer check:tarea`; al cerrar la entrega,
-  `composer check:tarea` otra vez (decisión del 2026-11-12), y después subes la rama y avisas con los enlaces a los planes.
-- Antes de cerrar una entrega con cambios de estructura (módulos, migraciones, dependencias,
-  efectos entre módulos), pide revisión al subagente `revisor-arquitectura`.
-- Los hooks formatean el PHP que edites y bloquean cambios a `.env`. Las migraciones se pueden
-  editar hasta el primer despliegue con datos reales; desde entonces, el hook las bloquea
-  (`docs/decisiones/0010-migraciones-editables.md`). Si un hook te bloquea, lee el mensaje y corrige.
-- El desarrollador trabaja en Windows con WSL2 o Docker. Scripts en PHP, no en bash ni PowerShell.
-- Antes de lanzar `composer check` (cierre de la etapa) o `composer check:tarea` (cierre de cada tarea), revisa
-  con `pgrep -af "artisan test"` que no haya otra corrida: dos a la vez en la misma copia comparten la base de pruebas y se rompen entre sí (una copia de trabajo distinta usa su propia base,
-  pero dos corridas completas cargan la máquina: mejor esperar). Dentro de un comando que ya contiene ese texto, `pgrep -f` se
-  encuentra a sí mismo: ahí usa `ps -eo cmd | grep "[a]rtisan test"`. Revísalo también después de detener una corrida:
-  sus procesos pueden seguir vivos y tumbar la siguiente (pasó el 2026-10-27).
-- Cuida el cupo: lee partes de documentos, no documentos completos; abre una sesión limpia por tarea.
+- Este es el repo de **modo rápido**: sin pruebas, sin planes, sin ramas ni PR. Se trabaja en `main` y se hace
+  commit y push al terminar cada pedido.
+- Los hooks formatean el PHP que edites y bloquean cambios a `.env`. Si falta una variable, agrégala a `.env.example`
+  y avisa.
+- La app corre en `http://localhost:8001` y su PostgreSQL en el puerto `5433`, para convivir con la app del repo
+  original (8000 y 5432) en la misma máquina.
+- Antes de avisar, la ficha de `docs/traspaso/fichas/` al día y cada decisión nueva de Sebastián con su número en
+  `docs/traspaso/decisiones.md` (nunca se reescribe una entrada: se reemplaza con otra). Si Sebastián dice «así me gusta», ficha aprobada y
+  etiqueta `aprobado/<ficha>-v<n>` subida.
+- Al avisar que algo está listo: qué cambió en dos o tres líneas, las URL que hay que abrir y cualquier supuesto
+  tomado. Sin listas largas ni reportes: Sebastián prefiere la explicación narrada y corta.
+- Cuida el cupo: lee partes de documentos, no documentos completos.

@@ -75,20 +75,6 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
-        ],
-        "check:tarea": [
-            "@php artisan config:clear --ansi",
-            "@php vendor/bin/pint --test",
-            "@php vendor/bin/phpstan analyse --memory-limit=1G",
-            "@php scripts/verificar-migraciones.php",
-            "@php scripts/pruebas-de-la-tarea.php"
-        ],
-        "check": [
-            "@php artisan config:clear --ansi",
-            "@php vendor/bin/pint --test",
-            "@php vendor/bin/phpstan analyse --memory-limit=1G",
-            "@php scripts/verificar-migraciones.php",
-            "@php artisan test --parallel --processes=6"
         ]
     },
     "extra": {
