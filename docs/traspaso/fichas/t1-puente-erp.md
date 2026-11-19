@@ -1,8 +1,9 @@
 # Ficha · Puente al ERP: ganar, proyecto y ofertado contra presupuesto
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Versión:** v2
 - **Tramo de la ruta:** T1
+- **Aprobada (v2):** 2026-11-19 · etiqueta `aprobado/t1-puente-erp-v2`
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-puente-erp-v1` (código del commit `e02abf7`)
 - **Fuentes del diseño:** ADR 0023 del repo original (numeración por dueño, copia al ganar);
   `docs/planes/activos/2026-11-16-presupuesto-copia-al-ganar.md` (plan 2.12, D1 a D5); `docs/vibe/ruta-mvp.md` (tramo 1).
@@ -127,3 +128,9 @@ traerla, la v1 pasa a «reemplazado», pero sigue siendo «lo ofertado» de la c
   `Erp/Presupuestos/Resumen/TarjetaDinero.php`, `Erp/Proyectos/Services/ProyectosEnBase.php` (`crearDesdeOportunidad`,
   `anularDesdeOportunidad`), `Erp/Proyectos/Filament/Resources/Proyectos/ProyectoResource.php`.
 - Migraciones editadas: `crear_proyectos`, `crear_presupuestos`, `crear_cotizaciones`.
+
+## Cambios desde la versión anterior
+
+v2 (2026-11-19, por `t2-contratos`): al ganar también nace el contrato en borrador, enlazado al proyecto; anular la
+ganada exige que ese contrato siga en borrador. Lo vendido ahora sale del contrato; la cotización aceptada queda como
+respaldo para proyectos sin contrato.

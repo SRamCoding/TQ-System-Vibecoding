@@ -56,4 +56,16 @@ final readonly class GastosDemoService
             return $gasto;
         });
     }
+
+    /**
+     * MVP rápido (t2-contratos): un costo a los gastos generales del proyecto (la comisión de una carta fianza, v4
+     * flujo 1, paso 2). Null si el proyecto aún no tiene árbol aprobado con su partida de gastos generales.
+     */
+    public function enGastosGenerales(int $proyectoId, string $descripcion, string $proveedor, CarbonImmutable $fecha, string $monto): ?GastoDemo
+    {
+        $partida = PartidaControl::query()->where('proyecto_id', $proyectoId)->where('es_gastos_generales', true)->where('es_hoja', true)->where('es_activa', true)
+            ->whereHas('arbol.estado', fn ($q) => $q->where('codigo', 'aprobado'))->orderBy('codigo')->first();
+
+        return $partida === null ? null : $this->registrar($partida->id, $descripcion, $proveedor, $fecha, $monto, $monto, $monto);
+    }
 }

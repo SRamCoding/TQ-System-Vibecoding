@@ -121,6 +121,8 @@ final class ProyectosEnMemoria implements ProyectosService
 
     public function anularDesdeOportunidad(int $oportunidadId, string $motivo): void {}
 
+    public function vincularContrato(int $proyectoId, int $contratoId): void {}
+
     public function iniciarEjecucion(int $proyectoId): void
     {
         $actual = $this->resumen($proyectoId);

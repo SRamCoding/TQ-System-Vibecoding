@@ -57,6 +57,9 @@ interface ProyectosService
      */
     public function anularDesdeOportunidad(int $oportunidadId, string $motivo): void;
 
+    /** MVP rápido (t2-contratos): el contrato del proyecto, al nacer al ganar. */
+    public function vincularContrato(int $proyectoId, int $contratoId): void;
+
     /**
      * Pasa el proyecto a «en ejecución» (lo llama Presupuestos al aprobar el árbol; no es acción de usuario). Si ya
      * está en ejecución, no hace nada.

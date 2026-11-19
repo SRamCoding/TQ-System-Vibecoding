@@ -27,6 +27,8 @@ use App\Modules\Crm\Oportunidades\Models\Oportunidad;
 use App\Modules\Crm\Oportunidades\Services\DatosDelProyectoAlGanar;
 use App\Modules\Crm\Oportunidades\Services\DatosOportunidad;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
+use App\Modules\Erp\Contratos\Models\Contrato;
+use App\Modules\Erp\Contratos\Services\ContratosService;
 use App\Modules\Erp\Presupuestos\Models\PartidaControl;
 use App\Modules\Erp\Presupuestos\Models\PartidaDePresupuesto;
 use App\Modules\Erp\Presupuestos\Models\Presupuesto;
@@ -210,6 +212,8 @@ final class DemoSeeder extends Seeder
             }
         });
 
+        $this->contratoDe($p, $proyectoId);
+
         if ($p['estado'] === 'en_preparacion') {
             return;
         }
@@ -220,6 +224,7 @@ final class DemoSeeder extends Seeder
             $this->en($p['fin'], function () use ($proyectoId): void {
                 $proyecto = Proyecto::query()->findOrFail($proyectoId);
                 app(TransicionesService::class)->transicionar($proyecto, 'cerrar', $proyecto->version, $this->dev, null, 'Acta de conformidad firmada.');
+                app(ContratosService::class)->culminar((int) Contrato::query()->where('proyecto_id', $proyectoId)->value('id'));
             });
         }
     }
@@ -667,6 +672,49 @@ final class DemoSeeder extends Seeder
                     $lead->update(['estado' => 'convertido', 'cuenta_id' => $op->cuenta_id, 'oportunidad_id' => $op->id]);
                 }
             }
+        }
+    }
+
+    /**
+     * El contrato de un proyecto de la cartera (ficha t2-contratos): se activa a los 3 días de ganar, con sus hitos; las
+     * entidades públicas piden carta fianza del 10 % (su comisión va a gastos generales); P6 tiene una adenda y P1 la
+     * penalidad tope del plan viejo (S/ 250,498.54).
+     */
+    private function contratoDe(array $p, int $proyectoId): void
+    {
+        $servicio = app(ContratosService::class);
+        $c = Contrato::query()->where('proyecto_id', $proyectoId)->firstOrFail();
+        $ganada = CarbonImmutable::parse($p['ganada']);
+        $publica = CarteraDemo::cuentas()[$p['cuenta']][2];
+        $anio = substr($p['ganada'], 0, 4);
+        $numero = $publica ? sprintf('Contrato N.° %03d-%s-%s', 10 + (int) substr($p['clave'], 1) * 7, $anio, strtoupper(substr($p['cuenta'], 0, 4))) : 'OS-'.$anio.'-0'.substr($p['clave'], 1);
+
+        $this->en($ganada->addDays(3), fn () => $servicio->activar($c->id, $numero, $ganada->addDays(3), $publica ? '100 % a la conformidad de cada entrega' : '50 % de adelanto y 50 % a la conformidad',
+            24, '10', null));
+        $hoy = CarbonImmutable::parse('2026-11-19');
+        $c->hitos()->get()->each(fn ($h) => $h->fecha_prevista->lt($hoy) && $h->fecha_real === null ? $h->update(['fecha_real' => $h->fecha_prevista->toDateString()]) : null);
+
+        if ($publica) {
+            $vence = match ($p['estado']) {
+                'cerrado' => CarbonImmutable::parse($p['fin'])->addDays(30),
+                'en_preparacion' => CarbonImmutable::parse($p['fin'])->addDays(60),
+                default => $p['clave'] === 'P8' ? CarbonImmutable::parse('2026-12-12') : CarbonImmutable::parse($p['fin'])->addDays(30),
+            };
+            $monto = $servicio->tope($c->refresh());
+            $estado = match ($p['estado']) {
+                'cerrado' => 'devuelta', 'en_preparacion' => 'solicitada', default => 'vigente'
+            };
+            $this->en($ganada->addDays(8), fn () => $servicio->registrarGarantia($c->id, 'fiel_cumplimiento', ['Banco Norte', 'Banco del Pacífico', 'Caja Valle Norte'][(int) substr($p['clave'], 1) % 3],
+                'CF-'.$anio.'-'.str_pad((string) (300 + (int) substr($p['clave'], 1)), 5, '0', STR_PAD_LEFT), $monto, $ganada->addDays(8), $vence,
+                $estado === 'solicitada' ? null : bcadd(bcmul($monto, '0.025', 4), '0.005', 2), $estado));
+        }
+
+        if ($p['clave'] === 'P6') {
+            $this->en('2026-02-16', fn () => $servicio->registrarAdenda($c->id, 'Adenda N.° 1', CarbonImmutable::parse('2026-02-16'), 'Doce computadoras más para el servicio de emergencia', '49625.14', 30));
+        }
+
+        if ($p['clave'] === 'P1') {
+            $this->en('2024-11-15', fn () => $servicio->aplicarPenalidad($c->id, 70, CarbonImmutable::parse('2024-11-15'), 'Atraso de 70 días en la conformidad por la reubicación de postes.'));
         }
     }
 }

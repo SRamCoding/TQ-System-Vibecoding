@@ -1,8 +1,9 @@
 # Ficha · Datos de demostración
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v2
+- **Versión:** v3
 - **Tramo de la ruta:** T0
+- **Aprobada (v3):** 2026-11-19 · etiqueta `aprobado/t0-datos-demo-v3`
 - **Aprobada (v2):** 2026-11-19 · etiqueta `aprobado/t0-datos-demo-v2` (código del commit `e02abf7`)
 - **Aprobada (v1):** 2026-11-19 · commit `ae8839a` (código; la etiqueta va en el commit de la aprobación, sin cambios de código) · etiqueta `aprobado/t0-datos-demo-v1`
 - **Fuentes del diseño:** `docs/vibe/ruta-mvp.md` (tramo 0); plan viejo
@@ -145,3 +146,9 @@ v2 (2026-11-19), por la ficha `t1-puente-erp` (MV-006 a MV-008):
   cliente: dos puntos de red más por consultorio» (35,400.00), para no repetir lo que ya entró en la v2.
 - Las oportunidades abiertas con cotización emitida se crearon entre setiembre y octubre de 2026 y sus cotizaciones
   valen 60 días, para que sigan vigentes y se puedan aceptar y ganar desde la pantalla.
+
+v3 (2026-11-19, por `t2-contratos`): cada proyecto tiene su contrato activado a los 3 días de ganar y las entidades
+públicas su carta fianza (comisión en gastos generales). P1 carga la penalidad tope de 250,498.54 y pierde dinero
+(vendido 1,872,370.44; margen previsto −119,993.56); P6 tiene una adenda de 49,625.14 (vendido 2,738,321.08; margen
+previsto 165,617.89). La tabla de «Reglas y números» de v2 queda como referencia del costo; lo vendido y el margen de P1
+y P6 son los de aquí.

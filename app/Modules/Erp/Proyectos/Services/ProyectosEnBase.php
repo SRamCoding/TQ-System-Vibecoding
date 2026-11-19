@@ -135,6 +135,11 @@ final readonly class ProyectosEnBase implements ProyectosService
         $this->transiciones->transicionar($proyecto, 'anular', $proyecto->version, $quien, new MotivoElegido($motivoId, "Se anuló la oportunidad ganada: {$motivo}"));
     }
 
+    public function vincularContrato(int $proyectoId, int $contratoId): void
+    {
+        Proyecto::query()->whereKey($proyectoId)->update(['contrato_id' => $contratoId]);
+    }
+
     public function iniciarEjecucion(int $proyectoId): void
     {
         DB::transaction(function () use ($proyectoId): void {

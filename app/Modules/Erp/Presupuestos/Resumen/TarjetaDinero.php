@@ -61,8 +61,10 @@ final class TarjetaDinero implements TarjetaResumen
 
         if ($d['venta'] !== null) {
             $lineas[] = new LineaResumen('Vendido', Soles::texto($d['venta']));
-            $lineas[] = new LineaResumen('Margen previsto', Soles::texto((string) $d['margen_previsto']));
-            $lineas[] = new LineaResumen('Margen proyectado', Soles::texto((string) $d['margen_proyectado']), $d['tono']);
+            // MVP rápido (t2-contratos): un margen negativo se ve en rojo (se pierde dinero), sea cual sea el semáforo del costo.
+            $rojo = fn (string $m): ?string => bccomp($m, '0', 2) < 0 ? 'danger' : null;
+            $lineas[] = new LineaResumen('Margen previsto', Soles::texto((string) $d['margen_previsto']), $rojo((string) $d['margen_previsto']));
+            $lineas[] = new LineaResumen('Margen proyectado', Soles::texto((string) $d['margen_proyectado']), $rojo((string) $d['margen_proyectado']) ?? $d['tono']);
         }
 
         // MV-008: cuánto se movió el presupuesto respecto de lo ofertado; cada fila lleva a la pestaña de la comparación.
