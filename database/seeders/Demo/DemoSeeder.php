@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders\Demo;
 
 use App\Modules\Crm\Actividades\Models\Actividad;
+use App\Modules\Crm\Catalogo\Models\FamiliaProducto;
+use App\Modules\Crm\Catalogo\Services\PreciosCatalogoService;
 use App\Modules\Crm\Cotizaciones\Enums\TipoRespaldo;
 use App\Modules\Crm\Cotizaciones\Estados\DefinicionCotizacion;
 use App\Modules\Crm\Cotizaciones\Models\Cotizacion;
@@ -105,6 +107,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: licitaciones');
             $this->licitaciones();
+
+            $this->command?->info('Demo: catálogo');
+            $this->en('2026-06-01', fn () => $this->catalogo());
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -565,6 +570,45 @@ final class DemoSeeder extends Seeder
             Actividad::query()->create(['tipo' => 'reunion', 'cuenta_id' => $o->cuenta_id, 'oportunidad_id' => $o->id, 'asunto' => 'Reunión de inicio con el cliente',
                 'fecha' => CarbonImmutable::parse($o->fecha_cierre_real->toDateString(), 'America/Lima')->addDays(6)->setTime(11, 0),
                 'resultado' => 'Presentamos al jefe de proyecto y acordamos el cronograma.', 'es_realizada' => true, 'responsable_user_id' => $this->dev->id]);
+        }
+    }
+
+    /** El catálogo de la demo (ficha t1-catalogo): familias, códigos del Estado e ítems con su historia de precios. */
+    private function catalogo(): void
+    {
+        $familias = [];
+
+        foreach (CarteraDemo::familias() as $codigo => [$nombre, $padre]) {
+            $familias[$codigo] = FamiliaProducto::query()->create(['codigo' => $codigo, 'nombre' => $nombre, 'parent_id' => $padre === null ? null : $familias[$padre]])->id;
+        }
+
+        $cubso = [];
+
+        foreach (CarteraDemo::cubso() as [$codigo, $descripcion]) {
+            $cubso[] = DB::table('cubso')->insertGetId(['codigo' => $codigo, 'descripcion' => $descripcion, 'version_catalogo' => '2026', 'es_activo' => true, 'created_by' => $this->dev->id, 'created_at' => now()]);
+        }
+
+        $precios = app(PreciosCatalogoService::class);
+        $lineas = ['VV' => 'VIDEOVIGILANCIA', 'RD' => 'REDES', 'CO' => 'DATACENTER', 'SV' => 'SOFTWARE'];
+
+        foreach (CarteraDemo::productos() as [$codigo, $descripcion, $familia, $unidad, $marca, $modelo, $c, $precio, $costo, $margen, $servicio, $serie, $anterior, $activo]) {
+            $p = $precios->crear([
+                'codigo' => $codigo, 'descripcion' => $descripcion, 'unidad_medida_id' => $this->unidad($unidad), 'familia_producto_id' => $familias[$familia],
+                'linea_solucion_id' => (int) DB::table('lineas_solucion')->where('codigo', $lineas[substr($familia, 0, 2)])->value('id'),
+                'marca' => $marca, 'modelo' => $modelo, 'cubso_id' => $c === null ? null : $cubso[$c], 'es_servicio' => $servicio, 'requiere_serie' => $serie,
+            ]);
+
+            if ($anterior !== null) {
+                $precios->cambiarPrecio($p->id, $anterior, null, $margen, CarbonImmutable::parse('2026-01-05'));
+            }
+
+            if ($precio !== null) {
+                $precios->cambiarPrecio($p->id, $precio, $costo, $margen, CarbonImmutable::parse($anterior === null ? '2026-03-02' : '2026-09-01'), $anterior === null ? 'manual' : 'carga');
+            }
+
+            if (! $activo) {
+                $precios->descontinuar($p->id, true);
+            }
         }
     }
 }

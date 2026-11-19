@@ -7,6 +7,7 @@ namespace App\Modules\Crm\Catalogo\Services\EnMemoria;
 use App\Modules\Crm\Catalogo\Models\Producto;
 use App\Modules\Crm\Catalogo\Services\CatalogoRechazado;
 use App\Modules\Crm\Catalogo\Services\CatalogoService;
+use App\Modules\Crm\Catalogo\Services\PrecioVigente;
 use App\Modules\Crm\Catalogo\Services\ResumenProducto;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -70,5 +71,10 @@ final class CatalogoEnMemoria implements CatalogoService
     private static function normalizar(string $texto): string
     {
         return mb_strtolower(Str::ascii(trim($texto)));
+    }
+
+    public function precioVigente(int $productoId): ?PrecioVigente
+    {
+        return null;
     }
 }

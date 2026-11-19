@@ -9,6 +9,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t1-puente-erp](fichas/t1-puente-erp.md) | T1 | aprobada | v1 | `aprobado/t1-puente-erp-v1` |
 | [t1-licitaciones](fichas/t1-licitaciones.md) | T1 | aprobada | v1 | `aprobado/t1-licitaciones-v1` |
 | [t1-agenda](fichas/t1-agenda.md) | T1 | aprobada | v1 | `aprobado/t1-agenda-v1` |
+| [t1-catalogo](fichas/t1-catalogo.md) | T1 | aprobada | v1 | `aprobado/t1-catalogo-v1` |
 
 ## Registro del repositorio
 

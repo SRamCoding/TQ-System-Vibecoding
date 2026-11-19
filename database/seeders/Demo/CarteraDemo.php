@@ -289,4 +289,69 @@ final class CarteraDemo
                 'motivo' => 'Piden experiencia mínima de S/ 300,000 en mantenimiento de CCTV con entidades públicas; no llegamos.'],
         ];
     }
+
+    /** Familias del catálogo: código => [nombre, código del padre]. */
+    public static function familias(): array
+    {
+        return [
+            'VV' => ['Videovigilancia', null], 'VV-CAM' => ['Cámaras', 'VV'], 'VV-GRA' => ['Grabadores y almacenamiento', 'VV'], 'VV-POS' => ['Postes y accesorios', 'VV'],
+            'RD' => ['Redes', null], 'RD-SW' => ['Switches', 'RD'], 'RD-CAB' => ['Cableado estructurado', 'RD'], 'RD-INA' => ['Inalámbrico', 'RD'], 'RD-SEG' => ['Seguridad de red', 'RD'],
+            'CO' => ['Cómputo', null], 'CO-PC' => ['Computadoras', 'CO'], 'CO-SRV' => ['Servidores', 'CO'], 'CO-IMP' => ['Impresión', 'CO'],
+            'SV' => ['Servicios', null], 'SV-INS' => ['Instalación', 'SV'], 'SV-MAN' => ['Mantenimiento', 'SV'], 'SV-SW' => ['Software y desarrollo', 'SV'],
+        ];
+    }
+
+    /** Códigos del Estado inventados para la demo: [código, descripción]. */
+    public static function cubso(): array
+    {
+        return [
+            ['46171610-00012', 'Cámara de video para vigilancia IP'], ['46171610-00027', 'Cámara de video domo PTZ'], ['43222612-00045', 'Conmutador (switch) de red'],
+            ['43222609-00008', 'Enrutador / cortafuegos de red'], ['26121636-00031', 'Cable de datos UTP categoría 6'], ['43211507-00102', 'Computadora de escritorio'],
+            ['43211501-00019', 'Servidor de rack'], ['43212105-00066', 'Impresora multifuncional láser'], ['43201410-00011', 'Punto de acceso inalámbrico'],
+            ['45111902-00004', 'Sistema de videoconferencia'], ['43201811-00014', 'Grabador de video en red (NVR)'],
+        ];
+    }
+
+    /**
+     * Ítems: [código, descripción, familia, unidad, marca, modelo, cubso (índice o null), precio, costo, margen, servicio, serie, precio anterior, activo].
+     *
+     * @return list<array<int, mixed>>
+     */
+    public static function productos(): array
+    {
+        return [
+            ['CAM-D4M', 'Cámara IP domo 4 MP, lente 2.8 mm, IR 30 m', 'VV-CAM', 'NIU', 'Visiontek', 'VT-D4M28', 0, '1180.00', '850.00', '28', false, true, '1095.00', true],
+            ['CAM-B8M', 'Cámara IP bullet 8 MP antivandálica, IR 60 m', 'VV-CAM', 'NIU', 'Visiontek', 'VT-B8M60', 0, '1640.00', '1210.00', '26', false, true, null, true],
+            ['CAM-PTZ2', 'Cámara PTZ 2 MP, zoom óptico 25x', 'VV-CAM', 'NIU', 'Visiontek', 'VT-PTZ225', 1, null, null, null, false, true, null, true],
+            ['CAM-PTZ4K', 'Cámara PTZ 4K, zoom óptico 30x, IR 200 m', 'VV-CAM', 'NIU', 'Optiwatch', 'OW-PTZ4K30', 1, '14850.00', '11200.00', '25', false, true, '13900.00', true],
+            ['CAM-TERM', 'Cámara térmica de largo alcance', 'VV-CAM', 'NIU', 'Optiwatch', 'OW-TH1200', null, '38500.00', '26900.00', '30', false, true, null, true],
+            ['CAM-LPR', 'Cámara de lectura de placas con analítica', 'VV-CAM', 'NIU', 'Optiwatch', 'OW-LPR5', 0, null, null, null, false, true, null, true],
+            ['CAM-D2M', 'Cámara IP domo 2 MP (modelo anterior)', 'VV-CAM', 'NIU', 'Visiontek', 'VT-D2M', 0, '690.00', '480.00', '30', false, true, null, false],
+            ['NVR-16', 'Grabador NVR de 16 canales, 4 discos', 'VV-GRA', 'NIU', 'Visiontek', 'VT-NVR16', 10, '4116.00', '3020.00', '27', false, true, null, true],
+            ['NVR-32', 'Grabador NVR de 32 canales, 8 discos', 'VV-GRA', 'NIU', 'Visiontek', 'VT-NVR32', 10, '6900.00', '5188.80', '25', false, true, '6650.00', true],
+            ['HDD-8T', 'Disco duro de vigilancia de 8 TB', 'VV-GRA', 'NIU', 'Datastor', 'DS-8TB-V', null, '980.00', '720.00', '26', false, true, null, true],
+            ['POS-9M', 'Poste metálico de 9 m con cimentación', 'VV-POS', 'NIU', null, null, null, '4650.00', '3500.00', '25', false, false, null, true],
+            ['SW-24P', 'Switch PoE de 24 puertos gigabit, 370 W', 'RD-SW', 'NIU', 'Netcore', 'NC-2400P', 2, '4250.00', '3104.20', '27', false, true, null, true],
+            ['SW-48P', 'Switch de acceso de 48 puertos PoE', 'RD-SW', 'NIU', 'Netcore', 'NC-4800P', 2, '8400.00', '6300.00', '25', false, true, '8150.00', true],
+            ['SW-DIS48', 'Switch de distribución de 48 puertos 10 G', 'RD-SW', 'NIU', 'Netcore', 'NC-D48X', 2, '12800.00', '9800.00', '23', false, true, null, true],
+            ['CAB-UTP6', 'Cable UTP categoría 6, caja de 305 m', 'RD-CAB', 'NIU', 'Cabletek', 'CT-C6-305', 4, '545.00', '398.00', '27', false, false, '520.00', true],
+            ['PTO-C6', 'Punto de red Cat 6 certificado (suministro e instalación)', 'RD-CAB', 'NIU', null, null, null, '245.00', '180.00', '26', true, false, null, true],
+            ['GAB-42U', 'Gabinete de piso de 42 RU', 'RD-CAB', 'NIU', 'Rackline', 'RL-42U', null, '5850.00', '4300.00', '26', false, false, null, true],
+            ['FO-MM12', 'Cable de fibra óptica multimodo 12 hilos (metro)', 'RD-CAB', 'MTR', 'Cabletek', 'CT-FO12', null, null, null, null, false, false, null, true],
+            ['AP-WIFI6', 'Punto de acceso inalámbrico wifi 6', 'RD-INA', 'NIU', 'Netcore', 'NC-AX3000', 8, '1350.00', '980.00', '27', false, true, null, true],
+            ['ENL-PTP', 'Enlace inalámbrico punto a punto 5 GHz', 'RD-INA', 'NIU', 'Airlink', 'AL-PTP5', null, '6900.00', '5100.00', '26', false, true, null, true],
+            ['FW-NGFW', 'Firewall de siguiente generación', 'RD-SEG', 'NIU', 'Shieldnet', 'SN-1800F', 3, '58400.00', '44900.00', '23', false, true, '56200.00', true],
+            ['PC-ESC24', 'Computadora de escritorio con monitor de 24"', 'CO-PC', 'NIU', 'Andina PC', 'AP-i5-24', 5, '2950.00', '2290.00', '22', false, true, '2800.00', true],
+            ['PC-ESC22', 'Computadora de escritorio con monitor de 22"', 'CO-PC', 'NIU', 'Andina PC', 'AP-i3-22', 5, '2150.00', '1540.00', '28', false, true, null, true],
+            ['TAB-10', 'Tableta de 10" para uso clínico', 'CO-PC', 'NIU', 'Andina PC', 'AP-TAB10', null, null, null, null, false, true, null, true],
+            ['SRV-R2U', 'Servidor de rack 2U con virtualización', 'CO-SRV', 'NIU', 'Servertek', 'ST-R740', 6, '86500.00', '68000.00', '21', false, true, null, true],
+            ['IMP-MFL', 'Impresora multifuncional láser', 'CO-IMP', 'NIU', 'Printwell', 'PW-M428', 7, '1890.00', '1420.00', '25', false, true, null, true],
+            ['IMP-PUL', 'Impresora de pulseras y etiquetas', 'CO-IMP', 'NIU', 'Printwell', 'PW-ZD620', null, null, null, null, false, true, null, true],
+            ['VC-SALA', 'Sistema de videoconferencia con cámara y barra de audio', 'CO-IMP', 'NIU', 'Meetline', 'ML-BAR4K', 9, '18900.00', '13900.00', '26', false, true, null, false],
+            ['SV-INST', 'Instalación y puesta en marcha (jornada de cuadrilla)', 'SV-INS', 'GLB', null, null, null, '1450.00', '980.00', '32', true, false, null, true],
+            ['SV-MPREV', 'Mantenimiento preventivo de CCTV (visita)', 'SV-MAN', 'GLB', null, null, null, '6200.00', '4100.00', '34', true, false, null, true],
+            ['SV-HORA', 'Hora de soporte técnico especializado', 'SV-MAN', 'HUR', null, null, null, '120.00', '68.00', '43', true, false, '110.00', true],
+            ['SV-DESA', 'Hora de desarrollo de software', 'SV-SW', 'HUR', null, null, null, null, null, null, true, false, null, true],
+        ];
+    }
 }

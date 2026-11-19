@@ -20,6 +20,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Tables\Columns\TextColumn;
@@ -149,7 +150,17 @@ final class LineasDeCotizacion extends Component implements HasActions, HasSchem
         return Select::make('producto_id')->searchable()->required()
             ->getSearchResultsUsing(fn (string $search): array => collect(app(CatalogoService::class)->buscar($search))
                 ->mapWithKeys(fn (ResumenProducto $p): array => [$p->id => $etiqueta($p)])->all())
-            ->getOptionLabelUsing(fn (mixed $value): ?string => is_numeric($value) ? $etiqueta(app(CatalogoService::class)->resumen((int) $value)) : null);
+            ->getOptionLabelUsing(fn (mixed $value): ?string => is_numeric($value) ? $etiqueta(app(CatalogoService::class)->resumen((int) $value)) : null)
+            // MVP rápido (t1-catalogo): trae el precio vigente y el costo referencial del catálogo; se pueden cambiar.
+            ->live()->afterStateUpdated(function (mixed $state, Set $set): void {
+                $precio = is_numeric($state) ? app(CatalogoService::class)->precioVigente((int) $state) : null;
+
+                if ($precio !== null) {
+                    $set('precio_unitario', $precio->precio);
+                    $set('costo_unitario', $precio->costo);
+                }
+            })
+            ->helperText('Trae el precio vigente del catálogo y su costo referencial.');
     }
 
     /** C8: los presupuestos de la oportunidad que se pueden enlazar (borrador u ofertados), la versión más nueva primero. */

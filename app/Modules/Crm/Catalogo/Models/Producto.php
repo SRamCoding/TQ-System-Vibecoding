@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Un producto o servicio del catálogo (plan 2.60, D1). Otros módulos lo leen por `CatalogoService` (C4), nunca por este
@@ -38,7 +40,7 @@ class Producto extends Model
 
     protected $table = 'productos';
 
-    protected $fillable = ['codigo', 'descripcion', 'descripcion_corta', 'unidad_medida_id', 'requiere_serie', 'es_servicio', 'es_activo'];
+    protected $fillable = ['codigo', 'descripcion', 'descripcion_corta', 'unidad_medida_id', 'requiere_serie', 'es_servicio', 'es_activo', 'familia_producto_id', 'linea_solucion_id', 'marca', 'modelo', 'cubso_id'];
 
     protected function casts(): array
     {
@@ -71,5 +73,23 @@ class Producto extends Model
     public function unidadMedida(): BelongsTo
     {
         return $this->belongsTo(UnidadMedida::class);
+    }
+
+    /** @return BelongsTo<FamiliaProducto, $this> */
+    public function familia(): BelongsTo
+    {
+        return $this->belongsTo(FamiliaProducto::class, 'familia_producto_id');
+    }
+
+    /** @return HasMany<PrecioProducto, $this> */
+    public function precios(): HasMany
+    {
+        return $this->hasMany(PrecioProducto::class)->orderByDesc('vigente_desde')->orderByDesc('id');
+    }
+
+    /** @return HasOne<PrecioProducto, $this> */
+    public function precioVigente(): HasOne
+    {
+        return $this->hasOne(PrecioProducto::class)->where('es_vigente', true);
     }
 }

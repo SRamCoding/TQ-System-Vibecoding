@@ -29,4 +29,7 @@ interface CatalogoService
      * @throws CatalogoRechazado si no existe
      */
     public function resumen(int $productoId): ResumenProducto;
+
+    /** MVP rápido (t1-catalogo): el precio referencial vigente, o null si no tiene. */
+    public function precioVigente(int $productoId): ?PrecioVigente;
 }
