@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Demo;
 
+use App\Modules\Crm\Actividades\Models\Actividad;
 use App\Modules\Crm\Cotizaciones\Enums\TipoRespaldo;
 use App\Modules\Crm\Cotizaciones\Estados\DefinicionCotizacion;
 use App\Modules\Crm\Cotizaciones\Models\Cotizacion;
@@ -104,6 +105,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: licitaciones');
             $this->licitaciones();
+
+            $this->command?->info('Demo: agenda');
+            $this->en('2026-11-19', fn () => $this->actividades());
         } finally {
             Carbon::setTestNow();
             CarbonImmutable::setTestNow();
@@ -509,6 +513,58 @@ final class DemoSeeder extends Seeder
                     'es_techquk' => $quien === 'techquk', 'oferta' => $oferta, 'puntaje' => $puntaje, 'puesto' => $puesto, 'es_ganador' => $puesto === 1,
                 ]);
             }
+        }
+    }
+
+    /**
+     * La agenda de la demo (ficha t1-agenda): gestiones hechas en cada oportunidad abierta y su próxima acción (dos
+     * vencidas, dos para hoy, las demás en los próximos días; dos oportunidades quedan sin próxima acción).
+     */
+    private function actividades(): void
+    {
+        $pendiente = ['prospecto' => ['llamada', 'Llamar para calificar la necesidad'], 'calificada' => ['correo', 'Enviar la propuesta'],
+            'propuesta_enviada' => ['llamada', 'Seguimiento de la propuesta'], 'negociacion' => ['reunion', 'Reunión de negociación']];
+        $dias = [-3, -1, 0, null, 0, 1, 2, null, 4, 6, 8, 9, 12, 14, 15, 20];
+        $horas = ['09:30', '11:00', '10:00', '15:30', '16:00', '09:00', '12:00'];
+        $abiertas = Oportunidad::query()->with('estado')->whereHas('estado', fn ($q) => $q->whereIn('codigo', array_keys($pendiente)))->orderBy('id')->get();
+        $hoy = CarbonImmutable::parse('2026-11-19', 'America/Lima');
+
+        foreach ($abiertas as $i => $o) {
+            $creada = CarbonImmutable::parse($o->created_at)->setTimezone('America/Lima')->startOfDay();
+            $decisor = $o->decisor_contacto_id === null ? 'el cliente' : (string) DB::table('party_contactos')->where('id', $o->decisor_contacto_id)->value('nombres');
+            $hechas = [[2, 'llamada', "Primera llamada con {$decisor}", 'Confirmó el interés y pidió una visita.']];
+
+            if ($o->estado->codigo !== 'prospecto') {
+                $hechas[] = [9, 'visita', 'Visita para revisar el alcance', 'Revisamos el alcance en sitio; piden detalle de plazos y garantía.'];
+            }
+
+            if (in_array($o->estado->codigo, ['propuesta_enviada', 'negociacion'], true)) {
+                $hechas[] = [14, 'correo', 'Envío de la propuesta', 'Propuesta enviada con la cotización emitida.'];
+            }
+
+            foreach ($hechas as [$d, $tipo, $asunto, $resultado]) {
+                $fecha = $creada->addDays($d)->setTime(10, 30);
+
+                if ($fecha->lt($hoy)) {
+                    Actividad::query()->create(['tipo' => $tipo, 'cuenta_id' => $o->cuenta_id, 'oportunidad_id' => $o->id, 'asunto' => $asunto, 'fecha' => $fecha,
+                        'resultado' => $resultado, 'es_realizada' => true, 'responsable_user_id' => $this->dev->id]);
+                }
+            }
+
+            $d = $dias[$i % count($dias)];
+
+            if ($d !== null) {
+                [$tipo, $asunto] = $pendiente[$o->estado->codigo];
+                [$h, $m] = explode(':', $horas[$i % count($horas)]);
+                Actividad::query()->create(['tipo' => $tipo, 'cuenta_id' => $o->cuenta_id, 'oportunidad_id' => $o->id, 'asunto' => $asunto,
+                    'fecha' => $hoy->addDays($d)->setTime((int) $h, (int) $m), 'es_realizada' => false, 'responsable_user_id' => $this->dev->id]);
+            }
+        }
+
+        foreach (Oportunidad::query()->whereHas('estado', fn ($q) => $q->where('codigo', 'ganada'))->get() as $o) {
+            Actividad::query()->create(['tipo' => 'reunion', 'cuenta_id' => $o->cuenta_id, 'oportunidad_id' => $o->id, 'asunto' => 'Reunión de inicio con el cliente',
+                'fecha' => CarbonImmutable::parse($o->fecha_cierre_real->toDateString(), 'America/Lima')->addDays(6)->setTime(11, 0),
+                'resultado' => 'Presentamos al jefe de proyecto y acordamos el cronograma.', 'es_realizada' => true, 'responsable_user_id' => $this->dev->id]);
         }
     }
 }

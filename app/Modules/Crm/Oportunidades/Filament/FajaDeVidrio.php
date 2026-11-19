@@ -13,6 +13,7 @@ use App\Modules\Crm\Oportunidades\Services\FilaFaja;
 use App\Modules\Crm\Oportunidades\Services\LimiteCajasFaja;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
+use App\Modules\Crm\Oportunidades\Services\ProximaAccionDeOportunidades;
 use App\Modules\Crm\Oportunidades\Services\TotalLugarFaja;
 use App\Modules\Nucleo\Models\Moneda;
 use App\Modules\Nucleo\Navegacion\ColoresMarca;
@@ -132,7 +133,7 @@ final class FajaDeVidrio
      */
     public static function conProximaAccion(): bool
     {
-        return false;
+        return app(ProximaAccionDeOportunidades::class)->existe();
     }
 
     /**
@@ -278,6 +279,6 @@ final class FajaDeVidrio
      */
     private static function avisoDeProximaAccion(FilaFaja $fila): bool
     {
-        return self::conProximaAccion() && $fila->proximaAccion === null;
+        return self::conProximaAccion() && ($fila->proximaAccion === null || str_starts_with($fila->proximaAccion, 'Vencida'));
     }
 }

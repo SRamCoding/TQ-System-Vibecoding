@@ -123,6 +123,7 @@ final class OportunidadesServiceProvider extends ServiceProvider
         // C3 ampliada (D1): Contratos registra la real; mientras, «no hay contrato».
         $this->app->bindIf(ContratosDeOportunidad::class, ContratosSinModulo::class);
         $this->app->bindIf(Services\ProyectoAlGanar::class, Services\SinProyectoAlGanar::class);
+        $this->app->bindIf(Services\ProximaAccionDeOportunidades::class, Services\SinProximaAccion::class);
         $this->app->singleton(Services\PedidoGanar::class);
         // Plan 2.22, D12: Cotizaciones registra la real; mientras, «no hay aceptada».
         $this->app->bindIf(CotizacionDeOportunidad::class, CotizacionesSinModulo::class);

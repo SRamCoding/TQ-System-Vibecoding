@@ -706,8 +706,10 @@ final readonly class OportunidadesService
         $motivos = $perdidas === [] ? [] : $this->motivosDePerdida($perdidas);
         $ganadores = $perdidas === [] ? [] : $this->ganadoresDe($perdidas);
         $portada = app(PortadaOportunidades::class);
+        // MVP rápido (t1-agenda): la próxima acción, de Actividades.
+        $proximas = app(ProximaAccionDeOportunidades::class)->deLote($oportunidades->pluck('id')->all());
 
-        return $oportunidades->map(function (Oportunidad $o) use ($cuentas, $contratos, $motivos, $ganadores, $tasas, $portada): FilaFaja {
+        return $oportunidades->map(function (Oportunidad $o) use ($cuentas, $contratos, $motivos, $ganadores, $tasas, $portada, $proximas): FilaFaja {
             $dias = $portada->diasEnEtapa($o);
             $etapa = EtapaAbierta::tryFrom($o->estado->codigo);
             $maximo = $etapa === null ? 0 : $portada->diasMaximos($etapa);
@@ -727,7 +729,7 @@ final readonly class OportunidadesService
                 ejecutivo: $o->ejecutivo->name,
                 diasEnEtapa: $dias,
                 atascada: $maximo > 0 && $dias > $maximo,
-                proximaAccion: null,
+                proximaAccion: isset($proximas[$o->id]) ? ($proximas[$o->id]['vencida'] ? 'Vencida · ' : '').$proximas[$o->id]['texto'] : null,
                 cierreEstimado: $o->fecha_cierre_estimada,
                 version: $o->version,
                 fechaCierre: $o->fecha_cierre_real,
