@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders\Demo;
 
 use App\Modules\Crm\Actividades\Models\Actividad;
+use App\Modules\Crm\Campanias\Models\Campania;
+use App\Modules\Crm\Campanias\Models\Lead;
+use App\Modules\Crm\Campanias\Services\LeadsService;
 use App\Modules\Crm\Catalogo\Models\FamiliaProducto;
 use App\Modules\Crm\Catalogo\Services\PreciosCatalogoService;
 use App\Modules\Crm\Cotizaciones\Enums\TipoRespaldo;
@@ -110,6 +113,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: catálogo');
             $this->en('2026-06-01', fn () => $this->catalogo());
+
+            $this->command?->info('Demo: campañas y leads');
+            $this->en('2026-11-19', fn () => $this->campanias());
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -608,6 +614,58 @@ final class DemoSeeder extends Seeder
 
             if (! $activo) {
                 $precios->descontinuar($p->id, true);
+            }
+        }
+    }
+
+    /** Campañas y leads de la demo (ficha t1-campanias). */
+    private function campanias(): void
+    {
+        $origen = fn (string $c): int => (int) DB::table('origenes_comerciales')->where('codigo', $c)->value('id');
+        $feria = Campania::query()->create(['nombre' => 'Feria Tecnológica del Norte 2026', 'tipo' => 'feria', 'desde' => '2026-09-24', 'hasta' => '2026-09-26', 'presupuesto' => '8500.00',
+            'objetivo' => 'Mostrar videovigilancia con analítica a municipios y empresas agroindustriales; meta: 20 contactos y 4 oportunidades.', 'es_activa' => false]);
+        $web = Campania::query()->create(['nombre' => 'Formulario de contacto del sitio web', 'tipo' => 'web', 'desde' => '2026-01-01', 'presupuesto' => null, 'objetivo' => 'Atender en menos de 3 días a quien escribe por la web.', 'es_activa' => true]);
+        $referidos = Campania::query()->create(['nombre' => 'Referidos de clientes 2026', 'tipo' => 'referidos', 'desde' => '2026-03-01', 'hasta' => '2026-12-31', 'presupuesto' => '3000.00',
+            'objetivo' => 'Que los clientes actuales nos presenten a otros; un vale por cada oportunidad calificada.', 'es_activa' => true]);
+        $mirador = DB::table('cuentas')->join('parties', 'parties.id', '=', 'cuentas.party_id')->where('parties.razon_social', 'Hotel Mirador del Valle S.A.C.')->value('parties.numero_documento');
+        $ganadaClinica = Oportunidad::query()->where('nombre', 'Mantenimiento de la red de datos 2027')->first();
+        $ahora = CarbonImmutable::parse('2026-11-19 10:00', 'America/Lima');
+
+        // [campaña, origen, nombre, cargo, organización, ruc, correo, mensaje, días atrás, estado, motivo]
+        $leads = [
+            [$feria, 'FERIA', 'Pedro Mendoza', 'Jefe del Área de Obras', 'Municipalidad Distrital de La Pampa Alta', null, 'pmendoza@pampaalta-demo.test', 'Quiere cámaras con analítica para el mercado y la plaza.', 54, 'contactado', null],
+            [$feria, 'FERIA', 'Ana Salazar', 'Administradora', 'Clínica San Rafael del Norte S.A.C.', null, 'asalazar@csr-demo.test', 'CCTV para dos sedes y control de acceso.', 54, 'nuevo', null],
+            [$feria, 'FERIA', 'Jorge Llontop', 'Gerente de Planta', 'Agroexportadora Valle Fértil S.A.C.', null, 'jllontop@vallefertil-demo.test', 'Monitoreo de cámaras frigoríficas y perímetro.', 55, 'convertido', null],
+            [$feria, 'FERIA', 'María Cáceres', 'Estudiante', null, null, 'mcaceres@correo-demo.test', 'Pidió información para una tesis.', 55, 'descartado', 'Solo pedía información'],
+            [$feria, 'FERIA', 'Luis Bances', 'Subgerente de Logística', 'Hotel Mirador del Valle S.A.C.', $mirador, 'lbances@mirador-demo.test', 'Ampliar el wifi a la zona de piscina.', 53, 'contactado', null],
+            [$web, 'SITIO_WEB', 'Rocío Paredes', 'Dueña', 'Minimarket Doña Rocío', null, 'rparedes@correo-demo.test', 'Cuatro cámaras para su tienda.', 20, 'descartado', 'No es mercado para Techquk'],
+            [$web, 'SITIO_WEB', 'Fernando Ríos', 'Gerente General', 'Clínica del Norte S.A.C.', null, 'frios@clinicanorte-demo.test', 'Renovar el contrato de mantenimiento de la red.', 50, 'convertido', null],
+            [$web, 'SITIO_WEB', 'Hugo Tello', 'Jefe de Sistemas', 'Colegio Los Andes del Norte S.A.C.', null, 'htello@andes-demo.test', 'Cotizar switches para un pabellón nuevo.', 6, 'nuevo', null],
+            [$web, 'SITIO_WEB', 'Karina Vela', 'Coordinadora', 'Instituto Superior Tecnológico Valle Norte', null, 'kvela@istvn-demo.test', 'Laboratorio de redes para la carrera de computación.', 2, 'nuevo', null],
+            [$referidos, 'REFERENCIA', 'Óscar Zapata', 'Director de Operaciones', 'Proyecto Especial Hidráulico Valle Norte', null, 'ozapata@pehvn-demo.test', 'Referido por Agrícola Pampa Verde: telemetría de canales.', 70, 'convertido', null],
+            [$referidos, 'REFERENCIA', 'Daniela Ruiz', 'Gerente de Finanzas', 'Transportes Costa Azul S.A.C.', null, 'druiz@costaazul-demo.test', 'Referida por Transportes Ruta Andina: GPS para su flota.', 9, 'nuevo', null],
+            [$referidos, 'REFERENCIA', 'Raúl Sandoval', 'Administrador', 'Condominio Los Pinos', null, 'rsandoval@lospinos-demo.test', 'Videoportero para 40 departamentos.', 15, 'contactado', null],
+        ];
+
+        foreach ($leads as [$campania, $o, $nombre, $cargo, $organizacion, $ruc, $correo, $mensaje, $dias, $estado, $motivo]) {
+            $llego = $ahora->subDays($dias);
+            $lead = Lead::query()->create(['campania_id' => $campania->id, 'origen_comercial_id' => $origen($o), 'nombre_contacto' => $nombre, 'cargo' => $cargo, 'organizacion' => $organizacion,
+                'ruc' => $ruc, 'email' => $correo, 'telefono' => '9'.str_pad((string) (40000000 + $dias * 1371), 8, '0', STR_PAD_LEFT), 'mensaje' => $mensaje, 'estado' => $estado === 'convertido' ? 'contactado' : $estado,
+                'motivo_descarte' => $motivo, 'asignado_user_id' => $estado === 'nuevo' ? null : $this->dev->id, 'atendido_at' => $estado === 'nuevo' ? null : $llego->addDays(1)]);
+            $lead->forceFill(['created_at' => $llego])->save();
+
+            if ($estado === 'convertido') {
+                $op = match ($nombre) {
+                    'Fernando Ríos' => $ganadaClinica,
+                    'Óscar Zapata' => Oportunidad::query()->where('nombre', 'Telemetría de canales de riego')->first(),
+                    default => null,
+                };
+
+                if ($op === null) {
+                    $op = Oportunidad::query()->findOrFail(app(LeadsService::class)->convertir($lead->id, null, '20699400018', 'Monitoreo de cámaras frigoríficas y perímetro', '145000', (int) DB::table('lineas_solucion')->where('codigo', 'VIDEOVIGILANCIA')->value('id'), $ahora->addDays(45), $this->dev)->oportunidad_id);
+                } else {
+                    $lead->update(['estado' => 'convertido', 'cuenta_id' => $op->cuenta_id, 'oportunidad_id' => $op->id]);
+                }
             }
         }
     }

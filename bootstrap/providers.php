@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Crm\Actividades\ActividadesServiceProvider;
+use App\Modules\Crm\Campanias\CampaniasServiceProvider;
 use App\Modules\Crm\Catalogo\CatalogoServiceProvider;
 use App\Modules\Crm\Cotizaciones\CotizacionesServiceProvider;
 use App\Modules\Crm\Cuentas\CuentasServiceProvider;
@@ -25,5 +26,6 @@ return [
     OportunidadesServiceProvider::class,
     CotizacionesServiceProvider::class,
     LicitacionesServiceProvider::class,
+    CampaniasServiceProvider::class,
     AppPanelProvider::class,
 ];
