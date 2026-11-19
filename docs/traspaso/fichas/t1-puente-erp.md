@@ -1,9 +1,9 @@
 # Ficha · Puente al ERP: ganar, proyecto y ofertado contra presupuesto
 
-- **Estado:** en curso
+- **Estado:** aprobada (MV-009)
 - **Versión:** v1
 - **Tramo de la ruta:** T1
-- **Aprobada:** —
+- **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-puente-erp-v1` (código del commit `e02abf7`)
 - **Fuentes del diseño:** ADR 0023 del repo original (numeración por dueño, copia al ganar);
   `docs/planes/activos/2026-11-16-presupuesto-copia-al-ganar.md` (plan 2.12, D1 a D5); `docs/vibe/ruta-mvp.md` (tramo 1).
 
@@ -22,6 +22,7 @@ movió el margen. Los costeos, cotizaciones y presupuestos se numeran por su due
   no se gana. Confirma el ADR 0023 del repo original.
 - **MV-007** (cruza módulos) · Numeración por dueño desde ahora: «OP-2026-0007 · COT-01 v1», «OP-2026-0007 · PRE-01
   v1», «PRY-2026-0013 · PRE-01 v1»; sin dueño, «PRE-2026-0031 v1». Confirma el ADR 0023.
+- **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 - **MV-008** (ficha) · La comparación va en su propia pestaña «Ofertado vs. presupuesto» de la ficha del proyecto, y el
   tablero muestra la diferencia total y lleva a esa pestaña.
 

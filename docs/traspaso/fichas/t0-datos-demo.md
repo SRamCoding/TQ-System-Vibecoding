@@ -1,8 +1,9 @@
 # Ficha · Datos de demostración
 
-- **Estado:** en curso (v2, por cambios del puente al ERP)
+- **Estado:** aprobada (MV-009)
 - **Versión:** v2
 - **Tramo de la ruta:** T0
+- **Aprobada (v2):** 2026-11-19 · etiqueta `aprobado/t0-datos-demo-v2` (código del commit `e02abf7`)
 - **Aprobada (v1):** 2026-11-19 · commit `ae8839a` (código; la etiqueta va en el commit de la aprobación, sin cambios de código) · etiqueta `aprobado/t0-datos-demo-v1`
 - **Fuentes del diseño:** `docs/vibe/ruta-mvp.md` (tramo 0); plan viejo
   `docs/planes/activos/2026-11-16-datos-desarrollo-cartera.md` (la cartera de nueve proyectos y su recorrido).

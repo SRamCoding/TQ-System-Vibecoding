@@ -118,3 +118,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «T1: puente al ERP»
+
+### MV-009 · 2026-11-19 · Hasta terminar el sistema, cada ficha se da por aprobada
+
+- **Ficha:** general
+- **Dijo Sebastián:** «al final que termines con todo el sistema allí empezaremos a hacer cambios, por ahora asume que
+  sí me gusta».
+- **Decisión:** el agente construye la ruta completa sin detenerse a pedir aprobación: cada ficha pasa a «aprobada»
+  con su etiqueta al terminarla. Lo que normalmente se preguntaría se resuelve con la opción recomendada y queda en
+  «Supuestos sin confirmar» de su ficha. Los cambios de Sebastián llegan al final, con fichas en versión nueva.
+- **Alcance:** ficha (forma de trabajo de este repositorio; no es una decisión del producto)
+- **Estado:** vigente
+- **Commit:** el de «Fichas t0-datos-demo v2 y t1-puente-erp aprobadas»
