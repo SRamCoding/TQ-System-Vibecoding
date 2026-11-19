@@ -239,4 +239,54 @@ final class CarteraDemo
             ['nombre' => 'Pantallas informativas del terminal', 'cuenta' => 'ruta_andina', 'linea' => 'REDES', 'monto' => '58000.00', 'creada' => '2026-06-20', 'cierre' => '2026-09-15', 'etapa' => 'perdida', 'perdida' => ['no_respondio', 'Tres seguimientos sin respuesta']],
         ];
     }
+
+    /** Competidores inventados: [razón social, base de RUC]. */
+    public static function competidores(): array
+    {
+        return [
+            'seguridad_norte' => ['Seguridad Norte S.A.C.', '2069930001'],
+            'andes_tech' => ['Andes Tech E.I.R.L.', '2069930002'],
+            'redes_pacifico' => ['Conectividad del Pacífico S.A.C.', '2069930003'],
+            'sistemas_salud' => ['Sistemas Integrados de Salud S.A.C.', '2069930004'],
+        ];
+    }
+
+    /**
+     * Las licitaciones de la demo (ficha t1-licitaciones). Participantes: [competidor o 'techquk', oferta, puntaje,
+     * puesto]. Documentos: [nombre, listo]; 'ia' => true deja la lista sugerida por confirmar.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function licitaciones(): array
+    {
+        return [
+            ['cuenta' => 'mpvn', 'nomenclatura' => 'LP-SM-3-2024-MPVN-1', 'tipo' => 'LP', 'linea' => 'VIDEOVIGILANCIA', 'vr' => '2650000.00', 'convocada' => '2023-12-04', 'estado' => 'buena_pro', 'oportunidad' => 'Videovigilancia y centro de monitoreo de Valle Norte',
+                'participantes' => [['techquk', '2504985.40', '96.40', 1], ['seguridad_norte', '2598000.00', '91.20', 2], ['andes_tech', '2640000.00', '88.75', 3]]],
+            ['cuenta' => 'ugel', 'nomenclatura' => 'AS-SM-8-2024-UGEL.VN-1', 'tipo' => 'AS', 'linea' => 'REDES', 'vr' => '228000.00', 'convocada' => '2024-04-08', 'estado' => 'buena_pro', 'oportunidad' => 'Cableado estructurado de la I.E. N.° 10245 Los Algarrobos',
+                'participantes' => [['techquk', '212132.14', '95.10', 1], ['redes_pacifico', '219900.00', '92.30', 2]]],
+            ['cuenta' => 'laureles', 'nomenclatura' => 'SIE-5-2024-MDLL-1', 'tipo' => 'SIE', 'linea' => 'REDES', 'vr' => '152000.00', 'convocada' => '2024-07-22', 'estado' => 'buena_pro', 'oportunidad' => 'Suministro de 60 computadoras para la Municipalidad de Los Laureles',
+                'participantes' => [['techquk', '139585.39', null, 1], ['andes_tech', '141200.00', null, 2], ['redes_pacifico', '146750.00', null, 3]]],
+            ['cuenta' => 'hospital', 'nomenclatura' => 'CP-SM-2-2025-HRVN-1', 'tipo' => 'CP', 'linea' => 'SOFTWARE', 'vr' => '3350000.00', 'convocada' => '2025-07-07', 'estado' => 'buena_pro', 'oportunidad' => 'Sistema de información hospitalaria, software y servidor del Hospital Regional de Valle Norte',
+                'participantes' => [['techquk', '3181593.74', '93.80', 1], ['sistemas_salud', '3289000.00', '90.15', 2]]],
+            ['cuenta' => 'gore', 'nomenclatura' => 'LP-SM-4-2026-GRVN-1', 'tipo' => 'LP', 'linea' => 'REDES', 'vr' => '1240000.00', 'convocada' => '2026-03-30', 'estado' => 'buena_pro', 'oportunidad' => 'Red de datos y enlaces de la sede del Gobierno Regional de Valle Norte',
+                'participantes' => [['techquk', '1180755.20', '97.05', 1], ['redes_pacifico', '1198000.00', '94.60', 2], ['andes_tech', '1231500.00', '90.10', 3]]],
+            ['cuenta' => 'hospital', 'nomenclatura' => 'LP-SM-6-2026-HRVN-1', 'tipo' => 'LP', 'linea' => 'SOFTWARE', 'vr' => '1890000.00', 'convocada' => '2026-09-14', 'estado' => 'buena_pro', 'oportunidad' => 'Historia clínica electrónica, servidores y equipamiento del Hospital Regional de Valle Norte',
+                'participantes' => [['techquk', '1799418.08', '95.90', 1], ['sistemas_salud', '1846000.00', '93.40', 2]]],
+            ['cuenta' => 'mpvn', 'nomenclatura' => 'AS-SM-21-2025-MPVN-1', 'tipo' => 'AS', 'linea' => 'VIDEOVIGILANCIA', 'objeto' => 'Semaforización inteligente de las avenidas del centro de Valle Norte', 'vr' => '480000.00', 'convocada' => '2025-05-12', 'estado' => 'perdida',
+                'participantes' => [['seguridad_norte', '368000.00', '98.10', 1], ['techquk', '412000.00', '91.70', 2], ['andes_tech', '441000.00', '86.20', 3]]],
+            ['cuenta' => 'mpvn', 'nomenclatura' => 'AS-SM-9-2026-MPVN-1', 'tipo' => 'AS', 'linea' => 'VIDEOVIGILANCIA', 'objeto' => 'Cámaras de lectura de placas en los accesos a la ciudad', 'vr' => '310000.00', 'convocada' => '2026-04-20', 'estado' => 'perdida',
+                'participantes' => [['seguridad_norte', '285200.00', '96.80', 1], ['techquk', '289900.00', '95.90', 2]]],
+            ['cuenta' => 'laureles', 'nomenclatura' => 'AS-SM-11-2026-MDLL-1', 'tipo' => 'AS', 'linea' => 'VIDEOVIGILANCIA', 'vr' => '92000.00', 'convocada' => '2026-08-17', 'estado' => 'perdida', 'oportunidad' => 'Cámaras corporales para serenazgo',
+                'participantes' => [['seguridad_norte', '70520.00', '98.40', 1], ['techquk', '86000.00', '90.20', 2]]],
+            ['cuenta' => 'mpvn', 'nomenclatura' => 'AS-SM-14-2026-MPVN-1', 'tipo' => 'AS', 'linea' => 'VIDEOVIGILANCIA', 'vr' => '380000.00', 'convocada' => '2026-10-29', 'estado' => 'en_preparacion', 'oportunidad' => 'Ampliación del centro de monitoreo de Valle Norte',
+                'documentos' => [['Bases integradas', true], ['Ficha técnica de los equipos ofertados', true], ['Carta fianza de seriedad de oferta', false], ['Certificados y experiencia del personal clave', false], ['Declaración jurada de datos del postor', true]],
+                'consultas' => [['¿Se acepta cámara PTZ con zoom óptico de 30x en lugar de 25x?', 'Sí, se acepta como mejora técnica.'], ['¿El plazo de ejecución incluye la capacitación?', null]]],
+            ['cuenta' => 'pehvn', 'nomenclatura' => 'CP-SM-3-2026-PEHVN-1', 'tipo' => 'CP', 'linea' => 'SOFTWARE', 'vr' => '690000.00', 'convocada' => '2026-11-09', 'estado' => 'en_preparacion', 'oportunidad' => 'Telemetría de canales de riego', 'ia' => true],
+            ['cuenta' => 'gore', 'nomenclatura' => 'LP-SM-9-2026-GRVN-1', 'tipo' => 'LP', 'linea' => 'REDES', 'vr' => '1380000.00', 'convocada' => '2026-09-21', 'estado' => 'presentada', 'oportunidad' => 'Red de fibra óptica entre sedes regionales', 'ofertado' => '1260000.00'],
+            ['cuenta' => 'minera', 'nomenclatura' => 'CONV-SEG-2026-014', 'tipo' => 'PRIVADA', 'linea' => 'VIDEOVIGILANCIA', 'vr' => null, 'convocada' => '2026-09-28', 'estado' => 'presentada', 'oportunidad' => 'CCTV perimetral de la planta concentradora', 'ofertado' => '512000.00'],
+            ['cuenta' => 'ugel', 'nomenclatura' => 'AS-SM-17-2026-UGEL.VN-1', 'tipo' => 'AS', 'linea' => 'REDES', 'objeto' => 'Equipamiento de las aulas de innovación de doce instituciones educativas', 'vr' => '310000.00', 'convocada' => '2026-11-16', 'estado' => 'registrada'],
+            ['cuenta' => 'pampa_alta', 'nomenclatura' => 'AS-SM-4-2026-MDLPA-1', 'tipo' => 'AS', 'linea' => 'VIDEOVIGILANCIA', 'objeto' => 'Mantenimiento de las cámaras del serenazgo por 24 meses', 'vr' => '74000.00', 'convocada' => '2026-10-19', 'estado' => 'no_participa',
+                'motivo' => 'Piden experiencia mínima de S/ 300,000 en mantenimiento de CCTV con entidades públicas; no llegamos.'],
+        ];
+    }
 }

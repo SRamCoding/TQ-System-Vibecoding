@@ -12,6 +12,10 @@ use App\Modules\Crm\Cotizaciones\Services\DatosCotizacion;
 use App\Modules\Crm\Cotizaciones\Services\DatosLinea;
 use App\Modules\Crm\Cuentas\Services\CuentasService;
 use App\Modules\Crm\Cuentas\Services\DatosCuenta;
+use App\Modules\Crm\Licitaciones\Enums\EstadoLicitacion;
+use App\Modules\Crm\Licitaciones\Enums\TipoProcedimiento;
+use App\Modules\Crm\Licitaciones\Models\Licitacion;
+use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
 use App\Modules\Crm\Oportunidades\Enums\GanadorConocido;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
 use App\Modules\Crm\Oportunidades\Services\DatosDelProyectoAlGanar;
@@ -29,6 +33,7 @@ use App\Modules\Erp\Presupuestos\Services\GastosDemoService;
 use App\Modules\Erp\Proyectos\Models\Proyecto;
 use App\Modules\Erp\Proyectos\Services\ProyectosService;
 use App\Modules\Nucleo\Aprobaciones\DatosRegla;
+use App\Modules\Nucleo\Enums\Catalogo;
 use App\Modules\Nucleo\Enums\CondicionRegla;
 use App\Modules\Nucleo\Enums\OrigenTipoCambio;
 use App\Modules\Nucleo\Enums\TipoUnidadOrganizativa;
@@ -37,10 +42,12 @@ use App\Modules\Nucleo\Models\Party;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Organigrama\DatosUnidad;
 use App\Modules\Nucleo\Parties\DatosContacto;
+use App\Modules\Nucleo\Parties\DatosParty;
 use App\Modules\Nucleo\Parties\DocumentoIdentidad;
 use App\Modules\Nucleo\Services\AprobacionesService;
 use App\Modules\Nucleo\Services\ContactosPartyService;
 use App\Modules\Nucleo\Services\OrganigramaService;
+use App\Modules\Nucleo\Services\PartiesService;
 use App\Modules\Nucleo\Services\SeguridadService;
 use App\Modules\Nucleo\Services\TipoCambioService;
 use App\Modules\Nucleo\Services\TransicionesService;
@@ -94,6 +101,9 @@ final class DemoSeeder extends Seeder
                 $this->command?->info("Demo: oportunidad · {$o['nombre']}");
                 $this->oportunidadAbierta($o);
             }
+
+            $this->command?->info('Demo: licitaciones');
+            $this->licitaciones();
         } finally {
             Carbon::setTestNow();
             CarbonImmutable::setTestNow();
@@ -428,5 +438,77 @@ final class DemoSeeder extends Seeder
     private static function sinTildes(string $texto): string
     {
         return strtr($texto, ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u', 'ñ' => 'n', 'ü' => 'u']);
+    }
+
+    /** Las licitaciones de la demo (ficha t1-licitaciones), enlazadas a la cartera y al embudo. */
+    private function licitaciones(): void
+    {
+        $competidores = [];
+
+        foreach (CarteraDemo::competidores() as $clave => [$razon, $base]) {
+            $competidores[$clave] = $this->en('2023-11-01', fn (): int => app(PartiesService::class)->registrar(
+                new DatosParty(Catalogo::RUC, $base.DocumentoIdentidad::digitoVerificadorRuc($base), razonSocial: $razon), [OportunidadesService::ROL_COMPETIDOR],
+            )->id);
+        }
+
+        $servicio = app(LicitacionesService::class);
+        $offsets = [0, 6, 11, 14, 19, 26];
+
+        foreach (CarteraDemo::licitaciones() as $d) {
+            $convocada = CarbonImmutable::parse($d['convocada']);
+            $oportunidad = isset($d['oportunidad']) ? Oportunidad::query()->where('nombre', $d['oportunidad'])->firstOrFail() : null;
+            $resultado = $oportunidad?->fecha_cierre_real !== null ? CarbonImmutable::parse($oportunidad->fecha_cierre_real->toDateString()) : $convocada->addDays(26);
+            $fechas = array_map(fn (int $dias): CarbonImmutable => $convocada->addDays($dias), $offsets);
+            $fechas[5] = $resultado->max($fechas[4]->addDay());
+            $cronograma = array_map(fn (string $etapa, CarbonImmutable $f): array => [$etapa, $f->toDateString()], LicitacionesService::ETAPAS, $fechas);
+            $cuenta = $this->cuenta($d['cuenta']);
+
+            $l = $this->en($convocada, fn (): Licitacion => $servicio->registrar(
+                $cuenta['cuenta'], $d['nomenclatura'], TipoProcedimiento::from($d['tipo']), $d['objeto'] ?? $d['nombre'] ?? (string) $oportunidad?->nombre,
+                (int) DB::table('lineas_solucion')->where('codigo', $d['linea'])->value('id'), $d['vr'], $convocada, null, $cronograma, $this->dev,
+            ));
+
+            $estado = EstadoLicitacion::from($d['estado']);
+            $cerrada = in_array($estado, [EstadoLicitacion::BuenaPro, EstadoLicitacion::Perdida, EstadoLicitacion::Desierta], true);
+            $nuestra = collect($d['participantes'] ?? [])->first(fn (array $p): bool => $p[0] === 'techquk');
+            $l->update([
+                'estado' => $estado,
+                'oportunidad_id' => $oportunidad?->id,
+                'motivo_no_participa' => $d['motivo'] ?? null,
+                'monto_ofertado' => $nuestra[1] ?? $d['ofertado'] ?? null,
+                'fecha_presentacion' => in_array($estado, [EstadoLicitacion::Presentada], true) || $cerrada ? $fechas[4]->toDateString() : null,
+                'fecha_resultado' => $cerrada ? $fechas[5]->toDateString() : null,
+            ]);
+
+            $hoy = CarbonImmutable::parse('2026-11-19');
+            $l->hitos()->get()->each(fn ($h) => $h->update(['es_cumplido' => $cerrada || $h->fecha->lte($hoy)]));
+
+            if (in_array($estado, [EstadoLicitacion::Presentada, EstadoLicitacion::BuenaPro, EstadoLicitacion::Perdida], true)) {
+                foreach (LicitacionesService::EXPEDIENTE_SUGERIDO as $i => $nombre) {
+                    $l->documentos()->create(['nombre' => $nombre, 'origen' => 'ia', 'es_confirmado' => true, 'es_listo' => true, 'orden' => $i + 1]);
+                }
+            }
+
+            foreach ($d['documentos'] ?? [] as $i => [$nombre, $listo]) {
+                $l->documentos()->create(['nombre' => $nombre, 'origen' => 'manual', 'es_confirmado' => true, 'es_listo' => $listo, 'orden' => $i + 1,
+                    'nota' => $listo ? null : 'Falta', 'vence' => str_contains($nombre, 'Certificados') ? '2026-12-20' : null]);
+            }
+
+            if ($d['ia'] ?? false) {
+                $servicio->sugerirExpediente($l);
+            }
+
+            foreach ($d['consultas'] ?? [] as $i => [$pregunta, $respuesta]) {
+                $l->consultas()->create(['pregunta' => $pregunta, 'respuesta' => $respuesta, 'fecha' => $fechas[1]->toDateString()]);
+            }
+
+            foreach ($d['participantes'] ?? [] as [$quien, $oferta, $puntaje, $puesto]) {
+                $l->participantes()->create([
+                    'nombre' => $quien === 'techquk' ? 'Techquk S.A.C.' : CarteraDemo::competidores()[$quien][0],
+                    'party_id' => $quien === 'techquk' ? null : $competidores[$quien],
+                    'es_techquk' => $quien === 'techquk', 'oferta' => $oferta, 'puntaje' => $puntaje, 'puesto' => $puesto, 'es_ganador' => $puesto === 1,
+                ]);
+            }
+        }
     }
 }

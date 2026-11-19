@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Modules\Crm\Catalogo\CatalogoServiceProvider;
 use App\Modules\Crm\Cotizaciones\CotizacionesServiceProvider;
 use App\Modules\Crm\Cuentas\CuentasServiceProvider;
+use App\Modules\Crm\Licitaciones\LicitacionesServiceProvider;
 use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
 use App\Modules\Erp\Presupuestos\PresupuestosServiceProvider;
 use App\Modules\Erp\Proyectos\ProyectosServiceProvider;
@@ -21,5 +22,6 @@ return [
     CuentasServiceProvider::class,
     OportunidadesServiceProvider::class,
     CotizacionesServiceProvider::class,
+    LicitacionesServiceProvider::class,
     AppPanelProvider::class,
 ];
