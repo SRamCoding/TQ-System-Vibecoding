@@ -23,7 +23,7 @@ cp .env.example .env && php artisan key:generate
 # en .env, opcional: DEV_USER_NOMBRES, DEV_USER_APELLIDOS, DEV_USER_EMAIL (tu usuario de desarrollo)
 php artisan migrate --seed
 npm install && npm run build
-php artisan serve --port=8001              # http://localhost:8001 · clave del usuario de desarrollo: password
+php artisan serve --port=8001              # http://localhost:8001 · usuario dev@techquk.test (o el de tu .env), clave Clave-de-prueba1
 ```
 
 ## Traer los datos que ya tienes en la app original (opcional)
