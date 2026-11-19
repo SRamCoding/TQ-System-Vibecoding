@@ -130,3 +130,25 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (forma de trabajo de este repositorio; no es una decisión del producto)
 - **Estado:** vigente
 - **Commit:** el de «Fichas t0-datos-demo v2 y t1-puente-erp aprobadas»
+
+### MV-010 · 2026-11-19 · El modo «Sistema» sigue el cielo de la sede
+
+- **Ficha:** `fichas/transicion-cielo.md` (se abre al construirla)
+- **Dijo Sebastián:** «en modo sistema quiero que exista una transición pues viendo el clima de la ubicación y también
+  el transicionamiento de día a noche»; para la ubicación eligió «sede» (en vez de la del navegador).
+- **Decisión:** en el modo de apariencia «Sistema», la pantalla deja de copiar al sistema operativo y sigue el cielo
+  de la sede de la empresa: claro u oscuro según la salida y puesta del sol de ese lugar y fecha, con una transición
+  gradual al amanecer y al atardecer, y el clima la matiza (nublado o lluvia más apagado y atardecer más temprano).
+  «Claro» y «Oscuro» siguen fijos.
+- **Alcance:** cruza módulos (interfaz del núcleo)
+- **Estado:** vigente
+- **Commit:** se anota al construirla
+
+### MV-011 · 2026-11-19 · La transición del cielo va después del tramo 3
+
+- **Ficha:** general
+- **Dijo Sebastián:** «hazlo después del tramo 3».
+- **Decisión:** el orden sigue: tramo 3 (flujo 2) y, al terminarlo, la transición del cielo (MV-010); después, el tramo 4.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** —
