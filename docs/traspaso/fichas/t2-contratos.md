@@ -1,8 +1,9 @@
 # Ficha · Contratos, garantías, penalidad y adendas (flujo 1)
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Versión:** v2
 - **Tramo de la ruta:** T2
+- **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t2-contratos-v2`
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t2-contratos-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-4-flujo-01.md` (pasos 1 y 2: contrato y carta fianza);
   `parte-8-criterios-aceptacion.md` (F1: penalidad 205.96, tope 2,471.51; carta fianza con comisión);
@@ -109,3 +110,9 @@ monto con IGV, IGV %, firma, inicio, plazo en días, forma de pago, garantía t�
 `ContratosDesdeElErp.php`, `Resumen/TarjetaContrato.php`, `Filament/Resources/Contratos/`); al ganar,
 `Erp/Presupuestos/Services/ProyectoDesdeLaGanada.php`; la comisión, `GastosDemoService::enGastosGenerales()`; datos en
 `DemoSeeder::contratoDe()`.
+
+## Cambios desde la versión anterior
+
+v2 (2026-11-20, por `t3-compras`): la comisión de la carta fianza ya no entra por un gasto de demostración: es una
+orden de servicio de tipo «Garantía financiera», aprobada, conforme y pagada, imputada a la partida de gastos generales
+(OS por 180.00 a PC-04 en el escenario del v4).

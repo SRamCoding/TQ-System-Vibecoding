@@ -5,15 +5,16 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 
 | Ficha | Tramo | Estado | Versión | Etiqueta |
 |---|---|---|---|---|
-| [t0-datos-demo](fichas/t0-datos-demo.md) | T0 | aprobada | v3 | `aprobado/t0-datos-demo-v3` |
+| [t0-datos-demo](fichas/t0-datos-demo.md) | T0 | aprobada | v4 | `aprobado/t0-datos-demo-v4` |
 | [t1-puente-erp](fichas/t1-puente-erp.md) | T1 | aprobada | v2 | `aprobado/t1-puente-erp-v2` |
 | [t1-licitaciones](fichas/t1-licitaciones.md) | T1 | aprobada | v1 | `aprobado/t1-licitaciones-v1` |
 | [t1-agenda](fichas/t1-agenda.md) | T1 | aprobada | v1 | `aprobado/t1-agenda-v1` |
 | [t1-catalogo](fichas/t1-catalogo.md) | T1 | aprobada | v1 | `aprobado/t1-catalogo-v1` |
 | [t1-campanias](fichas/t1-campanias.md) | T1 | aprobada | v1 | `aprobado/t1-campanias-v1` |
-| [t2-contratos](fichas/t2-contratos.md) | T2 | aprobada | v1 | `aprobado/t2-contratos-v1` |
+| [t2-contratos](fichas/t2-contratos.md) | T2 | aprobada | v2 | `aprobado/t2-contratos-v2` |
 | [t2-formula-polinomica](fichas/t2-formula-polinomica.md) | T2 | aprobada | v1 | `aprobado/t2-formula-polinomica-v1` |
 | [t2-presupuesto-empresa](fichas/t2-presupuesto-empresa.md) | T2 | aprobada | v1 | `aprobado/t2-presupuesto-empresa-v1` |
+| [t3-compras](fichas/t3-compras.md) | T3 | aprobada | v1 | `aprobado/t3-compras-v1` |
 
 ## Registro del repositorio
 

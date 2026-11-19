@@ -44,7 +44,7 @@ final class GarantiasRelationManager extends RelationManager
                     })
                     ->color(fn (GarantiaContrato $record): ?string => in_array($record->estado, ['vigente', 'renovada'], true) && (int) $hoy->diffInDays($record->vencimiento, false) <= 30 ? 'danger' : null),
                 TextColumn::make('comision')->label('Costo (comisión)')->alignEnd()->fontFamily('mono')->formatStateUsing(fn ($state): string => ContratoResource::soles($state))
-                    ->description(fn (GarantiaContrato $record): ?string => $record->gasto_id === null ? null : DB::table('gastos_demo')->where('id', $record->gasto_id)->value('numero').' › gastos generales'),
+                    ->description(fn (GarantiaContrato $record): ?string => $record->gasto_id === null ? null : DB::table('ordenes')->where('id', $record->gasto_id)->value('codigo').' › gastos generales'),
                 TextColumn::make('estado')->label('Estado')->badge()->formatStateUsing(fn (string $state): string => ContratosService::ESTADOS_GARANTIA[$state])
                     ->color(fn (string $state): string => match ($state) {
                         'vigente', 'renovada' => 'success', 'solicitada' => 'warning', default => 'gray'

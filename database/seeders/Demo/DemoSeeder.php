@@ -27,8 +27,11 @@ use App\Modules\Crm\Oportunidades\Models\Oportunidad;
 use App\Modules\Crm\Oportunidades\Services\DatosDelProyectoAlGanar;
 use App\Modules\Crm\Oportunidades\Services\DatosOportunidad;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
+use App\Modules\Erp\Compras\Models\Orden;
+use App\Modules\Erp\Compras\Services\ComprasService;
 use App\Modules\Erp\Contratos\Models\Contrato;
 use App\Modules\Erp\Contratos\Services\ContratosService;
+use App\Modules\Erp\Presupuestos\Models\Insumo;
 use App\Modules\Erp\Presupuestos\Models\PartidaControl;
 use App\Modules\Erp\Presupuestos\Models\PartidaDePresupuesto;
 use App\Modules\Erp\Presupuestos\Models\Presupuesto;
@@ -36,9 +39,12 @@ use App\Modules\Erp\Presupuestos\Services\AjustesPropuesta;
 use App\Modules\Erp\Presupuestos\Services\ArbolPartidasService;
 use App\Modules\Erp\Presupuestos\Services\ArmadoPresupuestoService;
 use App\Modules\Erp\Presupuestos\Services\ConsultaArbol;
+use App\Modules\Erp\Presupuestos\Services\DatosInsumo;
+use App\Modules\Erp\Presupuestos\Services\DatosLineaApu;
 use App\Modules\Erp\Presupuestos\Services\DatosPresupuesto;
 use App\Modules\Erp\Presupuestos\Services\FormulaPolinomicaService;
 use App\Modules\Erp\Presupuestos\Services\GastosDemoService;
+use App\Modules\Erp\Presupuestos\Services\InsumosService;
 use App\Modules\Erp\Presupuestos\Services\PresupuestoEmpresaService;
 use App\Modules\Erp\Proyectos\Models\Proyecto;
 use App\Modules\Erp\Proyectos\Services\ProyectosService;
@@ -113,6 +119,12 @@ final class DemoSeeder extends Seeder
                 $this->proyecto($p);
             }
 
+            $this->command?->info('Demo: catálogo');
+            $this->en('2026-06-01', fn () => $this->catalogo());
+
+            $this->command?->info('Demo: Plaza de Armas (escenarios del v4)');
+            $this->plazaDeArmas();
+
             foreach (CarteraDemo::embudo() as $o) {
                 $this->command?->info("Demo: oportunidad · {$o['nombre']}");
                 $this->oportunidadAbierta($o);
@@ -120,9 +132,6 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: licitaciones');
             $this->licitaciones();
-
-            $this->command?->info('Demo: catálogo');
-            $this->en('2026-06-01', fn () => $this->catalogo());
 
             $this->command?->info('Demo: campañas y leads');
             $this->en('2026-11-19', fn () => $this->campanias());
@@ -274,7 +283,7 @@ final class DemoSeeder extends Seeder
             foreach ([[$primero, '0.25', 'Compra'], [bcsub($total, $primero, 2), '0.70', 'Saldo de compra']] as $j => [$monto, $momento, $prefijo]) {
                 $fecha = $inicio->addDays((int) round($dias * (float) $momento));
                 [$ejecutado, $pagado] = $cerrado ? [$monto, $monto] : ($j === 0 ? [$monto, $monto] : [self::r2(bcmul($monto, '0.6', 4)), self::r2(bcmul($monto, '0.3', 4))]);
-                $this->en($fecha, fn () => $servicio->registrar($hoja->id, "{$prefijo}: {$hoja->nombre}", $proveedores[($i + $j) % count($proveedores)], $fecha, $monto, $ejecutado, $pagado));
+                $this->en($fecha, fn () => $this->compraDemo($hoja->id, "{$prefijo}: {$hoja->nombre}", $proveedores[($i + $j) % count($proveedores)], $fecha, $monto, $ejecutado, $pagado));
             }
         }
 
@@ -283,7 +292,7 @@ final class DemoSeeder extends Seeder
         foreach ($p['pc99'] ?? [] as $k => [$motivo, $comentario, $monto]) {
             $fecha = $inicio->addDays((int) round($dias * (0.5 + 0.15 * $k)));
             $motivoId = (int) DB::table('motivos as m')->join('tipos_motivo as t', 't.id', '=', 'm.tipo_motivo_id')->where('t.codigo', 'erp.presupuestos.gasto_no_presupuestado')->where('m.codigo', $motivo)->value('m.id');
-            $this->en($fecha, fn () => $servicio->registrar($pc99->id, $comentario, $proveedores[$k % count($proveedores)], $fecha, $monto, $cerrado ? $monto : self::r2(bcmul($monto, '0.5', 4)), $cerrado ? $monto : '0', $motivoId, $comentario));
+            $this->en($fecha, fn () => $this->compraDemo($pc99->id, $comentario, $proveedores[$k % count($proveedores)], $fecha, $monto, $cerrado ? $monto : self::r2(bcmul($monto, '0.5', 4)), $cerrado ? $monto : '0', $motivoId, $comentario));
         }
     }
 
@@ -834,5 +843,186 @@ final class DemoSeeder extends Seeder
         $desde = (int) DB::table('presupuesto_empresa_lineas')->where('presupuesto_empresa_id', $p)->where('sede_id', $sedes[0])->where('rubro', 'Movilidad y viáticos')->value('id');
         $hacia = (int) DB::table('presupuesto_empresa_lineas')->where('presupuesto_empresa_id', $p)->where('sede_id', $sedes[1])->where('rubro', 'Movilidad y viáticos')->value('id');
         $this->en('2026-11-12', fn () => $s->traspasar($desde, 12, $hacia, 11, '600.00', 'La Oficina Lima tiene más visitas por la cartera del GORE.'));
+    }
+
+    /**
+     * Un costo de la demo por el camino real (ficha t3-compras): orden directa de 100 unidades de su monto ÷ 100,
+     * aprobada (con motivo si excede), recibida en la proporción de lo ejecutado y pagada si todo lo ejecutado se pagó.
+     */
+    private function compraDemo(int $partidaId, string $descripcion, string $proveedor, CarbonImmutable $fecha, string $monto, string $ejecutado, string $pagado, ?int $motivoId = null, ?string $comentario = null): void
+    {
+        $compras = app(ComprasService::class);
+        $proyectoId = (int) DB::table('partidas_control')->where('id', $partidaId)->value('proyecto_id');
+        $esGg = (bool) DB::table('partidas_control')->where('id', $partidaId)->value('es_gastos_generales');
+        $orden = $compras->ordenDirecta($esGg ? 'servicio_puntual' : 'bien_proyecto', null, $proveedor, $proyectoId, '30 días', [[
+            'descripcion' => mb_substr($descripcion, 0, 250), 'unidad_medida_id' => $this->unidad('GLB'), 'cantidad' => '100', 'precio_unitario' => bcdiv($monto, '100', 4),
+            'partida_control_id' => $partidaId, 'motivo_id' => $motivoId, 'comentario' => $comentario,
+        ]], $fecha->addDays(5));
+        $compras->aprobarOrden($orden->id, $compras->excesos($orden->load('lineas')) === [] ? null : 'Ajuste de precio del proveedor.', $this->dev);
+
+        $recibido = bcmul(bcdiv($ejecutado, $monto, 6), '100', 3);
+
+        if (bccomp($recibido, '0', 3) > 0) {
+            $linea = $orden->lineas()->first();
+            $compras->recibir($orden->id, [$linea->id => $recibido], $fecha->addDays(4), 'GR-'.str_pad((string) $orden->id, 6, '0', STR_PAD_LEFT));
+        }
+
+        if (bccomp($pagado, '0', 2) > 0 && bccomp($pagado, $ejecutado, 2) === 0) {
+            $compras->pagar($orden->id);
+        }
+    }
+
+    /**
+     * El proyecto de los escenarios del v4 (flujos 1 y 2, parte 8), con fechas de octubre y noviembre de 2026: presupuesto
+     * con APU (costo directo 17,750.00; total 24,715.10), árbol de 9 partidas (19,525.00), contrato a 30 días (penalidad
+     * 205.96; tope 2,471.51), carta fianza con comisión de 180.00 a PC-04 y las compras: cimentación reservada del stock,
+     * cuadro comparativo del cable y OC de 650 m a 2.40 que excede PC-02.01 en 48.00, recibida 520 m (ejecutado 1,248.00).
+     */
+    private function plazaDeArmas(): void
+    {
+        $nombre = 'Videovigilancia de la Plaza de Armas de Valle Norte';
+        $jefe = $this->jefes['rosa'];
+
+        // Stock inicial del Almacén Central y los proveedores.
+        $compras = app(ComprasService::class);
+        $proveedores = [];
+        $this->en('2026-09-01', function () use ($compras, &$proveedores): void {
+            $kit = app(PreciosCatalogoService::class)->crear(['codigo' => 'CIM-KIT', 'descripcion' => 'Materiales de cimentación para poste (kit)', 'unidad_medida_id' => $this->unidad('NIU'),
+                'familia_producto_id' => (int) DB::table('familias_producto')->where('codigo', 'VV-POS')->value('id')], '160.00', '120.00', '25');
+            $rj = app(PreciosCatalogoService::class)->crear(['codigo' => 'CON-RJ45', 'descripcion' => 'Conector RJ45 Cat 6', 'unidad_medida_id' => $this->unidad('NIU'),
+                'familia_producto_id' => (int) DB::table('familias_producto')->where('codigo', 'RD-CAB')->value('id')], '2.20', '1.50', '30');
+
+            foreach ([[$kit->id, '6', '120.00'], [(int) DB::table('productos')->where('codigo', 'CAM-D4M')->value('id'), '8', '850.00'], [(int) DB::table('productos')->where('codigo', 'SW-24P')->value('id'), '2', '3104.20'],
+                [(int) DB::table('productos')->where('codigo', 'CAB-UTP6')->value('id'), '5', '398.00'], [(int) DB::table('productos')->where('codigo', 'HDD-8T')->value('id'), '12', '720.00']] as [$producto, $cantidad, $costo]) {
+                $compras->ingresoStock($producto, $cantidad, $costo, 'Inventario inicial', CarbonImmutable::parse('2026-09-01'));
+            }
+
+            foreach (['andino' => ['Proveedor Andino S.A.C.', '2069950001'], 'redes_norte' => ['Redes del Norte E.I.R.L.', '2069950002'], 'gruas' => ['Grúas y Montajes del Norte S.A.C.', '2069950003']] as $clave => [$razon, $base]) {
+                $proveedores[$clave] = app(PartiesService::class)->registrar(new DatosParty(Catalogo::RUC, $base.DocumentoIdentidad::digitoVerificadorRuc($base), razonSocial: $razon))->id;
+            }
+        });
+
+        // Flujo comercial y presupuesto con APU (PRE del v4: costo directo 17,750.00).
+        $o = $this->en('2026-09-20', function () use ($nombre): Oportunidad {
+            $o = $this->nuevaOportunidad('mpvn', $nombre, 'VIDEOVIGILANCIA', '24000.00', CarbonImmutable::parse('2026-10-23'), true);
+            $this->avanzar($o, 'calificar');
+
+            return $o->refresh();
+        });
+        $costeo = $this->en('2026-10-01', function () use ($o, $nombre): Presupuesto {
+            $armado = app(ArmadoPresupuestoService::class);
+            $pre = $armado->crear(new DatosPresupuesto($nombre, $this->pen, '10', '8', usaApu: true, oportunidadId: $o->id), $this->dev);
+            $insumo = fn (string $c, string $n, string $t, string $u): int => DB::table('insumos')->where('codigo', $c)->value('id')
+                ?? app(InsumosService::class)->crear(new DatosInsumo($c, $n, $t, $this->unidad($u)))->id;
+            $tec = $insumo('MO-TEC', 'Técnico', Insumo::MANO_OBRA, 'HUR');
+            $ayu = $insumo('MO-AYU', 'Ayudante', Insumo::MANO_OBRA, 'HUR');
+            $hereda = fn (int $i, string $p, string $c = '1'): DatosLineaApu => new DatosLineaApu($i, cuadrilla: $c, precio: $p);
+            $mat = fn (int $i, string $neta, string $p, string $d = '0'): DatosLineaApu => new DatosLineaApu($i, cantidadNeta: $neta, desperdicioPct: $d, precio: $p);
+            $titulos = [];
+
+            foreach (['01' => 'CÁMARAS', '02' => 'CABLEADO Y POSTES', '03' => 'CENTRO DE MONITOREO'] as $c => $n) {
+                $titulos[$c] = $armado->agregarTitulo($pre->id, null, $c, $n)->id;
+            }
+
+            $partidas = [
+                ['01', '01.01', 'Instalación de cámara domo IP', 'NIU', '10', ['0.5', 'hora'], [$mat($insumo('CAM-DOMO', 'Cámara domo IP', Insumo::MATERIAL, 'NIU'), '1', '583.00'), $hereda($tec, '18.00'), $hereda($ayu, '12.00')]],
+                ['02', '02.01', 'Tendido de cable UTP', 'MTR', '600', ['20', 'hora'], [$mat($insumo('CAB-UTP6', 'Cable UTP Cat6', Insumo::MATERIAL, 'MTR'), '1', '2.40', '5'), $hereda($tec, '18.00'), $hereda($ayu, '12.00')]],
+                ['02', '02.02', 'Instalación de poste metálico', 'NIU', '4', ['2', 'jornada'], [$mat($insumo('POS-MET', 'Poste metálico', Insumo::MATERIAL, 'NIU'), '1', '900.00'), $hereda($tec, '18.00'), $hereda($ayu, '12.00'),
+                    new DatosLineaApu($insumo('EQ-GRUA', 'Camión grúa', Insumo::EQUIPO, 'HUR'), rendimiento: '8', unidadRendimiento: 'jornada', precio: '70.00')]],
+                ['03', '03.01', 'NVR con almacenamiento', 'NIU', '1', ['0.125', 'hora'], [$mat($insumo('NVR-16', 'NVR de 16 canales', Insumo::MATERIAL, 'NIU'), '1', '4116.00'), $hereda($tec, '18.00'),
+                    new DatosLineaApu($ayu, rendimiento: '0.25', unidadRendimiento: 'hora', precio: '12.00')]],
+                ['03', '03.02', 'Pruebas y puesta en marcha', 'GLB', '1', ['0.5', 'hora'], [$hereda($tec, '18.00', '3'), $hereda($ayu, '12.00', '2'),
+                    new DatosLineaApu($insumo('EQ-INST', 'Instrumental de pruebas', Insumo::EQUIPO, 'HUR'), rendimiento: '1', unidadRendimiento: 'jornada', precio: '10.50')]],
+            ];
+
+            foreach ($partidas as [$t, $codigo, $desc, $und, $metrado, [$rend, $urend], $lineas]) {
+                $partida = $armado->agregarPartida($pre->id, $titulos[$t], $codigo, $desc, $this->unidad($und), $metrado, null, $rend, $urend);
+
+                foreach ($lineas as $linea) {
+                    $armado->agregarLineaApu($partida->id, $linea, PartidaDePresupuesto::query()->findOrFail($partida->id)->version);
+                }
+            }
+
+            return $pre->refresh();
+        });
+        $cot = $this->en('2026-10-08', function () use ($o, $costeo): Cotizacion {
+            $c = app(CotizacionesService::class)->crear($o->id, new DatosCotizacion(contactoId: $this->cuentas['mpvn']['decisor'], diasValidez: 30, plazoEntregaDias: 30, garantiaMeses: 24), $this->dev);
+            $c = app(CotizacionesService::class)->enlazarPresupuesto($c->id, $c->refresh()->version, $costeo->id, '0', $this->dev);
+
+            return $this->emitir($c->refresh());
+        });
+        $this->en('2026-10-09', fn () => $this->avanzar($o->refresh(), 'enviar_propuesta'));
+        $this->en('2026-10-18', fn () => $this->avanzar($o->refresh(), 'negociar'));
+        $this->en('2026-10-23', function () use ($o, $cot, $jefe): void {
+            $cot->refresh();
+            app(CotizacionesService::class)->aceptar($cot->id, $cot->version, CarbonImmutable::parse('2026-10-23'), TipoRespaldo::BuenaPro, 'AS-SM-22-2026-MPVN-1', null, null, $this->dev);
+            $o->refresh();
+            app(OportunidadesService::class)->ganar($o->id, $o->version, CarbonImmutable::parse('2026-10-23'), null, null, $this->dev,
+                new DatosDelProyectoAlGanar($jefe->id, CarbonImmutable::parse('2026-11-06'), CarbonImmutable::parse('2026-12-06')));
+        });
+        $proyectoId = (int) app(ProyectosService::class)->deOportunidad($o->id);
+        $contrato = Contrato::query()->where('proyecto_id', $proyectoId)->firstOrFail();
+        $this->en('2026-10-27', fn () => app(ContratosService::class)->activar($contrato->id, 'Contrato N.° 118-2026-MPVN', CarbonImmutable::parse('2026-10-27'), '100 % a la conformidad', 24, '10', '0.40'));
+
+        // El árbol del v4: separaron material de mano de obra; PC-04 son los gastos generales.
+        $ids = [];
+        $this->en('2026-10-30', function () use ($proyectoId, $jefe, &$ids): void {
+            $servicio = app(ArbolPartidasService::class);
+            $arbol = $servicio->crear($proyectoId, '19525.00', $this->dev);
+            $nodos = [['PC-01', 'Cámaras', null, null], ['PC-01.01', 'Suministro de cámaras y conectores', 'PC-01', '5830.00'], ['PC-01.02', 'Mano de obra de instalación', 'PC-01', '600.00'],
+                ['PC-02', 'Cableado y postes', null, null], ['PC-02.01', 'Cable', 'PC-02', '1512.00'], ['PC-02.02', 'Postes y cimentación', 'PC-02', '3880.00'], ['PC-02.03', 'Mano de obra', 'PC-02', '1380.00'],
+                ['PC-03', 'Centro de monitoreo', null, '4548.00'], ['PC-04', 'Gastos generales', null, '1775.00']];
+
+            foreach ($nodos as [$codigo, $nombre, $padre]) {
+                $ids[$codigo] = $servicio->agregarPartida($arbol->id, $padre === null ? null : $ids[$padre], $codigo, $nombre, $jefe->id, $codigo === 'PC-04')->id;
+            }
+
+            foreach ($nodos as [$codigo, , , $monto]) {
+                if ($monto !== null) {
+                    $servicio->fijarPresupuestado($ids[$codigo], $monto, PartidaControl::query()->findOrFail($ids[$codigo])->version);
+                }
+            }
+
+            $arbol->refresh();
+            app(TransicionesService::class)->transicionar($arbol, 'aprobar', $arbol->version, $this->dev);
+        });
+
+        // Carta fianza de fiel cumplimiento: comisión 180.00, OS a PC-04.
+        $this->en('2026-11-02', fn () => app(ContratosService::class)->registrarGarantia($contrato->id, 'fiel_cumplimiento', 'Banco Norte', 'CF-2026-00412', '2471.51',
+            CarbonImmutable::parse('2026-11-02'), CarbonImmutable::parse('2027-01-05'), '180.00'));
+
+        // REQ de postes: la cimentación hay en almacén (se reserva); la grúa y los conectores van a Compras.
+        $this->en('2026-11-10', function () use ($compras, $proyectoId, $ids, $proveedores): void {
+            $req = $compras->crearRequerimiento($proyectoId, 'Instalación de postes', CarbonImmutable::parse('2026-11-19'), [
+                ['tipo' => 'bien_proyecto', 'producto_id' => (int) DB::table('productos')->where('codigo', 'CIM-KIT')->value('id'), 'descripcion' => 'Materiales de cimentación', 'unidad_medida_id' => $this->unidad('NIU'), 'cantidad' => '4', 'partida_control_id' => $ids['PC-02.02']],
+                ['tipo' => 'alquiler_equipo', 'descripcion' => 'Alquiler de grúa · 1 día', 'unidad_medida_id' => $this->unidad('GLB'), 'cantidad' => '1', 'precio_estimado' => '650.00', 'partida_control_id' => $ids['PC-04']],
+                ['tipo' => 'bien_proyecto', 'producto_id' => (int) DB::table('productos')->where('codigo', 'CON-RJ45')->value('id'), 'descripcion' => 'Conectores RJ45 de repuesto', 'unidad_medida_id' => $this->unidad('NIU'), 'cantidad' => '10', 'partida_control_id' => $ids['PC-01.01']],
+            ], $this->jefes['diego']);
+            $compras->enviar($req->id);
+            $compras->aprobar($req->id, null, $this->dev);
+            $cuadro = $compras->crearCuadro($req->id);
+            $lineas = $req->lineas()->where('estado', 'en_cuadro')->pluck('id', 'descripcion');
+            $compras->agregarCotizacion($cuadro->id, $proveedores['gruas'], 1, 'contado', '4.0', [$lineas['Alquiler de grúa · 1 día'] => '650.00', $lineas['Conectores RJ45 de repuesto'] => '1.60']);
+        });
+
+        // El cable: cuadro con dos cotizaciones, OC de 650 m a 2.40 que excede PC-02.01 en 48.00, recibida 520 m.
+        $orden = $this->en('2026-11-11', function () use ($compras, $proyectoId, $ids, $proveedores): Orden {
+            $req = $compras->crearRequerimiento($proyectoId, 'Cable para el tendido de la plaza', CarbonImmutable::parse('2026-11-18'), [
+                ['tipo' => 'bien_proyecto', 'descripcion' => 'Cable UTP Cat6 exterior', 'unidad_medida_id' => $this->unidad('MTR'), 'cantidad' => '650', 'precio_estimado' => '2.40', 'partida_control_id' => $ids['PC-02.01']],
+            ], $this->jefes['diego']);
+            $compras->enviar($req->id);
+            $compras->aprobar($req->id, 'Faltaron 50 m por el desvío del tendido por la pileta.', $this->dev);
+            $cuadro = $compras->crearCuadro($req->id);
+            $linea = (int) $req->lineas()->value('id');
+            $andino = $compras->agregarCotizacion($cuadro->id, $proveedores['andino'], 2, '30 días', '4.5', [$linea => '2.40']);
+            $compras->agregarCotizacion($cuadro->id, $proveedores['redes_norte'], 1, 'contado', '3.8', [$linea => '2.60']);
+
+            return $compras->adjudicar($cuadro->id, $andino->id, 'Menor precio, crédito a 30 días y buen historial; el día adicional no afecta el hito del 19.', 'Obra · Plaza de Armas', CarbonImmutable::parse('2026-11-18'), $this->dev);
+        });
+        $this->en('2026-11-13', fn () => $compras->aprobarOrden($orden->id, 'El tendido real es 650 m; la diferencia de 48.00 se absorbe en el margen de la partida de postes.', $this->dev));
+        $this->en('2026-11-18', function () use ($compras, $orden): void {
+            $compras->recibir($orden->id, [(int) $orden->lineas()->value('id') => '520'], CarbonImmutable::parse('2026-11-18'), 'GR-001-004512', 'obra', 'Recibido en obra por el especialista.');
+            $orden->update(['seguimiento' => 'Faltan 130 m · el proveedor confirmó para el 20/11']);
+        });
     }
 }

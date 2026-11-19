@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Modules\Erp\Contratos\Services;
 
+use App\Modules\Erp\Compras\Services\ComprasService;
 use App\Modules\Erp\Contratos\Models\AdendaContrato;
 use App\Modules\Erp\Contratos\Models\Contrato;
 use App\Modules\Erp\Contratos\Models\GarantiaContrato;
 use App\Modules\Erp\Contratos\Models\PenalidadContrato;
-use App\Modules\Erp\Presupuestos\Services\GastosDemoService;
+use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Numeracion\FormatoNumeracion;
 use App\Modules\Nucleo\Services\NumeracionService;
+use App\Modules\Nucleo\Services\UsuarioSistema;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -136,8 +138,22 @@ final readonly class ContratosService
                 'vencimiento' => $vencimiento->toDateString(), 'comision' => $comision, 'estado' => $estado]);
 
             if ($comision !== null && bccomp($comision, '0', 2) > 0) {
-                $gasto = app(GastosDemoService::class)->enGastosGenerales($c->proyecto_id, 'Comisión de carta fianza '.self::TIPOS_GARANTIA[$tipo]." {$numero}", $banco, $emision, $comision);
-                $g->update(['gasto_id' => $gasto?->id]);
+                // La comisión es un servicio y se imputa a los gastos generales del proyecto (v4 flujo 1, paso 2): una OS.
+                $gg = DB::table('partidas_control as p')->join('partida_arboles as a', 'a.id', '=', 'p.arbol_alta_id')->join('estados as e', 'e.id', '=', 'a.estado_id')
+                    ->where('p.proyecto_id', $c->proyecto_id)->where('p.es_gastos_generales', true)->where('p.es_hoja', true)->where('e.codigo', 'aprobado')->orderBy('p.codigo')->value('p.id');
+
+                if ($gg !== null) {
+                    $compras = app(ComprasService::class);
+                    $os = $compras->ordenDirecta('garantia_financiera', null, $banco, $c->proyecto_id, 'Cargo en cuenta', [[
+                        'descripcion' => 'Comisión de carta fianza '.self::TIPOS_GARANTIA[$tipo]." {$numero}", 'unidad_medida_id' => (int) DB::table('unidades_medida')->where('codigo', 'GLB')->value('id'),
+                        'cantidad' => '1', 'precio_unitario' => $comision, 'partida_control_id' => (int) $gg,
+                    ]], $emision);
+                    $quien = auth()->user() instanceof User ? auth()->user() : User::query()->findOrFail(app(UsuarioSistema::class)->id());
+                    $compras->aprobarOrden($os->id, $compras->excesos($os->load('lineas')) === [] ? null : 'Comisión del banco por la carta fianza que exige el contrato.', $quien);
+                    $compras->recibir($os->id, [$os->lineas()->value('id') => '1'], $emision, null);
+                    $compras->pagar($os->id);
+                    $g->update(['gasto_id' => $os->id]);
+                }
             }
 
             return $g;

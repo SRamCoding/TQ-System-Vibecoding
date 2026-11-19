@@ -1,8 +1,9 @@
 # Ficha · Datos de demostración
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v3
+- **Versión:** v4
 - **Tramo de la ruta:** T0
+- **Aprobada (v4):** 2026-11-20 · etiqueta `aprobado/t0-datos-demo-v4`
 - **Aprobada (v3):** 2026-11-19 · etiqueta `aprobado/t0-datos-demo-v3`
 - **Aprobada (v2):** 2026-11-19 · etiqueta `aprobado/t0-datos-demo-v2` (código del commit `e02abf7`)
 - **Aprobada (v1):** 2026-11-19 · commit `ae8839a` (código; la etiqueta va en el commit de la aprobación, sin cambios de código) · etiqueta `aprobado/t0-datos-demo-v1`
@@ -152,3 +153,7 @@ públicas su carta fianza (comisión en gastos generales). P1 carga la penalidad
 (vendido 1,872,370.44; margen previsto −119,993.56); P6 tiene una adenda de 49,625.14 (vendido 2,738,321.08; margen
 previsto 165,617.89). La tabla de «Reglas y números» de v2 queda como referencia del costo; lo vendido y el margen de P1
 y P6 son los de aquí.
+
+v4 (2026-11-20, por `t3-compras`): los costos de los proyectos entran por órdenes directas aprobadas, recibidas y
+pagadas (mismos montos). Se agrega el proyecto de los escenarios del v4, «Videovigilancia de la Plaza de Armas de
+Valle Norte» (ganado el 23/10/2026, presupuesto 24,715.10), un Almacén Central con stock y tres proveedores.
