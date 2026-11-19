@@ -1,0 +1,24 @@
+{
+  "name": "techquk-documentacion",
+  "version": "1.0.0",
+  "description": "Sitio de documentación de TechQuk Integral System. Lee ../docs; no tiene contenido propio.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist && node scripts/verificar-enlaces.mjs",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@fontsource-variable/public-sans": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "astro": "^5.18.2",
+    "github-slugger": "^2.0.0",
+    "mdast-util-from-markdown": "^2.1.0",
+    "mermaid": "^12.2.0",
+    "pagefind": "^1.5.2",
+    "unist-util-visit": "^5.1.0",
+    "yaml": "^2.9.1"
+  }
+}

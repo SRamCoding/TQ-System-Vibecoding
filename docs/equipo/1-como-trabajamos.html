@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Cómo trabajamos en TechQuk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: guía de equipo; índice fijo a la izquierda en escritorio, arriba en el celular; secciones numeradas porque son un orden real de lectura */
+:root {
+  --bg: #f6f7fb; --surface: #ffffff; --fg: #141a2e; --muted: #556079; --line: #dde1ec;
+  --accent: #1b2f8a; --accent-soft: #e7ebfb; --teal: #0d7472; --teal-soft: #dff2f1;
+  --amber: #a85a06; --amber-soft: #fdf1df; --red: #b42318; --red-soft: #fdeceb; --green: #187a3d; --green-soft: #e3f4e8;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.envoltura { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2.5rem; max-width: 72rem; margin: 0 auto;
+  padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.5rem); align-self: start; font-size: 0.9rem; }
+nav.indice b { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+nav.indice ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; counter-reset: i; }
+nav.indice li { counter-increment: i; }
+nav.indice a { display: flex; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 6px; color: var(--fg); text-decoration: none; }
+nav.indice a::before { content: counter(i); font-family: var(--mono); color: var(--muted); min-width: 1.2rem; }
+nav.indice a:hover, nav.indice a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+main { min-width: 0; display: grid; gap: 3rem; }
+header.cabeza { display: grid; gap: 0.75rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
+h1 { font-family: var(--display); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; color: var(--fg); }
+.bajada { color: var(--muted); max-width: 62ch; margin: 0; font-size: 1.05rem; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+h2 { font-size: 1.45rem; margin: 0; display: flex; gap: 0.75rem; align-items: baseline; text-wrap: balance; }
+h2 .n { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); }
+h3 { font-size: 1.05rem; margin: 0.5rem 0 0; }
+p { margin: 0; max-width: 68ch; }
+.caja { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; }
+.nota { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; max-width: 68ch; }
+.nota.ambar { border-color: var(--amber); background: var(--amber-soft); }
+.nota.roja { border-color: var(--red); background: var(--red-soft); }
+.equipo { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.2rem; }
+.persona b { font-size: 1.05rem; }
+.persona span { color: var(--muted); font-size: 0.9rem; }
+
+/* ciclo */
+.ciclo { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; counter-reset: c; list-style: none; padding: 0; margin: 0; }
+.ciclo li { counter-increment: c; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem 0.4rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+.ciclo li::before { content: counter(c); display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: 0.8rem; }
+.ciclo li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 0.4rem; }
+
+/* tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+/* camino de una tarea */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: p; }
+.pasos > li { counter-increment: p; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details[open] { border-color: var(--accent); }
+summary { cursor: pointer; list-style: none; display: flex; gap: 0.75rem; align-items: center; padding: 0.8rem 1rem; font-weight: 600; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: counter(p); display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--mono); font-size: 0.85rem; }
+summary::after { content: "+"; margin-left: auto; color: var(--muted); font-family: var(--mono); }
+details[open] summary::after { content: "−"; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.det { padding: 0 1rem 1rem 3.55rem; display: grid; gap: 0.5rem; }
+.det ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+/* vida de una costura */
+.linea { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+.etapa { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.etapa b { font-size: 0.95rem; }
+.etapa small { font-family: var(--mono); color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* reglas */
+.reglas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; counter-reset: r; }
+.reglas li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem 0.7rem 2.8rem; position: relative; font-size: 0.93rem; }
+.reglas li::before { content: counter(r); position: absolute; left: 0.8rem; top: 0.7rem; font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+/* lista de verificación */
+.check { display: grid; gap: 0.4rem; }
+.check label { display: flex; gap: 0.7rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--green); flex: 0 0 auto; }
+.check label:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.check label:has(input:checked) span { text-decoration: line-through; color: var(--muted); }
+.check-pie { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.check-pie button { font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.check-pie button:hover, .check-pie button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.progreso { font-family: var(--mono); color: var(--green); font-weight: 500; }
+
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+@media (max-width: 860px) {
+  .envoltura { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  nav.indice { position: static; }
+  nav.indice ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .linea { grid-template-columns: minmax(0, 1fr); }
+  .det { padding-left: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+
+
+<div class="envoltura">
+  <nav class="indice" aria-label="Índice">
+    <b>Índice</b>
+    <ol>
+      <li><a href="#equipo">El equipo</a></li>
+      <li><a href="#ciclo">El ciclo de cada etapa</a></li>
+      <li><a href="#decide">Quién decide qué</a></li>
+      <li><a href="#costuras">Las costuras</a></li>
+      <li><a href="#tarea">El camino de una tarea</a></li>
+      <li><a href="#registro">Dónde queda cada cosa</a></li>
+      <li><a href="#pruebas">Pruebas y commits</a></li>
+      <li><a href="#claude">Trabajar con Claude Code</a></li>
+      <li><a href="#reglas">Reglas que no se negocian</a></li>
+      <li><a href="#verificar">Antes de cerrar una entrega</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="cabeza">
+      <span class="eyebrow">TechQuk Integral System · guía del equipo</span>
+      <h1>Cómo trabajamos en TechQuk</h1>
+      <p class="bajada">La forma de trabajar para todo lo que queda del proyecto, de la etapa 2 a la 5. Vale para los cuatro, para cada tarea y para cada etapa. Lo que cambia de una etapa a otra (quién lleva qué) está en el documento de cada etapa.</p>
+    </header>
+
+    <section id="equipo">
+      <h2><span class="n">01</span>El equipo</h2>
+      <p>Somos cuatro. En cada etapa el trabajo se parte en <b>áreas</b>, y cada área tiene un <b>dueño</b> que la construye y decide dentro de ella.</p>
+      <div class="equipo">
+        <div class="persona"><b>Sebastián</b><span>Responsable del proyecto. Lleva su área, desempata cuando el equipo no se pone de acuerdo y fusiona todo a <code>main</code>.</span></div>
+        <div class="persona"><b>Ander</b><span>Dueño de su área en cada etapa.</span></div>
+        <div class="persona"><b>Lennart</b><span>Dueño de su área en cada etapa.</span></div>
+        <div class="persona"><b>Yair</b><span>Dueño de su área en cada etapa.</span></div>
+      </div>
+      <div class="nota">Las áreas se arman para que sean lo más <b>aisladas</b> posible: lo que hace uno no debería romper lo de otro. Donde se tocan, hay <b>costuras</b> escritas de antemano.</div>
+    </section>
+
+    <section id="ciclo">
+      <h2><span class="n">02</span>El ciclo de cada etapa</h2>
+      <p>Cada etapa del proyecto (2, 3, 4 y 5) sigue el mismo ciclo:</p>
+      <ol class="ciclo">
+        <li>Repartir en áreas</li>
+        <li>Escribir las costuras (ADR)</li>
+        <li>Arrancar con versiones falsas</li>
+        <li>Construir en paralelo</li>
+        <li>Integrar cada costura apenas esté lista</li>
+        <li>Cerrar con los escenarios</li>
+      </ol>
+      <div class="tabla"><table>
+        <tr><th>Paso</th><th>Qué pasa</th></tr>
+        <tr><td>Repartir</td><td>Se divide la etapa en áreas con dueño, con cargas parecidas. Queda escrito en un ADR y en el mapa.</td></tr>
+        <tr><td>Escribir las costuras</td><td>En el mismo ADR: qué servicio y qué evento ofrece cada área a las demás, y quién es su dueño. Solo lo mínimo para empezar.</td></tr>
+        <tr><td>Arrancar</td><td>Todos empiezan el mismo día. Quien ofrece una costura deja primero su versión falsa para que los demás no esperen.</td></tr>
+        <tr><td>Construir</td><td>Cada uno avanza en su área, tarea por tarea, cada una con su plan, en la rama de su entrega.</td></tr>
+        <tr><td>Integrar</td><td>Cuando una costura real está lista, reemplaza a la falsa. Una a la vez, sin esperar al final.</td></tr>
+        <tr><td>Cerrar</td><td>La etapa se cierra cuando pasan sus escenarios del v4 con los números exactos y <code>composer check</code> está en verde.</td></tr>
+      </table></div>
+      <p>Al cerrar una etapa se reparte la siguiente con lo aprendido: qué pesó más, qué costura dio problemas.</p>
+    </section>
+
+    <section id="decide">
+      <h2><span class="n">03</span>Quién decide qué</h2>
+      <div class="tabla"><table>
+        <tr><th>Situación</th><th>Quién decide</th><th>Dónde queda</th></tr>
+        <tr><td>Algo dentro de tu área</td><td>Tú, como dueño</td><td>Sección «Decisiones» del plan de la tarea</td></tr>
+        <tr><td>Una duda entre dos áreas</td><td>Los dos involucrados lo conversan y proponen</td><td>En el ADR de las costuras, si cambia algo</td></tr>
+        <tr><td>Crear o cambiar una costura</td><td>El equipo, con la IA ayudando a proponer y comparar opciones</td><td>El ADR de las costuras de la etapa</td></tr>
+        <tr><td>Un desacuerdo que no se resuelve</td><td>Sebastián desempata</td><td>El ADR o el plan, según corresponda</td></tr>
+        <tr><td>El núcleo</td><td>Sebastián</td><td>Un ADR</td></tr>
+        <tr><td>Una regla de los agentes o una convención</td><td>El equipo, conversado antes; si no hay acuerdo, Sebastián desempata</td><td><code>AGENTS.md</code> o <code>docs/convenciones/</code>, con el porqué en el PR</td></tr>
+        <tr><td>Algo que depende de la empresa</td><td>Nadie por su cuenta: se pregunta</td><td><code>docs/decisiones/pendientes.md</code></td></tr>
+      </table></div>
+      <div class="nota ambar">Si una tarea depende de algo que está en <code>pendientes.md</code>, <b>se para y se pregunta</b> a Sebastián. Nunca se inventa una respuesta a lo que la empresa todavía no definió.</div>
+    </section>
+
+    <section id="costuras">
+      <h2><span class="n">04</span>Las costuras</h2>
+      <p>Una costura es el punto donde un área le pide algo a otra: un <b>servicio</b> (le pregunto algo y me responde) o un <b>evento</b> (me avisa que pasó algo). Entre áreas solo se habla por costuras: nadie lee ni escribe las tablas de otra.</p>
+      <div class="nota">Piensa en un tomacorriente en una casa en obra. Primero se acuerda dónde va y qué forma tiene; mientras el electricista termina, los demás enchufan a un generador provisional; cuando llega la corriente real, cambian de enchufe y la herramienta sigue igual. <b>La costura es el tomacorriente; la versión falsa es el generador.</b></div>
+      <h3>La vida de una costura</h3>
+      <div class="linea">
+        <div class="etapa"><small>Antes</small><b>Se escribe</b>En el ADR: nombre, qué recibe, qué devuelve, dueño.</div>
+        <div class="etapa"><small>Inicio</small><b>Versión falsa</b>El dueño la deja para que nadie espere.</div>
+        <div class="etapa"><small>Durante</small><b>Se conversa</b>Si a alguien le falta algo, se habla en ese momento.</div>
+        <div class="etapa"><small>Lista</small><b>Real por falsa</b>Se cambia; las pruebas de quien la usa siguen en verde.</div>
+        <div class="etapa"><small>Cierre</small><b>Se comprueba</b>Los escenarios de punta a punta.</div>
+      </div>
+      <div class="tabla"><table>
+        <tr><th>Qué hay que hacer con la costura</th><th>Quién</th></tr>
+        <tr><td>Construirla (la falsa y la real)</td><td>Su dueño</td></tr>
+        <tr><td>Un ajuste chico (agregar un dato, renombrar)</td><td>Los dos involucrados, y se actualiza el ADR</td></tr>
+        <tr><td>Un cambio grande o una costura nueva</td><td>El equipo, con la IA; si no hay acuerdo, Sebastián desempata</td></tr>
+        <tr><td>Revisar cuáles ya son reales</td><td>Todos, una vez por semana</td></tr>
+      </table></div>
+      <h3>Reglas de toda costura</h3>
+      <ul>
+        <li>Un servicio devuelve un <b>resumen</b> de solo lectura, nunca el modelo de otro módulo.</li>
+        <li>Un evento se dispara <b>después</b> de confirmar la transacción.</li>
+        <li>La versión falsa y la real pasan <b>las mismas pruebas</b>. Si la real no las pasa, su dueño la arregla antes del cambio.</li>
+        <li>Quien cambia una costura <b>avisa antes</b> a quien la usa.</li>
+      </ul>
+    </section>
+
+    <section id="tarea">
+      <h2><span class="n">05</span>El camino de una tarea</h2>
+      <p>Cada tarea, de cualquier área y de cualquier etapa, recorre los mismos pasos. Toca cada uno para ver el detalle.</p>
+      <div class="nota">Desde el 10 de noviembre de 2026 (decisión del desarrollador), <b>las tareas se agrupan en entregas</b>: una rama y un PR por entrega, ya no uno por tarea. Una <b>entrega</b> es un grupo de tareas relacionadas que juntas dan algo que se puede usar; no sigue las cuatro áreas. Se define al empezar, con su lista de tareas, y se cierra cuando lo que agrupa se puede usar, o al llegar a lo primero de: 6 tareas, 7 días de trabajo o unos 60 archivos cambiados (lo que se revisa de una sentada). Esos números se revisan después de dos o tres entregas.</div>
+      <ol class="pasos">
+        <li><details><summary>Su fila en el mapa</summary><div class="det">
+          <p>Toda tarea existe primero como fila en <code>docs/planes/mapa-etapas.md</code>, con su número y su responsable entre paréntesis. Si no está en el mapa, no se empieza.</p></div></details></li>
+        <li><details><summary>Su plan, antes de escribir código</summary><div class="det">
+          <p>En <code>docs/planes/activos/</code>, copiando <code>docs/planes/plantilla.md</code>. El plan lleva:</p>
+          <ul>
+            <li><b>Responsable</b> y estado.</li>
+            <li><b>Contexto que leí:</b> qué partes del v4, del modelo y de las convenciones consultaste.</li>
+            <li><b>Decisiones:</b> lo que decides en tu área, una por una, con fecha.</li>
+            <li><b>Pasos</b> chicos, cada uno verificable.</li>
+            <li><b>Preparado para lo diferido:</b> lo que se pospone y el punto de extensión que deja listo.</li>
+            <li><b>Bitácora:</b> lo que se descubrió o cambió. Es el punto de guardado.</li>
+          </ul></div></details></li>
+        <li><details><summary>La rama de su entrega</summary><div class="det">
+          <p>Una rama por entrega, <code>entrega/&lt;nombre&gt;</code>, que sale de <code>main</code> al día. Las tareas de la entrega se apilan en ella, cada una con su plan (que dice a qué entrega pertenece) y su sesión. Nunca se trabaja directo en <code>main</code>.</p>
+          <div class="tabla"><table>
+            <tr><th>Rama</th><th>Para qué</th></tr>
+            <tr><td><code>entrega/</code></td><td>Una entrega. Una entrega = un PR</td></tr>
+            <tr><td><code>plan/</code></td><td>Solo el plan de algo que todavía no empezó</td></tr>
+            <tr><td><code>spike/</code></td><td>Una exploración que quizá nunca se fusione</td></tr>
+            <tr><td><code>arreglo/</code></td><td>Un arreglo chico y urgente, fuera de una entrega</td></tr>
+          </table></div>
+          <p>En minúsculas, con guiones y en español. Una rama viva se renombra en un buen momento, nunca cortando una sesión a mitad de un paso.</p></div></details></li>
+        <li><details><summary>Pasos chicos, cada uno con su commit</summary><div class="det">
+          <ul>
+            <li>Al terminar cada paso: pint, phpstan y las pruebas de lo que tocaste.</li>
+            <li>Si pasan, <b>commit y push</b> de ese paso, con la bitácora al día.</li>
+            <li>Las verificaciones y el commit van encadenados con <code>&amp;&amp;</code>, nunca con <code>;</code>: así un error frena el commit.</li>
+          </ul></div></details></li>
+        <li><details><summary>Cierre de la tarea</summary><div class="det">
+          <ul>
+            <li>El flujo <code>/cerrar-tarea</code>.</li>
+            <li><code>composer check:tarea</code> en verde: las pruebas de todo lo que cambió la rama de la entrega.</li>
+            <li>Si cambió una regla, se actualiza su documento.</li>
+          </ul></div></details></li>
+        <li><details><summary>Cierre de la entrega y su PR</summary><div class="det">
+          <ul>
+            <li>Si hubo cambios de estructura (módulos, migraciones, efectos entre módulos), el revisor de arquitectura.</li>
+            <li><code>composer check:tarea</code> otra vez, en verde, antes del PR (ya cubre todo lo que cambió la rama). La corrida completa va una vez por etapa.</li>
+            <li>El agente sube la rama y avisa con los enlaces a los planes. <b>Ningún agente abre ni fusiona un PR.</b></li>
+            <li>El PR se titula <code>Entrega &lt;nombre&gt;: &lt;resumen&gt;</code> y su descripción lista las tareas y sus planes.</li>
+            <li>Lo revisa un compañero (la revisión cruzada de la etapa). Si toca un módulo de otra área, lo revisa también su dueño.</li>
+            <li><b>Solo Sebastián fusiona</b>, con un <i>merge commit</i>, y borra la rama. Nada se fusiona con pruebas en rojo. Las demás entregas vivas traen <code>main</code> con <i>merge</i>, nunca con <i>rebase</i>.</li>
+          </ul></div></details></li>
+      </ol>
+    </section>
+
+    <section id="registro">
+      <h2><span class="n">06</span>Dónde queda cada cosa</h2>
+      <p>Todo lo que pasa queda en el repositorio. Si no está escrito ahí, no existe para los demás.</p>
+      <div class="tabla"><table>
+        <tr><th>Qué</th><th>Dónde</th></tr>
+        <tr><td>El avance de cada día</td><td>La bitácora del plan de la tarea</td></tr>
+        <tr><td>Cada paso terminado</td><td>Un commit y push en la rama de la entrega</td></tr>
+        <tr><td>Una entrega</td><td>Su rama <code>entrega/&lt;nombre&gt;</code> y un PR; cada plan dice a qué entrega pertenece</td></tr>
+        <tr><td>Una decisión de tu área</td><td>«Decisiones», en el plan</td></tr>
+        <tr><td>Una decisión entre áreas</td><td>Un ADR en <code>docs/decisiones/</code></td></tr>
+        <tr><td>Algo que falta saber de la empresa</td><td><code>docs/decisiones/pendientes.md</code></td></tr>
+        <tr><td>Quién lleva qué y qué sigue</td><td><code>docs/planes/mapa-etapas.md</code></td></tr>
+        <tr><td>Algo que aprendiste y le sirve a todos</td><td><code>AGENTS.md</code> o <code>docs/convenciones/</code></td></tr>
+        <tr><td>Estas guías del equipo</td><td><code>docs/equipo/</code>, en HTML: se abren con doble clic, sin cuenta ni internet</td></tr>
+      </table></div>
+      <div class="nota roja"><b>Nunca en la memoria personal del agente.</b> La memoria de Claude Code vive en la máquina de cada uno y los demás no la ven. Lo que aprendas trabajando va a <code>AGENTS.md</code> o a las convenciones.</div>
+    </section>
+
+    <section id="pruebas">
+      <h2><span class="n">07</span>Pruebas y commits</h2>
+      <div class="tabla"><table>
+        <tr><th>Cuándo</th><th>Qué se corre</th></tr>
+        <tr><td>En cada paso</td><td>Solo los archivos de prueba de lo que tocaste (<code>php artisan test &lt;archivos&gt;</code>), pint y phpstan</td></tr>
+        <tr><td>Al cerrar cada tarea</td><td><code>composer check:tarea</code>: solo las pruebas de lo que cambió desde su última corrida en verde (en tu copia; si no hay una, desde <code>main</code>)</td></tr>
+        <tr><td>Al cerrar la entrega, antes del PR</td><td><code>composer check:tarea</code> otra vez, en verde</td></tr>
+        <tr><td>Al cerrar una etapa del mapa</td><td><b>Una</b> corrida completa de <code>composer check</code>, en local y en segundo plano</td></tr>
+      </table></div>
+      <p>Decisión del desarrollador del 12 de noviembre de 2026 (antes, una corrida completa por entrega). Si una tarea toca <code>tests/Pest.php</code>, <code>config/</code>, las rutas o <code>composer.json</code>, <code>check:tarea</code> ya corre todas las pruebas. Y si a la tarea le toca más de la cuarta parte de los archivos de prueba (pasa al cambiar el núcleo), corre todas en paralelo, que tarda menos (desarrollador, 15 de noviembre de 2026).</p>
+      <ul>
+        <li><b>Nunca dos corridas a la vez</b> en la misma copia de trabajo: comparten la base de pruebas y se rompen entre sí. Antes de lanzar una, revisa que no quede un proceso viejo vivo.</li>
+        <li>Cada escenario del v4 de tu área es una prueba con <b>los números exactos</b> de la especificación.</li>
+        <li>Cada archivo de prueba debe pasar <b>solo</b>, no únicamente junto a los demás.</li>
+        <li>Las pruebas nunca llaman al servicio real de IA ni usan datos reales.</li>
+      </ul>
+    </section>
+
+    <section id="claude">
+      <h2><span class="n">08</span>Trabajar con Claude Code</h2>
+      <ul>
+        <li><b>Una sesión limpia por tarea.</b> Al empezar, el agente lee el plan; si la sesión se corta, la siguiente continúa desde la bitácora.</li>
+        <li>El agente lee <code>AGENTS.md</code> solo: ahí están las reglas, el mapa del repositorio y la sección «Trabajo en equipo».</li>
+        <li>Usa los flujos del repositorio: <code>/nuevo-modulo</code>, <code>/nueva-migracion</code>, <code>/nuevo-documento</code>, <code>/nueva-accion</code>, <code>/automatizacion-ia</code>, <code>/cerrar-tarea</code>.</li>
+        <li>Si un hook te bloquea (por ejemplo, al tocar <code>.env</code> o una migración ya desplegada), lee su mensaje y corrige; no lo esquives.</li>
+        <li>Lee partes de documentos, no documentos completos: cuida el cupo.</li>
+        <li>Si el agente se equivoca de una forma que se puede repetir, la corrección va a <code>AGENTS.md</code>.</li>
+        <li><b>Orden en el repositorio:</b> ninguna rama queda sin push al final del día; las ramas fusionadas se borran; las copias de trabajo que no se usan se quitan con <code>git worktree remove</code> desde la carpeta principal y se vuelven a crear con <code>php scripts/nueva-copia.php</code> cuando hacen falta.</li>
+      </ul>
+      <h3>De dónde sacan las reglas los agentes</h3>
+      <p>Los agentes leen el repositorio, no estas páginas: <code>AGENTS.md</code>, <code>CLAUDE.md</code>, <code>docs/convenciones/</code>, los ADR, el mapa, la plantilla de plan y <code>.claude/</code> (flujos, revisor, hooks). Estas páginas explican lo mismo para leerlo fácil; si no coinciden, manda el repositorio.</p>
+      <h3>Cambiar las reglas de los agentes</h3>
+      <div class="tabla"><table>
+        <tr><th>Qué cambio</th><th>Cómo</th></tr>
+        <tr><td>Agregar una lección (un error del agente y cómo evitarlo)</td><td>En un PR, revisado por al menos un compañero</td></tr>
+        <tr><td>Cambiar o quitar una regla de <code>AGENTS.md</code>, <code>CLAUDE.md</code> o las convenciones</td><td><b>Se conversa en equipo antes.</b> El PR dice por qué cambió. Si no hay acuerdo, Sebastián desempata</td></tr>
+        <tr><td>Tocar lo compartido de <code>.claude/</code>: flujos, revisor, hooks, <code>settings.json</code></td><td><b>Se conversa en equipo antes</b>, igual que una regla</td></tr>
+        <tr><td>Tu configuración personal (<code>.claude/settings.local.json</code>)</td><td>Libre: no está en el repositorio</td></tr>
+      </table></div>
+    </section>
+
+    <section id="reglas">
+      <h2><span class="n">09</span>Reglas que no se negocian</h2>
+      <ol class="reglas">
+        <li><b>Precedencia:</b> convenciones, después decisiones aceptadas, después la especificación v4, después los documentos de agosto.</li>
+        <li><b>Un módulo no toca los modelos de otro.</b> Usa sus servicios o escucha sus eventos.</li>
+        <li><b>Toda línea de costo tiene destino:</b> una partida de control o el gasto directo con centro de costo.</li>
+        <li><b>Nunca</b> <code>float</code>, <code>char</code>, código de negocio como llave ni <code>empresa_id</code>. Toda llave foránea lleva índice.</li>
+        <li><b>Si un dato importa, es obligatorio</b> y su unicidad la garantiza la base.</li>
+        <li><b>Estados y transiciones son datos.</b> Un documento aprobado no se edita; anular exige motivo.</li>
+        <li><b>Toda acción de usuario queda registrada</b> y se puede ejecutar sin la interfaz. La lógica vive en servicios.</li>
+        <li><b>Cada flujo tiene su escenario del v4 como prueba,</b> con los números exactos.</li>
+        <li><b>La IA sugiere y una persona confirma.</b> Nada que mueva dinero se aprueba sin una persona.</li>
+        <li><b>Nada de datos reales</b> en el repositorio, en las pruebas ni en los registros.</li>
+        <li><b>Nadie toca producción</b>: ni el servidor, ni sus credenciales, ni su base.</li>
+        <li><b>No se inventan respuestas a lo pendiente:</b> se pregunta.</li>
+      </ol>
+      <h3>Y cuatro más del equipo</h3>
+      <ul>
+        <li><b>Lo que se pospone deja su punto de extensión listo:</b> anotarlo como deuda no basta.</li>
+        <li><b>Contenido festivo respetuoso del cristianismo:</b> nada de Halloween ni santos. Si una fecha es dudosa, se pregunta.</li>
+        <li><b>Las pantallas siguen los patrones que ya tiene el sistema</b> (cajas con buscador, panel deslizante, los mismos componentes). Nadie rediseña por su cuenta: la mejora visual se hace al final, a cargo de Sebastián.</li>
+        <li><b>El organigrama está en espera:</b> no se tocan unidades, puestos ni roles reales hasta que Sebastián lo entregue. Se trabaja con datos de prueba.</li>
+      </ul>
+    </section>
+
+    <section id="verificar">
+      <h2><span class="n">10</span>Antes de cerrar una entrega</h2>
+      <p>Márcalo cada vez. Se guarda solo en tu navegador, para la entrega que tengas en curso.</p>
+      <div class="check" id="lista">
+        <label><input type="checkbox" id="c1"><span>Cada tarea de la entrega tiene su fila en el mapa con mi nombre y su entrega.</span></label>
+        <label><input type="checkbox" id="c2"><span>Los planes están al día: entrega, decisiones, pasos marcados, «Preparado para lo diferido» y bitácora.</span></label>
+        <label><input type="checkbox" id="c3"><span>No toqué tablas ni modelos de otra área; usé sus costuras.</span></label>
+        <label><input type="checkbox" id="c4"><span>Si cambié una costura, está en el ADR y avisé a quien la usa.</span></label>
+        <label><input type="checkbox" id="c5"><span>Lo que depende de la empresa quedó en <code>pendientes.md</code>, sin inventar respuestas.</span></label>
+        <label><input type="checkbox" id="c6"><span>Los escenarios del v4 de mis tareas son pruebas con los números exactos.</span></label>
+        <label><input type="checkbox" id="c7"><span>Pasé <code>/cerrar-tarea</code> en cada tarea y, si toqué estructura, el revisor de arquitectura.</span></label>
+        <label><input type="checkbox" id="c8"><span>Cada tarea cerró con <code>composer check:tarea</code>, y la entrega cerró con <code>composer check:tarea</code> en verde, con una sola corrida a la vez.</span></label>
+        <label><input type="checkbox" id="c9"><span>Lo que aprendí y le sirve a todos está en <code>AGENTS.md</code> o en las convenciones.</span></label>
+        <label><input type="checkbox" id="c10"><span>Subí la rama y avisé con los enlaces a los planes; el PR <code>Entrega &lt;nombre&gt;: &lt;resumen&gt;</code> lista las tareas, y pedí la revisión cruzada.</span></label>
+      </div>
+      <div class="check-pie"><span class="progreso" id="progreso">0 de 10</span><button type="button" id="limpiar">Empezar de nuevo</button></div>
+    </section>
+
+    <footer>Esta guía vive en el repositorio, en <code>docs/equipo/1-como-trabajamos.html</code>. Fuentes: <code>AGENTS.md</code> (incluida «Trabajo en equipo»), <code>docs/planes/plantilla.md</code>, <code>docs/planes/mapa-etapas.md</code>, <code>docs/decisiones/</code>. Si esta guía y el repositorio no coinciden, manda el repositorio.</footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  const clave = 'tq-guia-check';
+  const cajas = [...document.querySelectorAll('#lista input')];
+  const progreso = document.getElementById('progreso');
+  let guardado = {};
+  try { guardado = JSON.parse(localStorage.getItem(clave) || '{}') || {}; } catch (e) { guardado = {}; }
+  cajas.forEach((c) => { c.checked = !!guardado[c.id]; });
+  const pintar = () => { progreso.textContent = cajas.filter((c) => c.checked).length + ' de ' + cajas.length; };
+  const guardar = () => {
+    const datos = {}; cajas.forEach((c) => { if (c.checked) datos[c.id] = true; });
+    try { localStorage.setItem(clave, JSON.stringify(datos)); } catch (e) {}
+  };
+  cajas.forEach((c) => c.addEventListener('change', () => { pintar(); guardar(); }));
+  document.getElementById('limpiar').addEventListener('click', () => { cajas.forEach((c) => { c.checked = false; }); pintar(); guardar(); });
+  pintar();
+})();
+</script>
+
+</body>
+</html>

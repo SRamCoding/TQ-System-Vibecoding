@@ -1,0 +1,11 @@
+# Publica en Netlify el sitio de documentación: un sitio Astro (sitio/) que lee docs/.
+# La aplicación Laravel no se despliega aquí: solo la documentación. Ver sitio/LEEME.md.
+[build]
+  base = "sitio"
+  command = "npm run build"
+  publish = "dist"
+  # Solo se reconstruye si cambió la documentación o el sitio, no con cada cambio de código.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- ../docs ."
+
+[build.environment]
+  NODE_VERSION = "22"

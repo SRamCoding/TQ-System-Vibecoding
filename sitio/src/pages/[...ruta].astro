@@ -1,0 +1,139 @@
+---
+// Cada documento de docs/ es una lámina. Las carpetas sin README tienen un índice armado aquí.
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Cajetin from '../components/Cajetin.astro';
+import { cargar, carpetas, leemeDe, url, type Doc } from '../lib/sitio';
+
+export async function getStaticPaths() {
+  const { docs } = await cargar();
+  const mapa = await carpetas();
+  const PROPIAS = new Set(['', 'decisiones']); // la portada y el índice de decisiones son páginas propias
+  const paginas: { params: { ruta: string }; props: { doc?: Doc; carpeta?: string } }[] = [];
+  for (const doc of docs.values()) paginas.push({ params: { ruta: doc.ruta }, props: { doc } });
+  for (const [carpeta, contenido] of mapa) {
+    if (!PROPIAS.has(carpeta) && !leemeDe(contenido.docs)) paginas.push({ params: { ruta: carpeta }, props: { carpeta } });
+  }
+  return paginas;
+}
+
+const { doc, carpeta } = Astro.props as { doc?: Doc; carpeta?: string };
+const { orden } = await cargar();
+const mapa = await carpetas();
+
+const nombreCarpeta = (c: string) => {
+  const ultimo = c.split('/').at(-1) ?? c;
+  return ultimo.charAt(0).toUpperCase() + ultimo.slice(1).replace(/[-_]+/g, ' ');
+};
+
+// Migas: docs / analisis / historia.md
+const archivoActual = doc ? doc.rel : `${carpeta}/`;
+const partes = archivoActual.split('/').filter(Boolean);
+const migas = partes.map((p, i) => ({
+  texto: p,
+  href: i < partes.length - 1 || !doc ? url(partes.slice(0, i + 1).join('/')) : undefined,
+}));
+
+let Content: any = null;
+let titulos: { depth: number; slug: string; text: string }[] = [];
+if (doc) {
+  const r = await render(doc.entrada);
+  Content = r.Content;
+  titulos = r.headings.filter((h) => h.depth === 2 || h.depth === 3);
+}
+
+// En los README y en los índices: lo que hay en la carpeta.
+const carpetaListada = doc ? (/(^|\/)(readme|leeme)\.md$/i.test(doc.rel) ? doc.carpeta : null) : carpeta!;
+const contenido = carpetaListada !== null && carpetaListada !== undefined ? mapa.get(carpetaListada) : undefined;
+const otros = contenido ? contenido.docs.filter((d) => d.rel !== doc?.rel) : [];
+const subcarpetas = contenido ? [...contenido.sub].sort() : [];
+
+const i = doc ? orden.findIndex((d) => d.rel === doc.rel) : -1;
+const anterior = i > 0 ? orden[i - 1] : undefined;
+const siguiente = i >= 0 && i < orden.length - 1 ? orden[i + 1] : undefined;
+
+const titulo = doc ? doc.titulo : nombreCarpeta(carpeta!);
+const seccion = doc ? doc.seccion : (mapa.get(carpeta!)?.docs[0]?.seccion ?? 'Documentación');
+const codigo = doc ? doc.codigo : 'Índice';
+---
+<Base titulo={titulo} actual={doc?.rel} seccion={seccion}>
+  <p class="ruta-archivo" data-pagefind-ignore>
+    <a href="/documentacion/">docs</a>
+    {migas.map((m) => <> / {m.href ? <a href={m.href}>{m.texto}</a> : <span>{m.texto}</span>}</>)}
+  </p>
+
+  <div class="lamina-cuerpo">
+    <article class="prosa">
+      {Content ? <Content /> : <h1>{titulo}</h1>}
+
+      {(otros.length > 0 || subcarpetas.length > 0) && (
+        <section class="en-carpeta" aria-labelledby="en-carpeta" data-pagefind-ignore>
+          <h2 id="en-carpeta">{doc ? 'En esta carpeta' : 'Documentos de esta carpeta'}</h2>
+          {otros.length > 0 && (
+            <ul class="listado">
+              {otros.map((d) => (
+                <li>
+                  <span class="clave">{d.codigo}</span>
+                  <a href={url(d.ruta)}>{d.titulo}</a>
+                  <span class="detalle"><code>{d.rel.split('/').at(-1)}</code></span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {subcarpetas.length > 0 && (
+            <ul class="listado">
+              {subcarpetas.map((c) => (
+                <li>
+                  <span class="clave">Carpeta</span>
+                  <a href={url(c)}>{nombreCarpeta(c)}</a>
+                  <span class="detalle"><code>{c}/</code> · {mapa.get(c)?.docs.length ?? 0} documentos</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
+
+      {(anterior || siguiente) && (
+        <nav class="pasar" aria-label="Lámina anterior y siguiente" data-pagefind-ignore>
+          {anterior && <a href={url(anterior.ruta)}><span>Anterior · {anterior.codigo}</span><strong>{anterior.corto}</strong></a>}
+          {siguiente && <a class="siguiente" href={url(siguiente.ruta)}><span>Siguiente · {siguiente.codigo}</span><strong>{siguiente.corto}</strong></a>}
+        </nav>
+      )}
+
+      <Cajetin titulo={titulo} codigo={codigo} seccion={seccion} archivo={doc ? `docs/${doc.rel}` : `docs/${carpeta}`} editable={!!doc} />
+    </article>
+
+    {titulos.length >= 3 && (
+      <aside class="en-esta-pagina" aria-labelledby="en-esta-pagina" data-pagefind-ignore>
+        <h2 id="en-esta-pagina">En esta lámina</h2>
+        <ol>
+          {titulos.map((t) => <li class={`n${t.depth}`}><a href={`#${t.slug}`}>{t.text.replace(/#$/, '')}</a></li>)}
+        </ol>
+      </aside>
+    )}
+  </div>
+</Base>
+
+<script>
+  // Marca en «En esta lámina» la sección que se está leyendo.
+  const enlaces = [...document.querySelectorAll<HTMLAnchorElement>('.en-esta-pagina a')];
+  if (enlaces.length && 'IntersectionObserver' in window) {
+    const porId = new Map(enlaces.map((a) => [decodeURIComponent(a.hash.slice(1)), a]));
+    const obs = new IntersectionObserver(
+      (entradas) => {
+        for (const e of entradas) {
+          if (e.isIntersecting) {
+            enlaces.forEach((a) => a.classList.remove('activa'));
+            porId.get(e.target.id)?.classList.add('activa');
+          }
+        }
+      },
+      { rootMargin: '-15% 0px -75% 0px' }
+    );
+    porId.forEach((_, id) => {
+      const t = document.getElementById(id);
+      if (t) obs.observe(t);
+    });
+  }
+</script>

@@ -1,0 +1,10 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - app
+        # Las fixtures usan los traits del núcleo que todavía ningún modelo de app/ usa.
+        - tests/Modules/Nucleo/Fixtures
+    tmpDir: storage/phpstan

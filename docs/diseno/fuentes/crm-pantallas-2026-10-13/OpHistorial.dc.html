@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Oportunidad · Historial de etapas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="oportunidades" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:20px 28px 44px;display:flex;flex-direction:column;gap:14px">
+<nav aria-label="Ruta" style="font-size:12.5px;color:#5E6A66"><a href="Oportunidades.dc.html" style="color:#5E6A66">Oportunidades</a> › Videovigilancia · Muni. de Pimentel › Historial de etapas</nav>
+<section style="background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;overflow:hidden">
+<dc-import name="CabOportunidad" tab="historial" hint-size="100%,300px"></dc-import>
+<div style="padding:20px 18px 26px;display:flex;flex-direction:column;gap:14px">
+<h2 style="margin:0;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Recorrido por el embudo</h2>
+<div style="overflow-x:auto;border:1px solid #E8E6DE;border-radius:10px">
+<table style="width:100%;border-collapse:collapse;min-width:640px;font-size:13.5px">
+<thead>
+<tr style="background:#F8F7F2;text-align:left">
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Fecha</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Usuario</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Cambio</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66;text-align:right">Días en la etapa anterior</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top:1px solid #E8E6DE;background:#F2FAF6">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px">Hoy</td>
+<td style="padding:12px 14px">—</td>
+<td style="padding:12px 14px"><b style="font-weight:600">En Calificada · 25 %</b> <span style="color:#5E6A66">· 4 de 14 días máximo</span></td>
+<td style="padding:12px 14px;text-align:right;color:#5E6A66">—</td>
+</tr>
+<tr style="border-top:1px solid #E8E6DE">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5E6A66">[fecha]</td>
+<td style="padding:12px 14px">A. Ruiz</td>
+<td style="padding:12px 14px">Prospecto → Calificada <span style="color:#5E6A66">· necesidad, presupuesto y decisor confirmados</span></td>
+<td style="padding:12px 14px;text-align:right;color:#5E6A66">[n]</td>
+</tr>
+<tr style="border-top:1px solid #E8E6DE">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:#5E6A66">[fecha]</td>
+<td style="padding:12px 14px">A. Ruiz</td>
+<td style="padding:12px 14px">Oportunidad creada <span style="color:#5E6A66">· origen: convocatoria LP-2026-014</span></td>
+<td style="padding:12px 14px;text-align:right;color:#5E6A66">—</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p style="margin:0;font-size:13px;color:#5E6A66">Cada cambio de etapa queda con quién lo hizo, cuándo y cuántos días estuvo en la anterior. Es lo que permite medir dónde se atascan las oportunidades.</p>
+</div>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

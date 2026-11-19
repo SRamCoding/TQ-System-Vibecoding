@@ -1,0 +1,53 @@
+---
+// Índice de las decisiones de arquitectura (ADR), armado desde docs/decisiones/.
+import Base from '../../layouts/Base.astro';
+import Cajetin from '../../components/Cajetin.astro';
+import { decisiones } from '../../lib/proyecto';
+import { url } from '../../lib/sitio';
+
+const lista = await decisiones();
+const abiertas = lista.filter((d) => d.tipo === 'propuesta');
+const cuenta = (t: string) => lista.filter((d) => d.tipo === t).length;
+const sello = (t: string) => (t === 'aceptada' ? 'ok' : t === 'propuesta' ? 'pendiente' : t === 'reemplazada' ? 'anulado' : '');
+---
+<Base titulo="Decisiones" fija="decisiones" seccion="Decisiones" descripcion="Las decisiones de arquitectura del proyecto, con su estado.">
+  <p class="ruta-archivo">docs / decisiones</p>
+  <div class="prosa">
+    <h1>Decisiones</h1>
+    <p>
+      Cada decisión de fondo queda escrita con su contexto, lo que se decidió, lo que se descartó y sus consecuencias.
+      Hay {lista.length}: {cuenta('aceptada')} aceptadas{abiertas.length ? ` y ${abiertas.length} en propuesta, esperando a quien decide` : ''}.
+      Cuando dos fuentes chocan, una decisión aceptada manda sobre la especificación v4 y los documentos de agosto; solo
+      las convenciones van antes (<a href={url('decisiones/0009-fuentes-de-verdad')}>ADR 0009</a>).
+    </p>
+    <p>
+      Lo que todavía no se decidió y bloquea algo está en <a href={url('decisiones/pendientes')}>pendientes</a>: un
+      agente que llega a uno de esos temas se detiene y pregunta.
+    </p>
+
+    <ul class="listado adrs">
+      {lista.map((d) => (
+        <li>
+          <span class="clave">ADR {d.numero}</span>
+          <a href={url(d.doc.ruta)}>{d.titulo}</a>
+          <span class={`sello ${sello(d.tipo)}`}>{d.estado.charAt(0).toUpperCase() + d.estado.slice(1)}</span>
+          {d.resumen && <span class="detalle">{d.resumen}</span>}
+          <span class="detalle meta">{[d.fecha && `Fecha: ${d.fecha}`, d.decide && `Decide: ${d.decide}`].filter(Boolean).join('. ')}</span>
+        </li>
+      ))}
+    </ul>
+
+    <Cajetin titulo="Decisiones" codigo="DE-00" seccion="Decisiones" archivo="docs/decisiones" editable={false} />
+  </div>
+</Base>
+
+<style>
+  .adrs {
+    margin-top: 2rem;
+  }
+  .adrs .meta {
+    font-size: 0.82rem;
+    color: var(--lapiz);
+    margin-top: -0.15rem;
+  }
+</style>

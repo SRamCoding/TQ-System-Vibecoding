@@ -1,0 +1,26 @@
+# Desarrollo: solo PostgreSQL. PHP corre nativo en WSL2 (docs/setup.md).
+# Usuario y clave iguales a los de CI; nunca se usan fuera de desarrollo.
+services:
+    postgres:
+        image: postgres:16
+        # `composer check` reconstruye 6 bases de prueba a la vez, y cada una borra todas sus tablas de una sola vez:
+        # con el límite por defecto (64) Postgres se quedaba sin memoria de bloqueos (2026-10-27).
+        command: ["postgres", "-c", "max_locks_per_transaction=256"]
+        environment:
+            POSTGRES_DB: techquk
+            POSTGRES_USER: techquk
+            POSTGRES_PASSWORD: techquk
+            TZ: America/Lima
+        ports:
+            - "${DB_PORT:-5432}:5432"
+        volumes:
+            - postgres-datos:/var/lib/postgresql/data
+            - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U techquk -d techquk"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+
+volumes:
+    postgres-datos:

@@ -1,0 +1,4165 @@
+// ============================================================
+// MODELO DE DATOS - Techquk S.A.C. - VERSION 2 (alineada con la especificacion v4)
+// 210 tablas activas (149 de agosto + 66 nuevas - 5 obsoletas) + 5 obsoletas marcadas
+// Motor: PostgreSQL 16. Tipos ya traducidos (varchar, text, boolean, timestamptz, jsonb).
+//
+// Fuente de verdad funcional: Especificacion v4 (21 set 2026), flujograma de gastos y
+// prototipo 4. Este archivo se pega en dbdiagram.io para ver el diagrama.
+//
+// Cambios respecto de agosto:
+//   - Nuevas: selector de imputacion (centros de costo, imputaciones), arbol de partidas de
+//     control, presupuesto con APU, formula polinomica, obra publica (adelantos, valorizaciones
+//     por linea, liquidacion, consorcios, subcontratos), tesoreria, rendiciones, tareo semanal,
+//     habilitacion de campo, RRHH completo con planilla propia, asientos por plantilla, IA,
+//     alertas configurables.
+//   - Obsoletas (grupo ZZ_Obsoletas_v4, no migrar): proyecto_presupuesto, proyecto_costos,
+//     partes_horas, asientos_generados, configuracion_contable.
+//   - CRM (CRM_01 a CRM_07): SIN CAMBIOS en esta version, salvo lo que decide el plan 2.20 (cuentas y los
+//     origenes comerciales). Falta cotejar la parte 2 del v4.
+//   - Las tablas nuevas llevan las cuatro columnas de auditoria; las de agosto conservan las suyas.
+// ============================================================
+
+Project techquk {
+  database_type: 'PostgreSQL'
+  Note: 'Sistema de gestion ERP + CRM de Techquk S.A.C. Version 2 alineada con la especificacion v4.'
+}
+
+
+// ---------- M1 - Identidad ----------
+
+Table parties [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  tipo varchar(20) [not null, note: 'natural | juridica. CHECK. Sale del documento (plan 1.3 D4); no se edita']
+  numero_documento varchar(20) [not null, note: 'RUC, DNI, CE. Normalizado: CHECK ~ ^[0-9A-Z]{1,20}$. Siempre texto (ceros iniciales). No se edita (plan 1.3 D5)']
+  tipo_documento_id bigint [ref: > tipos_documento_identidad.id, not null, note: 'FK tipos_documento_identidad. No se edita']
+  razon_social varchar(200) [not null, note: 'CHECK no en blanco. Natural: la arma el sistema (apellidos nombres)']
+  nombre_comercial varchar(200)
+  nombres varchar(100) [note: 'CHECK: natural => no nulo; juridica => nulo']
+  apellidos varchar(100) [note: 'CHECK: natural => no nulo; juridica => nulo']
+  direccion_fiscal varchar(255)
+  ubigeo_id bigint [ref: > ubigeos.id, note: 'FK ubigeos']
+  rubro_id bigint [ref: > rubros.id, note: 'Plan 2.20a N4: seccion CIIU Rev. 4 de la empresa. Opcional. Se cambia con su propia accion (nucleo.parties.cambiar-rubro)']
+  nombre_normalizado text [not null, note: 'Plan 2.20a N1: PosiblesDuplicados::normalizar(razon_social). Indice GIN de trigramas (pg_trgm). Lo llena el modelo: la razon social solo se escribe por el modelo']
+  nombre_comercial_normalizado text [note: 'Plan 2.20a N1: el nombre comercial normalizado; nula sin nombre comercial. Indice GIN de trigramas']
+  telefono varchar(30)
+  email varchar(150)
+  estado_sunat varchar(30) [note: 'ACTIVO | BAJA | SUSPENSION... Texto como lo reporta SUNAT. Lo llena el padron']
+  condicion_sunat varchar(30) [note: 'HABIDO | NO HABIDO... Texto como lo reporta SUNAT. Lo llena el padron']
+  es_agente_retencion boolean [not null, default: false, note: 'Marca manual: accion y permiso aparte (plan 1.3 D7). Manda sobre el padron']
+  es_agente_percepcion boolean [not null, default: false]
+  es_buen_contribuyente boolean [not null, default: false]
+  es_activo boolean [not null, default: true]
+  persona_tipo_id bigint [ref: > tipos_documento_identidad.id, not null, note: 'Clave de persona (plan 1.3b D5 5b): RUC 10 => DNI que lleva dentro; los demas, su propio documento. La llena el modelo al crear; CHECK solo admite esos dos valores. Un futuro corregir documento debe recalcularla']
+  persona_numero varchar(20) [not null]
+  version integer [not null, default: 1, note: 'Bloqueo optimista']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  indexes {
+    (id, persona_tipo_id, persona_numero) [unique, note: 'Destino de la FK compuesta de party_cuentas_bancarias']
+    (tipo_documento_id, numero_documento) [unique, note: 'Un RUC o DNI, una sola party. Lo garantiza la base: tambien crean parties procesos automaticos (convocatorias del OECE, padron SUNAT)']
+    numero_documento [note: 'varchar_pattern_ops: busqueda por prefijo del numero']
+  }
+  Note: 'Personas y organizaciones. La tabla mas referenciada del sistema. Otros modulos solo por PartiesService. Un RUC se guarda solo con digito verificador correcto (modulo 11). DNI y RUC 10 de la misma persona son dos parties (plan 1.3 D9, pendiente)'
+}
+
+Table tipos_documento_identidad [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(3) [not null, unique, note: 'Codigo SUNAT (catalogo 06). Inmutable. 1 DNI y 6 RUC son del sistema']
+  nombre varchar(60) [not null]
+  longitud smallint [note: 'CHECK 1 a 20. La de DNI y RUC no se edita']
+  es_activo boolean [not null, default: true]
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Catalogo: RUC, DNI, carne de extranjeria, pasaporte, doc. tributario de no domiciliado'
+}
+
+Table roles_party [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null, unique, note: 'Inmutable. Del sistema: cliente, proveedor, entidad, colaborador, banco']
+  nombre varchar(60) [not null]
+  descripcion varchar(255)
+  es_activo boolean [not null, default: true]
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Catalogo de papeles: cliente, proveedor, aliado, entidad (organismo publico que contrata), colaborador, banco'
+}
+
+Table party_roles [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null, note: 'FK parties']
+  rol_party_id bigint [ref: > roles_party.id, not null, note: 'FK roles_party']
+  desde date [not null]
+  hasta date [note: 'Ultimo dia vigente (incluido). Nulo = sin fin. CHECK hasta >= desde. Sin es_activo: vigente en un dia = desde <= dia y (hasta nulo o hasta >= dia) (plan 1.3 D8)']
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Que papeles cumple cada party, con vigencia. EXCLUDE USING gist (party_id =, rol_party_id =, daterange(desde, hasta, []) &&): dos periodos del mismo rol no se cruzan (extension btree_gist)'
+}
+
+Table party_contactos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null, note: 'FK parties. Natural o juridica (plan 1.3b D9)']
+  nombres varchar(100) [not null, note: 'CHECK no en blanco']
+  apellidos varchar(100) [not null, note: 'CHECK no en blanco']
+  cargo varchar(120)
+  area varchar(120)
+  telefono varchar(30)
+  email varchar(150) [note: 'En minusculas']
+  es_decisor boolean [not null, default: false, note: 'Si decide la compra']
+  es_principal boolean [not null, default: false, note: 'CHECK principal => hasta nulo. Unico parcial (party_id) WHERE es_principal']
+  desde date [note: 'Desde cuando esta en la institucion. Nulo = no se sabe (plan 1.3b D1)']
+  hasta date [note: 'Ultimo dia en la institucion (incluido). Nulo = vigente. CHECK hasta >= desde. Reemplaza a es_activo (plan 1.3b D1)']
+  contacto_anterior_id bigint [ref: - party_contactos.id, unique, note: 'Vinculo cerrado del que viene (traslado). Unico: un vinculo continua en un solo lugar. CHECK <> id']
+  version integer [not null, default: 1, note: 'Bloqueo optimista']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  indexes {
+    (party_id, id) [unique, note: 'Destino de la FK compuesta de party_sedes']
+  }
+  Note: 'Personas de contacto: cada fila es un vinculo (esta persona en esta organizacion). Cuando alguien rota no se borra: se cierra aqui y se abre otro vinculo enlazado (plan 1.3b D1). Datos personales: solo aqui y en su bitacora (derechos ARCO pendientes). Escritura solo por las acciones nucleo.parties.*-contacto'
+}
+
+Table party_sedes [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null, note: 'FK parties']
+  nombre varchar(150) [not null, note: 'CHECK no en blanco']
+  nombre_comparable varchar(150) [not null, note: 'lower(unaccent(nombre)): el modelo se lo pide a la base al guardar (PartySede::comparable); CHECK lo verifica. Unico parcial (party_id, nombre_comparable) WHERE es_activa (plan 1.3b D4)']
+  direccion varchar(255) [not null, note: 'CHECK no en blanco']
+  ubigeo_id bigint [ref: > ubigeos.id, note: 'FK ubigeos']
+  latitud decimal(10,7) [note: 'CHECK las dos o ninguna; -90 a 90']
+  longitud decimal(10,7) [note: 'CHECK -180 a 180']
+  contacto_id bigint [ref: > party_contactos.id, note: 'Contacto en la sede. FK compuesta (party_id, contacto_id) -> party_contactos (party_id, id): solo un contacto de la misma party. El DBML v2 la llamaba contacto_party_id (plan 1.3b D4)']
+  codigo_establecimiento varchar(4) [note: 'Anexo SUNAT para guias de remision; lo podra llenar el padron. CHECK ^[0-9]{4}$. Unico parcial (party_id, codigo) WHERE es_activa (plan 1.3b D3)']
+  es_activa boolean [not null, default: true]
+  version integer [not null, default: 1, note: 'Bloqueo optimista']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Sedes, sucursales, almacenes y puntos de entrega. Sin es_fiscal: la direccion fiscal es de la party. La direccion de una obra es del proyecto (etapa 2), nunca una sede. es_entrega llegara con despachos (plan 1.3b D3)'
+}
+
+Table party_cuentas_bancarias [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null, note: 'FK parties, el titular']
+  persona_tipo_id bigint [not null, note: 'Clave de persona del titular, copiada: FK compuesta (party_id, persona_tipo_id, persona_numero) -> parties ON UPDATE CASCADE (plan 1.3b D5 5b)']
+  persona_numero varchar(20) [not null]
+  banco_party_id bigint [ref: > parties.id, not null, note: 'FK parties, el banco: activo y con rol banco vigente (lo revisa el servicio)']
+  numero_cuenta varchar(30) [not null, note: 'Solo digitos: CHECK ^[0-9]{1,30}$. No se edita']
+  cci varchar(20) [note: 'CHECK exactamente 20 digitos. Solo se completa si estaba vacio. Digitos de control pendientes']
+  moneda_id bigint [ref: > monedas.id, not null, note: 'FK monedas. No se edita']
+  es_detraccion boolean [not null, default: false, note: 'Cuenta de detracciones: solo en el banco de parties.ruc_banco_detracciones y en moneda local. Unica activa por party. Nunca principal ni cuenta de pago normal']
+  es_principal boolean [not null, default: false, note: 'CHECK principal => activa y no detraccion. Unico parcial (party_id, moneda_id) WHERE es_principal']
+  es_activa boolean [not null, default: true]
+  version integer [not null, default: 1, note: 'Bloqueo optimista']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  indexes {
+    (party_id, banco_party_id, numero_cuenta) [unique, name: 'party_cuentas_bancarias_cuenta_unique']
+    (party_id, cci) [unique, note: 'WHERE cci IS NOT NULL']
+  }
+  Note: 'Cuentas para pago a proveedores y cobro de clientes. Banco, numero y moneda no cambian: se desactiva y se registra otra (plan 1.3b D5). EXCLUDE USING gist: la misma cuenta (banco + numero) o el mismo CCI solo se repite con la misma clave de persona (pareja DNI <-> RUC 10), tambien entre desactivadas. Registrar, desactivar y reactivar emiten eventos (aviso 1.10; aprobacion pendiente de Gerencia)'
+}
+
+// ---------- M2 - Autorizacion ----------
+
+Table reglas_aprobacion [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  nombre varchar(150) [not null]
+  documento_type varchar(120) [not null, note: 'Que tipo de documento aprueba']
+  ambito_type varchar(120) [note: 'proyecto | contrato | unidad. Nulo = global']
+  ambito_id bigint
+  moneda_id bigint [ref: > monedas.id, note: 'Nulo = cualquier moneda']
+  monto_desde decimal(14,2) [not null]
+  monto_hasta decimal(14,2) [note: 'Nulo = sin tope']
+  firmas_requeridas smallint [not null]
+  es_secuencial boolean [not null, note: 'Si el orden importa']
+  es_obligatorio boolean [not null, note: 'SI ESTA EN FALSO EL CONTROL NO BLOQUEA']
+  prioridad smallint [not null, note: 'Para desempatar reglas superpuestas']
+  es_activa boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Cruza ambito, moneda y rango de monto. El corazon del control'
+}
+
+Table regla_aprobadores [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  regla_aprobacion_id bigint [ref: > reglas_aprobacion.id, not null]
+  user_id bigint [ref: > users.id, note: 'FK users. Uno de los dos']
+  rol varchar(60) [note: 'O un rol en vez de una persona']
+  orden smallint [not null]
+  puede_delegar boolean [not null]
+  suplente_user_id bigint [ref: > users.id, note: 'Quien firma si no esta']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Quien puede firmar cada regla, y en que orden'
+}
+
+Table aprobaciones [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  aprobable_type varchar(120) [not null]
+  aprobable_id bigint [not null]
+  regla_aprobacion_id bigint [ref: > reglas_aprobacion.id, not null]
+  user_id bigint [ref: > users.id]
+  orden smallint [not null]
+  es_obligatorio boolean [not null, note: 'Copiado de la regla al crear']
+  estado varchar(20) [not null, note: 'pendiente | aprobado | observado | omitido']
+  firmado_at timestamptz
+  motivo text [note: 'Obligatorio si observa. PASA A CATALOGO (plan 1.5 D9; se construye en la 1.7): al observar, motivo_id a motivos (familia propia de observaciones) con comentario OBLIGATORIO, porque debe decir que corregir']
+  delegado_de bigint
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Las firmas de cada documento. Polimorfica'
+}
+
+// ---------- M3 - Estados ----------
+
+Table estados [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  documento_type varchar(120) [not null, note: 'Alias del morph map (orden_compra), no el nombre de la clase']
+  codigo varchar(40) [not null, note: 'Inmutable']
+  nombre varchar(80) [not null, note: 'Editable por pantalla; el sincronizador solo lo escribe al crear']
+  color varchar(20) [not null, note: 'Tono con nombre (plan 1.5 D10), CHECK: neutro | en_curso | por_aprobar | aprobado | alerta | cerrado | anulado. Editable por pantalla']
+  orden smallint [not null]
+  es_inicial boolean [not null, default: false, note: 'Uno por documento (indice unico parcial)']
+  es_final boolean [not null, default: false]
+  es_editable boolean [not null, default: false, note: 'Si el documento admite cambios en este estado']
+  es_cancelacion boolean [not null, default: false, note: 'CHECK: final y no editable']
+  es_activo boolean [not null, default: true]
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (documento_type, codigo) [unique]
+    (id, documento_type) [unique, note: 'Destino de llaves compuestas']
+    (id, documento_type, es_cancelacion) [unique, note: 'Destino de llaves compuestas']
+  }
+  Note: 'Catalogo de estados por tipo de documento. Lo escribe el sincronizador desde la definicion de cada modulo (plan 1.5 D1)'
+}
+
+Table transiciones_estado [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  documento_type varchar(120) [not null, note: 'Copiado en las dos llaves: desde y hacia son del mismo documento']
+  codigo varchar(40) [not null, note: 'La accion (aprobar). Inmutable']
+  nombre varchar(80) [not null]
+  orden smallint [not null]
+  desde_estado_id bigint [ref: > estados.id, not null, note: 'FK compuesta (desde_estado_id, documento_type)']
+  hacia_estado_id bigint [ref: > estados.id, not null, note: 'FK compuesta (hacia_estado_id, documento_type, hacia_es_cancelacion)']
+  hacia_es_cancelacion boolean [not null, default: false, note: 'Copia de estados.es_cancelacion; CHECK: si es true, requiere_motivo']
+  requiere_motivo boolean [not null, default: false, note: 'CHECK: = (tipo_motivo_id IS NOT NULL)']
+  tipo_motivo_id bigint [ref: > tipos_motivo.id, note: 'La lista de motivos de esta transicion']
+  requiere_aprobacion boolean [not null, default: false, note: 'La ejecuta el mecanismo de aprobaciones (1.7) como transicion del sistema. CHECK: si es true, permiso nulo']
+  permiso varchar(80) [note: 'Permiso necesario para ejecutarla. Nulo: transicion del sistema o con aprobacion (quien firma vive en las reglas de aprobacion)']
+  es_activa boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (documento_type, desde_estado_id, codigo) [unique]
+    (id, desde_estado_id, hacia_estado_id, requiere_motivo) [unique, note: 'Destino de llaves compuestas']
+    (id, tipo_motivo_id) [unique, note: 'Destino de llaves compuestas']
+  }
+  Note: 'Que saltos estan permitidos entre estados'
+}
+
+Table historial_estados [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  documentable_type varchar(120) [not null, note: 'FK compuesta (hacia_estado_id, documentable_type) a estados']
+  documentable_id bigint [not null]
+  desde_estado_id bigint [ref: > estados.id, note: 'Nulo solo en la fila de la creacion (CHECK con transicion_id)']
+  hacia_estado_id bigint [ref: > estados.id, not null]
+  transicion_id bigint [ref: > transiciones_estado.id, note: 'FK compuesta (transicion_id, desde_estado_id, hacia_estado_id, requiere_motivo)']
+  requiere_motivo boolean [not null, default: false, note: 'Copia de la transicion; CHECK: = (motivo_id IS NOT NULL) = (tipo_motivo_id IS NOT NULL)']
+  tipo_motivo_id bigint [ref: > tipos_motivo.id, note: 'Copia; FK compuesta (transicion_id, tipo_motivo_id)']
+  motivo_id bigint [ref: > motivos.id, note: 'FK compuesta (motivo_id, tipo_motivo_id, motivo_es_otro): de la lista de la transicion']
+  motivo_es_otro boolean [not null, default: false, note: 'Copia de motivos.es_otro. CHECK: con motivo_id']
+  motivo_detalle text [note: 'Solo con Otro, no en blanco (CHECK); el minimo de caracteres lo revisa el servicio (parametro motivos.minimo_detalle_otro)']
+  comentario text [note: 'Opcional, no en blanco']
+  user_id bigint [ref: > users.id, not null]
+  originado_por_user_id bigint [ref: > users.id, note: 'En transiciones del sistema, la persona que la disparo']
+  fecha timestamptz [not null, default: `now()`]
+  indexes {
+    (documentable_type, documentable_id, id)
+  }
+  Note: 'Bitacora de cada cambio de estado. Polimorfica. Solo se inserta (plan 1.5 D2). El motivo paso de texto libre a catalogo (D9)'
+}
+
+Table efectos_aplicados [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  historial_estado_id bigint [ref: > historial_estados.id, not null]
+  clave varchar(120) [not null, note: 'Clave del efecto en el registro']
+  orden smallint [not null]
+  es_externo boolean [not null, default: false, note: 'Externo: lo corre un job despues del commit']
+  datos jsonb [not null, default: '{}', note: 'Lo que hizo aplicar(); revertir() usa esto. Montos como texto decimal. No se muestra tal cual']
+  ejecutado_at timestamptz [note: 'CHECK: obligatorio si es interno']
+  revertido_por_historial_id bigint [ref: > historial_estados.id, note: 'La fila que lo revirtio (anular); posterior a la suya']
+  reservado_hasta timestamptz [note: 'Externo: un intento del job lo tomo hasta esta hora (envio fuera de transaccion); vencida, otro la retoma. CHECK: solo externo sin ejecutar']
+  reversion_reservada_hasta timestamptz [note: 'Igual, para revertir al anular. CHECK: solo externo revertido sin reversion hecha']
+  reversion_ejecutada_at timestamptz [note: 'Externo: el job ya corrio revertir(). CHECK: solo externo revertido que salio o pudo salir (ejecutado o reservado)']
+  indexes {
+    (historial_estado_id, orden) [unique]
+  }
+  Note: 'Efectos aplicados en cada cambio de estado, para revertir lo que se hizo de verdad (plan 1.5 D3, D4)'
+}
+
+// ---------- M4 - Auditoria ----------
+
+Table auditoria_cambios [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  auditable_type varchar(120) [not null]
+  auditable_id bigint [not null]
+  evento varchar(20) [not null, note: 'creado | actualizado | eliminado']
+  user_id bigint [ref: > users.id]
+  valores_anteriores text
+  valores_nuevos text
+  ip varchar(45)
+  agente varchar(255)
+  fecha timestamptz [not null]
+  Note: 'Que cambio, quien y cuando. Polimorfica'
+}
+
+// ---------- M5 - Catalogos ----------
+
+Table monedas [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(3) [not null]
+  nombre varchar(40) [not null]
+  simbolo varchar(5) [not null]
+  decimales smallint [not null]
+  es_activa boolean [not null]
+  Note: 'Soles y dolares'
+}
+
+Table tipos_cambio [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  moneda_id bigint [ref: > monedas.id, not null]
+  fecha date [not null]
+  compra decimal(10,4) [not null]
+  venta decimal(10,4) [not null]
+  origen varchar(30) [note: 'sunat | manual']
+  Note: 'Cotizacion diaria SUNAT'
+}
+
+Table unidades_medida [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(10) [not null]
+  nombre varchar(60) [not null]
+  abreviatura varchar(10) [not null]
+  permite_decimales boolean [not null]
+  es_activa boolean [not null]
+  Note: 'Unidad, metro, kilogramo, servicio'
+}
+
+Table ubigeos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(6) [not null]
+  departamento varchar(60) [not null]
+  provincia varchar(60) [not null]
+  distrito varchar(60) [not null]
+  es_activo boolean [not null]
+  Note: 'Departamento, provincia y distrito del Peru'
+}
+
+Table tipos_documento [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(3) [not null, note: 'Codigo SUNAT']
+  nombre varchar(80) [not null]
+  es_electronico boolean [not null]
+  afecta_cuenta_corriente boolean [not null]
+  signo smallint [not null, note: '1 suma, -1 resta']
+  es_activo boolean [not null]
+  Note: 'Factura, boleta, nota de credito, guia'
+}
+
+Table formas_pago [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(80) [not null]
+  dias smallint
+  es_activa boolean [not null]
+  Note: 'Contado, credito 30, credito 60'
+}
+
+Table lineas_solucion [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(80) [not null]
+  es_activa boolean [not null]
+  Note: 'Videovigilancia, redes, datacenter, software'
+}
+Table origenes_comerciales [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null, unique, note: 'Inmutable (ADR 0013)']
+  nombre varchar(80) [not null]
+  es_activo boolean [not null, default: true]
+  Note: 'Plan 2.20a N3. De donde llega una cuenta, un lead o una oportunidad: convocatoria publica, convocatoria privada, referencia, feria, sitio web, visita en frio. Reemplaza a origenes_lead (un solo catalogo para cuentas, leads y oportunidades). Sin Otro'
+}
+Table niveles_gobierno [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null, unique, note: 'Inmutable (ADR 0013)']
+  nombre varchar(80) [not null]
+  es_activo boolean [not null, default: true]
+  Note: 'Plan 2.20a N3. Gobierno local, regional o nacional de una cuenta publica'
+}
+Table rubros [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null, unique, note: 'Letra de la seccion CIIU Rev. 4 (A a U). Inmutable']
+  nombre varchar(120) [not null, note: 'Oficial abreviado; lo unico editable']
+  es_activo boolean [not null, default: true]
+  Note: 'Plan 2.20a N3. Las 21 secciones de la CIIU Rev. 4 (INEI; la usa SUNAT en el RUC). Catalogo cerrado: sin crear ni borrar desde la pantalla'
+}
+
+Table cubso [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  descripcion varchar(500) [not null]
+  unidad_medida_id bigint [ref: > unidades_medida.id]
+  version_catalogo varchar(20)
+  es_activo boolean [not null]
+  Note: 'Catalogo unico de bienes y servicios del Estado. 57 610 codigos'
+}
+
+Table tipos_penalidad [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(80) [not null]
+  es_activo boolean [not null]
+  Note: 'Mora, incumplimiento parcial, resolucion'
+}
+
+Table tipos_trabajo [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(60) [not null]
+  es_facturable_default boolean [not null]
+  es_activo boolean [not null]
+  Note: 'Desarrollo, analisis, pruebas, soporte, reunion'
+}
+
+// ---------- M6 - Numeracion ----------
+
+Table series_documento [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  tipo_documento_id bigint [ref: > tipos_documento.id]
+  documento_type varchar(120) [not null]
+  serie varchar(10) [not null]
+  proyecto_id bigint [ref: > proyectos.id, note: 'Series por proyecto']
+  contrato_id bigint [ref: > contratos.id, note: 'Series por contrato']
+  anio smallint [note: 'Nulo = no reinicia']
+  ultimo_numero integer [not null]
+  longitud smallint [not null, note: 'Digitos del correlativo']
+  es_activa boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Correlativos por tipo de documento, ambito y anio'
+}
+
+// ---------- M7 - Adjuntos ----------
+
+Table tipos_adjunto [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(30) [not null]
+  nombre varchar(80) [not null]
+  documento_type varchar(120)
+  es_obligatorio boolean [not null]
+  extensiones_permitidas varchar(150)
+  tamano_maximo_mb smallint [not null]
+  es_activo boolean [not null]
+  Note: 'Que tipos de archivo existen y cuales son obligatorios'
+}
+
+Table adjuntos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  adjuntable_type varchar(120) [not null]
+  adjuntable_id bigint [not null]
+  tipo_adjunto_id bigint [ref: > tipos_adjunto.id]
+  nombre_original varchar(255) [not null]
+  ruta varchar(500) [not null, note: 'NUNCA el binario']
+  mime varchar(120) [not null]
+  tamano_bytes bigint [not null]
+  hash varchar(64) [note: 'Para detectar duplicados']
+  disco varchar(30) [not null, note: 'local | s3']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  es_sensible boolean [not null, default: false, note: 'Examenes medicos, sueldos. La IA no los procesa y nunca salen a un servicio externo']
+  Note: 'Los archivos viven en disco. Aqui solo la ruta'
+}
+
+// ---------- M8 - Notificaciones ----------
+
+Table plantillas_notificacion [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(60) [not null]
+  nombre varchar(120) [not null]
+  evento varchar(80) [not null, note: 'contrato_por_vencer | fianza_por_vencer']
+  canal varchar(20) [not null, note: 'email | sistema | ambos']
+  asunto varchar(200) [not null]
+  cuerpo text [not null]
+  dias_anticipacion smallint [not null, note: '0 = al ocurrir']
+  es_recurrente boolean [not null, note: 'Repetir hasta que se resuelva']
+  es_activa boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Que se avisa, a quien y con cuanta anticipacion'
+}
+
+Table notificaciones [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  plantilla_notificacion_id bigint [ref: > plantillas_notificacion.id]
+  notificable_type varchar(120)
+  notificable_id bigint
+  user_id bigint [ref: > users.id, not null]
+  asunto varchar(200) [not null]
+  cuerpo text [not null]
+  canal varchar(20) [not null]
+  leida_at timestamptz
+  enviada_at timestamptz
+  fecha timestamptz [not null]
+  Note: 'Los avisos emitidos y su estado de lectura'
+}
+
+// ---------- M9 - Configuracion ----------
+
+Table parametros [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  grupo varchar(60) [not null]
+  clave varchar(80) [not null]
+  valor text [not null]
+  tipo varchar(20) [not null, note: 'texto | numero | booleano | fecha']
+  descripcion varchar(255)
+  es_editable boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Valores del negocio editables sin tocar el programa'
+}
+
+// ---------- M10 - Seguridad ----------
+
+Table users [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, note: 'FK parties']
+  name varchar(150) [not null]
+  email varchar(150) [not null]
+  password varchar(255) [not null]
+  unidad_organizativa_id bigint [ref: > unidades_organizativas.id, note: 'NO SE CREA (plan 1.4 D4): la unidad sale del puesto (puesto_id; puestos.unidad_organizativa_id es obligatoria)']
+  es_activo boolean [not null]
+  ultimo_acceso timestamptz
+  cumpleanos_dia smallint [note: 'Plan 1.4b D6: dia del cumpleanos, sin anio. Con cumpleanos_mes: los dos o ninguno, fecha valida (CHECK). Dato personal: no va a la bitacora']
+  cumpleanos_mes smallint
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Usuarios del sistema. Cuelga de parties. Plan 1.4 D4: party_id obligatorio salvo el usuario de sistema; copia la clave de persona de su ficha (persona_tipo_id, persona_numero, FK compuesta a parties) y es UNIQUE: una persona, una cuenta, tambien entre su ficha DNI y su RUC 10. Solo fichas DNI, CE o pasaporte (lo valida SeguridadService). Ademas: puesto_id (FK puestos), version; ultimo_acceso se llama ultimo_acceso_at (convencion: _at para marcas de tiempo). name se copia de la persona y se actualiza al editarla'
+}
+
+Table unidades_organizativas [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  parent_id bigint [ref: > unidades_organizativas.id, note: 'FK a si misma']
+  codigo varchar(20) [not null]
+  nombre varchar(120) [not null]
+  tipo varchar(30) [not null, note: 'gerencia | jefatura | coordinacion | area']
+  jefe_user_id bigint [ref: > users.id, note: 'REEMPLAZADO por jefe_puesto_id (plan 1.4 D5): el jefe es un puesto de la misma unidad (FK compuesta), con un solo ocupante activo; si cambia el ocupante la jefatura lo sigue y una vacante queda a la vista']
+  orden smallint [not null]
+  es_activa boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'El organigrama. Autoreferenciada: admite cualquier jerarquia. Plan 1.4 D5: codigo UNIQUE, CHECK de tipo, nombre unico entre hermanas, version. Sin ciclos: lo garantiza OrganigramaService con un candado del arbol'
+}
+
+Table permisos_por_ambito [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  user_id bigint [ref: > users.id]
+  rol varchar(60) [note: 'REEMPLAZADO por rol_id (FK roles de spatie, not null) (plan 1.4 D7): se asigna un rol, la unidad de la grilla']
+  permiso varchar(80) [not null, note: 'NO SE CREA (plan 1.4 D7): los permisos los da el rol']
+  ambito_type varchar(120) [not null, note: 'Alias del morph map. CHECK con los tipos conocidos: hoy unidad_organizativa']
+  ambito_id bigint [not null]
+  desde date
+  hasta date
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Permisos acotados a un proyecto, contrato o almacen. Plan 1.4 D7: user_id not null, hasta = ultimo dia vigente en hora de Lima, EXCLUDE para que el mismo rol en el mismo ambito no se cruce en el tiempo, version'
+}
+
+// ---------- Interfaz - Saludo y ambientacion (plan 1.4b) ----------
+
+Table categorias_frase [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null, unique, note: 'propias | autores | refranes | versiculos']
+  nombre varchar(60) [not null]
+  es_activa boolean [not null, note: 'Apagarla la apaga para toda la empresa']
+  version integer [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Categorias de las frases del saludo (plan 1.4b D1a). Catalogo editable (ADR 0013)'
+}
+
+Table frases_saludo [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(40) [not null, unique]
+  tipo varchar(20) [not null, note: 'saludo (lleva {nombre}, sin categoria) | frase (con categoria) | agradecimiento (plan 1.4b D10: lleva {anios}, hasta 60 caracteres, sin categoria; barra superior en el aniversario)']
+  categoria_frase_id bigint [ref: > categorias_frase.id]
+  idioma varchar(2) [not null, note: 'es | en | fr']
+  texto varchar(300) [not null]
+  fuente varchar(120) [note: 'Autor, Refran, o versiculo con version: Proverbios 16:3 (RVR1960)']
+  momento varchar(10) [note: 'manana | tarde | noche; nulo: siempre']
+  dia_semana smallint [note: '1 lunes a 7 domingo; nulo: siempre']
+  area varchar(10) [note: 'crm | erp; nulo: siempre']
+  ocasion varchar(20) [note: 'Fecha especial (enum Ocasion); nulo: siempre']
+  es_activa boolean [not null]
+  version integer [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Saludos y frases del inicio y agradecimientos del aniversario (plan 1.4b D1, D2, D10). Catalogo editable. CHECKs: valores; solo la frase lleva categoria; el saludo lleva {nombre}; el agradecimiento lleva {anios} y no pasa de 60 caracteres'
+}
+
+Table categorias_frase_usuario [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  categoria_frase_id bigint [not null, ref: > categorias_frase.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Categorias que la persona apago para si (plan 1.4b D1a). UNIQUE (user_id, categoria_frase_id)'
+}
+
+Table feriados [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(10) [not null, unique, note: 'La fecha, AAAA-MM-DD (CHECK de fecha valida): codigo del catalogo']
+  nombre varchar(80) [not null]
+  tipo varchar(20) [not null, note: 'feriado_nacional | no_laborable | libre_empresa (CHECK)']
+  techquk_no_trabaja boolean [not null, default: false, note: 'Siempre true salvo en no_laborable (CHECK): solo cuenta como no habil lo que Techquk no trabaja']
+  es_activo boolean [not null, default: true]
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Feriados y dias no laborables (plan 1.4d D2), catalogo editable. Lo lee CalendarioLaboral (dia habil = lunes a viernes y no marcado como no trabajado)'
+}
+
+Table grandes_momentos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  ocasion varchar(20) [not null, note: 'navidad | anio_nuevo | semana_santa | fiestas_patrias | aniversario (CHECK)']
+  anio smallint [not null, note: 'El anio del dia clave (CHECK 2000-2200)']
+  variante varchar(40) [not null, note: 'Clave de la VarianteGranMomento (codigo, sin FK)']
+  frase_saludo_id bigint [ref: > frases_saludo.id, note: 'El versiculo elegido; nulo si no habia']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Lo elegido para el gran momento de una fecha un anio (plan 1.4d D7), igual para todas las personas. UNIQUE (ocasion, anio). Se elige la primera vez que hace falta, saltando lo del anio anterior'
+}
+
+Table momentos_vistos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  gran_momento_id bigint [not null, ref: > grandes_momentos.id]
+  created_at timestamptz [not null, note: 'Cuando lo vio']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Quien vio cada gran momento (plan 1.4d D4). UNIQUE (user_id, gran_momento_id)'
+}
+
+Table preferencias_usuario [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  clave varchar(80) [not null, note: 'grupo.nombre en snake_case (CHECK), declarada en RegistroPreferencias']
+  valor text [not null, note: 'Como texto; el registro lo convierte a su tipo (nunca float). Un valor que ya no vale cuenta como el defecto']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Preferencias que la persona cambio (plan 1.4g D2). UNIQUE (user_id, clave). Sin fila vale el defecto del registro. Nunca datos personales ni estado de trabajo; las listas viven en la tabla de su modulo'
+}
+
+Table modulos_ocultos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  clave_modulo varchar(40) [not null, note: 'Clave de la CajaModulo (codigo, sin FK): minusculas, cifras y guiones (CHECK). Una clave de una caja que ya no existe se ignora']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Modulos que la persona saco de su barra lateral (plan 1.4f D2, D4). UNIQUE (user_id, clave_modulo). Se guarda lo oculto, no lo elegido; nunca da acceso'
+}
+
+// ---------- CRM-01 - Cuentas y contactos ----------
+
+Table cuentas [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null, unique, note: 'FK parties. Una cuenta por ficha (plan 2.20 D1)']
+  ejecutivo_user_id bigint [ref: > users.id, not null, note: 'Quien la atiende. Plan 2.20 D7: obligatorio; usuario activo con crm.cuentas.atender al asignarlo']
+  origen_comercial_id bigint [ref: > origenes_comerciales.id, not null, note: 'Plan 2.20 D4: catalogo comun con leads y oportunidades. Publica o privada no se guarda: se deriva del tipo entidad vigente de la party (D3; antes es_entidad_publica)']
+  nivel_gobierno_id bigint [ref: > niveles_gobierno.id, note: 'Plan 2.20 D4: obligatorio solo si la party tiene el tipo entidad vigente (lo exige el servicio: publica se deriva de party_roles, la base no puede); nulo si es privada. Si la party deja de ser publica, se conserva y no se muestra']
+  cliente_desde date [note: 'Plan 2.20 D8: nula = prospecto. Siempre la fecha mas antigua de cuenta_marcas_cliente; se recalcula en la misma transaccion']
+  version integer [not null, default: 1, note: 'Bloqueo optimista']
+  notas text
+  es_activa boolean [not null]
+  motivo_inactiva_id bigint [ref: > motivos.id, note: 'Plan 2.20 D9: familia crm.cuentas.desactivar. CHECK: inactiva <=> con motivo']
+  motivo_inactiva_detalle text [note: 'Detalle obligatorio si el motivo es Otro']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Ficha comercial de un party con rol cliente. Sin clasificacion (A | B | C): pendiente, ver plan 2.20 D6. Sin cuenta_historial: la bitacora del nucleo y las actividades de CRM-05 (D10)'
+}
+
+Table cuenta_marcas_cliente [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  cuenta_id bigint [ref: > cuentas.id, not null]
+  origen varchar(20) [not null, note: 'oportunidad | manual. CHECK']
+  oportunidad_id bigint [note: 'Si origen = oportunidad (CHECK). Sin FK declarada aqui: la tabla es de CRM-02; se agrega al crearla']
+  fecha date [not null]
+  comentario text [note: 'Obligatorio si origen = manual (CHECK)']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  quitada_en timestamptz [note: 'Plan 2.20 D8.6: la manual se anula al quitarla, no se borra. CHECK: quitada_en, quitada_por_user_id y motivo_quitada juntas, solo en la manual']
+  quitada_por_user_id bigint [ref: > users.id]
+  motivo_quitada text [note: 'Texto libre obligatorio al quitar (desarrollador, 2026-11-06)']
+  updated_at timestamptz [note: 'Al anularla']
+  updated_by bigint
+  indexes {
+    oportunidad_id [unique, note: 'Parcial: WHERE oportunidad_id IS NOT NULL. Una oportunidad marca una sola cuenta']
+    cuenta_id
+    cuenta_id [unique, note: 'Parcial: WHERE origen = manual AND quitada_en IS NULL. Una manual vigente por cuenta']
+  }
+  Note: 'Plan 2.20 D8: por que una cuenta es cliente. Se borra la fila al revertir la ganada; la manual se anula al quitarla, con su motivo. cliente_desde = la fecha mas antigua de las no anuladas'
+}
+
+// ---------- CRM-02 - Oportunidades ----------
+
+Table oportunidades [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'OP-AAAA-NNNN (plan 2.21, D1)']
+  cuenta_id bigint [ref: > cuentas.id, not null, note: 'No cambia despues de crear (D1)']
+  nombre varchar(200) [not null]
+  descripcion text
+  monto_estimado decimal(14,2) [not null, note: 'CHECK > 0 (D8)']
+  moneda_id bigint [ref: > monedas.id, not null]
+  fecha_cierre_estimada date [not null]
+  fecha_cierre_real date [note: 'Al ganar o perder; nunca futura (D3)']
+  estado_id bigint [ref: > estados.id, not null, note: 'La etapa es el estado (D1)']
+  en_etapa_desde date [not null, note: 'Copia de la ultima entrada al estado actual en historial_estados; la pone un efecto (D2)']
+  origen_comercial_id bigint [ref: > origenes_comerciales.id, not null, note: 'Por defecto el de la cuenta (D7); antes origen_lead_id']
+  ejecutivo_user_id bigint [ref: > users.id, not null]
+  linea_solucion_id bigint [ref: > lineas_solucion.id, not null]
+  necesidad_confirmada boolean [not null, default: false, note: 'Requisito de calificar (D9)']
+  presupuesto_confirmado boolean [not null, default: false, note: 'El cliente tiene presupuesto (D9; pendiente Embudo comercial)']
+  decisor_contacto_id bigint [ref: > party_contactos.id, note: 'Un contacto de la ficha de la cuenta (D9)']
+  ganador_conocido varchar(20) [note: 'si, no, no_se_sabe; CHECK; obligatorio solo en perdida (D4)']
+  version integer [not null, note: 'Bloqueo optimista']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'El negocio en curso (plan 2.21). Sin probabilidad: la da la etapa, por parametro (D2). El motivo de perder, retroceder o anular queda en historial_estados (nucleo). campania_id y ticket_id no se crean: los agrega cada modulo cuando exista (D12)'
+}
+
+Table oportunidad_lineas [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  oportunidad_id bigint [ref: > oportunidades.id, not null]
+  producto_id bigint [ref: > productos.id]
+  descripcion varchar(300) [not null]
+  cantidad decimal(12,3) [not null]
+  precio_estimado decimal(14,4) [not null]
+  subtotal decimal(14,2) [not null]
+  Note: 'NO SE CONSTRUYE (plan 2.21, D8): los items van en la cotizacion (CRM-03). Si se pide una estimacion por item, es una tabla nueva'
+}
+
+Table oportunidad_competidores [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  oportunidad_id bigint [ref: > oportunidades.id, not null]
+  party_id bigint [ref: > parties.id, not null, note: 'Ficha de Personas y empresas, con el tipo Competidor; nunca texto libre (D4)']
+  precio decimal(14,2) [note: 'CHECK > 0; con su moneda']
+  moneda_id bigint [ref: > monedas.id]
+  precio_desconocido boolean [not null, default: false, note: 'CHECK: precio y moneda juntos, o precio_desconocido sin ninguno (solo el ganador lo marca)']
+  es_ganador boolean [not null, default: false, note: 'Unico parcial: un ganador por oportunidad']
+  fortalezas text
+  debilidades text
+  version integer [not null]
+  created_at timestamptz [not null]
+  created_by bigint [not null]
+  updated_at timestamptz
+  updated_by bigint
+  Note: 'Contra quien se compite y a que precio (plan 2.21, D4). Unico (oportunidad_id, party_id)'
+}
+
+Table motivos_perdida [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(100) [not null]
+  es_activo boolean [not null]
+  Note: 'REEMPLAZADA (plan 1.5 D9b): no se crea. La perdida de una oportunidad usa la familia perdida_oportunidad de motivos, con Otro y comentario. Lista inicial a validar con el area comercial: precio, plazo, requisito, competencia, sin presupuesto (la siembra el CRM en la etapa 2)'
+}
+
+// ---------- CRM-03 - Cotizaciones ----------
+
+Table cotizaciones [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, note: 'COT-AAAA-NNNN; lo comparten sus versiones (plan 2.22, D2)']
+  numero_version smallint [not null, note: 'unico con numero']
+  oportunidad_id bigint [ref: > oportunidades.id, not null, note: 'Obligatoria (plan 2.22, P1)']
+  cuenta_id bigint [ref: > cuentas.id, not null, note: 'La de la oportunidad']
+  contacto_id bigint [ref: > party_contactos.id, note: 'Atencion']
+  moneda_id bigint [ref: > monedas.id, not null]
+  presupuesto_id bigint [ref: > presupuestos.id, note: 'Presupuesto con APU enlazado, no copiado (C8)']
+  dias_validez smallint [not null]
+  fecha_emision date [note: 'Al emitir']
+  fecha_vencimiento date [note: 'Al emitir']
+  emitida_at timestamptz
+  tipo_cambio decimal(10,4) [note: 'Congelado al emitir']
+  igv_porcentaje decimal(5,2) [note: 'Congelado al emitir']
+  plazo_entrega_dias smallint
+  forma_pago_id bigint [ref: > formas_pago.id]
+  forma_pago_detalle varchar(200)
+  garantia_meses smallint
+  lugar_entrega varchar(200)
+  motivo_version_id bigint [ref: > motivos.id, note: 'Motivo de la version nueva (plan 1.5 D9)']
+  motivo_version_detalle varchar(300)
+  subtotal decimal(14,2) [not null]
+  descuento_total decimal(14,2) [not null]
+  igv decimal(14,2) [not null]
+  total decimal(14,2) [not null]
+  costo_total decimal(14,2) [not null]
+  margen_porcentaje decimal(6,2)
+  margen_minimo decimal(5,2) [note: 'Con que se midio al pedir aprobacion o emitir']
+  margen_objetivo decimal(5,2)
+  es_aceptada boolean [not null, note: 'Una sola por numero y por oportunidad']
+  fecha_aceptacion date
+  respaldo_tipo varchar(20) [note: 'orden_compra, orden_servicio, buena_pro, contrato, correo']
+  respaldo_referencia varchar(100)
+  respaldo_adjunto_id bigint [ref: > adjuntos.id]
+  adjunto_pdf_id bigint [ref: > adjuntos.id, note: 'El PDF que se envio']
+  estado_id bigint [ref: > estados.id, not null]
+  version integer [not null, note: 'Bloqueo optimista']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Cada fila es una version de la propuesta al cliente (plan 2.22, D2: reemplaza a cotizaciones + cotizacion_versiones)'
+}
+Table cotizacion_lineas [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  cotizacion_id bigint [ref: > cotizaciones.id, not null]
+  origen varchar(12) [not null, note: 'catalogo, libre o presupuesto']
+  producto_id bigint [ref: > productos.id, note: 'Solo las del catalogo']
+  descripcion varchar(500) [not null]
+  cantidad decimal(12,3) [not null]
+  unidad_medida_id bigint [ref: > unidades_medida.id, not null]
+  costo_unitario decimal(14,4) [not null]
+  precio_unitario decimal(14,4) [not null]
+  descuento_porcentaje decimal(5,2) [not null]
+  subtotal decimal(14,2) [not null]
+  margen_porcentaje decimal(6,2)
+  orden smallint [not null]
+  version integer [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Producto, cantidad, costo, precio y margen por linea (es_opcional, diferido: plan 2.22, P7)'
+}
+Table condiciones_comerciales [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(120) [not null]
+  forma_pago_id bigint [ref: > formas_pago.id]
+  garantia_meses smallint
+  texto text
+  es_activa boolean [not null]
+  Note: 'Formas de pago, plazos y garantias estandar'
+}
+
+// ---------- CRM-04 - Licitaciones ----------
+
+Table convocatorias [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  codigo_proceso varchar(60) [not null, note: 'El numero del SEACE']
+  entidad_party_id bigint [ref: > parties.id, not null, note: 'La entidad convocante']
+  tipo_procedimiento_id bigint [ref: > tipos_procedimiento.id, not null]
+  objeto varchar(500) [not null]
+  valor_referencial decimal(14,2)
+  moneda_id bigint [ref: > monedas.id, not null]
+  fecha_convocatoria date [not null]
+  estado_id bigint [ref: > estados.id, not null]
+  url_seace varchar(500)
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Los procesos de contratacion publica detectados'
+}
+
+Table convocatoria_cronograma [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  convocatoria_id bigint [ref: > convocatorias.id, not null]
+  etapa varchar(80) [not null, note: 'consultas | absolucion | presentacion | buena_pro']
+  fecha_inicio date [not null]
+  fecha_fin date
+  orden smallint [not null]
+  cumplida boolean [not null]
+  Note: 'Las etapas con sus fechas criticas'
+}
+
+Table participaciones [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  convocatoria_id bigint [ref: > convocatorias.id, not null]
+  decision varchar(20) [not null, note: 'participa | no_participa']
+  motivo_no_participar varchar(300) [note: 'Muestra donde esta el techo comercial. PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, con su tipo_motivo propio; texto libre solo como detalle de Otro o comentario']
+  monto_ofertado decimal(14,2)
+  responsable_user_id bigint [ref: > users.id, not null]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'La decision de participar y su seguimiento'
+}
+
+Table participacion_documentos [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  participacion_id bigint [ref: > participaciones.id, not null]
+  tipo_adjunto_id bigint [ref: > tipos_adjunto.id, not null]
+  adjunto_id bigint [ref: > adjuntos.id]
+  presentado boolean [not null]
+  fecha_presentacion date
+  Note: 'Que se presento en cada etapa'
+}
+
+Table participacion_resultado [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  participacion_id bigint [ref: > participaciones.id, not null]
+  resultado varchar(30) [not null, note: 'buena_pro | perdida | descalificada | desierta']
+  ganador_party_id bigint [ref: > parties.id]
+  ganador_nombre varchar(200)
+  precio_adjudicado decimal(14,2)
+  puesto smallint
+  motivo_descalificacion varchar(300) [note: 'PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, con su tipo_motivo propio; texto libre solo como detalle de Otro o comentario']
+  fecha date [not null]
+  Note: 'Quien gano y a que precio. El activo del modulo'
+}
+
+Table tipos_procedimiento [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(100) [not null]
+  monto_desde decimal(14,2)
+  monto_hasta decimal(14,2)
+  es_activo boolean [not null]
+  Note: 'Licitacion publica, adjudicacion simplificada, subasta inversa'
+}
+
+// ---------- CRM-05 - Actividades ----------
+
+Table actividades [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  tipo_actividad_id bigint [ref: > tipos_actividad.id, not null]
+  actividable_type varchar(120) [not null, note: 'cuenta | oportunidad | proyecto | ticket']
+  actividable_id bigint [not null]
+  asunto varchar(200) [not null]
+  fecha timestamptz [not null]
+  duracion_minutos smallint
+  resultado text
+  proxima_accion varchar(255)
+  proxima_fecha date
+  es_realizada boolean [not null]
+  responsable_user_id bigint [ref: > users.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Visitas, llamadas y proximas acciones. Polimorfica'
+}
+
+Table actividad_participantes [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  actividad_id bigint [ref: > actividades.id, not null]
+  party_contacto_id bigint [ref: > party_contactos.id]
+  user_id bigint [ref: > users.id]
+  es_principal boolean [not null]
+  Note: 'Quienes participaron, de ambos lados'
+}
+
+Table tipos_actividad [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(60) [not null]
+  icono varchar(40)
+  es_activa boolean [not null]
+  Note: 'Visita, llamada, correo, reunion tecnica, demostracion'
+}
+
+// ---------- CRM-06 - Catalogo comercial ----------
+
+Table productos [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  codigo varchar(40) [not null]
+  descripcion varchar(500) [not null]
+  descripcion_corta varchar(150)
+  marca_id bigint [ref: > marcas.id]
+  familia_producto_id bigint [ref: > familias_producto.id]
+  linea_solucion_id bigint [ref: > lineas_solucion.id]
+  unidad_medida_id bigint [ref: > unidades_medida.id, not null]
+  modelo varchar(100)
+  parte_fabricante varchar(80)
+  requiere_serie boolean [not null, note: 'Decide si el almacen exige numero de serie']
+  es_servicio boolean [not null]
+  stock_minimo decimal(12,3)
+  es_activo boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Que vende Techquk. Lo necesitan cotizaciones, compras y almacen'
+}
+
+Table marcas [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  nombre varchar(80) [not null]
+  party_id bigint [ref: > parties.id, note: 'Si tambien es proveedor']
+  es_activa boolean [not null]
+  Note: 'Los fabricantes representados'
+}
+
+Table familias_producto [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  parent_id bigint [ref: > familias_producto.id]
+  codigo varchar(20) [not null]
+  nombre varchar(120) [not null]
+  es_activa boolean [not null]
+  Note: 'Agrupacion jerarquica del catalogo'
+}
+
+Table producto_precios [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  producto_id bigint [ref: > productos.id, not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  precio decimal(14,4) [not null]
+  costo_referencial decimal(14,4)
+  margen_objetivo decimal(6,2)
+  vigente_desde date [not null]
+  vigente_hasta date
+  es_vigente boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Precio referencial y margen objetivo, con vigencia'
+}
+
+Table producto_cubso [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  producto_id bigint [ref: > productos.id, not null]
+  cubso_id bigint [ref: > cubso.id, not null]
+  es_principal boolean [not null]
+  Note: 'Equivalencia con el codigo del Estado'
+}
+
+Table producto_proveedores [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  producto_id bigint [ref: > productos.id, not null]
+  party_id bigint [ref: > parties.id, not null]
+  codigo_proveedor varchar(60)
+  costo decimal(14,4)
+  moneda_id bigint [ref: > monedas.id]
+  plazo_entrega_dias smallint
+  es_preferente boolean [not null]
+  actualizado_at timestamptz
+  Note: 'Que proveedores lo suministran y a que costo'
+}
+
+// ---------- CRM-07 - Campanias ----------
+
+Table campanias [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  nombre varchar(150) [not null]
+  tipo varchar(40) [not null, note: 'PASA A CATALOGO (plan 1.5 D9): tipos de campania']
+  desde date [not null]
+  hasta date
+  presupuesto decimal(14,2)
+  objetivo text
+  es_activa boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Acciones de prospeccion con su periodo y presupuesto'
+}
+
+Table leads [headercolor: #0F6E56] {
+  id bigint [pk, increment]
+  campania_id bigint [ref: > campanias.id]
+  origen_lead_id bigint [ref: > origenes_comerciales.id, not null, note: 'Plan 2.20a N3: el catalogo comun de origenes; al convertir el lead, pasa tal cual a la cuenta']
+  nombre_contacto varchar(150) [not null]
+  organizacion varchar(200)
+  email varchar(150)
+  telefono varchar(30)
+  mensaje text
+  party_id bigint [ref: > parties.id, note: 'Si se convirtio: evita duplicar la organizacion']
+  oportunidad_id bigint [ref: > oportunidades.id]
+  estado varchar(20) [not null]
+  motivo_descarte varchar(120) [note: 'PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, con su tipo_motivo propio; texto libre solo como detalle de Otro o comentario']
+  asignado_user_id bigint [ref: > users.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Contactos entrantes sin calificar'
+}
+
+
+// ---------- ERP-10 - Contratos ----------
+
+Table contratos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  numero_cliente varchar(60)
+  party_id bigint [ref: > parties.id, not null, note: 'La contraparte']
+  cotizacion_id bigint [ref: > cotizaciones.id]
+  participacion_id bigint [ref: > participaciones.id]
+  objeto varchar(500) [not null]
+  monto decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  fecha_firma date [not null]
+  fecha_inicio date [not null]
+  plazo_dias smallint [not null]
+  fecha_fin_contractual date [not null, note: 'La actualizan las adendas']
+  penalidad_diaria decimal(14,2) [note: 'SE CALCULA, no se digita (v4). CUANTO CUESTA CADA DIA DE ATRASO']
+  penalidad_tope_porcentaje decimal(5,2) [note: 'Normalmente 10%']
+  estado_id bigint [ref: > estados.id, not null]
+  responsable_user_id bigint [ref: > users.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  tipo_contrato varchar(20) [not null, default: 'bienes_servicios', note: 'bienes_servicios | obra']
+  forma_pago_id bigint [ref: > formas_pago.id]
+  penalidad_coeficiente decimal(4,2) [default: 0.10, note: 'Formula: coeficiente x monto / (F x plazo)']
+  penalidad_factor_f decimal(4,2) [note: 'F segun bases y reglamento vigente. v4: 0.40 hasta 60 dias. POR VALIDAR contra Ley 32069']
+  plazo_vigente_dias smallint [note: 'Calculado: plazo original mas adendas aprobadas con resolucion']
+  garantia_modalidad varchar(10) [default: 'fianza', note: 'fianza | retencion']
+  Note: 'La puerta del ERP. Todo compromiso firmado pasa por aqui'
+}
+
+Table contrato_hitos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  contrato_id bigint [ref: > contratos.id, not null]
+  descripcion varchar(255) [not null]
+  fecha_comprometida date [not null]
+  fecha_real date
+  dias_atraso smallint [note: 'Calculado al cumplirse']
+  monto_asociado decimal(14,2)
+  es_penalizable boolean [not null]
+  estado_id bigint [ref: > estados.id, not null]
+  orden smallint [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Los compromisos de entrega con fecha'
+}
+
+Table contrato_adendas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  contrato_id bigint [ref: > contratos.id, not null]
+  numero varchar(30) [not null]
+  tipo varchar(30) [not null, note: 'plazo | monto | alcance']
+  dias_ampliados smallint
+  monto_adicional decimal(14,2)
+  resolucion varchar(120)
+  fecha date [not null]
+  motivo text [note: 'PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, familia de causales de ampliacion de plazo, sembrada desde las causales de la Ley 32069 y su reglamento (verificar el articulo vigente al construir contratos); texto libre solo como detalle de Otro o comentario']
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Ampliaciones de plazo. Unica forma legitima de mover la fecha fin'
+}
+
+Table cartas_fianza [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  contrato_id bigint [ref: > contratos.id, note: 'Nulo si es garantia de seriedad de oferta (antes del contrato)']
+  tipo varchar(40) [not null, note: 'fiel_cumplimiento | adelanto | seriedad_oferta | monto_diferencial']
+  entidad_party_id bigint [ref: > parties.id, not null, note: 'El banco emisor']
+  numero varchar(60) [not null]
+  monto decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  emitida_el date [not null]
+  vence_el date [not null, note: 'DISPARA ALERTA']
+  es_renovable boolean [not null]
+  estado varchar(20) [not null]
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  participacion_id bigint [ref: > participaciones.id]
+  codigo varchar(20) [unique, note: 'GAR-AAAA-NNNN']
+  orden_costo_id bigint [ref: > ordenes_compra.id, note: 'Orden de servicio tipo garantia financiera con la comision']
+  condicion_devolucion varchar(300) [note: 'Que conformidad la libera']
+  conformidad_liberadora_id bigint [ref: > conformidades.id]
+  liberada_at date
+  devuelta_at date
+  Note: 'Garantias con vencimiento. Su caducidad puede ser un incumplimiento'
+}
+
+Table penalidades [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  contrato_id bigint [ref: > contratos.id, not null]
+  contrato_hito_id bigint [ref: > contrato_hitos.id]
+  tipo_penalidad_id bigint [ref: > tipos_penalidad.id, not null]
+  dias_atraso smallint [not null]
+  monto_calculado decimal(14,2) [not null]
+  monto_aplicado decimal(14,2)
+  motivo text [not null, note: 'PASA A CATALOGO (plan 1.5 D9): la clasificacion ya es tipo_penalidad_id (tipos_penalidad). Al construir contratos: si este texto solo repite el tipo, queda como comentario; si la causa necesita lista propia, motivo_id a motivos (familia de penalidades). Texto libre solo como detalle de Otro o comentario']
+  es_imputable boolean [not null, note: 'Si la causa fue de Techquk']
+  estado varchar(20) [not null, note: 'estimada | notificada | aplicada | exonerada']
+  fecha date [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Las incurridas, con su calculo y si la causa fue propia'
+}
+
+Table conformidades [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  contrato_id bigint [ref: > contratos.id, not null]
+  contrato_hito_id bigint [ref: > contrato_hitos.id]
+  fecha_solicitud date [not null]
+  fecha_otorgada date
+  observaciones text
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Las actas obtenidas del cliente'
+}
+
+// ---------- ERP-01 - Proyectos ----------
+
+Table proyectos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(30) [not null]
+  contrato_id bigint [ref: > contratos.id]
+  nombre varchar(200) [not null]
+  tipologia varchar(20) [not null, note: 'T1 a T6']
+  party_id bigint [ref: > parties.id, not null, note: 'El cliente']
+  fecha_inicio date [not null]
+  fecha_fin_prevista date [not null]
+  fecha_fin_real date
+  monto_contratado decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  jefe_proyecto_user_id bigint [ref: > users.id, not null]
+  estado_id bigint [ref: > estados.id, not null]
+  avance_porcentaje decimal(5,2) [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  es_interno boolean [not null, default: false, note: 'Un proyecto siempre tiene contrato salvo los internos']
+  Note: 'La ficha de ejecucion. Siete modulos dependen de ella'
+}
+
+Table plantillas_fase [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  tipologia varchar(20) [not null]
+  nombre varchar(120) [not null]
+  es_activa boolean [not null]
+  Note: 'Secuencia de fases por tipologia. Configurable sin programar'
+}
+
+Table plantilla_fase_pasos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  plantilla_fase_id bigint [ref: > plantillas_fase.id, not null]
+  nombre varchar(150) [not null]
+  orden smallint [not null]
+  dias_estimados smallint
+  es_obligatorio boolean [not null]
+  requiere_evidencia boolean [not null]
+  Note: 'Los pasos de cada fase de la plantilla'
+}
+
+Table proyecto_fases [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  nombre varchar(150) [not null]
+  orden smallint [not null]
+  fecha_inicio date
+  fecha_fin date
+  avance_porcentaje decimal(5,2) [not null]
+  estado_id bigint [ref: > estados.id, not null]
+  responsable_user_id bigint [ref: > users.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'La instancia real de la plantilla en un proyecto'
+}
+
+Table proyecto_hitos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  proyecto_fase_id bigint [ref: > proyecto_fases.id]
+  descripcion varchar(255) [not null]
+  fecha_comprometida date [not null]
+  fecha_real date
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Puntos de control internos, distintos de los contractuales'
+}
+
+Table proyecto_entregables [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  proyecto_fase_id bigint [ref: > proyecto_fases.id]
+  nombre varchar(200) [not null]
+  descripcion text
+  fecha_entrega date
+  estado_id bigint [ref: > estados.id, not null]
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Que se entrega y en que estado'
+}
+
+Table actas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  numero varchar(30) [not null]
+  tipo varchar(30) [not null, note: 'inicio | recepcion | conformidad']
+  fecha date [not null]
+  contenido text
+  firmada_cliente boolean [not null]
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Actas de inicio, recepcion y conformidad'
+}
+
+Table valorizaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  numero smallint [not null]
+  periodo date [not null]
+  avance_porcentaje decimal(5,2) [not null]
+  monto decimal(14,2) [not null]
+  estado_id bigint [ref: > estados.id, not null]
+  aprobada_at timestamptz
+  comprobante_id bigint [ref: > comprobantes.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  contrato_id bigint [ref: > contratos.id]
+  subcontrato_id bigint [ref: > subcontratos.id]
+  direccion varchar(12) [not null, default: 'cliente', note: 'cliente (se cobra) | subcontrato (se paga)']
+  monto_avance decimal(14,2) [note: 'Metrado ejecutado x precio contractual']
+  factor_reajuste decimal(10,7) [note: 'Formula polinomica con los indices del periodo']
+  monto_reajuste decimal(14,2)
+  monto_amortizacion decimal(14,2)
+  monto_retencion decimal(14,2)
+  monto_penalidades decimal(14,2)
+  monto_neto decimal(14,2) [note: 'Calculado. Habilita el comprobante por el neto']
+  Note: 'Avance valorizado por periodo, para las tipologias que lo requieren'
+}
+
+Table proyecto_presupuesto [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  partida varchar(120) [not null]
+  tipo_costo varchar(30) [not null, note: 'material | mano_obra | servicio | traslado | importacion']
+  monto_estimado decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'OBSOLETA v4 -> usar presupuestos + presupuesto_partidas + partida_arboles + partidas_control. NO MIGRAR. Lo estimado, por partida de costo'
+}
+
+Table proyecto_costos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  origen_type varchar(120) [not null, note: 'movimiento_linea | parte_horas | traslado | orden_compra | prorrateo']
+  origen_id bigint [not null]
+  tipo_costo varchar(30) [not null]
+  partida varchar(120)
+  fecha date [not null]
+  monto decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  tipo_cambio decimal(10,4)
+  monto_local decimal(14,2) [not null, note: 'Convertido a soles']
+  descripcion varchar(300)
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'OBSOLETA v4 -> usar imputaciones (selector de imputacion). NO MIGRAR. DONDE CONVERGE TODO EL COSTO REAL. Polimorfica en el origen'
+}
+
+Table proyecto_ubicaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  nombre varchar(150) [not null]
+  direccion varchar(255)
+  ubigeo_id bigint [ref: > ubigeos.id]
+  latitud decimal(10,7)
+  longitud decimal(10,7)
+  estado varchar(30)
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Puntos geograficos instalados. Para videovigilancia'
+}
+
+Table traslados [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  fecha date [not null]
+  origen varchar(255) [not null]
+  destino varchar(255) [not null]
+  kilometros decimal(8,2)
+  costo decimal(10,2) [not null]
+  vehiculo varchar(60)
+  motivo varchar(255) [not null, note: 'PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, con su tipo_motivo propio; texto libre solo como detalle de Otro o comentario']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Viajes imputados a proyecto. Fuente de costo que suele quedar fuera'
+}
+
+// ---------- ERP-02 - Compras ----------
+
+Table requerimientos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  proyecto_id bigint [ref: > proyectos.id]
+  solicitante_user_id bigint [ref: > users.id, not null]
+  fecha date [not null]
+  fecha_necesidad date [not null, note: 'Lo que permite priorizar']
+  justificacion text
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Que necesita un proyecto y para cuando'
+}
+
+Table requerimiento_lineas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  requerimiento_id bigint [ref: > requerimientos.id, not null]
+  producto_id bigint [ref: > productos.id]
+  descripcion varchar(500) [not null]
+  cantidad decimal(12,3) [not null]
+  unidad_medida_id bigint [ref: > unidades_medida.id, not null]
+  cantidad_atendida decimal(12,3) [not null]
+  almacen_destino_id bigint [ref: > almacenes.id]
+  estado_id bigint [ref: > estados.id, not null]
+  tipo_compra_id bigint [ref: > tipos_compra.id, not null]
+  partida_control_id bigint [ref: > partidas_control.id]
+  centro_costo_id bigint [ref: > centros_costo.id]
+  fecha_necesaria date
+  atencion varchar(10) [note: 'stock (reserva) | compra']
+  motivo_exceso_id bigint [ref: > motivos.id]
+  Note: 'Los items pedidos, con su destino'
+}
+
+Table cotizaciones_proveedor [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  requerimiento_id bigint [ref: > requerimientos.id]
+  party_id bigint [ref: > parties.id, not null, note: 'El proveedor']
+  fecha date [not null]
+  validez_dias smallint
+  moneda_id bigint [ref: > monedas.id, not null]
+  plazo_entrega_dias smallint
+  total decimal(14,2) [not null]
+  adjunto_id bigint [ref: > adjuntos.id]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Las ofertas recibidas. En S10 esta tabla tenia CERO registros'
+}
+
+Table cotizacion_proveedor_lineas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  cotizacion_proveedor_id bigint [ref: > cotizaciones_proveedor.id, not null]
+  requerimiento_linea_id bigint [ref: > requerimiento_lineas.id]
+  producto_id bigint [ref: > productos.id]
+  descripcion varchar(500) [not null]
+  cantidad decimal(12,3) [not null]
+  precio_unitario decimal(14,4) [not null]
+  subtotal decimal(14,2) [not null]
+  plazo_dias smallint
+  Note: 'Precio y plazo por item'
+}
+
+Table cuadros_comparativos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  requerimiento_id bigint [ref: > requerimientos.id, not null]
+  fecha date [not null]
+  criterio varchar(40) [not null, note: 'precio | plazo | calidad | mixto']
+  cotizacion_ganadora_id bigint [ref: > cotizaciones_proveedor.id]
+  justificacion text [not null, note: 'Obligatoria si no gana la mas barata']
+  elaborado_por bigint [not null]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'La comparacion de ofertas y la decision tomada'
+}
+
+Table ordenes_compra [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  party_id bigint [ref: > parties.id, not null]
+  requerimiento_id bigint [ref: > requerimientos.id]
+  cuadro_comparativo_id bigint [ref: > cuadros_comparativos.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  fecha date [not null]
+  fecha_entrega_comprometida date
+  moneda_id bigint [ref: > monedas.id, not null]
+  tipo_cambio decimal(10,4)
+  forma_pago_id bigint [ref: > formas_pago.id]
+  subtotal decimal(14,2) [not null]
+  igv decimal(14,2) [not null]
+  total decimal(14,2) [not null]
+  es_importacion boolean [not null]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  clase varchar(10) [not null, default: 'compra', note: 'compra (OC) | servicio (OS)']
+  lugar_entrega varchar(20) [note: 'almacen_central | almacen_obra']
+  Note: 'La orden emitida al proveedor'
+}
+
+Table orden_compra_lineas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  orden_compra_id bigint [ref: > ordenes_compra.id, not null]
+  requerimiento_linea_id bigint [ref: > requerimiento_lineas.id]
+  producto_id bigint [ref: > productos.id]
+  descripcion varchar(500) [not null]
+  cantidad decimal(12,3) [not null]
+  cantidad_recibida decimal(12,3) [not null]
+  unidad_medida_id bigint [ref: > unidades_medida.id, not null]
+  precio_unitario decimal(14,4) [not null]
+  subtotal decimal(14,2) [not null]
+  tipo_compra_id bigint [ref: > tipos_compra.id, not null]
+  partida_control_id bigint [ref: > partidas_control.id]
+  centro_costo_id bigint [ref: > centros_costo.id]
+  motivo_exceso_id bigint [ref: > motivos.id]
+  Note: 'Que se compra, contra que requerimiento'
+}
+
+Table evaluaciones_proveedor [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null]
+  orden_compra_id bigint [ref: > ordenes_compra.id]
+  periodo date [not null]
+  puntaje_plazo smallint [not null]
+  puntaje_calidad smallint [not null]
+  puntaje_precio smallint [not null]
+  puntaje_total decimal(5,2) [not null]
+  observaciones text
+  evaluado_por bigint [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Calificacion por cumplimiento de plazo, calidad y precio'
+}
+
+// ---------- ERP-03 - Importaciones ----------
+
+Table ordenes_importacion [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  orden_compra_id bigint [ref: > ordenes_compra.id, not null]
+  incoterm varchar(10) [not null, note: 'FOB | CIF | EXW | DDP']
+  agente_aduana_id bigint [ref: > agentes_aduana.id]
+  pais_origen varchar(60) [note: 'PASA A CATALOGO OFICIAL (plan 1.5 D9): paises ISO 3166']
+  valor_fob decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'La operacion, con su incoterm. 80 al ano en Techquk'
+}
+
+Table embarques [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  orden_importacion_id bigint [ref: > ordenes_importacion.id, not null]
+  via varchar(20) [not null, note: 'maritima | aerea | terrestre']
+  numero_documento varchar(60) [note: 'BL o AWB']
+  naviera varchar(120)
+  puerto_origen varchar(80) [note: 'PASA A CATALOGO (plan 1.5 D9): catalogo de puertos']
+  puerto_destino varchar(80)
+  fecha_embarque date
+  fecha_estimada_llegada date [note: 'CRUZA CON contrato_hitos']
+  fecha_llegada_real date
+  peso_kg decimal(12,3)
+  volumen_m3 decimal(12,3)
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'El envio fisico y sus fechas. Su atraso es la causa mas comun de penalidad'
+}
+
+Table declaraciones_aduana [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  embarque_id bigint [ref: > embarques.id, not null]
+  numero_dua varchar(40) [not null]
+  regimen varchar(40)
+  fecha_numeracion date [not null]
+  fecha_levante date
+  valor_cif decimal(14,2) [not null]
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'La DUA con su regimen'
+}
+
+Table conceptos_costo_importacion [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(80) [not null]
+  base_prorrateo varchar(20) [not null, note: 'valor | peso | volumen | unidades']
+  es_activo boolean [not null]
+  Note: 'Flete, seguro, derechos, agente, almacenaje'
+}
+
+Table gastos_importacion [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  orden_importacion_id bigint [ref: > ordenes_importacion.id, not null]
+  concepto_costo_id bigint [ref: > conceptos_costo_importacion.id, not null]
+  party_id bigint [ref: > parties.id]
+  comprobante_id bigint [ref: > comprobantes.id]
+  fecha date [not null]
+  monto decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  tipo_cambio decimal(10,4)
+  monto_local decimal(14,2) [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Cada gasto con su comprobante'
+}
+
+Table prorrateo_importacion [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  gasto_importacion_id bigint [ref: > gastos_importacion.id, not null]
+  orden_compra_linea_id bigint [ref: > orden_compra_lineas.id, not null]
+  base_valor decimal(14,4) [not null]
+  porcentaje decimal(8,5) [not null]
+  monto_asignado decimal(14,2) [not null]
+  Note: 'Como se reparte cada gasto entre los items que llegaron'
+}
+
+Table agentes_aduana [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null]
+  codigo_sunat varchar(20)
+  es_activo boolean [not null]
+  Note: 'Los agentes con los que se opera'
+}
+
+// ---------- ERP-04 - Almacen ----------
+
+Table almacenes [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(120) [not null]
+  direccion varchar(255)
+  ubigeo_id bigint [ref: > ubigeos.id]
+  proyecto_id bigint [ref: > proyectos.id, note: 'Almacenes de obra. v4: el almacen de obra es un almacen mas, con la misma pantalla']
+  responsable_user_id bigint [ref: > users.id]
+  es_activo boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Depositos con responsable'
+}
+
+Table ubicaciones_almacen [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  almacen_id bigint [ref: > almacenes.id, not null]
+  codigo varchar(20) [not null]
+  nombre varchar(80) [not null]
+  es_activa boolean [not null]
+  Note: 'Estante, zona, seccion'
+}
+
+Table tipos_movimiento [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(10) [not null]
+  nombre varchar(120) [not null]
+  signo smallint [not null, note: '1 ingreso, -1 egreso']
+  afecta_stock boolean [not null]
+  exige_documento boolean [not null]
+  exige_proyecto boolean [not null]
+  imputa_costo boolean [not null]
+  exige_serie boolean [not null]
+  es_activo boolean [not null]
+  Note: 'Catalogo con banderas. En S10 son 55 y solo 11 se usan'
+}
+
+Table movimientos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  tipo_movimiento_id bigint [ref: > tipos_movimiento.id, not null]
+  almacen_id bigint [ref: > almacenes.id, not null]
+  almacen_destino_id bigint [ref: > almacenes.id, note: 'Transferencias']
+  fecha date [not null]
+  party_id bigint [ref: > parties.id, note: 'Proveedor o cliente']
+  orden_compra_id bigint [ref: > ordenes_compra.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  documento_referencia varchar(60)
+  observacion text
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Cabecera de cada guia de almacen'
+}
+
+Table movimiento_lineas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  movimiento_id bigint [ref: > movimientos.id, not null]
+  producto_id bigint [ref: > productos.id, not null]
+  orden_compra_linea_id bigint [ref: > orden_compra_lineas.id]
+  ubicacion_almacen_id bigint [ref: > ubicaciones_almacen.id]
+  cantidad decimal(12,3) [not null]
+  unidad_medida_id bigint [ref: > unidades_medida.id, not null]
+  costo_unitario decimal(14,4)
+  costo_total decimal(14,2)
+  partida_control_id bigint [ref: > partidas_control.id, note: 'Destino de costo en un despacho a obra']
+  centro_costo_id bigint [ref: > centros_costo.id]
+  Note: 'Item, cantidad y costo de cada movimiento'
+}
+
+Table stock [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  producto_id bigint [ref: > productos.id, not null]
+  almacen_id bigint [ref: > almacenes.id, not null]
+  ubicacion_almacen_id bigint [ref: > ubicaciones_almacen.id]
+  cantidad decimal(12,3) [not null]
+  cantidad_reservada decimal(12,3) [not null]
+  costo_promedio decimal(14,4)
+  actualizado_at timestamptz [not null]
+  Note: 'Saldo por producto, almacen y ubicacion'
+}
+
+Table series [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  producto_id bigint [ref: > productos.id, not null]
+  numero_serie varchar(80) [not null]
+  orden_compra_id bigint [ref: > ordenes_compra.id]
+  almacen_id bigint [ref: > almacenes.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  proyecto_ubicacion_id bigint [ref: > proyecto_ubicaciones.id]
+  fecha_ingreso date
+  fecha_instalacion date
+  garantia_hasta date
+  estado varchar(30) [not null, note: 'en_almacen | instalado | en_garantia | baja']
+  serie_anterior_id bigint [ref: > series.id, note: 'Si reemplazo a otra por garantia']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Cada equipo por su numero de serie. S10 NO TIENE ESTA CAPACIDAD'
+}
+
+Table serie_movimientos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  serie_id bigint [ref: > series.id, not null]
+  movimiento_id bigint [ref: > movimientos.id]
+  fecha date [not null]
+  evento varchar(40) [not null]
+  almacen_id bigint [ref: > almacenes.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  user_id bigint [ref: > users.id, not null]
+  Note: 'Trazabilidad de cada serie a lo largo del tiempo'
+}
+
+Table guias_remision [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  serie varchar(4) [not null]
+  correlativo integer [not null]
+  movimiento_id bigint [ref: > movimientos.id, not null]
+  motivo_traslado varchar(40) [not null, note: 'PASA A CATALOGO OFICIAL (plan 1.5 D9): catalogo 20 de SUNAT (motivos de traslado)']
+  transportista_party_id bigint [ref: > parties.id]
+  conductor_documento varchar(20)
+  placa_vehiculo varchar(10)
+  punto_partida varchar(255) [not null]
+  punto_llegada varchar(255) [not null]
+  ubigeo_partida_id bigint [ref: > ubigeos.id]
+  ubigeo_llegada_id bigint [ref: > ubigeos.id]
+  fecha_traslado date [not null]
+  peso_total decimal(10,3)
+  estado_sunat varchar(20)
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Guia electronica de traslado ante SUNAT. Distinta de la guia interna'
+}
+
+// ---------- ERP-05 - Servicios y postventa ----------
+
+Table contratos_servicio [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  party_id bigint [ref: > parties.id, not null]
+  proyecto_id bigint [ref: > proyectos.id]
+  descripcion varchar(300) [not null]
+  vigente_desde date [not null]
+  vigente_hasta date [not null]
+  monto_periodo decimal(14,2)
+  moneda_id bigint [ref: > monedas.id, not null]
+  periodicidad varchar(20)
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Acuerdo recurrente con su vigencia'
+}
+
+Table sla_definiciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  contrato_servicio_id bigint [ref: > contratos_servicio.id]
+  prioridad varchar(20) [not null, note: 'critica | alta | media | baja']
+  horas_respuesta smallint [not null]
+  horas_resolucion smallint [not null]
+  horario varchar(40) [note: '24x7 | habil']
+  Note: 'Tiempos comprometidos por prioridad. Responder y resolver son distintos'
+}
+
+Table tickets [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  party_id bigint [ref: > parties.id, not null]
+  contrato_servicio_id bigint [ref: > contratos_servicio.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  serie_id bigint [ref: > series.id, note: 'Que equipo falla']
+  asunto varchar(200) [not null]
+  descripcion text [not null]
+  prioridad varchar(20) [not null]
+  canal varchar(20) [note: 'PASA A CATALOGO (plan 1.5 D9): canales de ticket']
+  fecha_apertura timestamptz [not null]
+  fecha_primera_respuesta timestamptz
+  fecha_resolucion timestamptz
+  vence_respuesta timestamptz
+  vence_resolucion timestamptz
+  cumple_sla boolean
+  asignado_user_id bigint [ref: > users.id]
+  estado_id bigint [ref: > estados.id, not null]
+  oportunidad_id bigint [ref: > oportunidades.id, note: 'Si derivo en venta']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Cada solicitud con su prioridad y su reloj de SLA'
+}
+
+Table ticket_seguimientos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  ticket_id bigint [ref: > tickets.id, not null]
+  fecha timestamptz [not null]
+  user_id bigint [ref: > users.id, not null]
+  descripcion text [not null]
+  es_visible_cliente boolean [not null]
+  minutos smallint
+  Note: 'Bitacora de la atencion'
+}
+
+Table visitas_tecnicas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  ticket_id bigint [ref: > tickets.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  party_id bigint [ref: > parties.id, not null]
+  fecha_programada timestamptz [not null]
+  fecha_realizada timestamptz
+  tecnico_user_id bigint [ref: > users.id, not null]
+  direccion varchar(255)
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Salidas a campo'
+}
+
+Table informes_servicio [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  visita_tecnica_id bigint [ref: > visitas_tecnicas.id]
+  ticket_id bigint [ref: > tickets.id]
+  numero varchar(30) [not null]
+  fecha date [not null]
+  diagnostico text [not null]
+  trabajo_realizado text [not null]
+  recomendaciones text
+  firmado_cliente boolean [not null]
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'El entregable de cada atencion'
+}
+
+Table garantias [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  serie_id bigint [ref: > series.id]
+  producto_id bigint [ref: > productos.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  party_id bigint [ref: > parties.id, not null]
+  desde date [not null]
+  hasta date [not null]
+  tipo varchar(40) [note: 'PASA A CATALOGO (plan 1.5 D9): tipos de garantia (fiel cumplimiento, adelanto, seriedad de oferta). Si el sistema decide segun el tipo, lista fija con CHECK']
+  condiciones text
+  es_vigente boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Cobertura hacia el cliente'
+}
+
+Table reclamos_garantia [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  ticket_id bigint [ref: > tickets.id]
+  fabricante_party_id bigint [ref: > parties.id, not null]
+  numero_caso varchar(60) [note: 'El que asigna el fabricante']
+  fecha_reclamo date [not null]
+  descripcion_falla text [not null]
+  resultado varchar(20) [note: 'reemplazo | reparacion | rechazo']
+  serie_reemplazo_id bigint [ref: > series.id, note: 'CONSECUENCIA DE INVENTARIO']
+  fecha_resolucion date
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'El reclamo al fabricante. El proceso hacia atras'
+}
+
+Table reclamo_series [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  reclamo_garantia_id bigint [ref: > reclamos_garantia.id, not null]
+  serie_id bigint [ref: > series.id, not null]
+  estado varchar(20) [not null, note: 'enviado | en_evaluacion | devuelto | reemplazado']
+  Note: 'Que equipos se reclaman en cada caso'
+}
+
+// ---------- ERP-11 - Suscripciones ----------
+
+Table suscripciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  party_id bigint [ref: > parties.id, not null, note: 'El cliente']
+  proveedor_party_id bigint [ref: > parties.id, not null, note: 'A quien le paga Techquk']
+  proyecto_id bigint [ref: > proyectos.id]
+  servicio varchar(200) [not null]
+  vigente_desde date [not null]
+  vigente_hasta date [not null]
+  dias_vigencia smallint [note: 'Hasta 372 en los casos observados']
+  costo_periodo decimal(14,2) [not null]
+  precio_periodo decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  periodicidad varchar(20) [not null]
+  disponibilidad_comprometida decimal(5,2)
+  renovacion_automatica boolean [not null]
+  dias_aviso_renovacion smallint [not null]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Servicios en nube. Costo y precio corren juntos, por eso viven juntos'
+}
+
+Table suscripcion_renovaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  suscripcion_id bigint [ref: > suscripciones.id, not null]
+  numero_renovacion smallint [not null]
+  desde date [not null]
+  hasta date [not null]
+  costo_anterior decimal(14,2) [not null]
+  costo_nuevo decimal(14,2) [not null]
+  precio_anterior decimal(14,2) [not null]
+  precio_nuevo decimal(14,2) [not null]
+  motivo varchar(255) [note: 'PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, con su tipo_motivo propio; texto libre solo como detalle de Otro o comentario']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Historial con los cuatro montos, para ver si el margen se erosiona'
+}
+
+Table disponibilidad_servicio [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  suscripcion_id bigint [ref: > suscripciones.id, not null]
+  periodo date [not null]
+  disponibilidad_efectiva decimal(5,2) [not null]
+  minutos_caida integer [not null]
+  cumple boolean [not null]
+  origen_medicion varchar(20) [not null, note: 'manual | plataforma']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Comprometido contra efectivo, por periodo'
+}
+
+Table incidentes_seguridad [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  suscripcion_id bigint [ref: > suscripciones.id, not null]
+  fecha timestamptz [not null]
+  criticidad varchar(20) [not null]
+  descripcion text [not null]
+  contencion text
+  resuelto_at timestamptz
+  reportado_al_cliente boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Incidentes con su criticidad y contencion'
+}
+
+// ---------- ERP-06 - Facturacion ----------
+
+Table comprobantes [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  tipo_documento_id bigint [ref: > tipos_documento.id, not null]
+  serie varchar(4) [not null]
+  correlativo integer [not null]
+  party_id bigint [ref: > parties.id, not null]
+  contrato_id bigint [ref: > contratos.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  valorizacion_id bigint [ref: > valorizaciones.id]
+  suscripcion_id bigint [ref: > suscripciones.id]
+  fecha_emision date [not null]
+  fecha_vencimiento date
+  moneda_id bigint [ref: > monedas.id, not null]
+  tipo_cambio decimal(10,4) [note: 'Congelado al emitir']
+  subtotal decimal(14,2) [not null]
+  igv decimal(14,2) [not null]
+  total decimal(14,2) [not null]
+  forma_pago_id bigint [ref: > formas_pago.id]
+  comprobante_referencia_id bigint [ref: > comprobantes.id]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  xml_adjunto_id bigint [ref: > adjuntos.id, note: 'XML subido desde el facturador']
+  origen varchar(20) [default: 'facturador_xml', note: 'facturador_xml | manual']
+  hito_id bigint [ref: > contrato_hitos.id, note: 'Hito confirmado por la persona']
+  hito_sugerido_id bigint [ref: > contrato_hitos.id, note: 'Sugerido por el sistema; no se asocia hasta confirmar']
+  validado_sunat_at timestamptz
+  Note: 'Facturas, boletas y notas emitidas'
+}
+
+Table comprobante_lineas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  comprobante_id bigint [ref: > comprobantes.id, not null]
+  producto_id bigint [ref: > productos.id]
+  descripcion varchar(500) [not null]
+  cantidad decimal(12,3) [not null]
+  unidad_medida_id bigint [ref: > unidades_medida.id, not null]
+  precio_unitario decimal(14,4) [not null]
+  descuento decimal(14,2) [not null]
+  subtotal decimal(14,2) [not null]
+  igv decimal(14,2) [not null]
+  total decimal(14,2) [not null]
+  Note: 'El detalle de lo facturado'
+}
+
+Table comprobantes_electronicos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  comprobante_id bigint [ref: > comprobantes.id, not null]
+  estado varchar(20) [not null, note: 'pendiente | enviado | aceptado | observado | rechazado']
+  codigo_respuesta varchar(10)
+  mensaje text
+  hash_cpe varchar(100)
+  xml_ruta varchar(500)
+  cdr_ruta varchar(500)
+  enviado_at timestamptz
+  intentos smallint [not null, note: 'SIN ESTE CAMPO NO SE SABE QUE FALLA REPETIDO']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'El estado ante SUNAT. En S10 hay MAS ERRORES QUE DOCUMENTOS'
+}
+
+Table cuentas_cobrar [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  comprobante_id bigint [ref: > comprobantes.id, not null]
+  party_id bigint [ref: > parties.id, not null]
+  fecha_emision date [not null]
+  fecha_vencimiento date [not null]
+  monto decimal(14,2) [not null]
+  saldo decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  dias_vencido smallint
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'El saldo pendiente por comprobante'
+}
+
+Table cobranzas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null]
+  party_id bigint [ref: > parties.id, not null]
+  fecha date [not null]
+  monto decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  medio_pago varchar(40) [not null, note: 'PASA A CATALOGO OFICIAL (plan 1.5 D9): catalogo 59 de SUNAT (medios de pago)']
+  cuenta_bancaria_id bigint [ref: > party_cuentas_bancarias.id]
+  numero_operacion varchar(60)
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Los pagos recibidos y su aplicacion'
+}
+
+Table cobranza_aplicaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  cobranza_id bigint [ref: > cobranzas.id, not null]
+  cuenta_cobrar_id bigint [ref: > cuentas_cobrar.id, not null]
+  monto_aplicado decimal(14,2) [not null]
+  Note: 'A que comprobantes se aplica cada cobro'
+}
+
+Table detracciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  comprobante_id bigint [ref: > comprobantes.id, not null]
+  codigo_bien_servicio varchar(10) [not null]
+  porcentaje decimal(5,2) [not null]
+  monto decimal(14,2) [not null]
+  numero_constancia varchar(40)
+  fecha_deposito date
+  estado varchar(20) [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'El monto detraido y su constancia'
+}
+
+Table retenciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  comprobante_id bigint [ref: > comprobantes.id, not null]
+  numero varchar(40)
+  porcentaje decimal(5,2) [not null]
+  monto decimal(14,2) [not null]
+  fecha date
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Las retenciones aplicadas por el cliente'
+}
+
+// ---------- ERP-07 - Personal ----------
+
+Table colaboradores [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null]
+  codigo varchar(20) [not null]
+  unidad_organizativa_id bigint [ref: > unidades_organizativas.id]
+  fecha_ingreso date [not null]
+  fecha_cese date
+  cargo varchar(120)
+  costo_hora decimal(10,2) [note: 'REFERENCIA: el costo estandar sale de categorias_costo_hora y el real de la planilla propia']
+  es_activo boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  puesto_id bigint [ref: > puestos.id]
+  categoria_costo_id bigint [ref: > categorias_costo_hora.id]
+  estado_id bigint [ref: > estados.id, note: 'candidato | activo | no_habilitado | en_salida | cesado']
+  Note: 'La ficha laboral sobre parties'
+}
+
+Table contratos_laborales [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  modalidad varchar(30) [not null, note: 'planilla | locacion | practicante']
+  regimen varchar(40)
+  cargo varchar(120) [not null]
+  vigente_desde date [not null]
+  vigente_hasta date [note: 'Nulo en indefinidos']
+  jornada_horas decimal(4,1)
+  es_vigente boolean [not null]
+  motivo_cese varchar(120) [note: 'PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, con su tipo_motivo propio; texto libre solo como detalle de Otro o comentario. En la etapa 4, verificar si el T-Registro de SUNAT tiene tabla oficial de motivos de cese (baja) y, si la tiene, usarla en lugar de una lista propia']
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  remuneracion decimal(14,2) [note: 'DATO SENSIBLE: solo RRHH, Gerencia y contabilidad']
+  regimen_pensiones varchar(20) [note: 'AFP | ONP']
+  proyecto_id bigint [ref: > proyectos.id, note: 'Personal eventual enlazado a un proyecto']
+  es_eventual boolean [not null, default: false]
+  Note: 'Una sola entidad con modalidad. Permite historial continuo'
+}
+
+Table competencias [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(120) [not null]
+  categoria varchar(60) [note: 'PASA A CATALOGO (plan 1.5 D9): categorias de competencia']
+  es_activa boolean [not null]
+  Note: 'Catalogo de habilidades tecnicas'
+}
+
+Table certificaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(150) [not null]
+  marca_id bigint [ref: > marcas.id]
+  vigencia_meses smallint
+  es_activa boolean [not null]
+  Note: 'Catalogo de certificaciones de fabricante'
+}
+
+Table colaborador_competencias [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  competencia_id bigint [ref: > competencias.id, not null]
+  nivel smallint [not null, note: '1 a 5']
+  evaluado_at date
+  Note: 'Que sabe hacer cada quien y a que nivel'
+}
+
+Table colaborador_certificaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  certificacion_id bigint [ref: > certificaciones.id, not null]
+  numero varchar(60)
+  obtenida_el date [not null]
+  vence_el date
+  adjunto_id bigint [ref: > adjuntos.id]
+  es_vigente boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Que acredita, CON SU VENCIMIENTO. Es informacion comercial'
+}
+
+Table asignaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  rol varchar(80)
+  desde date [not null]
+  hasta date
+  dedicacion_porcentaje smallint [not null, note: 'Detecta sobreasignacion']
+  es_activa boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Quien esta en que proyecto y con que dedicacion. PLANIFICA'
+}
+
+Table disponibilidad [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  desde date [not null]
+  hasta date [not null]
+  motivo varchar(80) [not null, note: 'PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, con su tipo_motivo propio; texto libre solo como detalle de Otro o comentario']
+  es_ausencia boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Ausencias, vacaciones y bloqueos de agenda'
+}
+
+// ---------- ERP-12 - Desarrollo de software ----------
+
+Table partes_horas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  asignacion_id bigint [ref: > asignaciones.id]
+  fecha date [not null]
+  horas decimal(5,2) [not null]
+  tipo_trabajo_id bigint [ref: > tipos_trabajo.id, not null]
+  descripcion varchar(500)
+  es_facturable boolean [not null]
+  costo_hora decimal(10,2) [note: 'CONGELADO al imputar, no se lee de la ficha']
+  aprobado_por bigint
+  aprobado_at timestamptz
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'OBSOLETA v4 -> usar partes_semanales + parte_lineas. NO MIGRAR. Horas efectivas. REGISTRA lo real, frente a lo que asignaciones planifica'
+}
+
+Table especificaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  codigo varchar(20) [not null]
+  titulo varchar(200) [not null]
+  descripcion text [not null]
+  criterios_aceptacion text
+  prioridad varchar(20) [not null]
+  estimacion_horas decimal(6,2)
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Requisitos con criterios de aceptacion'
+}
+
+Table especificacion_cambios [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  especificacion_id bigint [ref: > especificaciones.id, not null]
+  fecha date [not null]
+  solicitante varchar(150) [not null]
+  descripcion text [not null]
+  impacto_horas decimal(6,2)
+  aprobado boolean
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Gestion de cambios sobre lo especificado'
+}
+
+Table casos_prueba [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  especificacion_id bigint [ref: > especificaciones.id]
+  codigo varchar(20) [not null]
+  titulo varchar(200) [not null]
+  pasos text [not null]
+  resultado_esperado text [not null]
+  version_id bigint [ref: > versiones.id]
+  resultado varchar(20) [note: 'paso | fallo | bloqueado']
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Casos y su resultado por version'
+}
+
+Table defectos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  caso_prueba_id bigint [ref: > casos_prueba.id]
+  titulo varchar(200) [not null]
+  descripcion text [not null]
+  severidad varchar(20) [not null]
+  version_detectada_id bigint [ref: > versiones.id]
+  version_corregida_id bigint [ref: > versiones.id]
+  asignado_user_id bigint [ref: > users.id]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Defectos con severidad y estado'
+}
+
+Table versiones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  numero varchar(20) [not null]
+  fecha_entrega date
+  notas_version text
+  certificada_por bigint
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Entregas certificadas'
+}
+
+Table integraciones_cliente [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  party_id bigint [ref: > parties.id, not null]
+  nombre varchar(150) [not null]
+  sistema_origen varchar(120) [not null]
+  sistema_destino varchar(120) [not null]
+  frecuencia varchar(40)
+  ultima_ejecucion timestamptz
+  estado varchar(20)
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Integraciones desplegadas y su bitacora'
+}
+
+// ---------- ERP-13 - Integracion contable ----------
+
+Table cuentas_pagar [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null]
+  orden_compra_id bigint [ref: > ordenes_compra.id]
+  tipo_documento_id bigint [ref: > tipos_documento.id, not null]
+  serie varchar(10) [not null]
+  correlativo integer [not null]
+  fecha_emision date [not null]
+  fecha_vencimiento date [not null]
+  monto decimal(14,2) [not null]
+  saldo decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  tipo_cambio decimal(10,4)
+  proyecto_id bigint [ref: > proyectos.id]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  xml_adjunto_id bigint [ref: > adjuntos.id, note: 'Fuente de los datos. Si solo hay PDF, lectura por vision con revision']
+  validada_sunat_at timestamptz
+  cruce_estado varchar(15) [default: 'pendiente', note: 'Cruce de tres vias: pendiente | coincide | retenida']
+  cruce_detalle jsonb
+  retenida_motivo varchar(300) [note: 'PASA A CATALOGO (plan 1.5 D9): motivo_id a motivos, con su tipo_motivo propio; texto libre solo como detalle de Otro o comentario']
+  Note: 'Lo que se debe a proveedores. FALTABA en el modelo original'
+}
+
+Table pagos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  cuenta_pagar_id bigint [ref: > cuentas_pagar.id, not null]
+  fecha date [not null]
+  monto decimal(14,2) [not null]
+  medio_pago varchar(40) [not null, note: 'PASA A CATALOGO OFICIAL (plan 1.5 D9): catalogo 59 de SUNAT (medios de pago)']
+  cuenta_bancaria_id bigint [ref: > party_cuentas_bancarias.id]
+  numero_operacion varchar(60)
+  detraccion_monto decimal(14,2)
+  adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'Pagos emitidos y su aplicacion'
+}
+
+Table asientos_generados [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  origen_type varchar(120) [not null]
+  origen_id bigint [not null]
+  periodo date [not null]
+  cuenta_contable varchar(20) [not null]
+  debe decimal(14,2) [not null]
+  haber decimal(14,2) [not null]
+  glosa varchar(255) [not null]
+  estado_exportacion varchar(20) [not null]
+  exportado_at timestamptz
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'OBSOLETA v4 -> usar asientos + asiento_lineas. NO MIGRAR. El puente hacia el sistema contable externo'
+}
+
+Table configuracion_contable [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  tipo_operacion varchar(60) [not null]
+  cuenta_debe varchar(20) [not null]
+  cuenta_haber varchar(20) [not null]
+  centro_costo varchar(20)
+  vigente_desde date [not null]
+  es_activa boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'OBSOLETA v4 -> usar plantillas_contables + plantilla_contable_lineas. NO MIGRAR. Que cuenta corresponde a cada operacion. Dato, no codigo'
+}
+
+Table bitacora_integraciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  integracion varchar(40) [not null, note: 'facturacion_electronica | padron_ruc | contable | planillas | monitoreo']
+  documentable_type varchar(120)
+  documentable_id bigint
+  ejecutado_at timestamptz [not null]
+  resultado varchar(20) [not null]
+  mensaje text
+  intentos smallint [not null]
+  Note: 'Sirve a las SIETE integraciones, no solo a la contable'
+}
+
+// ---------- ERP-09 - Analitica ----------
+
+Table indicadores [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(40) [not null]
+  nombre varchar(150) [not null]
+  descripcion text
+  unidad varchar(20)
+  meta decimal(14,4)
+  periodicidad varchar(20) [not null]
+  es_activo boolean [not null]
+  created_at timestamptz [not null, note: 'Cuando se creo']
+  created_by bigint [not null, note: 'Quien lo creo']
+  updated_at timestamptz [note: 'Ultima modificacion']
+  updated_by bigint [note: 'Quien la hizo']
+  Note: 'La definicion: formula, unidad, meta, periodicidad'
+}
+
+Table indicador_valores [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  indicador_id bigint [ref: > indicadores.id, not null]
+  periodo date [not null]
+  ambito_type varchar(120)
+  ambito_id bigint
+  valor decimal(14,4) [not null]
+  calculado_at timestamptz [not null]
+  Note: 'La serie historica. Responde como viene evolucionando'
+}
+
+Table tableros [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(40) [not null]
+  nombre varchar(120) [not null]
+  rol varchar(60)
+  es_activo boolean [not null]
+  Note: 'Que indicadores ve cada rol'
+}
+
+Table tablero_indicadores [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  tablero_id bigint [ref: > tableros.id, not null]
+  indicador_id bigint [ref: > indicadores.id, not null]
+  orden smallint [not null]
+  tipo_grafico varchar(30)
+  Note: 'La composicion de cada tablero'
+}
+
+
+// ============================================================
+// AGRUPACION POR MODULO
+// dbdiagram dibuja juntas las tablas de cada grupo
+// ============================================================
+
+// ======================================================================
+// TABLAS NUEVAS DE LA ESPECIFICACION v4 (21 set 2026)
+// Marcas: [S] = diseno propuesto a partir del v4; POR VALIDAR / POR CONFIRMAR = pendiente con el personal
+// ======================================================================
+
+Table centros_costo [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null, unique]
+  nombre varchar(120) [not null]
+  es_activo boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Destino del gasto directo sin proyecto. Iniciales segun v4: Administracion, Comercial, Operaciones, Suministro, RRHH. POR CONFIRMAR con Contabilidad'
+}
+
+Table tipos_motivo [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(80) [not null, unique, note: 'Una por transicion que exige motivo, con su clave (compras.orden.anular), mas las que declaren los modulos: perdida_oportunidad | gasto_no_presupuestado | exceso_partida | habilitacion_sin_requisito']
+  nombre varchar(120) [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Familias de listas cerradas de motivos. v4 parte 6: el motivo es lista cerrada configurable, no texto libre'
+}
+
+Table motivos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  tipo_motivo_id bigint [ref: > tipos_motivo.id, not null]
+  codigo varchar(40) [not null]
+  nombre varchar(160) [not null]
+  nombre_comparable varchar(160) [not null, note: 'CHECK: el nombre sin espacios al borde ni repetidos, en minusculas y sin tildes (unaccent). Lo pide el modelo a la base']
+  es_cambio_cliente boolean [not null, default: false, note: 'Si es true el gasto se marca como POSIBLE ADICIONAL']
+  es_otro boolean [not null, default: false, note: 'Uno por familia (indice unico parcial); CHECK: siempre activo']
+  es_activo boolean [not null, default: true]
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (tipo_motivo_id, codigo) [unique]
+    (tipo_motivo_id, nombre_comparable) [unique, note: 'Dos motivos de una lista no se llaman igual']
+    (id, tipo_motivo_id, es_otro) [unique, note: 'Destino de la llave compuesta del historial']
+  }
+  Note: 'Catalogo unico de motivos (plan 1.5 D9 y D9b; se construye en la 1.5, no en la 1.9). Una familia por transicion que exige motivo, mas las que declaren los modulos (perdida_oportunidad reemplaza a motivos_perdida). Cada familia tiene su Otro (es_otro, uno por familia, no se desactiva) que obliga a escribir el detalle. Se configuran desde pantalla, se desactivan y no se borran'
+}
+
+Table imputaciones [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  origen_type varchar(120) [not null, note: 'linea de orden | requerimiento | despacho | parte de horas | rendicion | gasto de importacion | valorizacion de subcontrato | servicio con vigencia']
+  origen_id bigint [not null]
+  proyecto_id bigint [ref: > proyectos.id]
+  partida_control_id bigint [ref: > partidas_control.id, note: 'Proyecto > partida. PC-99 si es gasto no presupuestado']
+  centro_costo_id bigint [ref: > centros_costo.id, note: 'Obligatorio si no hay partida; referencia si es PC-99']
+  tipo_compra_id bigint [ref: > tipos_compra.id]
+  fecha date [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  tipo_cambio decimal(10,4)
+  monto_comprometido decimal(14,2) [not null, default: 0, note: 'Al aprobar orden, reserva o semana de tareo']
+  monto_ejecutado decimal(14,2) [not null, default: 0, note: 'Al despachar, dar conformidad, cerrar tareo o aprobar rendicion. Nunca mayor que el comprometido']
+  monto_pagado decimal(14,2) [not null, default: 0, note: 'Al aplicar pago. Medida de caja, no de costo']
+  motivo_id bigint [ref: > motivos.id]
+  comentario varchar(500)
+  es_posible_adicional boolean [not null, default: false]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (origen_type, origen_id) [unique]
+    (partida_control_id)
+    (centro_costo_id)
+    (proyecto_id)
+  }
+  Note: 'SELECTOR DE IMPUTACION (v4 idea 2). Toda linea de costo tiene exactamente un destino: una partida de control o el gasto directo con centro de costo. Sin linea sin destino. [S] diseno propuesto: una fila por linea de origen con sus tres montos. Regla de base: partida_control_id o centro_costo_id (al menos uno); comprometido >= ejecutado'
+}
+
+Table posibles_adicionales [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  imputacion_id bigint [not null, unique, ref: - imputaciones.id]
+  contrato_id bigint [ref: > contratos.id, not null]
+  estado varchar(15) [not null, default: 'detectado', note: 'detectado | en_adenda | descartado']
+  adenda_id bigint [ref: > contrato_adendas.id]
+  redaccion_sugerida text [note: 'FASE POSTERIOR (IA)']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Gasto no presupuestado causado por un cambio pedido por el cliente: podria cobrarse con una adenda. Alerta a Administracion de Contratos (v4 flujo 7)'
+}
+
+Table ia_proveedores [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(40) [not null, unique]
+  nombre varchar(120) [not null]
+  implementacion varchar(40) [not null, note: 'Implementacion registrada en el contenedor: anthropic | ...']
+  es_externo boolean [not null, default: true, note: 'Sale de la empresa; decide la huella de autorizacion de los procesos']
+  variable_clave varchar(80) [note: 'Nombre de la variable de entorno con la clave; CHECK ~ ^IA_CLAVE_[A-Z0-9_]+$; nunca la clave. Nulo: no la necesita (local)']
+  llamadas_en_paralelo smallint [not null, default: 2]
+  es_activo boolean [not null, default: true]
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Plan 1.11 D5 (no estaba en el v2): Claude API, modelo local u otra cuenta de la empresa'
+}
+
+Table ia_modelos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  proveedor_id bigint [ref: > ia_proveedores.id, not null]
+  codigo varchar(100) [not null, note: 'Nombre del modelo para el proveedor; es dato, no codigo']
+  nombre varchar(120) [not null]
+  max_tokens_salida integer [not null, default: 4096]
+  es_por_defecto boolean [not null, default: false, note: 'El modelo por defecto del sistema: indice unico parcial; solo uno activo']
+  es_activo boolean [not null, default: true]
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (proveedor_id, codigo) [unique]
+  }
+  Note: 'Plan 1.11 D5'
+}
+
+Table ia_precios_modelo [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  modelo_id bigint [ref: > ia_modelos.id, not null]
+  vigente_desde date [not null]
+  usd_millon_entrada decimal(12,6) [not null, note: 'USD por millon de tokens; 0 en un modelo local']
+  usd_millon_salida decimal(12,6) [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  indexes {
+    (modelo_id, vigente_desde) [unique]
+  }
+  Note: 'Plan 1.11 D3. El pasado no se recalcula: cada llamada guarda el precio que aplico'
+}
+
+Table ia_procesos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(60) [not null, unique, note: 'arbol_desde_archivos | comprobante_sin_xml | notas_tesoreria | enlace_sugerido | posible_adicional | rendicion_foto | datos_contrato | partida_sugerida | licitacion_bases. Declarado en codigo (RegistroProcesosIa)']
+  esta_activo boolean [not null, default: false, note: 'Se activa o desactiva por configuracion. Sin nombre: viene del codigo (plan 1.11 D1). CHECK: si envia datos externos, solo con autorizacion']
+  envia_datos_externos boolean [not null, default: true, note: 'Plan 1.11: sale de los proveedores de sus modelos']
+  autorizado_por bigint [ref: > users.id, note: 'Gerencia autoriza que datos pueden enviarse']
+  autorizado_at timestamptz
+  autorizacion_huella varchar(64) [note: 'Plan 1.11 D2: huella de lo que el proceso declaraba enviar al autorizarse; si cambia, la autorizacion cae']
+  tope_mensual_usd decimal(12,2) [not null, default: 0, note: 'Plan 1.11 D3: lo fija Gerencia; 0 = no llama']
+  modelo_id bigint [ref: > ia_modelos.id, note: 'Plan 1.11 D5: nulo = el modelo por defecto']
+  modelo_respaldo_id bigint [ref: > ia_modelos.id, note: 'Si falla el principal; no al llegar al tope']
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Catalogo de procesos donde la IA sugiere. Reglas: nunca guarda sola; siempre existe camino manual; datos sensibles nunca salen (v4 idea 4)'
+}
+
+Table ia_proceso_destinos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  proceso_id bigint [ref: > ia_procesos.id, not null]
+  proveedor_id bigint [ref: > ia_proveedores.id, not null]
+  autorizacion_huella varchar(64) [not null, note: 'FK compuesta (proceso_id, autorizacion_huella) a ia_procesos: solo existe mientras dura la autorizacion']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (proceso_id, proveedor_id) [unique]
+  }
+  Note: 'Plan 1.11 D2 (no estaba en el v2): proveedores externos adonde Gerencia autorizo que salgan los datos del proceso. Se llena al autorizar y se vacia cuando la autorizacion cae (otro externo, otra implementacion u otra variable de clave del proveedor, otra declaracion)'
+}
+
+Table ia_llamadas [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  proceso_id bigint [ref: > ia_procesos.id, not null]
+  origen_type varchar(120) [not null]
+  origen_id bigint [not null]
+  adjunto_id bigint [ref: > adjuntos.id]
+  modelo_id bigint [ref: > ia_modelos.id, not null, note: 'El proveedor sale del modelo']
+  es_respaldo boolean [not null, default: false]
+  intento smallint [not null, default: 1]
+  prompt_version smallint [not null]
+  resultado varchar(20) [not null, note: 'valida | invalida (mal formada) | cortada (limite de tokens) | error | tiempo_agotado | saturado | sin_credito | clave_invalida']
+  tokens_entrada integer [not null, default: 0]
+  tokens_salida integer [not null, default: 0]
+  duracion_ms integer [not null]
+  precio_id bigint [not null, ref: > ia_precios_modelo.id, note: 'Precio aplicado, tomado antes de llamar: sin precio vigente no hay llamada (un modelo propio lleva precio 0)']
+  costo_usd decimal(12,6) [not null, default: 0]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  indexes {
+    (proceso_id, created_at)
+    (origen_type, origen_id)
+  }
+  Note: 'Plan 1.11 D3 (no estaba en el v2): una fila por llamada, salga bien o no. El tope se mide desde aqui. Sin datos del origen ni la respuesta'
+}
+
+Table ia_sugerencias [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'SUG-AAAA-NNNNNN']
+  proceso_id bigint [ref: > ia_procesos.id, not null]
+  llamada_id bigint [ref: > ia_llamadas.id, not null, unique, note: 'Plan 1.11 D3: la llamada que la produjo (proveedor, modelo, version del prompt, costo)']
+  origen_type varchar(120) [not null, note: 'Plan 1.11 D4: el registro de origen, restringido al morph map']
+  origen_id bigint [not null]
+  origen_adjunto_id bigint [ref: > adjuntos.id, note: 'Plan 1.11 D4: opcional; nunca uno sensible']
+  propuesta jsonb [not null, note: 'Cada campo con su valor y su evidencia (pagina y texto, o registro y campo)']
+  seguridad_por_campo jsonb [not null, note: 'alta | media | baja por campo, de senales comprobables (D6)']
+  explicacion varchar(300) [not null, note: 'Por que lo propuso, en una linea']
+  estado varchar(15) [not null, default: 'por_revisar', note: 'por_revisar | resuelta']
+  accion varchar(15) [note: 'aceptada | corregida | rechazada']
+  correccion jsonb
+  resuelta_por bigint [ref: > users.id]
+  resuelta_at timestamptz
+  resultado_type varchar(120)
+  resultado_id bigint
+  version integer [not null, default: 1]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (proceso_id, estado)
+    (origen_type, origen_id)
+  }
+  Note: 'Auditoria de cada sugerencia. Permite medir cuanto acierta cada proceso. No procesa adjuntos ni campos sensibles. Las respuestas invalidas no crean sugerencia: quedan en ia_llamadas'
+}
+
+Table ia_aprendizajes [headercolor: #5F5E5A] {
+  // Plan 1.11 D12: se crea con el primer proceso que lo use (partida_sugerida)
+  id bigint [pk, increment]
+  proceso_id bigint [ref: > ia_procesos.id, not null]
+  clave_origen varchar(300) [not null]
+  valor_destino varchar(300) [not null]
+  veces smallint [not null, default: 1]
+  ultima_sugerencia_id bigint [ref: > ia_sugerencias.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (proceso_id, clave_origen) [unique]
+  }
+  Note: 'Lo que una persona corrige una vez no se vuelve a preguntar (ej: es la misma partida)'
+}
+
+Table alerta_tipos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  codigo varchar(60) [not null, unique]
+  nombre varchar(160) [not null]
+  es_obligatoria boolean [not null, default: false, note: 'Se puede adelantar, no apagar']
+  anticipacion_dias varchar(40) [note: 'Por defecto, ej: 60,30,15']
+  destinatarios varchar(200) [note: 'Roles por defecto']
+  es_activa boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Catalogo unico de alertas y vencimientos (v4 parte 7): hitos, cartas fianza, servicios con vigencia, partidas excedidas, embarque en riesgo, tareo sin cerrar, certificaciones, habilitacion de campo, etc.'
+}
+
+Table alerta_preferencias [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  user_id bigint [not null, ref: > users.id]
+  alerta_tipo_id bigint [ref: > alerta_tipos.id, not null]
+  anticipacion_dias varchar(40)
+  canal varchar(20) [not null, default: 'app', note: 'app | correo']
+  es_activa boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (user_id, alerta_tipo_id) [unique]
+  }
+  Note: 'Cada persona ajusta anticipacion y canal dentro de lo que su rol permite'
+}
+
+Table alertas_emitidas [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  alerta_tipo_id bigint [ref: > alerta_tipos.id, not null]
+  entidad_type varchar(120) [not null]
+  entidad_id bigint [not null]
+  clave varchar(200) [not null, unique, note: 'IDEMPOTENCIA: tipo + entidad + umbral + fecha. Evita enviar dos veces la misma alerta']
+  user_id bigint [not null, ref: > users.id]
+  emitida_at timestamptz [not null, default: `now()`]
+  leida_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Registro de alertas enviadas. La clave unica hace idempotentes los jobs programados'
+}
+
+Table puestos [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  nombre varchar(120) [not null]
+  unidad_organizativa_id bigint [ref: > unidades_organizativas.id]
+  es_activo boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'El puesto es el cargo del organigrama; el rol es un paquete de permisos y una persona puede tener varios (v4 glosario). Plan 1.4: unidad_organizativa_id not null, nombre unico en su unidad, version. Un puesto no cambia de unidad'
+}
+
+Table restricciones_campo [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  rol_id bigint [not null, note: 'Tabla roles de spatie/laravel-permission']
+  recurso varchar(80) [not null, note: 'proyecto | orden | contrato_laboral | habilitacion | almacen']
+  campo varchar(80) [not null, note: 'costos | margen | remuneracion | detalle_medico | precio_compra']
+  tipo varchar(15) [not null, default: 'oculto', note: 'oculto | solo_lectura']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (rol_id, recurso, campo) [unique]
+  }
+  Note: 'NO SE CREA (ADR 0016, plan 1.4 D6): cada modelo declara sus campos sensibles y su grupo en el codigo (camposSensibles); un campo sensible esta oculto salvo el permiso campos.ver-<grupo>. Restricciones por CAMPO, no por modulo: auxiliares abren un proyecto pero no ven costos ni margenes; sueldos solo RRHH, Gerencia y contabilidad; detalle medico solo RRHH'
+}
+
+Table cruces_funciones [headercolor: #5F5E5A] {
+  id bigint [pk, increment]
+  rol_a_id bigint [not null]
+  rol_b_id bigint [not null]
+  control_compensatorio varchar(300) [not null]
+  aprobado_por bigint [ref: > users.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'REEMPLAZADA (plan 1.4 D1 y D9): el cruce es de PERMISOS, no de roles. incompatibilidades_permisos (permiso_a_id < permiso_b_id, motivo, es_activa) es el catalogo; cruces_funciones (user_id, incompatibilidad_id, desde, hasta, aprobado_por_user_id: nombre segun la convencion de FK) es el cruce de una persona, abierto mientras junte los dos permisos; controles_cruce (cruce_id, user_id copiado, control, responsable_user_id distinto de la persona, vigente_hasta, es_actual) es su control compensatorio. Separacion de funciones: que la misma persona no pida y apruebe. Si se asignan roles que se cruzan, alerta a Gerencia General'
+}
+
+Table tipos_compra [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(40) [not null, unique]
+  nombre varchar(120) [not null]
+  ejemplo varchar(200)
+  requiere_recepcion boolean [not null, default: false]
+  requiere_conformidad boolean [not null, default: false]
+  controla_stock boolean [not null, default: false]
+  requiere_embarque boolean [not null, default: false]
+  genera_valorizacion boolean [not null, default: false]
+  tiene_vigencia boolean [not null, default: false]
+  requiere_rendicion boolean [not null, default: false]
+  es_activo boolean [not null, default: true]
+  orden smallint [not null, default: 0]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Doce tipos iniciales configurables (v4 flujo 2): bien_proyecto, importacion, servicio_puntual, subcontrato, servicio_vigencia, garantia_financiera, viaticos_caja_chica, bien_empresa (FASE POSTERIOR), alquiler_equipo, honorarios, software_licencias, combustible_peajes. El texto v4 dice ocho pero lista doce'
+}
+
+Table presupuestos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, note: 'PRE-AAAA-NNNN']
+  version smallint [not null, default: 1]
+  oportunidad_id bigint [ref: > oportunidades.id]
+  proyecto_id bigint [ref: > proyectos.id]
+  nombre varchar(200) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  usa_apu boolean [not null, default: true, note: 'false = precio por item (suministro simple). POR VALIDAR en que contratos se usa APU completo']
+  gastos_generales_pct decimal(5,2) [not null, default: 0]
+  utilidad_pct decimal(5,2) [not null, default: 0]
+  igv_pct decimal(5,2) [not null, default: 18]
+  costo_directo decimal(14,2) [not null, default: 0]
+  gastos_generales decimal(14,2) [not null, default: 0]
+  utilidad decimal(14,2) [not null, default: 0]
+  igv decimal(14,2) [not null, default: 0]
+  total decimal(14,2) [not null, default: 0]
+  estado_id bigint [ref: > estados.id, not null]
+  aprobado_por bigint [ref: > users.id]
+  aprobado_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (numero, version) [unique]
+  }
+  Note: 'Presupuesto con analisis de precios unitarios. Una version aprobada no se edita. Al ganar, el MISMO presupuesto pasa al proyecto (no se copia). La lista de insumos debe sumar exactamente el costo directo'
+}
+
+Table presupuesto_titulos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  presupuesto_id bigint [ref: > presupuestos.id, not null]
+  padre_id bigint [ref: > presupuesto_titulos.id]
+  codigo varchar(30) [not null]
+  nombre varchar(200) [not null]
+  orden smallint [not null, default: 0]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Titulos del presupuesto (01 CAMARAS, 02 CABLEADO Y POSTES...)'
+}
+
+Table presupuesto_partidas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  presupuesto_id bigint [ref: > presupuestos.id, not null]
+  titulo_id bigint [ref: > presupuesto_titulos.id]
+  codigo varchar(30) [not null]
+  descripcion varchar(300) [not null]
+  unidad_medida_id bigint [ref: > unidades_medida.id, not null]
+  metrado decimal(12,3) [not null]
+  costo_unitario decimal(14,4) [not null, note: 'Con APU sale de apu_insumos']
+  parcial decimal(14,2) [not null, note: 'metrado x costo_unitario']
+  orden smallint [not null, default: 0]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Partidas del presupuesto con metrado y costo unitario'
+}
+
+Table insumos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  codigo varchar(30) [not null, unique]
+  nombre varchar(200) [not null]
+  tipo varchar(15) [not null, note: 'material | mano_obra | equipo | subcontrato']
+  unidad_medida_id bigint [ref: > unidades_medida.id, not null]
+  precio_referencia decimal(14,4)
+  producto_id bigint [ref: > productos.id]
+  es_activo boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Todo lo que cuesta. S10 trae catalogos genericos: migrar solo lo que Techquk usa (v4 migracion)'
+}
+
+Table apu_insumos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  presupuesto_partida_id bigint [ref: > presupuesto_partidas.id, not null]
+  insumo_id bigint [ref: > insumos.id, not null]
+  tipo_cantidad varchar(15) [not null, note: 'cantidad | rendimiento']
+  cantidad decimal(12,5) [not null, note: 'Ej: cable 1.05 m por metro; tecnico 0.05 h por metro (20 m/h)']
+  desperdicio_pct decimal(5,2) [not null, default: 0]
+  precio decimal(14,4) [not null]
+  parcial decimal(14,4) [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Analisis de precios unitarios: la receta de insumos de una unidad de partida'
+}
+
+Table partida_arboles [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  version smallint [not null, default: 1]
+  presupuesto_id bigint [ref: > presupuestos.id]
+  estado_id bigint [ref: > estados.id, not null]
+  costo_presupuestado decimal(14,2) [not null, note: 'La suma de las hojas debe ser igual a este monto']
+  aprobado_por bigint [ref: > users.id, note: 'Jefatura de Proyectos']
+  aprobado_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (proyecto_id, version) [unique]
+  }
+  Note: 'Version del arbol de partidas de control. Al aprobar: crea PC-99, pasa el proyecto a en ejecucion, habilita el selector de imputacion'
+}
+
+Table partidas_control [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  padre_id bigint [ref: > partidas_control.id]
+  arbol_alta_id bigint [ref: > partida_arboles.id, not null, note: 'Version del arbol donde nace']
+  codigo varchar(30) [not null, note: 'PC-02.01']
+  nombre varchar(200) [not null]
+  es_hoja boolean [not null, default: true]
+  responsable_user_id bigint [ref: > users.id, not null, note: 'Una persona por partida']
+  origen_titulo_id bigint [ref: > presupuesto_titulos.id]
+  origen_partida_id bigint [ref: > presupuesto_partidas.id]
+  es_gastos_generales boolean [not null, default: false, note: 'PC-04']
+  es_no_presupuestado boolean [not null, default: false, note: 'PC-99: la crea el sistema al aprobar el arbol. No se borra']
+  es_activa boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (proyecto_id, codigo) [unique]
+  }
+  Note: 'Nodo del arbol contra el que se carga cada costo real. Profundidad libre; lo disenan Robert y el especialista del proyecto. Una partida con costos no se elimina ni se mueve sin dejar rastro'
+}
+
+Table partida_presupuestos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  partida_id bigint [ref: > partidas_control.id, not null]
+  arbol_id bigint [ref: > partida_arboles.id, not null]
+  monto decimal(14,2) [not null, note: 'Solo en hojas; los padres suman']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (partida_id, arbol_id) [unique]
+  }
+  Note: 'Presupuestado de cada partida en cada version del arbol (las partidas con costos se conservan entre versiones). [S] diseno propuesto'
+}
+
+Table formulas_polinomicas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  presupuesto_id bigint [not null, unique, ref: - presupuestos.id]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Regla de reajuste de precios de un contrato de obra. Se define con el presupuesto y se aplica en cada valorizacion'
+}
+
+Table formula_monomios [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  formula_id bigint [ref: > formulas_polinomicas.id, not null]
+  simbolo varchar(10) [not null]
+  descripcion varchar(120) [not null]
+  coeficiente decimal(6,5) [not null, note: 'Los coeficientes suman exactamente 1']
+  indice_codigo varchar(20) [not null]
+  indice_base decimal(12,4) [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Monomios de la formula polinomica'
+}
+
+Table indices_precios [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  indice_codigo varchar(20) [not null]
+  periodo date [not null]
+  valor decimal(12,4) [not null]
+  fuente varchar(60) [not null, default: 'oficial']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (indice_codigo, periodo) [unique]
+  }
+  Note: 'Indices mensuales para el reajuste. Carga manual mensual; automatizable FASE POSTERIOR. No se valoriza un periodo sin sus indices'
+}
+
+Table adelantos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'ADL-AAAA-NNNN']
+  contrato_id bigint [ref: > contratos.id]
+  subcontrato_id bigint [ref: > subcontratos.id]
+  direccion varchar(10) [not null, note: 'recibido (del cliente) | entregado (al subcontratista)']
+  tipo varchar(15) [not null, note: 'directo | materiales']
+  monto decimal(14,2) [not null]
+  porcentaje decimal(5,2)
+  moneda_id bigint [ref: > monedas.id, not null]
+  garantia_id bigint [ref: > cartas_fianza.id]
+  monto_amortizado decimal(14,2) [not null, default: 0, note: 'Nunca supera el monto del adelanto']
+  estado_id bigint [ref: > estados.id, not null]
+  fecha date [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Dinero recibido o entregado antes del avance, que se descuenta despues (v4 flujo 10)'
+}
+
+Table valorizacion_lineas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  valorizacion_id bigint [ref: > valorizaciones.id, not null]
+  presupuesto_partida_id bigint [ref: > presupuesto_partidas.id, not null]
+  metrado_periodo decimal(12,3) [not null]
+  metrado_acumulado decimal(12,3) [not null]
+  precio_contractual decimal(14,4) [not null]
+  monto decimal(14,2) [not null, note: 'Metrado ejecutado x precio contractual']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Detalle del avance valorizado por partida'
+}
+
+Table liquidaciones_contrato [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'LIQ-contrato']
+  contrato_id bigint [ref: > contratos.id]
+  subcontrato_id bigint [ref: > subcontratos.id]
+  estado_id bigint [ref: > estados.id, not null]
+  presentada_at date
+  plazo_pronunciamiento_at date
+  consentida_at date
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Cierre economico hacia la entidad o el subcontratista. No se presenta con valorizaciones pendientes. Al consentirse habilita devolucion de garantias y cierre del proyecto'
+}
+
+Table liquidacion_conceptos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  liquidacion_id bigint [ref: > liquidaciones_contrato.id, not null]
+  concepto varchar(20) [not null, note: 'contratado | adicionales | reducciones | reajustes | penalidades | adelantos | retenciones | cobrado']
+  monto decimal(14,2) [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Conceptos de la liquidacion'
+}
+
+Table consorcios [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'CSR-AAAA-NNN']
+  contrato_id bigint [ref: > contratos.id, not null]
+  modo varchar(15) [not null, note: 'participacion (solo Techquk) | total (todo el contrato con porcentajes)']
+  operador_party_id bigint [ref: > parties.id, not null, note: 'Quien factura a la entidad']
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Agrupacion con otras empresas para un contrato. Valorizaciones y costos se reparten segun el modo'
+}
+
+Table consorcio_integrantes [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  consorcio_id bigint [ref: > consorcios.id, not null]
+  party_id bigint [ref: > parties.id, not null]
+  porcentaje decimal(5,2) [not null, note: 'Los porcentajes suman exactamente 100']
+  es_techquk boolean [not null, default: false]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Integrantes y participacion'
+}
+
+Table subcontratos [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'SC-AAAA-NNN']
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  party_id bigint [ref: > parties.id, not null, note: 'El subcontratista']
+  orden_compra_id bigint [ref: > ordenes_compra.id]
+  monto decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  retencion_pct decimal(5,2) [not null, default: 0, note: '% de garantia sobre cada valorizacion']
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Un tipo de compra con alcance, valorizaciones, adelantos, retencion y liquidacion. Al aprobar: comprometido en las partidas del alcance'
+}
+
+Table subcontrato_partidas [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  subcontrato_id bigint [ref: > subcontratos.id, not null]
+  partida_control_id bigint [ref: > partidas_control.id, not null]
+  monto decimal(14,2) [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Alcance del subcontrato asignado a partidas de control'
+}
+
+Table garantia_renovaciones [headercolor: #534AB7] {
+  id bigint [pk, increment]
+  carta_fianza_id bigint [ref: > cartas_fianza.id, not null]
+  vence_anterior date [not null]
+  vence_nuevo date [not null]
+  comision decimal(14,2) [not null, default: 0, note: 'Toda garantia registra su costo, aunque sea cero']
+  orden_costo_id bigint [ref: > ordenes_compra.id]
+  renovada_at date [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Historial de renovaciones de una garantia (v4 flujo 1)'
+}
+
+Table pagos_programados [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  cuenta_pagar_id bigint [ref: > cuentas_pagar.id, not null]
+  fecha_programada date [not null]
+  monto decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  orden_tarjeta smallint [not null, default: 0]
+  estado varchar(15) [not null, default: 'programado', note: 'programado | pagado | postergado']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Tarjetas del tablero de pagos: Tesoreria las ubica por vencimiento y las arrastra entre columnas; el sistema suma y muestra la caja restante'
+}
+
+Table notas_tesoreria [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  fecha date [not null]
+  adjunto_id bigint [ref: > adjuntos.id, not null, note: 'Foto de la hoja en papel']
+  estado varchar(15) [not null, default: 'por_revisar', note: 'por_revisar | revisada']
+  sugerencia_ia_id bigint [ref: > ia_sugerencias.id]
+  revisada_por bigint [ref: > users.id]
+  revisada_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Captura de las notas en papel de Tesoreria por foto. La IA sugiere, Tesoreria confirma. POR VALIDAR con una hoja real'
+}
+
+Table notas_tesoreria_lineas [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  nota_id bigint [ref: > notas_tesoreria.id, not null]
+  tipo varchar(10) [not null, note: 'cobro | pago']
+  party_id bigint [ref: > parties.id]
+  descripcion varchar(300) [not null]
+  monto decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  fecha_prevista date
+  cuenta_pagar_id bigint [ref: > cuentas_pagar.id]
+  cuenta_cobrar_id bigint [ref: > cuentas_cobrar.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Lineas de la hoja de notas, enlazadas a la cuenta que corresponda'
+}
+
+Table flujo_caja_escenarios [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  nombre varchar(120) [not null]
+  descripcion varchar(300)
+  es_base boolean [not null, default: false]
+  caja_minima decimal(14,2) [note: 'Alerta si la caja proyectada baja de este monto']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Escenarios del flujo de caja (lo cobrado menos lo pagado, semana a semana)'
+}
+
+Table flujo_caja_ajustes [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  escenario_id bigint [ref: > flujo_caja_escenarios.id, not null]
+  fecha date [not null]
+  concepto varchar(200) [not null]
+  monto decimal(14,2) [not null, note: 'Positivo ingreso, negativo egreso']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Movimientos hipoteticos de un escenario'
+}
+
+Table servicios_vigencia [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null, note: 'Proveedor']
+  tipo varchar(20) [not null, note: 'sctr | poliza | alquiler | licencia | otro']
+  descripcion varchar(300) [not null]
+  proyecto_id bigint [ref: > proyectos.id]
+  centro_costo_id bigint [ref: > centros_costo.id]
+  vigente_desde date [not null]
+  vence_el date [not null, note: 'ALERTA 30 dias antes']
+  monto decimal(14,2)
+  moneda_id bigint [ref: > monedas.id, not null]
+  orden_servicio_id bigint [ref: > ordenes_compra.id]
+  responsable_user_id bigint [ref: > users.id, not null]
+  estado_id bigint [ref: > estados.id, not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'SCTR, polizas, alquileres y licencias con vencimiento. El SCTR vigente por proyecto es requisito para tarear en obra'
+}
+
+Table rendiciones_viaticos [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'REN-AAAA-NNNN']
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  proyecto_id bigint [ref: > proyectos.id]
+  fecha_entrega date [not null]
+  monto_entregado decimal(14,2) [not null]
+  moneda_id bigint [ref: > monedas.id, not null]
+  monto_rendido decimal(14,2) [not null, default: 0]
+  saldo_devolver decimal(14,2) [not null, default: 0]
+  orden_fondo_id bigint [ref: > ordenes_compra.id]
+  estado_id bigint [ref: > estados.id, not null]
+  aprobada_por bigint [ref: > users.id, note: 'Jefatura del tecnico']
+  aprobada_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Entrega de fondos de campo y su rendicion con comprobantes (v4 flujo 7)'
+}
+
+Table rendicion_lineas [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  rendicion_id bigint [ref: > rendiciones_viaticos.id, not null]
+  fecha date [not null]
+  concepto varchar(200) [not null]
+  monto decimal(14,2) [not null]
+  comprobante_tipo varchar(10)
+  comprobante_serie varchar(10)
+  comprobante_numero varchar(20)
+  adjunto_id bigint [ref: > adjuntos.id, note: 'Foto de la boleta']
+  partida_control_id bigint [ref: > partidas_control.id]
+  centro_costo_id bigint [ref: > centros_costo.id]
+  sugerencia_ia_id bigint [ref: > ia_sugerencias.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Gastos rendidos. Al aprobar la rendicion se ejecuta en la partida'
+}
+
+Table categorias_costo_hora [headercolor: #993556] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null, unique]
+  nombre varchar(120) [not null]
+  costo_hora decimal(10,2) [not null, note: 'Costo estandar']
+  vigente_desde date [not null]
+  vigente_hasta date
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Tabla de categorias de costo hora vigentes a la fecha. El costo real viene de la planilla; la diferencia estandar vs real se calcula al cerrarla'
+}
+
+Table partes_semanales [headercolor: #993556] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'HOR-AAAA-SS-persona']
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  anio smallint [not null]
+  semana smallint [not null]
+  estado_id bigint [ref: > estados.id, not null]
+  enviado_por bigint [ref: > users.id, note: 'Jefe de cuadrilla o desarrollador']
+  enviado_at timestamptz
+  cerrado_por bigint [ref: > users.id, note: 'Jefatura de Proyectos o de Desarrollo']
+  cerrado_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (colaborador_id, anio, semana) [unique]
+  }
+  Note: 'Parte de horas semanal (tareo de obra y horas de desarrollo en un solo documento). Al cerrar: comprometido y ejecutado en cada partida; la semana ya no se edita'
+}
+
+Table parte_lineas [headercolor: #993556] {
+  id bigint [pk, increment]
+  parte_id bigint [ref: > partes_semanales.id, not null]
+  fecha date [not null]
+  horas decimal(4,2) [not null, note: 'Mas de 12 horas en un dia requiere motivo']
+  proyecto_id bigint [ref: > proyectos.id]
+  partida_control_id bigint [ref: > partidas_control.id]
+  centro_costo_id bigint [ref: > centros_costo.id]
+  tipo_trabajo_id bigint [ref: > tipos_trabajo.id, not null]
+  descripcion varchar(300)
+  costo_hora decimal(10,2) [note: 'Congelado al cerrar, de la categoria vigente']
+  es_facturable boolean [not null, default: false]
+  motivo_exceso_id bigint [ref: > motivos.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Horas por dia y por imputacion. No se registran horas de obra sin SCTR vigente para el proyecto ni sin habilitacion de campo'
+}
+
+Table requisitos_habilitacion [headercolor: #993556] {
+  id bigint [pk, increment]
+  codigo varchar(30) [not null, unique, note: 'examen_ocupacional | sctr | induccion | epp']
+  nombre varchar(120) [not null]
+  es_por_proyecto boolean [not null, default: false, note: 'SCTR es por proyecto']
+  dias_alerta smallint [not null, default: 15]
+  es_activo boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Lo que alguien necesita vigente para trabajar en obra'
+}
+
+Table colaborador_habilitaciones [headercolor: #993556] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  requisito_id bigint [ref: > requisitos_habilitacion.id, not null]
+  proyecto_id bigint [ref: > proyectos.id]
+  vigente_desde date [not null]
+  vence_el date [not null, note: 'Alerta 15 dias antes; bloqueo el dia del vencimiento']
+  resultado_apto boolean [note: 'UNICO dato visible fuera de RRHH. El detalle medico solo lo ve RRHH']
+  adjunto_id bigint [ref: > adjuntos.id, note: 'Si es examen medico, el adjunto va con es_sensible = true']
+  autorizada_sin_requisito boolean [not null, default: false]
+  autorizada_por bigint [ref: > users.id, note: 'Gerencia de Operaciones']
+  motivo_id bigint [ref: > motivos.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (colaborador_id, requisito_id, proyecto_id)
+  }
+  Note: 'Datos de salud: sensibles segun la ley de proteccion de datos personales'
+}
+
+Table asistencias [headercolor: #993556] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  fecha date [not null]
+  tipo varchar(20) [not null, note: 'asistio | falta | tardanza | licencia | vacaciones | descanso_medico']
+  horas decimal(4,2)
+  fuente varchar(15) [not null, default: 'manual', note: 'tareo | manual | importada']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (colaborador_id, fecha) [unique]
+  }
+  Note: 'Lo ocurrido; insumo de la planilla. Las ausencias futuras y bloqueos de agenda siguen en disponibilidad'
+}
+
+Table demandas_personal [headercolor: #993556] {
+  id bigint [pk, increment]
+  proyecto_id bigint [ref: > proyectos.id]
+  competencia_id bigint [ref: > competencias.id]
+  puesto_id bigint [ref: > puestos.id]
+  cantidad smallint [not null, default: 1]
+  fecha_desde date [not null]
+  fecha_hasta date [not null]
+  estado varchar(15) [not null, default: 'abierta', note: 'abierta | cubierta | cancelada']
+  calculada_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Demanda de personal a 90 dias: brecha entre proyectos en cartera y personal disponible'
+}
+
+Table candidatos [headercolor: #993556] {
+  id bigint [pk, increment]
+  party_id bigint [ref: > parties.id, not null]
+  fuente varchar(60)
+  puesto_id bigint [ref: > puestos.id]
+  estado varchar(20) [not null, default: 'en_banco', note: 'en_banco | en_proceso | contratado | descartado']
+  observaciones text
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Banco de candidatos (v4 flujo 9)'
+}
+
+Table procesos_seleccion [headercolor: #993556] {
+  id bigint [pk, increment]
+  demanda_id bigint [ref: > demandas_personal.id]
+  puesto_id bigint [ref: > puestos.id, not null]
+  estado_id bigint [ref: > estados.id, not null]
+  fecha_inicio date [not null]
+  fecha_cierre date
+  responsable_user_id bigint [ref: > users.id, not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Proceso de seleccion de un perfil'
+}
+
+Table proceso_candidatos [headercolor: #993556] {
+  id bigint [pk, increment]
+  proceso_id bigint [ref: > procesos_seleccion.id, not null]
+  candidato_id bigint [ref: > candidatos.id, not null]
+  etapa varchar(30) [not null]
+  resultado varchar(20)
+  colaborador_id bigint [ref: > colaboradores.id, note: 'Si fue contratado']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (proceso_id, candidato_id) [unique]
+  }
+  Note: 'Candidatos dentro de un proceso'
+}
+
+Table salidas_personal [headercolor: #993556] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  fecha_inicio date [not null]
+  fecha_cese_prevista date
+  motivo varchar(120) [note: 'PASA A CATALOGO (plan 1.5 D9): la misma lista que contratos_laborales.motivo_cese (la tabla oficial del T-Registro de SUNAT si se confirma en la etapa 4; si no, la misma familia de motivos). Texto libre solo como detalle de Otro o comentario']
+  estado_id bigint [ref: > estados.id, not null]
+  liquidacion_planilla_id bigint [ref: > planillas.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Salida de personal: lista de traspasos y revocacion de accesos. La liquidacion va en planilla con su asiento'
+}
+
+Table salida_traspasos [headercolor: #993556] {
+  id bigint [pk, increment]
+  salida_id bigint [ref: > salidas_personal.id, not null]
+  tipo varchar(20) [not null, note: 'asignaciones | cartera | conocimiento | accesos | equipos']
+  descripcion varchar(300) [not null]
+  responsable_user_id bigint [ref: > users.id, not null]
+  estado varchar(15) [not null, default: 'pendiente']
+  completado_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Items del traspaso al salir una persona'
+}
+
+Table planillas [headercolor: #993556] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'PLA-AAAA-MM']
+  periodo date [not null]
+  tipo varchar(15) [not null, default: 'mensual', note: 'mensual | ajuste | gratificacion | cts']
+  estado_id bigint [ref: > estados.id, not null]
+  calculada_at timestamptz
+  cerrada_por bigint [ref: > users.id, note: 'RRHH']
+  cerrada_at timestamptz
+  visto_bueno_contador_por bigint [ref: > users.id]
+  visto_bueno_at timestamptz
+  archivo_plame_adjunto_id bigint [ref: > adjuntos.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Calculo mensual de remuneraciones DENTRO del ERP (decision v4). Al cerrar: boletas, archivo PLAME, asientos y diferencia real contra estandar. Una planilla cerrada se corrige con una planilla de ajuste. No se cierra con tareo sin cerrar'
+}
+
+Table planilla_conceptos [headercolor: #993556] {
+  id bigint [pk, increment]
+  codigo varchar(20) [not null]
+  nombre varchar(120) [not null]
+  tipo varchar(20) [not null, note: 'ingreso | descuento | aporte_empleador']
+  base varchar(30)
+  tasa decimal(8,5)
+  tope decimal(14,2)
+  vigente_desde date [not null]
+  vigente_hasta date
+  es_activo boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (codigo, vigente_desde) [unique]
+  }
+  Note: 'Tasas, topes y conceptos como tablas configurables con vigencia. Las reglas vigentes las valida el contador'
+}
+
+Table planilla_boletas [headercolor: #993556] {
+  id bigint [pk, increment]
+  planilla_id bigint [ref: > planillas.id, not null]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  contrato_laboral_id bigint [ref: > contratos_laborales.id, not null]
+  dias_trabajados smallint [not null]
+  total_ingresos decimal(14,2) [not null]
+  total_descuentos decimal(14,2) [not null]
+  total_aportes decimal(14,2) [not null]
+  neto decimal(14,2) [not null]
+  adjunto_id bigint [ref: > adjuntos.id, note: 'Boleta de pago']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (planilla_id, colaborador_id) [unique]
+  }
+  Note: 'Boleta por persona y periodo. DATO SENSIBLE: sueldos solo RRHH, Gerencia y contabilidad'
+}
+
+Table planilla_boleta_lineas [headercolor: #993556] {
+  id bigint [pk, increment]
+  boleta_id bigint [ref: > planilla_boletas.id, not null]
+  concepto_id bigint [ref: > planilla_conceptos.id, not null]
+  base decimal(14,2)
+  monto decimal(14,2) [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Conceptos aplicados en cada boleta'
+}
+
+Table planilla_diferencias_costo [headercolor: #993556] {
+  id bigint [pk, increment]
+  planilla_id bigint [ref: > planillas.id, not null]
+  proyecto_id bigint [ref: > proyectos.id, not null]
+  partida_control_id bigint [ref: > partidas_control.id]
+  costo_estandar decimal(14,2) [not null]
+  costo_real decimal(14,2) [not null]
+  diferencia decimal(14,2) [not null]
+  se_reparte boolean [note: 'POR VALIDAR con Gerencia: repartir a partidas o dejar como gasto']
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Diferencia entre costo estandar y costo real, por proyecto, al cerrar la planilla'
+}
+
+Table planilla_saldos [headercolor: #993556] {
+  id bigint [pk, increment]
+  colaborador_id bigint [ref: > colaboradores.id, not null]
+  tipo varchar(20) [not null, note: 'vacaciones | cts | gratificacion']
+  dias decimal(6,2)
+  saldo decimal(14,2)
+  a_fecha date [not null]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Saldos iniciales de la migracion (vacaciones, CTS acumulada). Validar con el contador antes del primer calculo'
+}
+
+Table plantillas_contables [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  tipo_operacion varchar(60) [not null, unique]
+  nombre varchar(160) [not null]
+  vigente_desde date [not null]
+  es_activa boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'La regla que dice en que cuentas se registra cada tipo de operacion. La define el contador. Una operacion sin plantilla no genera asiento: queda en fallidos'
+}
+
+Table plantilla_contable_lineas [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  plantilla_id bigint [ref: > plantillas_contables.id, not null]
+  lado varchar(5) [not null, note: 'debe | haber']
+  cuenta varchar(20) [not null]
+  base varchar(20) [not null, note: 'subtotal | igv | total | detraccion | retencion']
+  usa_centro_costo boolean [not null, default: false]
+  orden smallint [not null, default: 0]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Lineas de una plantilla'
+}
+
+Table asientos [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'AS-AAAA-MM-NNNN']
+  origen_type varchar(120) [not null]
+  origen_id bigint [not null]
+  periodo date [not null]
+  plantilla_id bigint [ref: > plantillas_contables.id]
+  estado varchar(15) [not null, default: 'generado', note: 'generado | exportado | fallido']
+  motivo_fallo varchar(300)
+  exportacion_id bigint [ref: > exportaciones_contables.id]
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  indexes {
+    (origen_type, origen_id)
+  }
+  Note: 'Registro contable de una operacion, armado por plantilla. Reemplaza a asientos_generados (que mezclaba cabecera y lineas)'
+}
+
+Table asiento_lineas [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  asiento_id bigint [ref: > asientos.id, not null]
+  cuenta varchar(20) [not null]
+  debe decimal(14,2) [not null, default: 0]
+  haber decimal(14,2) [not null, default: 0]
+  proyecto_id bigint [ref: > proyectos.id]
+  centro_costo_id bigint [ref: > centros_costo.id]
+  glosa varchar(255)
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Debe y haber siempre suman lo mismo dentro de un asiento'
+}
+
+Table exportaciones_contables [headercolor: #854F0B] {
+  id bigint [pk, increment]
+  numero varchar(30) [not null, unique, note: 'EXP-NNNN']
+  periodo date [not null]
+  adjunto_id bigint [ref: > adjuntos.id, note: 'Excel de formato fijo']
+  estado varchar(15) [not null, default: 'generada']
+  formato_version varchar(20)
+  total_asientos integer [not null, default: 0]
+  total_fallidos integer [not null, default: 0]
+  generada_por bigint [ref: > users.id]
+  generada_at timestamptz
+  created_at timestamptz [not null, default: `now()`]
+  created_by bigint [not null, ref: > users.id]
+  updated_at timestamptz
+  updated_by bigint [ref: > users.id]
+  Note: 'Lote exportado al programa del contador. Si una operacion no tiene cuenta configurada queda fallida con su motivo; el resto del lote se exporta. Columnas exactas POR CONFIRMAR con el contador'
+}
+
+
+TableGroup M1_Identidad {
+  parties
+  tipos_documento_identidad
+  roles_party
+  party_roles
+  party_contactos
+  party_sedes
+  party_cuentas_bancarias
+}
+
+TableGroup M2_Autorizacion {
+  reglas_aprobacion
+  regla_aprobadores
+  aprobaciones
+}
+
+TableGroup M3_Estados {
+  estados
+  transiciones_estado
+  historial_estados
+}
+
+TableGroup M4_Auditoria {
+  auditoria_cambios
+}
+
+TableGroup M5_Catalogos {
+  monedas
+  tipos_cambio
+  unidades_medida
+  ubigeos
+  tipos_documento
+  formas_pago
+  lineas_solucion
+  origenes_comerciales
+  niveles_gobierno
+  rubros
+  cubso
+  tipos_penalidad
+  tipos_trabajo
+}
+
+TableGroup M6_Numeracion {
+  series_documento
+}
+
+TableGroup M7_Adjuntos {
+  tipos_adjunto
+  adjuntos
+}
+
+TableGroup M8_Notificaciones {
+  plantillas_notificacion
+  notificaciones
+}
+
+TableGroup M9_Configuracion {
+  parametros
+}
+
+TableGroup M10_Seguridad {
+  users
+  unidades_organizativas
+  permisos_por_ambito
+  puestos
+  restricciones_campo
+  cruces_funciones
+}
+
+TableGroup CRM_01_Cuentas_y_contactos {
+  cuentas
+  cuenta_marcas_cliente
+}
+
+TableGroup CRM_02_Oportunidades {
+  oportunidades
+  oportunidad_lineas
+  oportunidad_competidores
+  motivos_perdida
+}
+
+TableGroup CRM_03_Cotizaciones {
+  cotizaciones
+  cotizacion_lineas
+  condiciones_comerciales
+}
+
+TableGroup CRM_04_Licitaciones {
+  convocatorias
+  convocatoria_cronograma
+  participaciones
+  participacion_documentos
+  participacion_resultado
+  tipos_procedimiento
+}
+
+TableGroup CRM_05_Actividades {
+  actividades
+  actividad_participantes
+  tipos_actividad
+}
+
+TableGroup CRM_06_Catalogo_comercial {
+  productos
+  marcas
+  familias_producto
+  producto_precios
+  producto_cubso
+  producto_proveedores
+}
+
+TableGroup CRM_07_Campanias {
+  campanias
+  leads
+}
+
+TableGroup ERP_10_Contratos {
+  contratos
+  contrato_hitos
+  contrato_adendas
+  cartas_fianza
+  penalidades
+  conformidades
+}
+
+TableGroup ERP_01_Proyectos {
+  proyectos
+  plantillas_fase
+  plantilla_fase_pasos
+  proyecto_fases
+  proyecto_hitos
+  proyecto_entregables
+  actas
+  valorizaciones
+  proyecto_ubicaciones
+  traslados
+}
+
+TableGroup ERP_02_Compras {
+  requerimientos
+  requerimiento_lineas
+  cotizaciones_proveedor
+  cotizacion_proveedor_lineas
+  cuadros_comparativos
+  ordenes_compra
+  orden_compra_lineas
+  evaluaciones_proveedor
+  tipos_compra
+}
+
+TableGroup ERP_03_Importaciones {
+  ordenes_importacion
+  embarques
+  declaraciones_aduana
+  conceptos_costo_importacion
+  gastos_importacion
+  prorrateo_importacion
+  agentes_aduana
+}
+
+TableGroup ERP_04_Almacen {
+  almacenes
+  ubicaciones_almacen
+  tipos_movimiento
+  movimientos
+  movimiento_lineas
+  stock
+  series
+  serie_movimientos
+  guias_remision
+}
+
+TableGroup ERP_05_Servicios_y_postventa {
+  contratos_servicio
+  sla_definiciones
+  tickets
+  ticket_seguimientos
+  visitas_tecnicas
+  informes_servicio
+  garantias
+  reclamos_garantia
+  reclamo_series
+}
+
+TableGroup ERP_11_Suscripciones {
+  suscripciones
+  suscripcion_renovaciones
+  disponibilidad_servicio
+  incidentes_seguridad
+}
+
+TableGroup ERP_06_Facturacion {
+  comprobantes
+  comprobante_lineas
+  comprobantes_electronicos
+  cuentas_cobrar
+  cobranzas
+  cobranza_aplicaciones
+  detracciones
+  retenciones
+}
+
+TableGroup ERP_07_Personal {
+  colaboradores
+  contratos_laborales
+  competencias
+  certificaciones
+  colaborador_competencias
+  colaborador_certificaciones
+  asignaciones
+  disponibilidad
+}
+
+TableGroup ERP_12_Desarrollo_de_software {
+  especificaciones
+  especificacion_cambios
+  casos_prueba
+  defectos
+  versiones
+  integraciones_cliente
+}
+
+TableGroup ERP_13_Integracion_contable {
+  cuentas_pagar
+  pagos
+  bitacora_integraciones
+  plantillas_contables
+  plantilla_contable_lineas
+  asientos
+  asiento_lineas
+  exportaciones_contables
+}
+
+TableGroup ERP_09_Analitica {
+  indicadores
+  indicador_valores
+  tableros
+  tablero_indicadores
+}
+TableGroup M11_Imputacion {
+  centros_costo
+  tipos_motivo
+  motivos
+  imputaciones
+  posibles_adicionales
+}
+
+TableGroup M12_IA {
+  ia_procesos
+  ia_sugerencias
+  ia_aprendizajes
+}
+
+TableGroup M13_Alertas {
+  alerta_tipos
+  alerta_preferencias
+  alertas_emitidas
+}
+
+TableGroup ERP_14_Presupuesto_y_Partidas {
+  presupuestos
+  presupuesto_titulos
+  presupuesto_partidas
+  insumos
+  apu_insumos
+  partida_arboles
+  partidas_control
+  partida_presupuestos
+  formulas_polinomicas
+  formula_monomios
+  indices_precios
+}
+
+TableGroup ERP_15_Obra_Publica {
+  adelantos
+  valorizacion_lineas
+  liquidaciones_contrato
+  liquidacion_conceptos
+  consorcios
+  consorcio_integrantes
+  subcontratos
+  subcontrato_partidas
+  garantia_renovaciones
+}
+
+TableGroup ERP_16_Tesoreria_y_Gastos {
+  pagos_programados
+  notas_tesoreria
+  notas_tesoreria_lineas
+  flujo_caja_escenarios
+  flujo_caja_ajustes
+  servicios_vigencia
+  rendiciones_viaticos
+  rendicion_lineas
+}
+
+TableGroup ERP_17_Tareo_y_Habilitacion {
+  categorias_costo_hora
+  partes_semanales
+  parte_lineas
+  requisitos_habilitacion
+  colaborador_habilitaciones
+  asistencias
+}
+
+TableGroup ERP_18_RRHH_y_Planilla {
+  demandas_personal
+  candidatos
+  procesos_seleccion
+  proceso_candidatos
+  salidas_personal
+  salida_traspasos
+  planillas
+  planilla_conceptos
+  planilla_boletas
+  planilla_boleta_lineas
+  planilla_diferencias_costo
+  planilla_saldos
+}
+
+TableGroup ZZ_Obsoletas_v4 {
+  proyecto_presupuesto
+  proyecto_costos
+  partes_horas
+  asientos_generados
+  configuracion_contable
+}

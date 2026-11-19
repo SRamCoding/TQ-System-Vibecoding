@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cuenta · Actividades</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="cuentas" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:20px 28px 44px;display:flex;flex-direction:column;gap:14px">
+<nav aria-label="Ruta" style="font-size:12.5px;color:#5E6A66"><a href="Cuentas.dc.html" style="color:#5E6A66">Cuentas</a> › Municipalidad de Pimentel › Actividades</nav>
+<section style="background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;overflow:hidden">
+<dc-import name="CabCuenta" tab="actividades" hint-size="100%,150px"></dc-import>
+<div style="padding:18px 18px 26px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+
+<div style="flex:1.2 1 460px;min-width:0;display:flex;flex-direction:column;gap:18px">
+<div>
+<h2 style="margin:0 0 10px;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Próximas</h2>
+<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+<li style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;border:1px solid #E8E6DE;border-radius:10px;padding:12px 14px;background:#FFFFFF"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;min-width:84px">Hoy · 10:00</span><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Visita</span><span><b style="font-weight:600">Visita · Muni. de Pimentel</b><br><span style="font-size:13px;color:#5E6A66">con L. Fernández · Videovigilancia</span></span></li>
+<li style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;border:1px solid #E8E6DE;border-radius:10px;padding:12px 14px;background:#FFFFFF"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;min-width:84px">22 set</span><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Llamada</span><span><b style="font-weight:600">Llamada de seguimiento</b><br><span style="font-size:13px;color:#5E6A66">próxima acción de la cuenta</span></span></li>
+</ul>
+</div>
+<div>
+<h2 style="margin:0 0 10px;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Anteriores</h2>
+<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px">
+<li style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;border:1px solid #E8E6DE;border-radius:10px;padding:12px 14px;background:#FFFFFF"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;min-width:84px">hace 6 días</span><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#EEEDE6;color:#4A5551">Visita</span><span><b style="font-weight:600">Último contacto registrado</b><br><span style="font-size:13px;color:#5E6A66">[qué pasó · quién lo registró]</span></span></li>
+<li style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;border:1px solid #E8E6DE;border-radius:10px;padding:12px 14px;background:#FFFFFF"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;min-width:84px">[fecha]</span><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#EEEDE6;color:#4A5551">[tipo]</span><span style="color:#5E6A66">[actividades anteriores de la cuenta]</span></li>
+</ul>
+</div>
+<div style="border-top:1px solid #E8E6DE;padding-top:12px">
+<a href="AgendaEscritorio.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;text-decoration:none">Ver mi agenda completa en Actividades ›</a>
+<div style="font-size:12px;color:#5E6A66;margin-top:6px">Opcional: abre la agenda en su módulo.</div>
+</div>
+</div>
+
+<section style="flex:1 1 380px;min-width:0;border:1px solid #E8E6DE;border-radius:10px;padding:18px 20px;background:#FFFFFF;display:flex;flex-direction:column;gap:14px">
+<h2 style="margin:0;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Registrar actividad</h2>
+<fieldset style="margin:0;padding:0;border:0">
+<legend style="padding:0;margin-bottom:6px;font-size:13px;font-weight:500">Tipo</legend>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #0F6E56;border-radius:8px;background:#E1F5EE"><input type="radio" name="tipo" checked="" style="width:18px;height:18px;accent-color:#0F6E56">Visita</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="tipo" style="width:18px;height:18px;accent-color:#0F6E56">Llamada</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="tipo" style="width:18px;height:18px;accent-color:#0F6E56">Correo</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="tipo" style="width:18px;height:18px;accent-color:#0F6E56">Reunión</label>
+</div>
+</fieldset>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Relacionado con
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Videovigilancia</option><option>[oportunidad 2]</option><option>[oportunidad 3]</option><option>Toda la cuenta</option></select>
+</label>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Qué pasó
+<textarea rows="4" placeholder="Qué se conversó, qué se acordó" style="font:inherit;font-size:14px;font-weight:400;padding:10px 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28;resize:vertical"></textarea>
+</label>
+<fieldset style="margin:0;padding:0;border:0">
+<legend style="padding:0;margin-bottom:6px;font-size:13px;font-weight:500">Próxima acción</legend>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="prox" style="width:18px;height:18px;accent-color:#0F6E56">Mañana</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="prox" style="width:18px;height:18px;accent-color:#0F6E56">3 días</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid #0F6E56;border-radius:8px;background:#E1F5EE"><input type="radio" name="prox" checked="" style="width:18px;height:18px;accent-color:#0F6E56">1 semana</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="prox" style="width:18px;height:18px;accent-color:#0F6E56">Ninguna</label>
+</div>
+<p style="margin:8px 0 0;font-size:12.5px;color:#5E6A66">La próxima acción es el mecanismo central del CRM, con la opción explícita de no programar ninguna.</p>
+</fieldset>
+<div style="display:flex;flex-wrap:wrap;gap:10px;border-top:1px solid #E8E6DE;padding-top:14px">
+<button type="button" style="font:inherit;font-size:13.5px;font-weight:600;min-height:44px;padding:0 18px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;cursor:pointer">Guardar actividad</button>
+</div>
+</section>
+
+</div>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

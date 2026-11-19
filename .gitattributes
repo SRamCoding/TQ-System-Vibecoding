@@ -1,0 +1,22 @@
+# El equipo trabaja en Windows: forzar LF en el repositorio para que Pint, CI y los
+# hooks vean los mismos archivos.
+* text=auto eol=lf
+
+*.php    text eol=lf
+*.md     text eol=lf
+*.json   text eol=lf
+*.yml    text eol=lf
+*.dbml   text eol=lf
+*.bat    text eol=crlf
+*.ps1    text eol=crlf
+
+*.png binary
+*.jpg binary
+*.pdf binary
+
+# Diffs legibles (del esqueleto de Laravel)
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php

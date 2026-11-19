@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Dónde estamos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: guía de equipo; índice fijo a la izquierda en escritorio, arriba en el celular; secciones numeradas porque son un orden real de lectura */
+:root {
+  --bg: #f6f7fb; --surface: #ffffff; --fg: #141a2e; --muted: #556079; --line: #dde1ec;
+  --accent: #1b2f8a; --accent-soft: #e7ebfb; --teal: #0d7472; --teal-soft: #dff2f1;
+  --amber: #a85a06; --amber-soft: #fdf1df; --red: #b42318; --red-soft: #fdeceb; --green: #187a3d; --green-soft: #e3f4e8;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.envoltura { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2.5rem; max-width: 72rem; margin: 0 auto;
+  padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.5rem); align-self: start; font-size: 0.9rem; }
+nav.indice b { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+nav.indice ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; counter-reset: i; }
+nav.indice li { counter-increment: i; }
+nav.indice a { display: flex; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 6px; color: var(--fg); text-decoration: none; }
+nav.indice a::before { content: counter(i); font-family: var(--mono); color: var(--muted); min-width: 1.2rem; }
+nav.indice a:hover, nav.indice a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+main { min-width: 0; display: grid; gap: 3rem; }
+header.cabeza { display: grid; gap: 0.75rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
+h1 { font-family: var(--display); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; color: var(--fg); }
+.bajada { color: var(--muted); max-width: 62ch; margin: 0; font-size: 1.05rem; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+h2 { font-size: 1.45rem; margin: 0; display: flex; gap: 0.75rem; align-items: baseline; text-wrap: balance; }
+h2 .n { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); }
+h3 { font-size: 1.05rem; margin: 0.5rem 0 0; }
+p { margin: 0; max-width: 68ch; }
+.caja { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; }
+.nota { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; max-width: 68ch; }
+.nota.ambar { border-color: var(--amber); background: var(--amber-soft); }
+.nota.roja { border-color: var(--red); background: var(--red-soft); }
+.equipo { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.2rem; }
+.persona b { font-size: 1.05rem; }
+.persona span { color: var(--muted); font-size: 0.9rem; }
+
+/* ciclo */
+.ciclo { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; counter-reset: c; list-style: none; padding: 0; margin: 0; }
+.ciclo li { counter-increment: c; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem 0.4rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+.ciclo li::before { content: counter(c); display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: 0.8rem; }
+.ciclo li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 0.4rem; }
+
+/* tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+/* camino de una tarea */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: p; }
+.pasos > li { counter-increment: p; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details[open] { border-color: var(--accent); }
+summary { cursor: pointer; list-style: none; display: flex; gap: 0.75rem; align-items: center; padding: 0.8rem 1rem; font-weight: 600; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: counter(p); display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--mono); font-size: 0.85rem; }
+summary::after { content: "+"; margin-left: auto; color: var(--muted); font-family: var(--mono); }
+details[open] summary::after { content: "−"; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.det { padding: 0 1rem 1rem 3.55rem; display: grid; gap: 0.5rem; }
+.det ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+/* vida de una costura */
+.linea { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+.etapa { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.etapa b { font-size: 0.95rem; }
+.etapa small { font-family: var(--mono); color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* reglas */
+.reglas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; counter-reset: r; }
+.reglas li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem 0.7rem 2.8rem; position: relative; font-size: 0.93rem; }
+.reglas li::before { content: counter(r); position: absolute; left: 0.8rem; top: 0.7rem; font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+/* lista de verificación */
+.check { display: grid; gap: 0.4rem; }
+.check label { display: flex; gap: 0.7rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--green); flex: 0 0 auto; }
+.check label:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.check label:has(input:checked) span { text-decoration: line-through; color: var(--muted); }
+.check-pie { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.check-pie button { font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.check-pie button:hover, .check-pie button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.progreso { font-family: var(--mono); color: var(--green); font-weight: 500; }
+
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+@media (max-width: 860px) {
+  .envoltura { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  nav.indice { position: static; }
+  nav.indice ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .linea { grid-template-columns: minmax(0, 1fr); }
+  .det { padding-left: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tabs button, .chipbtn { font: inherit; font-size: 0.92rem; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; }
+.tabs button:hover, .tabs button:focus-visible, .chipbtn:hover, .chipbtn:focus-visible { border-color: var(--accent); outline: none; }
+.tabs button[aria-selected="true"], .chipbtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.15rem; display: grid; gap: 0.6rem; }
+.panel p, .panel li { max-width: 68ch; }
+.panel ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.75rem; }
+.tres { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; }
+.bloque { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.45rem; align-content: start; }
+.bloque h3 { margin: 0; font-size: 1rem; }
+.bloque ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; font-size: 0.93rem; }
+.bloque.azul { border-top: 4px solid var(--accent); } .bloque.teal { border-top: 4px solid var(--teal); }
+.bloque.ambar { border-top: 4px solid var(--amber); } .bloque.verde { border-top: 4px solid var(--green); } .bloque.gris { border-top: 4px solid var(--muted); }
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; }
+.cifra { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 0.9rem; display: grid; gap: 0.15rem; }
+.cifra b { font-family: var(--mono); font-size: 1.45rem; color: var(--accent); font-weight: 500; font-variant-numeric: tabular-nums; }
+.cifra span { color: var(--muted); font-size: 0.88rem; }
+.flujo { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.4rem; }
+.flujo .paso { flex: 1 1 8rem; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c, var(--accent)); border-radius: 8px; padding: 0.6rem 0.7rem; font-size: 0.88rem; display: grid; gap: 0.15rem; }
+.flujo .paso b { font-size: 0.95rem; }
+.flujo .paso span { color: var(--muted); }
+.flecha { align-self: center; color: var(--muted); font-family: var(--mono); }
+.numeros4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-radius: 10px; overflow: hidden; }
+.numeros4 div { padding: 0.8rem; color: var(--surface); display: grid; gap: 0.2rem; font-size: 0.88rem; }
+.numeros4 div b { font-size: 1rem; }
+.viaje { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.viaje button { width: 100%; text-align: left; font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; display: flex; gap: 0.7rem; align-items: center; }
+.viaje button:hover, .viaje button:focus-visible { border-color: var(--accent); outline: none; }
+.viaje button[aria-expanded="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.viaje .et { font-family: var(--mono); font-size: 0.78rem; color: var(--surface); background: var(--c, var(--accent)); border-radius: 5px; padding: 0.1rem 0.45rem; min-width: 2.2rem; text-align: center; }
+.viaje .tt { font-weight: 600; flex: 1; min-width: 0; }
+.viaje .mm { color: var(--muted); font-size: 0.82rem; font-family: var(--mono); }
+.viaje .det { padding: 0.6rem 0.8rem 0.4rem 3.6rem; font-size: 0.94rem; display: grid; gap: 0.3rem; }
+.buscar { font: inherit; width: 100%; max-width: 26rem; padding: 0.5rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); }
+.buscar:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tl { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.4rem; }
+.tl div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem; font-size: 0.85rem; display: grid; gap: 0.2rem; align-content: start; }
+.tl div b { font-size: 0.92rem; }
+.tl .ok { border-color: var(--green); background: var(--green-soft); }
+.tl .casi { border-color: var(--amber); background: var(--amber-soft); }
+.tl .sig { border-color: var(--accent); background: var(--accent-soft); }
+.estado { font-family: var(--mono); font-size: 0.72rem; font-weight: 500; }
+.tarea-h { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 0.6rem; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--line); font-size: 0.93rem; }
+.tarea-h:last-child { border-bottom: 0; }
+.tarea-h .id { font-family: var(--mono); color: var(--accent); font-weight: 500; }
+.tarea-h .abierta { color: var(--amber); }
+.lista-h { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.pie-dato { color: var(--muted); font-size: 0.88rem; }
+@media (max-width: 860px) { .numeros4, .tl { grid-template-columns: repeat(2, minmax(0, 1fr)); } .viaje .det { padding-left: 0.8rem; } .viaje .mm { display: none; } }
+
+</style>
+</head>
+<body>
+
+<div class="envoltura">
+  <nav class="indice" aria-label="Índice">
+    <b>Índice</b>
+    <ol>
+      <li><a href="#resumen">En una mirada</a></li>
+      <li><a href="#etapas">Las seis etapas</a></li>
+      <li><a href="#etapa0">Etapa 0 · Base</a></li>
+      <li><a href="#etapa1">Etapa 1 · Núcleo</a></li>
+      <li><a href="#aporta">Lo que el núcleo ya resuelve</a></li>
+      <li><a href="#decisiones">Decisiones recientes</a></li>
+      <li><a href="#etapa2">Etapa 2 · lo que viene</a></li>
+      <li><a href="#despues">Después de la etapa 2</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="cabeza">
+      <span class="eyebrow">TechQuk Integral System · estado del proyecto</span>
+      <h1>Dónde estamos</h1>
+      <p class="bajada">Lo que ya está construido (etapas 0 y 1), lo que se decidió en estos días y lo que empieza ahora (etapa 2). Al 4 de noviembre de 2026.</p>
+    </header>
+
+    <section id="resumen">
+      <h2><span class="n">01</span>En una mirada</h2>
+      <div class="cifras">
+        <div class="cifra"><b>2</b><span>etapas listas de 6 (la 1 con 4 tareas abiertas que no frenan)</span></div>
+        <div class="cifra"><b>2,323</b><span>pruebas automáticas en verde</span></div>
+        <div class="cifra"><b>134</b><span>acciones de usuario registradas</span></div>
+        <div class="cifra"><b>72</b><span>modelos del núcleo</span></div>
+        <div class="cifra"><b>505</b><span>commits desde el 6 de octubre</span></div>
+      </div>
+      <div class="nota"><b>En palabras simples:</b> los cimientos están hechos. Todo lo que cualquier módulo necesita (personas y empresas, seguridad, estados, aprobaciones, numeración, auditoría, imputación, alertas, IA) ya existe y está probado. Ahora empieza lo que responde la pregunta del sistema: el control de costos de cada proyecto.</div>
+    </section>
+
+    <section id="etapas">
+      <h2><span class="n">02</span>Las seis etapas</h2>
+      <div class="tl">
+        <div class="ok"><b>0 · Base</b>Laravel, Filament, Docker, login<span class="estado">cerrada · 9 oct</span></div>
+        <div class="casi"><b>1 · Núcleo</b>Los mecanismos que todos usan<span class="estado">mecanismos listos</span></div>
+        <div class="sig"><b>2 · Control de costos</b>CRM, contratos, presupuesto, compras, almacén, horas<span class="estado">empieza ahora</span></div>
+        <div><b>3 · Ciclo del dinero</b>Facturación, tesorería, contabilidad, cierre<span class="estado">después</span></div>
+        <div><b>4 · RRHH</b>Selección, contratos, planilla<span class="estado">después</span></div>
+        <div><b>5 · Importaciones y postventa</b>Embarques, tickets, garantías, tableros<span class="estado">después</span></div>
+      </div>
+      <p>Cada etapa se cierra con sus pruebas en verde antes de abrir la siguiente. La única excepción escrita: la etapa 2 se abre con cuatro tareas de la 1 todavía abiertas, porque no tocan nada de lo que la 2 usa.</p>
+    </section>
+
+    <section id="etapa0">
+      <h2><span class="n">03</span>Etapa 0 · Base</h2>
+      <p>Cerrada el 9 de octubre de 2026. El esqueleto sobre el que se construye todo:</p>
+      <div class="tres">
+        <div class="bloque gris"><h3>Tecnología</h3><ul><li>PHP, Laravel y Filament</li><li>PostgreSQL</li><li>Docker para desarrollo</li></ul></div>
+        <div class="bloque gris"><h3>Forma de trabajar</h3><ul><li>Reglas para agentes (<code>AGENTS.md</code>)</li><li>Flujos, hooks y revisor de arquitectura</li><li>Integración continua</li></ul></div>
+        <div class="bloque gris"><h3>Estructura</h3><ul><li>Monolito dividido en módulos</li><li>Pruebas que vigilan las fronteras</li><li>Login y navegación</li></ul></div>
+      </div>
+    </section>
+
+    <section id="etapa1">
+      <h2><span class="n">04</span>Etapa 1 · Núcleo</h2>
+      <p>Filtra por tipo de tarea:</p>
+      <div class="tabs" role="group" aria-label="Filtrar tareas">
+        <button type="button" class="chipbtn" data-grupo="todas" aria-pressed="true">Todas</button>
+        <button type="button" class="chipbtn" data-grupo="mecanismo" aria-pressed="false">Mecanismos</button>
+        <button type="button" class="chipbtn" data-grupo="interfaz" aria-pressed="false">Interfaz</button>
+        <button type="button" class="chipbtn" data-grupo="operacion" aria-pressed="false">Operación</button>
+        <button type="button" class="chipbtn" data-grupo="abierta" aria-pressed="false">Abiertas</button>
+      </div>
+      <div class="lista-h" id="tareas-1">
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.1</span><span><b>Auditoría y registro de acciones.</b> Quién creó y cambió cada cosa; toda acción con sus campos y su permiso.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.2</span><span><b>Catálogos y parámetros,</b> editables por pantalla, con tipo de cambio automático de SUNAT.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.3</span><span><b>Personas y empresas:</b> un solo registro, con roles, contactos, sedes y cuentas bancarias.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.4</span><span><b>Seguridad:</b> usuarios, organigrama, puestos, permisos por ámbito, datos sensibles y funciones que no deben juntarse.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.5</span><span><b>Estados y transiciones</b> con efectos, anulación con motivo y catálogo de motivos.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.6</span><span><b>Numeración</b> sin saltos ni repetidos, probada con procesos en paralelo.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.7</span><span><b>Aprobaciones configurables</b> por monto, probadas con aprobaciones simultáneas.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.8</span><span><b>Adjuntos y notificaciones:</b> archivos en cualquier documento y la campana.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.9</span><span><b>Imputación y centros de costo:</b> el destino de cada costo, listo para sumar las partidas.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.10</span><span><b>Alertas</b> configurables que no se repiten.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.11</span><span><b>Mecanismo de IA:</b> proveedores, autorización de Gerencia, topes de gasto y su propia cola.</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.13</span><span><b>Configuración inicial</b> paso a paso, con una bienvenida al entrar (1.13b).</span></div>
+        <div class="tarea-h" data-g="mecanismo"><span class="id">1.15</span><span><b>Techquk como ficha:</b> los documentos toman los datos de la empresa de un solo lugar.</span></div>
+        <div class="tarea-h" data-g="operacion"><span class="id">1.11b</span><span><b>Seguridad de dependencias:</b> librerías actualizadas por fallas conocidas.</span></div>
+        <div class="tarea-h" data-g="operacion"><span class="id">1.12</span><span><b>Página de salud:</b> estado de la cola, respaldos cifrados y programados, la IA.</span></div>
+        <div class="tarea-h" data-g="operacion"><span class="id">1.12b</span><span><b>Imagen de producción:</b> listo para desplegar en el servidor.</span></div>
+        <div class="tarea-h" data-g="interfaz"><span class="id">1.3d · 1.4f</span><span><b>Navegación:</b> un solo modo, barra lateral, inicio con cajas por módulo.</span></div>
+        <div class="tarea-h" data-g="interfaz"><span class="id">1.4b · 1.4e</span><span><b>Saludo</b> personalizado según la hora y el horario de la empresa, con dibujos de la fecha.</span></div>
+        <div class="tarea-h" data-g="interfaz"><span class="id">1.4g · 1.4h</span><span><b>Preferencias por usuario y «Mis datos»:</b> tema, densidad, contraseña, foto y redes.</span></div>
+        <div class="tarea-h" data-g="interfaz"><span class="id">1.4j · 1.4m</span><span><b>Pantallas de Catálogos y de Personas y empresas,</b> con cajas, buscador y panel deslizante.</span></div>
+        <div class="tarea-h" data-g="interfaz"><span class="id">1.4p · 1.4x</span><span><b>Panel de aplicaciones</b> y avisos solo para leer.</span></div>
+        <div class="tarea-h" data-g="interfaz"><span class="id">1.4r · 1.4u</span><span><b>Estaciones y clima:</b> el inicio y el fondo cambian con la estación y el clima real.</span></div>
+        <div class="tarea-h" data-g="interfaz"><span class="id">1.4c</span><span><b>Pantalla de seguridad:</b> roles por permisos y permisos incompatibles.</span></div>
+        <div class="tarea-h" data-g="interfaz"><span class="id">1.4i · 1.4l</span><span><b>Modo desarrollo y «Mien»,</b> el tablero personal.</span></div>
+        <div class="tarea-h" data-g="abierta"><span class="id abierta">1.14</span><span><b>Ayuda con IA y tickets.</b> Espera la API del sistema de tickets existente y una decisión sobre el chat libre.</span></div>
+        <div class="tarea-h" data-g="abierta"><span class="id abierta">1.4d</span><span><b>El gran momento de las fechas.</b> En pausa, sin fecha.</span></div>
+        <div class="tarea-h" data-g="abierta"><span class="id abierta">1.4d2 · 1.4k</span><span><b>Variantes y escenas del gran momento.</b> Para después.</span></div>
+      </div>
+    </section>
+
+    <section id="aporta">
+      <h2><span class="n">05</span>Lo que el núcleo ya resuelve para la etapa 2</h2>
+      <p>Cada módulo nuevo se enchufa a esto en vez de programarlo de nuevo.</p>
+      <div class="tabla"><table>
+        <tr><th>La etapa 2 necesita…</th><th>Ya existe</th></tr>
+        <tr><td>Imputar cada costo a una partida</td><td>El servicio de imputación, los centros de costo y los motivos</td></tr>
+        <tr><td>Documentos con estados (contrato, orden, requerimiento)</td><td>Estados, transiciones, efectos y anulación</td></tr>
+        <tr><td>Aprobar según el monto</td><td>Aprobaciones configurables</td></tr>
+        <tr><td>Numerar CT-2026-018, OC-2026-0142…</td><td>Numeración segura</td></tr>
+        <tr><td>Clientes, proveedores, trabajadores</td><td>Personas y empresas</td></tr>
+        <tr><td>Vencimiento de la carta fianza, de la habilitación</td><td>Alertas</td></tr>
+        <tr><td>Montos en dólares</td><td>Tipo de cambio automático</td></tr>
+        <tr><td>Actas, PDF, evidencias</td><td>Adjuntos</td></tr>
+        <tr><td>Los datos de Techquk en los documentos</td><td>La ficha de la empresa y su encabezado</td></tr>
+      </table></div>
+    </section>
+
+    <section id="decisiones">
+      <h2><span class="n">06</span>Decisiones recientes</h2>
+      <div class="tabla"><table>
+        <tr><th>Decisión</th><th>Dónde quedó</th></tr>
+        <tr><td>Las convocatorias públicas llegan solas cada día desde los datos abiertos del OECE</td><td>ADR 0018 (aceptado)</td></tr>
+        <tr><td>Las licitaciones privadas se registran a mano, con la misma trazabilidad</td><td>Mapa, etapa 2</td></tr>
+        <tr><td>La contabilidad sigue en S10 con el contador de Techquk; el sistema le exporta los asientos. Un sistema contable propio queda fuera del MVP</td><td><code>pendientes.md</code> y el mapa</td></tr>
+        <tr><td>La planilla, hoy en Excel, la calculará este sistema en la etapa 4, validada contra el Excel antes de usarse para pagar</td><td><code>pendientes.md</code></td></tr>
+        <tr><td>Tesorería completa en la etapa 3: conciliación, detracciones, retenciones, fondos por proyecto e incremento con revisión</td><td>Mapa, etapa 3</td></tr>
+        <tr><td>La etapa 2 se reparte en cuatro áreas con dueño, medidas por puntos de esfuerzo (~25 % cada una), y once costuras</td><td>ADR 0020 (aceptado)</td></tr>
+        <tr><td>Costuras, reglas de los agentes y convenciones se deciden en equipo</td><td><code>AGENTS.md</code> y ADR 0020</td></tr>
+        <tr><td>Las pantallas siguen los patrones actuales; la mejora visual se hace al final</td><td><code>AGENTS.md</code></td></tr>
+      </table></div>
+    </section>
+
+    <section id="etapa2">
+      <h2><span class="n">07</span>Etapa 2 · lo que viene</h2>
+      <p>El control de costos: desde que se vende hasta que se gasta. Se cierra cuando pasan cuatro escenarios con números exactos: margen S/ 1,327.00, penalidad S/ 205.96 por día, cable S/ 1,248.00 en su partida y el taxi en la PC-99.</p>
+      <div class="dos">
+        <div class="bloque azul"><h3>Sebastián · Presupuesto y costo</h3><p>Presupuesto con APU, árbol de partidas, saldos, el selector de imputación, el margen y los gastos no presupuestados.</p></div>
+        <div class="bloque teal"><h3>Ander · Comercial</h3><p>Cuentas, oportunidades, cotizaciones, licitaciones y actividades.</p></div>
+        <div class="bloque ambar"><h3>Lennart · Contratos y abastecimiento</h3><p>Contratos, compras, almacén y subcontratos: todo lo que se firma.</p></div>
+        <div class="bloque verde"><h3>Yair · Obra y personas</h3><p>Proyectos, personal, tareo, valorizaciones, el catálogo y, al final, el OECE.</p></div>
+      </div>
+      <div class="nota">Todos arrancan el mismo día. El detalle está en las guías <code>2-etapa-2</code> y en la de cada uno (<code>3</code> a <code>6</code>), y la forma de trabajar en <code>1-como-trabajamos</code>, en <code>docs/equipo/</code>.</div>
+    </section>
+
+    <section id="despues">
+      <h2><span class="n">08</span>Después de la etapa 2</h2>
+      <div class="tres">
+        <div class="bloque gris"><h3>Etapa 3 · Ciclo del dinero</h3><ul><li>Facturación por XML, cobranzas</li><li>Tesorería completa</li><li>Asientos para S10, cierre del proyecto</li></ul></div>
+        <div class="bloque gris"><h3>Etapa 4 · RRHH</h3><ul><li>Demanda, selección, salida</li><li>Planilla en el sistema (hoy en Excel)</li></ul></div>
+        <div class="bloque gris"><h3>Etapa 5</h3><ul><li>Importaciones</li><li>Postventa: tickets, garantías, suscripciones</li><li>Tableros por rol</li></ul></div>
+      </div>
+      <p>Cada etapa se reparte al cerrar la anterior, con lo aprendido.</p>
+    </section>
+
+    <footer>Esta guía vive en el repositorio, en <code>docs/equipo/8-donde-estamos.html</code>. Fuente: <code>docs/planes/mapa-etapas.md</code>. Si no coinciden, manda el repositorio.</footer>
+  </main>
+</div>
+<script>
+(function () {
+  const botones = [...document.querySelectorAll('[data-grupo]')];
+  const filas = [...document.querySelectorAll('#tareas-1 .tarea-h')];
+  botones.forEach((b) => b.addEventListener('click', () => {
+    botones.forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    filas.forEach((f) => { f.hidden = b.dataset.grupo !== 'todas' && f.dataset.g !== b.dataset.grupo; });
+  }));
+})();
+</script>
+
+</body>
+</html>

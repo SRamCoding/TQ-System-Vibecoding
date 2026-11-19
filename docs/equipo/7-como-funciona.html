@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Cómo funciona TechQuk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: guía de equipo; índice fijo a la izquierda en escritorio, arriba en el celular; secciones numeradas porque son un orden real de lectura */
+:root {
+  --bg: #f6f7fb; --surface: #ffffff; --fg: #141a2e; --muted: #556079; --line: #dde1ec;
+  --accent: #1b2f8a; --accent-soft: #e7ebfb; --teal: #0d7472; --teal-soft: #dff2f1;
+  --amber: #a85a06; --amber-soft: #fdf1df; --red: #b42318; --red-soft: #fdeceb; --green: #187a3d; --green-soft: #e3f4e8;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.envoltura { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2.5rem; max-width: 72rem; margin: 0 auto;
+  padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.5rem); align-self: start; font-size: 0.9rem; }
+nav.indice b { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+nav.indice ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; counter-reset: i; }
+nav.indice li { counter-increment: i; }
+nav.indice a { display: flex; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 6px; color: var(--fg); text-decoration: none; }
+nav.indice a::before { content: counter(i); font-family: var(--mono); color: var(--muted); min-width: 1.2rem; }
+nav.indice a:hover, nav.indice a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+main { min-width: 0; display: grid; gap: 3rem; }
+header.cabeza { display: grid; gap: 0.75rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
+h1 { font-family: var(--display); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; color: var(--fg); }
+.bajada { color: var(--muted); max-width: 62ch; margin: 0; font-size: 1.05rem; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+h2 { font-size: 1.45rem; margin: 0; display: flex; gap: 0.75rem; align-items: baseline; text-wrap: balance; }
+h2 .n { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); }
+h3 { font-size: 1.05rem; margin: 0.5rem 0 0; }
+p { margin: 0; max-width: 68ch; }
+.caja { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; }
+.nota { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; max-width: 68ch; }
+.nota.ambar { border-color: var(--amber); background: var(--amber-soft); }
+.nota.roja { border-color: var(--red); background: var(--red-soft); }
+.equipo { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.2rem; }
+.persona b { font-size: 1.05rem; }
+.persona span { color: var(--muted); font-size: 0.9rem; }
+
+/* ciclo */
+.ciclo { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; counter-reset: c; list-style: none; padding: 0; margin: 0; }
+.ciclo li { counter-increment: c; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem 0.4rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+.ciclo li::before { content: counter(c); display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: 0.8rem; }
+.ciclo li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 0.4rem; }
+
+/* tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+/* camino de una tarea */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: p; }
+.pasos > li { counter-increment: p; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details[open] { border-color: var(--accent); }
+summary { cursor: pointer; list-style: none; display: flex; gap: 0.75rem; align-items: center; padding: 0.8rem 1rem; font-weight: 600; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: counter(p); display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--mono); font-size: 0.85rem; }
+summary::after { content: "+"; margin-left: auto; color: var(--muted); font-family: var(--mono); }
+details[open] summary::after { content: "−"; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.det { padding: 0 1rem 1rem 3.55rem; display: grid; gap: 0.5rem; }
+.det ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+/* vida de una costura */
+.linea { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+.etapa { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.etapa b { font-size: 0.95rem; }
+.etapa small { font-family: var(--mono); color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* reglas */
+.reglas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; counter-reset: r; }
+.reglas li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem 0.7rem 2.8rem; position: relative; font-size: 0.93rem; }
+.reglas li::before { content: counter(r); position: absolute; left: 0.8rem; top: 0.7rem; font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+/* lista de verificación */
+.check { display: grid; gap: 0.4rem; }
+.check label { display: flex; gap: 0.7rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--green); flex: 0 0 auto; }
+.check label:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.check label:has(input:checked) span { text-decoration: line-through; color: var(--muted); }
+.check-pie { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.check-pie button { font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.check-pie button:hover, .check-pie button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.progreso { font-family: var(--mono); color: var(--green); font-weight: 500; }
+
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+@media (max-width: 860px) {
+  .envoltura { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  nav.indice { position: static; }
+  nav.indice ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .linea { grid-template-columns: minmax(0, 1fr); }
+  .det { padding-left: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tabs button, .chipbtn { font: inherit; font-size: 0.92rem; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; }
+.tabs button:hover, .tabs button:focus-visible, .chipbtn:hover, .chipbtn:focus-visible { border-color: var(--accent); outline: none; }
+.tabs button[aria-selected="true"], .chipbtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.15rem; display: grid; gap: 0.6rem; }
+.panel p, .panel li { max-width: 68ch; }
+.panel ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.75rem; }
+.tres { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; }
+.bloque { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.45rem; align-content: start; }
+.bloque h3 { margin: 0; font-size: 1rem; }
+.bloque ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; font-size: 0.93rem; }
+.bloque.azul { border-top: 4px solid var(--accent); } .bloque.teal { border-top: 4px solid var(--teal); }
+.bloque.ambar { border-top: 4px solid var(--amber); } .bloque.verde { border-top: 4px solid var(--green); } .bloque.gris { border-top: 4px solid var(--muted); }
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; }
+.cifra { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 0.9rem; display: grid; gap: 0.15rem; }
+.cifra b { font-family: var(--mono); font-size: 1.45rem; color: var(--accent); font-weight: 500; font-variant-numeric: tabular-nums; }
+.cifra span { color: var(--muted); font-size: 0.88rem; }
+.flujo { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.4rem; }
+.flujo .paso { flex: 1 1 8rem; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c, var(--accent)); border-radius: 8px; padding: 0.6rem 0.7rem; font-size: 0.88rem; display: grid; gap: 0.15rem; }
+.flujo .paso b { font-size: 0.95rem; }
+.flujo .paso span { color: var(--muted); }
+.flecha { align-self: center; color: var(--muted); font-family: var(--mono); }
+.numeros4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-radius: 10px; overflow: hidden; }
+.numeros4 div { padding: 0.8rem; color: var(--surface); display: grid; gap: 0.2rem; font-size: 0.88rem; }
+.numeros4 div b { font-size: 1rem; }
+.viaje { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.viaje button { width: 100%; text-align: left; font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; display: flex; gap: 0.7rem; align-items: center; }
+.viaje button:hover, .viaje button:focus-visible { border-color: var(--accent); outline: none; }
+.viaje button[aria-expanded="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.viaje .et { font-family: var(--mono); font-size: 0.78rem; color: var(--surface); background: var(--c, var(--accent)); border-radius: 5px; padding: 0.1rem 0.45rem; min-width: 2.2rem; text-align: center; }
+.viaje .tt { font-weight: 600; flex: 1; min-width: 0; }
+.viaje .mm { color: var(--muted); font-size: 0.82rem; font-family: var(--mono); }
+.viaje .det { padding: 0.6rem 0.8rem 0.4rem 3.6rem; font-size: 0.94rem; display: grid; gap: 0.3rem; }
+.buscar { font: inherit; width: 100%; max-width: 26rem; padding: 0.5rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); }
+.buscar:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tl { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.4rem; }
+.tl div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem; font-size: 0.85rem; display: grid; gap: 0.2rem; align-content: start; }
+.tl div b { font-size: 0.92rem; }
+.tl .ok { border-color: var(--green); background: var(--green-soft); }
+.tl .casi { border-color: var(--amber); background: var(--amber-soft); }
+.tl .sig { border-color: var(--accent); background: var(--accent-soft); }
+.estado { font-family: var(--mono); font-size: 0.72rem; font-weight: 500; }
+.tarea-h { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 0.6rem; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--line); font-size: 0.93rem; }
+.tarea-h:last-child { border-bottom: 0; }
+.tarea-h .id { font-family: var(--mono); color: var(--accent); font-weight: 500; }
+.tarea-h .abierta { color: var(--amber); }
+.lista-h { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.pie-dato { color: var(--muted); font-size: 0.88rem; }
+@media (max-width: 860px) { .numeros4, .tl { grid-template-columns: repeat(2, minmax(0, 1fr)); } .viaje .det { padding-left: 0.8rem; } .viaje .mm { display: none; } }
+
+</style>
+</head>
+<body>
+
+<div class="envoltura">
+  <nav class="indice" aria-label="Índice">
+    <b>Índice</b>
+    <ol>
+      <li><a href="#pregunta">La pregunta</a></li>
+      <li><a href="#caras">Dos caras</a></li>
+      <li><a href="#vecinos">El sistema y sus vecinos</a></li>
+      <li><a href="#ideas">Las cuatro ideas</a></li>
+      <li><a href="#dinero">El costo y el dinero</a></li>
+      <li><a href="#viaje">El viaje de un negocio</a></li>
+      <li><a href="#tesoreria">Tesorería y fondos</a></li>
+      <li><a href="#personas">Personas y planilla</a></li>
+      <li><a href="#nucleo">El núcleo</a></li>
+      <li><a href="#glosario">Glosario</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="cabeza">
+      <span class="eyebrow">TechQuk Integral System · cómo funciona</span>
+      <h1>Cómo funciona el sistema</h1>
+      <p class="bajada">El ERP + CRM propio de Techquk S.A.C., explicado de punta a punta: qué hace, cómo se conectan sus partes y qué queda fuera. Actualizado al 10 de noviembre de 2026.</p>
+    </header>
+
+    <section id="pregunta">
+      <h2><span class="n">01</span>La pregunta</h2>
+      <div class="nota"><b>«¿Cuánto se gana realmente en cada proyecto?»</b> Todo el sistema existe para responder esa pregunta con números, sin armar una hoja de cálculo a fin de mes.</div>
+      <p>Techquk es un integrador tecnológico de Chiclayo que trabaja sobre todo con el Estado. El sistema reemplaza al ERP S10 y junta lo que hoy está repartido entre S10, hojas de Excel, papel y la memoria de las personas.</p>
+      <div class="nota ambar">Piensa en un restaurante. El <b>CRM</b> es el salón: recibe al cliente y toma el pedido. El <b>ERP</b> es la cocina: compra, cocina y controla cuánto costó cada plato. El <b>núcleo</b> son las instalaciones (luz, agua, caja registradora) que usan los dos. Y la pregunta del dueño es siempre: ¿ganamos con este plato?</div>
+    </section>
+
+    <section id="caras">
+      <h2><span class="n">02</span>Dos caras, un solo sistema</h2>
+      <div class="dos">
+        <div class="bloque teal"><h3>CRM · vender</h3><p>«¿Vamos a ganar este negocio?»</p><ul>
+          <li>Cuentas (sin duplicados: se crean desde el RUC)</li>
+          <li>Oportunidades por etapas y el tablero del ejecutivo</li>
+          <li>Cotizaciones enlazadas al presupuesto real</li>
+          <li>Licitaciones públicas: llegan solas cada día desde los datos abiertos del OECE</li>
+          <li>Licitaciones privadas: se registran a mano, con la misma trazabilidad</li>
+          <li>Actividades, catálogo único, campañas</li></ul></div>
+        <div class="bloque azul"><h3>ERP · cumplir</h3><p>«¿Estamos cumpliendo y ganando con lo que firmamos?»</p><ul>
+          <li>Contrato: plazos, hitos, carta fianza, penalidad</li>
+          <li>Proyecto: presupuesto con APU y árbol de partidas</li>
+          <li>Compras, almacén, despachos a obra</li>
+          <li>Personas, habilitación de campo y horas</li>
+          <li>Facturación, cobranzas y tesorería</li>
+          <li>Cierre, postventa, RRHH</li></ul></div>
+      </div>
+      <div class="nota">Se pasan la posta en un solo momento: cuando la oportunidad pasa a <b>«Ganada»</b>. Ahí nace el contrato con todo lo que ya se escribió al vender, sin volver a escribirlo. Comparten el registro de personas y empresas, el catálogo y el presupuesto.</div>
+    </section>
+
+    <section id="vecinos">
+      <h2><span class="n">03</span>El sistema y sus vecinos</h2>
+      <p>El sistema es el <b>operativo</b>: donde vive el día a día de cada proyecto. Lo legal y contable sigue en otros programas, y se conectan en puntos claros.</p>
+      <div class="flujo">
+        <div class="paso" style="--c: var(--teal)"><b>OECE</b><span>convocatorias y bases, cada día</span></div><span class="flecha">→</span>
+        <div class="paso" style="--c: var(--accent)"><b>Nuestro sistema</b><span>proyectos, costos, compras, personas, tesorería</span></div><span class="flecha">→</span>
+        <div class="paso" style="--c: var(--amber)"><b>S10</b><span>contabilidad oficial, con el contador de Techquk</span></div>
+      </div>
+      <div class="tabla"><table>
+        <tr><th>Qué</th><th>Dónde vive</th><th>Cómo se conecta</th></tr>
+        <tr><td>Proyectos, presupuesto, compras, almacén, horas</td><td>Nuestro sistema</td><td>—</td></tr>
+        <tr><td>Tesorería: qué pagar, cuándo, flujo de caja</td><td>Nuestro sistema (etapa 3)</td><td>La transferencia se hace en el banco y se registra aquí</td></tr>
+        <tr><td>Contabilidad oficial</td><td>S10, con el contador de Techquk</td><td>El sistema genera los asientos y los exporta en el formato que S10 importa. Un sistema contable propio queda fuera del MVP</td></tr>
+        <tr><td>Planilla (boletas, PLAME)</td><td>Hoy en Excel; este sistema desde la etapa 4</td><td>Se compara con el Excel actual y no se usa para pagar hasta que el contador la valide</td></tr>
+        <tr><td>Facturas de venta</td><td>El facturador de siempre</td><td>Se sube el XML y el sistema lo lee y lo enlaza</td></tr>
+        <tr><td>Tipo de cambio, validación de comprobantes</td><td>SUNAT</td><td>Automático, detrás de una interfaz</td></tr>
+      </table></div>
+    </section>
+
+    <section id="ideas">
+      <h2><span class="n">04</span>Las cuatro ideas</h2>
+      <p>Si se entienden estas cuatro ideas, el resto del sistema se lee solo.</p>
+      <div class="tabs" role="tablist" aria-label="Las cuatro ideas">
+        <button type="button" role="tab" aria-selected="true" aria-controls="idea1" id="tab1">1 · El proyecto es el eje</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="idea2" id="tab2">2 · Todo costo tiene destino</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="idea3" id="tab3">3 · Documentos con estados</button>
+        <button type="button" role="tab" aria-selected="false" aria-controls="idea4" id="tab4">4 · La IA sugiere</button>
+      </div>
+      <div class="panel" role="tabpanel" id="idea1" aria-labelledby="tab1">
+        <p>Casi todo pertenece a un proyecto, y todo proyecto nace de un contrato. El <b>contrato</b> es la cara hacia el cliente (plazos, hitos, garantías, penalidades); el <b>proyecto</b> es la cara hacia adentro (presupuesto, partidas, compras, personas, avance). Un contrato puede tener varios proyectos; los proyectos internos no tienen contrato.</p>
+      </div>
+      <div class="panel" role="tabpanel" id="idea2" aria-labelledby="tab2" hidden>
+        <p>Cada línea de costo dice <b>a dónde va</b>: a una <b>partida de control</b> de un proyecto, o al <b>gasto directo</b> de la empresa con su centro de costo. No hay tercera opción.</p>
+        <ul>
+          <li>Gasto general del proyecto (SCTR, movilidad, carta fianza) → su partida de gastos generales.</li>
+          <li>Gasto de la empresa (alquiler, contador) → gasto directo con centro de costo.</li>
+          <li>Gasto del proyecto no presupuestado (un taxi, cámaras extra) → la <b>PC-99</b>, con motivo y aprobación. Si lo pidió el cliente, se marca como posible adicional para cobrarlo.</li>
+        </ul>
+        <p>Es como los sobres de dinero de una casa: si un gasto no tiene sobre, a fin de mes nadie sabe en qué se fue la plata. El saldo de la partida se ve <b>antes</b> de pedir.</p>
+      </div>
+      <div class="panel" role="tabpanel" id="idea3" aria-labelledby="tab3" hidden>
+        <p>Un requerimiento, una orden, una recepción, una factura: todo es un documento que avanza por estados. Lo importante es <b>qué efecto produce cada cambio</b>: aprobar una orden compromete el saldo; despachar a obra lo ejecuta; la conformidad habilita facturar.</p>
+        <p>Un documento aprobado <b>no se edita</b>: se anula con motivo o se corrige con otro. Nada se borra.</p>
+      </div>
+      <div class="panel" role="tabpanel" id="idea4" aria-labelledby="tab4" hidden>
+        <p>La IA lee lo desordenado (una foto, un PDF, un Excel ajeno) y <b>propone</b>; una persona <b>confirma</b>. No calcula nada que tenga una sola respuesta correcta (costos, penalidad, stock, asientos). Nunca guarda sola, siempre hay camino manual, los datos sensibles no salen, y todo lo que mueve dinero lo aprueba una persona.</p>
+      </div>
+    </section>
+
+    <section id="dinero">
+      <h2><span class="n">05</span>El costo y el dinero</h2>
+      <h3>Cuatro números por cada partida</h3>
+      <div class="numeros4">
+        <div style="background: var(--muted)"><b>Presupuestado</b>lo que se decidió gastar</div>
+        <div style="background: var(--amber)"><b>Comprometido</b>órdenes aprobadas, aunque no hayan llegado</div>
+        <div style="background: var(--accent)"><b>Ejecutado</b>lo consumido: despacho, conformidad, horas</div>
+        <div style="background: var(--green)"><b>Pagado</b>lo que ya salió de la caja</div>
+      </div>
+      <h3>El ingreso</h3>
+      <div class="flujo">
+        <div class="paso" style="--c: var(--teal)"><b>Contratado</b><span>contrato y adendas</span></div><span class="flecha">→</span>
+        <div class="paso" style="--c: var(--teal)"><b>Facturable</b><span>con conformidad o valorización</span></div><span class="flecha">→</span>
+        <div class="paso"><b>Facturado</b><span>aceptado por SUNAT</span></div><span class="flecha">→</span>
+        <div class="paso" style="--c: var(--green)"><b>Cobrado</b><span>cobranza aplicada</span></div>
+      </div>
+      <div class="dos">
+        <div class="bloque azul"><h3>¿Ganamos con este proyecto?</h3><p>Margen real = lo cobrable − lo ejecutado. Disponible de una partida = presupuestado − comprometido.</p></div>
+        <div class="bloque verde"><h3>¿Tenemos plata en la caja?</h3><p>Caja = lo cobrado − lo pagado. Un proyecto rentable puede dejar la caja en rojo meses, si la entidad paga tarde.</p></div>
+      </div>
+      <p class="pie-dato">Caso del v4 que se usa en todas las pruebas: Videovigilancia Plaza de Armas, contrato de S/ 24,715.10; se presupuestó ganar S/ 1,420.00 y al cerrar se ganan S/ 1,327.00.</p>
+    </section>
+
+    <section id="viaje">
+      <h2><span class="n">06</span>El viaje de un negocio</h2>
+      <p>Toca cada paso para ver qué pasa, en qué etapa se construye y qué ya funciona.</p>
+      <ol class="viaje" id="viaje-lista">
+        <li><button type="button" aria-expanded="false" style="--c: var(--teal)"><span class="et">CRM</span><span class="tt">Se detecta y se vende</span><span class="mm">etapa 2 · en marcha</span></button><div class="det" hidden>Una convocatoria del OECE llega sola (o una privada se registra a mano), se busca la entidad por RUC, nace la oportunidad, avanza por etapas y se cotiza sobre el presupuesto real. <strong>Ya funcionan</strong> las cuentas (se crean desde el RUC, sin duplicados) y las oportunidades: cuatro etapas (Prospecto, Calificada, Propuesta enviada, Negociación) sin saltos, cada una con lo que exige para pasar, y la probabilidad la pone la etapa. Faltan cotizaciones, licitaciones y actividades.</div></li>
+        <li><button type="button" aria-expanded="false" style="--c: var(--green)"><span class="et">→</span><span class="tt">Se gana</span><span class="mm">etapa 2 · en marcha</span></button><div class="det" hidden>La oportunidad pasa a «Ganada» y crea el contrato en borrador. Administración de Contratos completa hitos, penalidad y garantías. <strong>Ya funciona el lado del CRM:</strong> ganar convierte la cuenta en cliente y avisa al ERP; perder pide motivo, quién ganó y a qué precio. El contrato en borrador llega con el módulo de Contratos.</div></li>
+        <li><button type="button" aria-expanded="false"><span class="et">1</span><span class="tt">Del contrato al proyecto listo</span><span class="mm">etapa 2 · en marcha</span></button><div class="det" hidden>Contrato, carta fianza, presupuesto con APU y el árbol de partidas aprobado. Desde aquí hay saldo que vigilar. <strong>Ya están</strong> el proyecto y su árbol de partidas con saldo, y el selector de imputación que muestra el saldo antes de pedir. Faltan el contrato y el presupuesto con APU.</div></li>
+        <li><button type="button" aria-expanded="false"><span class="et">2</span><span class="tt">De la necesidad al costo</span><span class="mm">etapa 2</span></button><div class="det" hidden>Requerimiento, aprobación, cuadro comparativo, orden (compromete), recepción, despacho a obra (ejecuta).</div></li>
+        <li><button type="button" aria-expanded="false"><span class="et">3</span><span class="tt">Las horas de la gente</span><span class="mm">etapa 2</span></button><div class="det" hidden>Asignación, habilitación de campo (bloquea si venció), horas por día y partida, cierre de semana que valoriza e imputa.</div></li>
+        <li><button type="button" aria-expanded="false"><span class="et">7</span><span class="tt">Gastos no presupuestados</span><span class="mm">etapa 2 · listo</span></button><div class="det" hidden>El taxi imprevisto va a la PC-99 con motivo y aprobación; si lo pidió el cliente, es un posible adicional. <strong>Ya funciona:</strong> no es un documento aparte sino una línea de otro documento con costo, que siempre pasa por aprobación. Falta mover un gasto ya aprobado a otra partida (reclasificar).</div></li>
+        <li><button type="button" aria-expanded="false" style="--c: var(--amber)"><span class="et">4</span><span class="tt">De la conformidad al cobro</span><span class="mm">etapa 3</span></button><div class="det" hidden>Hitos y plazos vigilados, conformidad, factura en el facturador de siempre (se sube el XML), cobranza, con retenciones y detracciones registradas aparte.</div></li>
+        <li><button type="button" aria-expanded="false" style="--c: var(--amber)"><span class="et">5</span><span class="tt">El dinero que sale</span><span class="mm">etapa 3</span></button><div class="det" hidden>Cruce de tres vías, tablero de pagos, notas por foto, flujo de caja, conciliación bancaria y asientos exportados a S10.</div></li>
+        <li><button type="button" aria-expanded="false" style="--c: var(--amber)"><span class="et">10</span><span class="tt">Obra pública</span><span class="mm">etapas 2 y 3</span></button><div class="det" hidden>Valorizaciones y subcontratos en la etapa 2; adelantos, reajustes, consorcios, retención y liquidación en la 3.</div></li>
+        <li><button type="button" aria-expanded="false" style="--c: var(--red)"><span class="et">6</span><span class="tt">El cierre del proyecto</span><span class="mm">etapa 3</span></button><div class="det" hidden>Presupuesto contra real, nada abierto, margen real y devolución de la garantía.</div></li>
+        <li><button type="button" aria-expanded="false" style="--c: var(--muted)"><span class="et">9</span><span class="tt">Las personas</span><span class="mm">etapa 4</span></button><div class="det" hidden>Demanda a 90 días, selección, contratos laborales, competencias, salida; la planilla, que hoy se hace en Excel.</div></li>
+        <li><button type="button" aria-expanded="false" style="--c: var(--teal)"><span class="et">8</span><span class="tt">La postventa</span><span class="mm">etapa 5</span></button><div class="det" hidden>Tickets con nivel de servicio, garantías por serie, suscripciones. Una renovación vuelve al CRM como nueva oportunidad.</div></li>
+      </ol>
+    </section>
+
+    <section id="tesoreria">
+      <h2><span class="n">07</span>Tesorería y fondos</h2>
+      <p>Tesorería controla el dinero real que entra y sale. En una frase: <b>Compras decide, Almacén recibe, Tesorería paga y cobra, Contabilidad registra.</b> Se construye en la etapa 3.</p>
+      <div class="tres">
+        <div class="bloque ambar"><h3>Pagos</h3><ul><li>Cuentas por pagar con cruce de tres vías</li><li>Tablero: qué se paga y qué espera</li><li>Pago adelantado contra la orden, si se paga antes de recibir</li><li>Detracciones al Banco de la Nación</li></ul></div>
+        <div class="bloque verde"><h3>Cobros y caja</h3><ul><li>Cobranzas con retenciones y detracciones aparte</li><li>Flujo de caja con el atraso típico del Estado</li><li>Conciliación bancaria</li></ul></div>
+        <div class="bloque teal"><h3>Fondos de proyecto</h3><ul><li>Un fondo por proyecto a cargo del residente</li><li>Rendición por foto; cada gasto a su partida</li><li>Incremento pedido, revisado y aprobado por otro</li></ul></div>
+      </div>
+      <div class="nota">Más fondo no es más presupuesto: si un proyecto va a gastar más de lo previsto, eso va a la PC-99 con su aprobación.</div>
+    </section>
+
+    <section id="personas">
+      <h2><span class="n">08</span>Personas y planilla</h2>
+      <div class="dos">
+        <div class="bloque azul"><h3>Aquí: la gestión</h3><ul><li>Fichas, competencias y certificaciones</li><li>Habilitación de campo (bloquea si venció)</li><li>Asignaciones y horas por partida</li><li>Costo estándar por hora</li></ul></div>
+        <div class="bloque ambar"><h3>Aquí, desde la etapa 4: la planilla</h3><ul><li>Hoy se calcula en Excel</li><li>El sistema la calculará con tasas y topes en tablas con vigencia</li><li>Se compara al centavo con el Excel y no se usa para pagar hasta que el contador la valide</li></ul></div>
+      </div>
+    </section>
+
+    <section id="nucleo">
+      <h2><span class="n">09</span>El núcleo</h2>
+      <p>Lo que todos los módulos usan y nadie vuelve a programar. Ya está construido; la etapa 2 le va sumando lo que piden las áreas.</p>
+      <div class="tabla"><table>
+        <tr><th>Mecanismo</th><th>Qué resuelve</th></tr>
+        <tr><td>Personas y empresas</td><td>Un solo registro de clientes, proveedores, competidores, trabajadores y la propia Techquk, con contactos, sedes y cuentas bancarias; avisa de posibles duplicados por nombre</td></tr>
+        <tr><td>Seguridad</td><td>Usuarios, organigrama, roles y permisos con el área en su nombre (<code>crm.cuentas.ver</code>); permisos sobre «lo propio», como las cuentas de cada ejecutivo; datos sensibles solo con permiso; funciones que no deben juntarse</td></tr>
+        <tr><td>Estados y aprobaciones</td><td>La barra de estados, sus efectos, la anulación con motivo; quién aprueba según el monto</td></tr>
+        <tr><td>Numeración y auditoría</td><td>Correlativos sin saltos ni repetidos; quién cambió qué, campo por campo</td></tr>
+        <tr><td>Registro de acciones</td><td>Toda acción con sus campos y su permiso, ejecutable sin la pantalla</td></tr>
+        <tr><td>Catálogos, parámetros, tipo de cambio</td><td>Editables por pantalla; tipo de cambio automático de SUNAT</td></tr>
+        <tr><td>Imputación</td><td>El destino de cada costo, centros de costo y motivos</td></tr>
+        <tr><td>Adjuntos, avisos y alertas</td><td>Archivos en cualquier documento, la campana y avisos que no se repiten</td></tr>
+        <tr><td>IA</td><td>Proveedores, autorización de Gerencia y topes de gasto (todavía sin procesos activos)</td></tr>
+        <tr><td>Salud y configuración inicial</td><td>Si el sistema está bien, y una guía paso a paso para adaptarlo a Techquk</td></tr>
+      </table></div>
+    </section>
+
+    <section id="glosario">
+      <h2><span class="n">10</span>Glosario</h2>
+      <input class="buscar" type="search" id="buscar-termino" placeholder="Busca un término: partida, tareo, PC-99…" aria-label="Buscar en el glosario">
+      <div class="tabla"><table id="glosario-tabla">
+        <tr><th>Término</th><th>Qué significa</th></tr>
+        <tr><td>Partida</td><td>Una unidad de trabajo con su unidad de medida: «instalación de cámara, unidad».</td></tr>
+        <tr><td>APU</td><td>Análisis de precios unitarios: la receta de insumos de una unidad de partida.</td></tr>
+        <tr><td>Partida de control</td><td>Nodo del árbol de un proyecto contra el que se carga cada costo real.</td></tr>
+        <tr><td>PC-99</td><td>La partida «No presupuestados» de todo proyecto; empieza en cero y no se borra.</td></tr>
+        <tr><td>Gasto directo</td><td>Gasto que no pertenece a ningún proyecto, con su centro de costo.</td></tr>
+        <tr><td>Imputación</td><td>El destino de costo de una línea: partida o gasto directo.</td></tr>
+        <tr><td>Carta fianza</td><td>Garantía bancaria que exige la entidad; tiene costo y vencimiento.</td></tr>
+        <tr><td>Conformidad</td><td>Acta con la que el cliente acepta un entregable; habilita facturarlo.</td></tr>
+        <tr><td>Valorización</td><td>Cálculo del avance de un periodo para cobrarlo.</td></tr>
+        <tr><td>Tareo</td><td>Horas por trabajador, por día y por partida.</td></tr>
+        <tr><td>Habilitación de campo</td><td>Examen, SCTR, inducción y equipo de protección vigentes para trabajar en obra.</td></tr>
+        <tr><td>Cruce de tres vías</td><td>Comparar orden, recepción y factura antes de pagar.</td></tr>
+        <tr><td>Detracción</td><td>Parte de un pago que se deposita en la cuenta del proveedor en el Banco de la Nación.</td></tr>
+        <tr><td>Retención</td><td>El 3 % que un agente de retención paga a SUNAT a nombre del proveedor.</td></tr>
+        <tr><td>Conciliación bancaria</td><td>Comparar el estado de cuenta del banco con lo registrado.</td></tr>
+        <tr><td>Fondo de proyecto</td><td>Dinero confiado al residente para gastos del proyecto; se rinde y se repone.</td></tr>
+        <tr><td>Costura</td><td>Punto acordado por donde un área le pide algo a otra: un servicio o un evento.</td></tr>
+        <tr><td>S10</td><td>El ERP que el sistema reemplaza; la contabilidad sigue ahí con el contador de Techquk y recibe los asientos.</td></tr>
+        <tr><td>Cuenta</td><td>La ficha comercial de un cliente o prospecto en el CRM, sobre su registro único de persona o empresa; tiene un ejecutivo a cargo.</td></tr>
+        <tr><td>Oportunidad</td><td>Un negocio posible con una cuenta. Avanza por etapas sin saltos (Prospecto, Calificada, Propuesta enviada, Negociación) y termina ganada o perdida.</td></tr>
+        <tr><td>OECE</td><td>El organismo de contrataciones del Estado; sus datos abiertos traen las convocatorias.</td></tr>
+      </table></div>
+      <p class="pie-dato" id="sin-resultado" hidden>No hay términos con esa palabra.</p>
+    </section>
+
+    <footer>Esta guía vive en el repositorio, en <code>docs/equipo/7-como-funciona.html</code>. Fuentes: la especificación v4 (<code>docs/diseno/v4/</code>), <code>ARCHITECTURE.md</code>, el mapa de etapas, los ADR y <code>pendientes.md</code>. Si no coinciden, manda el repositorio.</footer>
+  </main>
+</div>
+<script>
+(function () {
+  const tabs = [...document.querySelectorAll('[role=tab]')];
+  tabs.forEach((t) => t.addEventListener('click', () => {
+    tabs.forEach((o) => { o.setAttribute('aria-selected', String(o === t)); document.getElementById(o.getAttribute('aria-controls')).hidden = o !== t; });
+  }));
+  document.querySelectorAll('#viaje-lista button').forEach((b) => b.addEventListener('click', () => {
+    const abierto = b.getAttribute('aria-expanded') === 'true';
+    b.setAttribute('aria-expanded', String(!abierto)); b.nextElementSibling.hidden = abierto;
+  }));
+  const buscar = document.getElementById('buscar-termino');
+  const filas = [...document.querySelectorAll('#glosario-tabla tr')].slice(1);
+  const sin = document.getElementById('sin-resultado');
+  const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  buscar.addEventListener('input', () => {
+    const q = norm(buscar.value.trim()); let n = 0;
+    filas.forEach((f) => { const ok = !q || norm(f.textContent).includes(q); f.hidden = !ok; if (ok) n++; });
+    sin.hidden = n > 0;
+  });
+})();
+</script>
+
+</body>
+</html>

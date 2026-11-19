@@ -1,0 +1,1917 @@
+tabla,filas,ncols,dominio,veces_referenciada,relaciones_salientes,tiene_pk
+Cubso,57610,12,M01 Nucleo y maestros,0,0,0
+ConfiguracionVsflex,51127,24,M01 Nucleo y maestros,0,0,1
+AccesoCatalogo_Historial,2852,13,M01 Nucleo y maestros,0,0,1
+UbicacionGeografica,2115,18,M01 Nucleo y maestros,7,0,1
+EstadoProyecto,1946,5,M01 Nucleo y maestros,0,0,1
+SucursalUsuarioPermiso,1936,9,M01 Nucleo y maestros,0,1,1
+AccesoEscenario_Historial,1760,6,M01 Nucleo y maestros,0,0,1
+AccesoCatalogo,1743,9,M01 Nucleo y maestros,0,1,1
+IdentificadorTipoIdentificador,1655,6,M01 Nucleo y maestros,0,2,1
+Identificador,1638,101,M01 Nucleo y maestros,129,3,1
+AccesoEscenario,1505,3,M01 Nucleo y maestros,0,1,1
+TipoCambio,1494,20,M01 Nucleo y maestros,0,1,1
+FormatoExportacion,1195,20,M01 Nucleo y maestros,1,0,1
+UnidadMedida,1094,4,M01 Nucleo y maestros,0,0,1
+SucursalUsuarioPermiso_Historial,1012,13,M01 Nucleo y maestros,0,0,1
+TipoBoletaNominaFormato,809,11,M01 Nucleo y maestros,0,0,1
+Notero,508,23,M01 Nucleo y maestros,2,0,1
+FormatoEquivalencia,507,5,M01 Nucleo y maestros,0,1,1
+IdentificadorTipoIdentificadorIdentificador,329,5,M01 Nucleo y maestros,0,0,1
+Usuario_Historial,264,21,M01 Nucleo y maestros,0,0,1
+Pais,240,8,M01 Nucleo y maestros,0,0,1
+Identificador_SSCO,212,12,M01 Nucleo y maestros,0,0,0
+MonedaInternacional,180,3,M01 Nucleo y maestros,0,0,1
+TipodocumentoSunatComplemento,127,11,M01 Nucleo y maestros,0,1,1
+ConfiguracionS10,114,115,M01 Nucleo y maestros,0,0,1
+ConfiguracionClonDetalle,108,3,M01 Nucleo y maestros,0,0,1
+AccesoProyectoUsuario,91,5,M01 Nucleo y maestros,0,0,1
+Unidad,83,18,M01 Nucleo y maestros,4,0,1
+ConfiguracionCronograma,73,17,M01 Nucleo y maestros,0,0,1
+IdentificadorSucursal,72,7,M01 Nucleo y maestros,2,1,1
+FormatoCampos,67,13,M01 Nucleo y maestros,0,0,1
+TipoDocumento,66,52,M01 Nucleo y maestros,21,2,1
+TipoDocumentoSunat,50,18,M01 Nucleo y maestros,3,0,1
+ConfiguracionS10Detalle,36,41,M01 Nucleo y maestros,0,0,1
+DocumentoVenta,32,15,M01 Nucleo y maestros,0,0,1
+EmpresaFormato,30,3,M01 Nucleo y maestros,0,2,1
+FormatoImpresion,30,15,M01 Nucleo y maestros,1,0,1
+DocumentoOrganizadorUsuario,26,4,M01 Nucleo y maestros,0,0,1
+Documento,25,5,M01 Nucleo y maestros,0,0,1
+AplicacionRol,24,11,M01 Nucleo y maestros,0,0,1
+ConfiguracionPais,24,5,M01 Nucleo y maestros,0,0,1
+NoteroMultiple,24,13,M01 Nucleo y maestros,5,0,1
+NotificacionDestinatarios,24,11,M01 Nucleo y maestros,0,0,1
+EstadoMaster,22,10,M01 Nucleo y maestros,0,0,1
+SucursalUsuario_Historial,22,20,M01 Nucleo y maestros,0,0,1
+Rol,21,14,M01 Nucleo y maestros,2,0,1
+Aplicacion,18,17,M01 Nucleo y maestros,0,0,1
+IndicadorGestion,18,27,M01 Nucleo y maestros,9,0,1
+ModuloRecurso,18,5,M01 Nucleo y maestros,0,0,1
+NotificacionEnviosAdjunto,18,6,M01 Nucleo y maestros,0,1,1
+TipoDocumentoImpuesto,18,3,M01 Nucleo y maestros,0,2,1
+ConfiguracionFeriado,14,11,M01 Nucleo y maestros,0,0,1
+Usuario,14,56,M01 Nucleo y maestros,12,1,1
+AccesoAplicacion,13,19,M01 Nucleo y maestros,0,0,1
+NotificacionDestinatariosDetalle,13,8,M01 Nucleo y maestros,0,1,1
+TipoIdentificador,13,14,M01 Nucleo y maestros,1,0,1
+InformacionBaseDatos,12,2,M01 Nucleo y maestros,0,0,0
+EstadoCuentaMovimiento,11,2,M01 Nucleo y maestros,1,0,1
+NoteroCambio,11,11,M01 Nucleo y maestros,0,0,1
+TipoOperacion,11,12,M01 Nucleo y maestros,0,0,0
+TipoCalidad,10,23,M01 Nucleo y maestros,0,0,1
+NotificacionEnvios,9,16,M01 Nucleo y maestros,2,0,1
+TipoRestriccion,9,14,M01 Nucleo y maestros,1,0,1
+TipoSeguridad,9,2,M01 Nucleo y maestros,0,0,0
+DocumentoUbicacionFisica,8,14,M01 Nucleo y maestros,2,0,1
+EmpresaUsuario,8,5,M01 Nucleo y maestros,0,2,1
+SucursalUsuario,8,24,M01 Nucleo y maestros,1,3,1
+TipoCampoEspecificacionDinamica,7,13,M01 Nucleo y maestros,0,0,1
+TipoTerceroConfiguracionConcepto,7,9,M01 Nucleo y maestros,0,2,1
+AplicacionURL,6,4,M01 Nucleo y maestros,0,0,1
+ConfiguracionAlterno,6,25,M01 Nucleo y maestros,0,0,1
+TipoProyecto,6,16,M01 Nucleo y maestros,1,0,1
+TipoModulo,5,2,M01 Nucleo y maestros,0,0,0
+TipoObra,5,14,M01 Nucleo y maestros,0,0,1
+ConfiguracionServidorCorreo,4,6,M01 Nucleo y maestros,0,0,1
+Registro,4,45,M01 Nucleo y maestros,13,5,1
+TipoPrestamo,4,20,M01 Nucleo y maestros,0,1,1
+TipoTercero,4,15,M01 Nucleo y maestros,3,0,1
+ConfiguracionPortalProveedor,3,4,M01 Nucleo y maestros,0,0,1
+TipoActa,3,16,M01 Nucleo y maestros,2,0,1
+TipoCartaFianza,3,10,M01 Nucleo y maestros,1,0,1
+ConfiguracionDataControl,2,13,M01 Nucleo y maestros,0,0,1
+Moneda,2,18,M01 Nucleo y maestros,38,0,1
+ServicePack,2,2,M01 Nucleo y maestros,0,0,1
+ConfiguracionClon,1,5,M01 Nucleo y maestros,0,0,1
+ConfiguracionWeb,1,5,M01 Nucleo y maestros,0,0,1
+Modulo,1,11,M01 Nucleo y maestros,1,0,1
+TipoCentroCompra,1,17,M01 Nucleo y maestros,1,1,1
+AccesoCatalogoTipoIdentificador,0,3,M01 Nucleo y maestros,0,0,1
+AccesoDocumento,0,8,M01 Nucleo y maestros,0,1,1
+AccesoDocumentoUnidadOperativa,0,8,M01 Nucleo y maestros,0,1,1
+AccesoDocumentoUnidadOperativaRol,0,7,M01 Nucleo y maestros,0,3,1
+AccesoDocumentoUsuario,0,6,M01 Nucleo y maestros,0,3,1
+AccesoInsumoServicios,0,6,M01 Nucleo y maestros,0,0,0
+AccesoMaquina,0,3,M01 Nucleo y maestros,0,1,1
+AplicacionCorporacion,0,30,M01 Nucleo y maestros,0,0,1
+AplicacionEmpresa,0,23,M01 Nucleo y maestros,0,0,0
+AplicacionInsumo,0,8,M01 Nucleo y maestros,0,0,1
+AplicacionNotificacion,0,27,M01 Nucleo y maestros,0,0,1
+ConfiguracionCalculo,0,12,M01 Nucleo y maestros,0,0,1
+ConfiguracionCalculoDetalle,0,10,M01 Nucleo y maestros,0,0,1
+ConfiguracionCorreoMasivo,0,16,M01 Nucleo y maestros,0,0,1
+ConfiguracionLogStore,0,5,M01 Nucleo y maestros,0,0,1
+ConfiguracionPartidaTipo,0,14,M01 Nucleo y maestros,0,0,1
+ConfiguracionPartidaTipoDetalleEstructura,0,10,M01 Nucleo y maestros,0,0,1
+DocumentoCriterioEstadistica,0,7,M01 Nucleo y maestros,0,0,1
+DocumentoCriterioEstadisticaClasificacionDocumento,0,3,M01 Nucleo y maestros,0,0,1
+DocumentoCriterioEstadisticaItemDeControl,0,3,M01 Nucleo y maestros,0,0,1
+DocumentoDetalle,0,12,M01 Nucleo y maestros,0,0,1
+DocumentoEstadisticaClasificacionDocumento,0,4,M01 Nucleo y maestros,0,0,1
+DocumentoEstadisticaItemDeControl,0,4,M01 Nucleo y maestros,0,0,1
+DocumentoIdentificadorUsuario,0,3,M01 Nucleo y maestros,0,0,1
+DocumentoItemdeControl,0,4,M01 Nucleo y maestros,0,2,1
+DocumentoLeido,0,10,M01 Nucleo y maestros,0,1,1
+DocumentoPersonal,0,21,M01 Nucleo y maestros,0,0,1
+DocumentoRevision,0,18,M01 Nucleo y maestros,0,1,1
+Documentos,0,25,M01 Nucleo y maestros,0,0,1
+EmpresaDescuentoPersonal,0,10,M01 Nucleo y maestros,0,2,1
+EmpresaDocumentoConfiguracion,0,12,M01 Nucleo y maestros,0,3,1
+EmpresaEntidadCrediticia,0,19,M01 Nucleo y maestros,1,9,1
+EmpresaPrestamoPersonal,0,10,M01 Nucleo y maestros,0,0,1
+EmpresaSincronizacionMovil,0,9,M01 Nucleo y maestros,0,0,1
+EstadoCuenta,0,17,M01 Nucleo y maestros,0,0,1
+EstadoCuentaDetalle,0,12,M01 Nucleo y maestros,0,0,1
+EstadoFinanciero,0,17,M01 Nucleo y maestros,0,0,1
+EstadoFinancieroColumna,0,6,M01 Nucleo y maestros,0,0,1
+EstadoFinancieroRubro,0,21,M01 Nucleo y maestros,0,0,1
+EstadoFinancieroRubroCuenta,0,4,M01 Nucleo y maestros,0,0,1
+EstadoServicio,0,14,M01 Nucleo y maestros,0,0,1
+FichaDocumento,0,69,M01 Nucleo y maestros,13,7,1
+FichaDocumentoArchivo,0,3,M01 Nucleo y maestros,0,0,1
+FichaDocumentoAuditoria,0,3,M01 Nucleo y maestros,6,1,1
+FichaDocumentoAuditoriaNota,0,4,M01 Nucleo y maestros,0,4,1
+FichaDocumentoAuditoriaRespuesta,0,4,M01 Nucleo y maestros,0,4,1
+FichaDocumentoDependencia,0,2,M01 Nucleo y maestros,0,0,1
+FichaDocumentoDetalle,0,4,M01 Nucleo y maestros,0,0,1
+FichaDocumentoIdentificador,0,5,M01 Nucleo y maestros,0,1,1
+FichaDocumentoRelaciones,0,4,M01 Nucleo y maestros,0,0,1
+FormatoCliente,0,9,M01 Nucleo y maestros,0,1,1
+FormatoVarios,0,10,M01 Nucleo y maestros,0,0,0
+IdentificadorAFP,0,11,M01 Nucleo y maestros,0,0,1
+IdentificadorBolsaTolerancia,0,9,M01 Nucleo y maestros,0,0,1
+IdentificadorCapacitacion,0,12,M01 Nucleo y maestros,0,1,1
+IdentificadorCategoria,0,13,M01 Nucleo y maestros,0,0,1
+IdentificadorClientes,0,33,M01 Nucleo y maestros,0,0,1
+IdentificadorComplemento,0,2,M01 Nucleo y maestros,0,0,1
+IdentificadorContacto,0,16,M01 Nucleo y maestros,0,0,1
+IdentificadorContrato,0,44,M01 Nucleo y maestros,0,1,1
+IdentificadorContratoConfiguracion,0,8,M01 Nucleo y maestros,0,2,1
+IdentificadorContratoNotificacion,0,10,M01 Nucleo y maestros,0,3,1
+IdentificadorCuentaBanco,0,24,M01 Nucleo y maestros,1,1,1
+IdentificadorCuentaBanco_Historial_Eliminacion,0,22,M01 Nucleo y maestros,0,0,0
+IdentificadorDerechoHabiente,0,19,M01 Nucleo y maestros,0,0,1
+IdentificadorDocumentoAlterno,0,6,M01 Nucleo y maestros,0,2,1
+IdentificadorDocumentoHistorial,0,5,M01 Nucleo y maestros,0,0,1
+IdentificadorHorarioGlobal,0,10,M01 Nucleo y maestros,0,3,1
+IdentificadorIngreso,0,17,M01 Nucleo y maestros,1,0,1
+IdentificadorIngresoCalificacion,0,6,M01 Nucleo y maestros,0,3,1
+IdentificadorIngreso_Historial_Eliminacion,0,18,M01 Nucleo y maestros,0,0,0
+IdentificadorItemDeControl,0,6,M01 Nucleo y maestros,0,2,1
+IdentificadorMarcacion,0,22,M01 Nucleo y maestros,0,0,1
+IdentificadorPortalProveedor,0,8,M01 Nucleo y maestros,0,0,1
+IdentificadorTarjeta,0,16,M01 Nucleo y maestros,0,3,1
+IdentificadorTercero,0,11,M01 Nucleo y maestros,0,2,1
+Identificador_Notas,0,3,M01 Nucleo y maestros,0,0,1
+IndicadorGestionCabecera,0,8,M01 Nucleo y maestros,0,3,1
+IndicadorGestionDetalle,0,4,M01 Nucleo y maestros,0,1,1
+IndicadorGestionGlobal,0,15,M01 Nucleo y maestros,0,0,1
+Licencia,0,7,M01 Nucleo y maestros,0,0,1
+NoteroCalificacion,0,4,M01 Nucleo y maestros,0,0,1
+NoteroEstado,0,12,M01 Nucleo y maestros,0,0,1
+Notificacion,0,7,M01 Nucleo y maestros,0,2,1
+NotificacionWeb,0,19,M01 Nucleo y maestros,0,2,1
+RegistroAdicionalItemDeControl,0,1,M01 Nucleo y maestros,0,0,1
+RegistroAuditoria,0,4,M01 Nucleo y maestros,9,1,1
+RegistroAuditoriaNota,0,4,M01 Nucleo y maestros,0,4,1
+RegistroAuditoriaRespuesta,0,6,M01 Nucleo y maestros,0,2,1
+RegistroCertificadoDimension,0,11,M01 Nucleo y maestros,0,0,1
+RegistroConsumo,0,18,M01 Nucleo y maestros,4,4,1
+RegistroConsumoDetalle,0,8,M01 Nucleo y maestros,0,3,1
+RegistroConsumoDiario,0,9,M01 Nucleo y maestros,0,3,1
+RegistroCriterioEstadistica,0,10,M01 Nucleo y maestros,0,0,1
+RegistroCriterioEstadisticaAccion,0,2,M01 Nucleo y maestros,0,1,1
+RegistroCriterioEstadisticaItemDeControl,0,2,M01 Nucleo y maestros,0,1,1
+RegistroDimensionApp,0,10,M01 Nucleo y maestros,0,0,1
+RegistroDocumento,0,4,M01 Nucleo y maestros,0,2,1
+RegistroDocumentoUsuario,0,5,M01 Nucleo y maestros,0,2,1
+RegistroEstadisticaAccion,0,3,M01 Nucleo y maestros,0,1,1
+RegistroEstadisticaItemDeControl,0,3,M01 Nucleo y maestros,0,1,1
+RegistroIdentificador,0,47,M01 Nucleo y maestros,6,3,1
+RegistroIdentificadorAdicionalAccion,0,2,M01 Nucleo y maestros,0,0,1
+RegistroIdentificadorAdicionalItemDeControl,0,2,M01 Nucleo y maestros,0,0,1
+RegistroIdentificadorAplicacion,0,9,M01 Nucleo y maestros,0,0,1
+RegistroIdentificadorConfiguracion,0,3,M01 Nucleo y maestros,0,1,1
+RegistroIdentificadorNota,0,16,M01 Nucleo y maestros,0,4,1
+RegistroIdentificadorNotificacion,0,5,M01 Nucleo y maestros,0,0,1
+RegistroIdentificadorParticipante,0,19,M01 Nucleo y maestros,0,0,1
+RegistroIdentificadorPermuta,0,14,M01 Nucleo y maestros,0,0,1
+RegistroIdentificadorProyecto,0,3,M01 Nucleo y maestros,0,1,1
+RegistroIdentificadorRespuesta,0,6,M01 Nucleo y maestros,0,4,1
+RegistroIdentificadorRespuestaNota,0,5,M01 Nucleo y maestros,0,0,1
+RegistroIdentificadorUsuario,0,3,M01 Nucleo y maestros,0,1,1
+RegistroItemdeControl,0,5,M01 Nucleo y maestros,0,2,1
+RegistroLimpiarTrazaDeLog,0,6,M01 Nucleo y maestros,0,0,1
+RegistroMuestra,0,14,M01 Nucleo y maestros,0,0,1
+RegistroMuestraDetalle,0,2,M01 Nucleo y maestros,0,0,1
+RegistroOrganizadorUsuario,0,6,M01 Nucleo y maestros,0,3,1
+RegistroPaquete,0,2,M01 Nucleo y maestros,0,2,1
+RegistroPaso,0,22,M01 Nucleo y maestros,14,4,1
+RegistroPasoAuditoriaNota,0,5,M01 Nucleo y maestros,0,7,1
+RegistroPasoAuditoriaRespuesta,0,5,M01 Nucleo y maestros,0,7,1
+RegistroPasoDocumento,0,3,M01 Nucleo y maestros,0,3,1
+RegistroPasoInstruccion,0,3,M01 Nucleo y maestros,0,3,1
+RegistroPasoLeido,0,7,M01 Nucleo y maestros,0,1,1
+RegistroPasoNota,0,3,M01 Nucleo y maestros,0,3,1
+RegistroPasoPaquete,0,3,M01 Nucleo y maestros,0,3,1
+RegistroPasoRespuesta,0,5,M01 Nucleo y maestros,0,3,1
+RegistroSoporte,0,23,M01 Nucleo y maestros,0,0,1
+RegistroSoporteTablas,0,16,M01 Nucleo y maestros,0,0,1
+RegistroUsuario,0,11,M01 Nucleo y maestros,0,0,1
+Registro_Impresion_Comprobante_Retencion_Portal,0,3,M01 Nucleo y maestros,0,0,1
+Responsable,0,21,M01 Nucleo y maestros,6,3,1
+Restriccion,0,28,M01 Nucleo y maestros,6,2,1
+RestriccionAccion,0,2,M01 Nucleo y maestros,0,1,1
+RestriccionActividad,0,3,M01 Nucleo y maestros,0,1,1
+RestriccionIdentificador,0,2,M01 Nucleo y maestros,0,2,1
+RestriccionNota,0,2,M01 Nucleo y maestros,0,1,1
+Selectividad,0,50,M01 Nucleo y maestros,6,4,1
+SelectividadAplicabilidad,0,7,M01 Nucleo y maestros,0,2,1
+SelectividadCalificacion,0,5,M01 Nucleo y maestros,0,1,1
+SelectividadFecha,0,3,M01 Nucleo y maestros,0,2,1
+SelectividadHistorico,0,4,M01 Nucleo y maestros,0,1,1
+SelectividadPresupuestador,0,3,M01 Nucleo y maestros,0,2,1
+TipoActaProyecto,0,3,M01 Nucleo y maestros,0,2,1
+TipoAgrupamientoDocumento,0,14,M01 Nucleo y maestros,0,0,1
+TipoAlerta,0,2,M01 Nucleo y maestros,0,0,1
+TipoBarra,0,6,M01 Nucleo y maestros,0,0,1
+TipoBoletaNomina,0,28,M01 Nucleo y maestros,2,1,1
+TipoBoletaNominaProceso,0,3,M01 Nucleo y maestros,1,1,1
+TipoBoletaNominaProcesoConcepto,0,5,M01 Nucleo y maestros,0,2,1
+TipoBoletaNominaProcesoConceptoHistorial,0,6,M01 Nucleo y maestros,0,0,1
+TipoCalificacionEscala,0,15,M01 Nucleo y maestros,1,0,1
+TipoCentroCompraDetalle,0,8,M01 Nucleo y maestros,1,2,1
+TipoCentroCompraDetalleUsuario,0,4,M01 Nucleo y maestros,0,1,1
+TipoContrato,0,14,M01 Nucleo y maestros,0,0,1
+TipoCredito,0,11,M01 Nucleo y maestros,0,0,1
+TipoCuentaBancaria,0,11,M01 Nucleo y maestros,1,0,1
+TipoDescuento,0,16,M01 Nucleo y maestros,2,4,1
+TipoDocumentoMapper,0,4,M01 Nucleo y maestros,0,0,1
+TipoEquipo,0,14,M01 Nucleo y maestros,1,0,1
+TipoEvaluacionPersonal,0,15,M01 Nucleo y maestros,1,0,1
+TipoProyectoDetalle,0,8,M01 Nucleo y maestros,1,2,1
+TipoProyectoDetalleUsuario,0,4,M01 Nucleo y maestros,0,1,1
+TipoTerceroConcepto,0,4,M01 Nucleo y maestros,0,3,1
+TipoVectorCaracteristica,0,15,M01 Nucleo y maestros,0,0,1
+TipoVectorEspecificacion,0,16,M01 Nucleo y maestros,0,0,1
+UnidadEquivalente,0,5,M01 Nucleo y maestros,0,0,1
+UnidadNegocio,0,17,M01 Nucleo y maestros,1,1,1
+UnidadNegocioProyecto,0,2,M01 Nucleo y maestros,0,1,1
+UnidadTmp,0,2,M01 Nucleo y maestros,0,0,1
+UsuarioPedidoSincronizacion,0,7,M01 Nucleo y maestros,0,0,1
+ClasificacionTipoDetalle,131871,12,M02 Presupuestos,0,0,1
+PartidaDetalle,28429,21,M02 Presupuestos,0,7,1
+PresupuestoTituloDetalle,19588,7,M02 Presupuestos,0,4,1
+PresupuestoItemDetalle,12582,7,M02 Presupuestos,0,4,1
+PresupuestoHistoria,12156,10,M02 Presupuestos,0,0,1
+ClasificacionTipo,11776,16,M02 Presupuestos,0,0,1
+PresupuestoPartidaDetalle,11612,9,M02 Presupuestos,0,6,0
+PresupuestoPartidaAnalisis,11604,16,M02 Presupuestos,0,2,1
+PresupuestoSubpartidaDetalle,10373,16,M02 Presupuestos,0,1,1
+Insumo,10254,69,M02 Presupuestos,88,4,1
+InsumoComplemento,10254,29,M02 Presupuestos,0,3,1
+Partida,9113,92,M02 Presupuestos,51,4,1
+SubpresupuestoDetalle,6675,73,M02 Presupuestos,39,7,1
+PresupuestoPartida,3354,43,M02 Presupuestos,5,5,1
+PresupuestoSubpartidaProyectoDetalle,2225,21,M02 Presupuestos,0,5,1
+ClasificacionGeneralCampos,1627,15,M02 Presupuestos,0,0,1
+PresupuestoTitulo,1315,13,M02 Presupuestos,3,0,1
+PresupuestoSubpartida,1225,29,M02 Presupuestos,0,0,0
+PresupuestoSubpartidaProyecto,856,47,M02 Presupuestos,5,1,1
+PresupuestoInsumo,671,6,M02 Presupuestos,0,2,1
+Grupos,608,10,M02 Presupuestos,9,0,1
+SubpresupuestoDetalleSeleccion,510,4,M02 Presupuestos,0,0,1
+PartidaEspecialidad,494,4,M02 Presupuestos,0,0,1
+Titulo,390,12,M02 Presupuestos,2,0,1
+Clasificacion,348,21,M02 Presupuestos,0,1,1
+ClasificacionDocumento,246,22,M02 Presupuestos,2,0,1
+PartidaControlGeneral,57,23,M02 Presupuestos,2,0,1
+GruposCampos,48,9,M02 Presupuestos,0,3,1
+Presupuesto,44,90,M02 Presupuestos,24,6,1
+ClasificacionGeneralGruposCampos,43,16,M02 Presupuestos,0,1,1
+FormulaPolinomica,40,13,M02 Presupuestos,0,4,1
+Subpresupuesto,33,58,M02 Presupuestos,28,1,1
+ClasificacionPapeleta,14,20,M02 Presupuestos,1,1,1
+InsumoClasificacion,13,16,M02 Presupuestos,0,0,1
+UnidadOperativa,13,14,M02 Presupuestos,7,0,1
+PresupuestoSubpartidaControl,10,3,M02 Presupuestos,0,0,1
+PresupuestoUsuario,10,4,M02 Presupuestos,0,1,1
+InsumoDetalle,7,5,M02 Presupuestos,0,2,1
+PresupuestoComplemento,7,9,M02 Presupuestos,0,4,1
+Especialidad,5,12,M02 Presupuestos,0,0,1
+PresupuestoVinculoPrecio,5,13,M02 Presupuestos,0,0,1
+PresupuestoSubpartidaReporte,3,5,M02 Presupuestos,0,0,0
+ClasificacionGeneralGrupos,2,10,M02 Presupuestos,1,0,1
+EspecialidadControl,2,18,M02 Presupuestos,2,1,1
+InsumoConceptoAjuste,2,3,M02 Presupuestos,0,1,1
+InsumoCostos,1,13,M02 Presupuestos,0,0,1
+UnidadOperativaRol,1,8,M02 Presupuestos,24,3,1
+UnidadOperativaRolDetalle,1,8,M02 Presupuestos,0,3,1
+ClasificacionCampos,0,8,M02 Presupuestos,0,0,1
+ClasificacionCentralProducto,0,14,M02 Presupuestos,0,0,1
+ClasificacionPapeletaPlantilla,0,7,M02 Presupuestos,0,4,1
+ClasificacionSuma,0,70,M02 Presupuestos,4,1,1
+ClasificacionSumaRecurso,0,21,M02 Presupuestos,0,4,1
+FormulaPolinomicaDetalle,0,13,M02 Presupuestos,0,0,1
+FormulaPolinomicaDetalleValorizacion,0,13,M02 Presupuestos,0,0,1
+FormulaPolinomicaValorizacion,0,14,M02 Presupuestos,0,0,1
+GrupoEmpresarial,0,11,M02 Presupuestos,1,1,1
+GrupoEmpresarialIdentificador,0,4,M02 Presupuestos,0,2,1
+GrupoFactor,0,14,M02 Presupuestos,1,0,1
+GrupoFactorInflacion,0,6,M02 Presupuestos,0,2,1
+GrupoPresupuesto,0,3,M02 Presupuestos,0,0,1
+GrupoProcesoNomina,0,14,M02 Presupuestos,2,1,1
+GrupoProcesoNominaDetalle,0,5,M02 Presupuestos,0,2,1
+GrupoProyecto,0,14,M02 Presupuestos,1,0,1
+GrupoProyectoDetalle,0,2,M02 Presupuestos,0,2,1
+InsumoActivo,0,4,M02 Presupuestos,0,2,0
+InsumoAnticipo,0,2,M02 Presupuestos,0,1,1
+InsumoCalendario,0,4,M02 Presupuestos,0,4,1
+InsumoCategoria,0,7,M02 Presupuestos,0,3,1
+InsumoConceptoBanco,0,10,M02 Presupuestos,0,1,1
+InsumoConceptoBoletajeNotaDebito,0,2,M02 Presupuestos,0,1,1
+InsumoDesagregadoTecnologico,0,8,M02 Presupuestos,0,1,1
+InsumoEquivalente,0,5,M02 Presupuestos,0,0,1
+InsumoMapper,0,8,M02 Presupuestos,0,0,1
+InsumoNoDeducible,0,3,M02 Presupuestos,0,1,1
+InsumoRecodifica,0,2,M02 Presupuestos,0,0,1
+InsumoRecurso,0,5,M02 Presupuestos,0,0,1
+InsumoRendicion,0,2,M02 Presupuestos,0,1,1
+InsumoServicios,0,6,M02 Presupuestos,0,0,0
+InsumoTipoTitulo,0,2,M02 Presupuestos,0,1,1
+Insumo_Historial,0,8,M02 Presupuestos,0,1,1
+Insumo_Incidencia,0,17,M02 Presupuestos,0,0,1
+Insumo_Mantenimiento,0,5,M02 Presupuestos,0,1,1
+Insumo_Observacion,0,6,M02 Presupuestos,0,1,1
+MetradoDetalle,0,17,M02 Presupuestos,0,0,1
+PartidaPeriodoCronograma,0,41,M02 Presupuestos,0,5,1
+PartidaRendimiento,0,12,M02 Presupuestos,0,3,1
+PresupuestoAgrupacion,0,14,M02 Presupuestos,1,0,1
+PresupuestoAgrupacionPresupuesto,0,2,M02 Presupuestos,0,2,1
+PresupuestoEquipoAlquiler,0,28,M02 Presupuestos,0,3,1
+PresupuestoEstimadaDetalle,0,7,M02 Presupuestos,0,4,1
+PresupuestoFaseDetalle,0,8,M02 Presupuestos,0,1,1
+PresupuestoFaseInsumoFactor,0,11,M02 Presupuestos,0,1,1
+PresupuestoIdentificador,0,4,M02 Presupuestos,0,0,1
+PresupuestoInsumoCotizacion,0,16,M02 Presupuestos,0,2,1
+PresupuestoInsumoDetalle,0,4,M02 Presupuestos,0,3,1
+PresupuestoInsumoFactor,0,10,M02 Presupuestos,0,1,1
+PresupuestoInsumoTUnitario,0,4,M02 Presupuestos,0,0,1
+PresupuestoInsumoVinculo,0,8,M02 Presupuestos,2,1,1
+PresupuestoInsumoVinculoDetalle,0,4,M02 Presupuestos,0,3,1
+PresupuestoPartidaEquipo,0,8,M02 Presupuestos,1,5,1
+PresupuestoPartidaEquipoDetalle,0,5,M02 Presupuestos,0,2,1
+PresupuestoReporte,0,8,M02 Presupuestos,0,0,1
+PresupuestoSubpartidaProyectoConsolidado,0,35,M02 Presupuestos,0,0,1
+SubpresupuestoDetalleAsociado,0,13,M02 Presupuestos,0,0,1
+SubpresupuestoDetalleCalculo,0,13,M02 Presupuestos,0,0,1
+SubpresupuestoDetalleCalculoDetalle,0,13,M02 Presupuestos,0,0,1
+SubpresupuestoDetalleConfiguracionDuplicado,0,9,M02 Presupuestos,0,0,1
+SubpresupuestoDetalleEstructura,0,11,M02 Presupuestos,0,0,1
+SubpresupuestoDetalleMedicion,0,21,M02 Presupuestos,0,0,1
+SubpresupuestoDetallePendiente,0,27,M02 Presupuestos,0,1,1
+SubpresupuestoDetallePlano,0,8,M02 Presupuestos,0,0,1
+UnidadOperativaAuditor,0,7,M02 Presupuestos,0,0,1
+UnidadOperativaClasificacionDocumento,0,7,M02 Presupuestos,0,3,1
+UnidadOperativaIC,0,2,M02 Presupuestos,0,2,1
+UnidadOperativaRolManualFunciones,0,4,M02 Presupuestos,0,0,1
+UnidadOperativaRolUsuario,0,8,M02 Presupuestos,1,2,1
+UsoRecurso,546965,22,M03 Proyectos y produccion,0,0,1
+CalidadFechaControl,36524,2,M03 Proyectos y produccion,0,0,1
+MSP_TEXT_FIELDS,9236,5,M03 Proyectos y produccion,0,0,0
+PlanUtilizacionPeriodoRecurso,6553,11,M03 Proyectos y produccion,0,0,1
+TareaK2_Log,4008,12,M03 Proyectos y produccion,0,0,1
+IncidenciaInsumo,3453,14,M03 Proyectos y produccion,0,7,1
+MSP_ASSIGNMENTS,2322,53,M03 Proyectos y produccion,0,0,0
+CronogramaInsumoReporte,2228,19,M03 Proyectos y produccion,0,0,1
+TareaK2,1711,7,M03 Proyectos y produccion,0,0,1
+MSP_TASKS,1482,95,M03 Proyectos y produccion,0,0,0
+PlantillaFormulaConcepto,1388,6,M03 Proyectos y produccion,0,2,1
+PartidaDeControl,1079,39,M03 Proyectos y produccion,16,2,1
+ProyectoUsuario_Historial,835,97,M03 Proyectos y produccion,0,0,1
+Actividad,653,70,M03 Proyectos y produccion,15,3,1
+MSP_RESOURCES,526,57,M03 Proyectos y produccion,0,0,0
+TareaApp,487,4,M03 Proyectos y produccion,0,0,1
+TareaKF2,340,2,M03 Proyectos y produccion,0,0,0
+Proyecto,234,173,M03 Proyectos y produccion,101,3,1
+ProyectoEstructuraTarea,226,17,M03 Proyectos y produccion,0,1,1
+CronogramaReporte,216,20,M03 Proyectos y produccion,0,0,1
+MSP_CALENDARS,210,8,M03 Proyectos y produccion,0,0,0
+Tarea,209,33,M03 Proyectos y produccion,4,1,1
+CronogramaReporteFiltro,136,7,M03 Proyectos y produccion,0,0,0
+MSP_CALENDAR_DATA,112,18,M03 Proyectos y produccion,0,0,0
+MSP_LINKS,104,10,M03 Proyectos y produccion,0,0,0
+TareaKPA2,102,2,M03 Proyectos y produccion,0,0,0
+RecursoInsumo,85,3,M03 Proyectos y produccion,0,0,1
+CronogramaPartidaReporte,58,23,M03 Proyectos y produccion,0,0,0
+CalidadEstadoMaster,54,9,M03 Proyectos y produccion,0,0,1
+PlantillaSubcontrato,48,12,M03 Proyectos y produccion,0,0,1
+ProyectoGrupo,43,8,M03 Proyectos y produccion,0,3,1
+ProyectoCalendario,34,3,M03 Proyectos y produccion,0,3,1
+Calendario,33,12,M03 Proyectos y produccion,10,1,1
+MSP_OUTLINE_CODES,32,9,M03 Proyectos y produccion,0,0,0
+TareaKPC2,26,2,M03 Proyectos y produccion,0,0,0
+Recurso,18,26,M03 Proyectos y produccion,1,0,1
+PlantillaCorreo,14,14,M03 Proyectos y produccion,1,0,1
+ProyectoUsuario,14,109,M03 Proyectos y produccion,2,2,1
+TareaKPE2,14,2,M03 Proyectos y produccion,0,0,0
+PlantillaFormula,11,16,M03 Proyectos y produccion,2,0,1
+ItemDeControl,10,15,M03 Proyectos y produccion,7,0,1
+MSP_PROJECTS,9,74,M03 Proyectos y produccion,0,0,0
+PlantillaCorreoVariable,9,6,M03 Proyectos y produccion,0,0,1
+ProyectoComplemento,8,9,M03 Proyectos y produccion,0,0,1
+PlantillaDetalle,5,7,M03 Proyectos y produccion,0,1,1
+ProyectoEscala,5,4,M03 Proyectos y produccion,0,0,1
+RecursoControl,4,16,M03 Proyectos y produccion,1,0,1
+ProyectoIdentificadorPago,3,4,M03 Proyectos y produccion,0,0,1
+TareaKPCE2,3,2,M03 Proyectos y produccion,0,0,0
+PlantillaReporteCalidad,2,19,M03 Proyectos y produccion,0,0,1
+ProyectoCambio,2,4,M03 Proyectos y produccion,0,0,1
+ProyectoPresupuesto,2,17,M03 Proyectos y produccion,0,2,1
+RecursoControlInsumo,2,3,M03 Proyectos y produccion,0,0,1
+Plantilla,1,2,M03 Proyectos y produccion,1,0,1
+ProyectoPeriodo,1,6,M03 Proyectos y produccion,0,0,1
+ProyectoPiloto,1,2,M03 Proyectos y produccion,0,0,0
+ActividadAsignacionRecurso,0,9,M03 Proyectos y produccion,0,0,1
+ActividadAsignadaReporte,0,14,M03 Proyectos y produccion,0,0,1
+ActividadAutomatica,0,71,M03 Proyectos y produccion,0,0,1
+ActividadCronograma,0,61,M03 Proyectos y produccion,2,1,1
+ActividadCronogramaActivo,0,13,M03 Proyectos y produccion,0,7,1
+ActividadCronogramaCambio,0,58,M03 Proyectos y produccion,0,0,1
+ActividadEstadoCalidad,0,7,M03 Proyectos y produccion,0,0,1
+ActividadPeriodoCronograma,0,97,M03 Proyectos y produccion,14,5,1
+ActividadPeriodoDeductivo,0,11,M03 Proyectos y produccion,0,1,1
+ActividadPeriodoInsumoCronograma,0,36,M03 Proyectos y produccion,0,8,1
+ActividadPeriodoRestriccion,0,15,M03 Proyectos y produccion,0,2,1
+ActividadVector,0,10,M03 Proyectos y produccion,0,0,1
+Frente,0,23,M03 Proyectos y produccion,2,0,1
+IncidenciaInsumoSubproyecto,0,14,M03 Proyectos y produccion,0,7,1
+MSP_ASSIGNMENT_BASELINES,0,9,M03 Proyectos y produccion,0,0,0
+MSP_ASSN_ENTERPRISE,0,53,M03 Proyectos y produccion,0,0,0
+MSP_ATTRIBUTE_STRINGS,0,5,M03 Proyectos y produccion,0,0,0
+MSP_AVAILABILITY,0,7,M03 Proyectos y produccion,0,0,0
+MSP_CODE_FIELDS,0,5,M03 Proyectos y produccion,0,0,0
+MSP_CONVERSIONS,0,4,M03 Proyectos y produccion,0,0,0
+MSP_DATE_FIELDS,0,5,M03 Proyectos y produccion,0,0,0
+MSP_DURATION_FIELDS,0,6,M03 Proyectos y produccion,0,0,0
+MSP_FIELD_ATTRIBUTES,0,7,M03 Proyectos y produccion,0,0,0
+MSP_FLAG_FIELDS,0,5,M03 Proyectos y produccion,0,0,0
+MSP_MV_FIELDS,0,7,M03 Proyectos y produccion,0,0,0
+MSP_NUMBER_FIELDS,0,5,M03 Proyectos y produccion,0,0,0
+MSP_RESOURCE_BASELINES,0,5,M03 Proyectos y produccion,0,0,0
+MSP_RESOURCE_RATES,0,12,M03 Proyectos y produccion,0,0,0
+MSP_RES_GLOBAL_BINARY,0,5,M03 Proyectos y produccion,0,0,0
+MSP_STRING_TYPES,0,3,M03 Proyectos y produccion,0,0,0
+MSP_TASK_BASELINES,0,9,M03 Proyectos y produccion,0,0,0
+MSP_TIMEPHASED_DATA,0,17,M03 Proyectos y produccion,0,0,0
+PlanUtilizacionRecurso,0,24,M03 Proyectos y produccion,0,0,1
+PlanUtilizacionRecursoCambio,0,14,M03 Proyectos y produccion,0,0,1
+PlantillaContenido,0,15,M03 Proyectos y produccion,0,0,1
+PlantillaCorreoDestinatario,0,3,M03 Proyectos y produccion,0,1,1
+PlantillaDocumento,0,26,M03 Proyectos y produccion,0,0,1
+PlantillaInsumo,0,1,M03 Proyectos y produccion,0,1,1
+PlantillaPlanilla,0,15,M03 Proyectos y produccion,0,0,1
+PlantillaReparto,0,11,M03 Proyectos y produccion,1,1,1
+PlantillaRepartoDetalle,0,5,M03 Proyectos y produccion,1,2,1
+PlantillaRepartoTransferencia,0,10,M03 Proyectos y produccion,0,1,1
+PredecesorSucesor,0,12,M03 Proyectos y produccion,0,8,1
+PredecesorSucesorCambio,0,13,M03 Proyectos y produccion,0,0,1
+ProgramacionGestion,0,5,M03 Proyectos y produccion,0,1,1
+ProgramacionGestionCabecera,0,9,M03 Proyectos y produccion,0,1,1
+ProgramacionPago,0,13,M03 Proyectos y produccion,0,0,1
+ProgramacionPagoDetalle,0,8,M03 Proyectos y produccion,0,0,1
+ProgramacionPagoSaldo,0,9,M03 Proyectos y produccion,0,0,1
+ProyectoAccesorioSeries,0,13,M03 Proyectos y produccion,0,0,1
+ProyectoAccesorios,0,15,M03 Proyectos y produccion,0,0,1
+ProyectoAccion,0,15,M03 Proyectos y produccion,2,1,1
+ProyectoBase,0,5,M03 Proyectos y produccion,0,4,1
+ProyectoCalidadSincronizacion,0,21,M03 Proyectos y produccion,0,0,1
+ProyectoCalidadSincronizacionConfiguracion,0,6,M03 Proyectos y produccion,0,0,1
+ProyectoCalidadSincronizacionDetalle,0,9,M03 Proyectos y produccion,0,0,1
+ProyectoCalidadSincronizacionHistorico,0,19,M03 Proyectos y produccion,0,0,1
+ProyectoCalidadSincronizacionPeriodo,0,7,M03 Proyectos y produccion,0,0,1
+ProyectoCalificacion,0,14,M03 Proyectos y produccion,0,0,1
+ProyectoCertificadoPago,0,4,M03 Proyectos y produccion,0,2,1
+ProyectoComisionxEtapa,0,16,M03 Proyectos y produccion,0,0,1
+ProyectoCreditos,0,13,M03 Proyectos y produccion,0,0,1
+ProyectoEjecutivoVentas,0,10,M03 Proyectos y produccion,0,0,1
+ProyectoEquipo,0,46,M03 Proyectos y produccion,12,5,1
+ProyectoEquipoHistorial,0,6,M03 Proyectos y produccion,0,0,1
+ProyectoEquipoOrden,0,4,M03 Proyectos y produccion,0,2,1
+ProyectoEquipoParte,0,41,M03 Proyectos y produccion,0,3,1
+ProyectoEquipoParteInsumo,0,6,M03 Proyectos y produccion,0,3,1
+ProyectoEquipoParteResumen,0,11,M03 Proyectos y produccion,0,2,1
+ProyectoEquipoPeriodo,0,11,M03 Proyectos y produccion,0,3,1
+ProyectoEsquema,0,45,M03 Proyectos y produccion,3,2,1
+ProyectoEsquemaConfiguracion,0,11,M03 Proyectos y produccion,0,1,1
+ProyectoEsquemaHorasPeriodo,0,13,M03 Proyectos y produccion,0,0,1
+ProyectoEsquemaPeriodo,0,31,M03 Proyectos y produccion,19,3,1
+ProyectoEsquemaPeriodoHistorico,0,5,M03 Proyectos y produccion,0,1,1
+ProyectoEsquemaTiempoConcepto,0,9,M03 Proyectos y produccion,0,2,1
+ProyectoEsquemaUsuario,0,5,M03 Proyectos y produccion,0,0,1
+ProyectoEsquemaVacacionGanada,0,6,M03 Proyectos y produccion,0,2,1
+ProyectoEtiqueta,0,15,M03 Proyectos y produccion,2,1,1
+ProyectoEvaluacionPersonal,0,26,M03 Proyectos y produccion,2,5,1
+ProyectoEvaluacionPersonalDetalle,0,8,M03 Proyectos y produccion,1,2,1
+ProyectoEvaluacionPersonalDetalleResultado,0,10,M03 Proyectos y produccion,0,2,1
+ProyectoEvaluacionPersonalRelacionado,0,4,M03 Proyectos y produccion,0,2,1
+ProyectoHerramienta,0,18,M03 Proyectos y produccion,0,1,1
+ProyectoIGVMixtoCabecera,0,11,M03 Proyectos y produccion,1,0,1
+ProyectoIGVMixtoDetalle,0,6,M03 Proyectos y produccion,0,1,1
+ProyectoIdentificador,0,8,M03 Proyectos y produccion,0,0,1
+ProyectoIdentificadorEsquema,0,5,M03 Proyectos y produccion,0,0,1
+ProyectoIdentificadorEsquemaConcepto,0,3,M03 Proyectos y produccion,0,0,1
+ProyectoIdentificadorEsquemaProceso,0,5,M03 Proyectos y produccion,1,0,1
+ProyectoIdentificadorEsquemaProcesoHistoria,0,6,M03 Proyectos y produccion,0,0,1
+ProyectoMetaBase,0,8,M03 Proyectos y produccion,0,7,1
+ProyectoMetaOferta,0,8,M03 Proyectos y produccion,0,7,1
+ProyectoNube,0,6,M03 Proyectos y produccion,0,0,1
+ProyectoObrero,0,49,M03 Proyectos y produccion,12,7,1
+ProyectoObreroAnalisisMarcacion,0,8,M03 Proyectos y produccion,0,2,1
+ProyectoObreroConceptoPeriodo,0,11,M03 Proyectos y produccion,0,5,1
+ProyectoObreroDia,0,7,M03 Proyectos y produccion,0,0,0
+ProyectoObreroDistribucionCosto,0,11,M03 Proyectos y produccion,0,3,1
+ProyectoObreroHistoricoDatos,0,7,M03 Proyectos y produccion,0,0,1
+ProyectoObreroOcupacion,0,6,M03 Proyectos y produccion,0,0,1
+ProyectoObreroOrden,0,4,M03 Proyectos y produccion,0,2,1
+ProyectoObreroPapeleta,0,29,M03 Proyectos y produccion,3,3,1
+ProyectoObreroPapeletaDetalle,0,12,M03 Proyectos y produccion,0,2,1
+ProyectoObreroPapeletaOrigenDestino,0,8,M03 Proyectos y produccion,0,3,1
+ProyectoObreroQuintaProyectos,0,10,M03 Proyectos y produccion,0,0,1
+ProyectoOferta,0,5,M03 Proyectos y produccion,0,4,1
+ProyectoPagoValorizacion,0,5,M03 Proyectos y produccion,0,2,1
+ProyectoPaquetesVivienda,0,13,M03 Proyectos y produccion,0,0,1
+ProyectoPartida,0,32,M03 Proyectos y produccion,0,11,1
+ProyectoPeriodoCorreo,0,9,M03 Proyectos y produccion,0,0,1
+ProyectoPrecioDescuento,0,11,M03 Proyectos y produccion,0,0,1
+ProyectoPrecioLista,0,11,M03 Proyectos y produccion,0,0,1
+ProyectoProject,0,3,M03 Proyectos y produccion,0,0,1
+ProyectoProjectTarea,0,27,M03 Proyectos y produccion,0,0,0
+ProyectoProjectTareaDependencia,0,9,M03 Proyectos y produccion,0,0,0
+ProyectoRama,0,5,M03 Proyectos y produccion,0,1,1
+ProyectoRecurso,0,3,M03 Proyectos y produccion,0,0,1
+ProyectoTareadorActividad,0,7,M03 Proyectos y produccion,0,0,1
+ProyectoTareadorPartidaDeControl,0,7,M03 Proyectos y produccion,0,0,1
+ProyectoTerminal,0,14,M03 Proyectos y produccion,0,0,1
+ProyectoUnidadOperativa,0,3,M03 Proyectos y produccion,2,2,1
+ProyectoUsuarioControl,0,15,M03 Proyectos y produccion,0,0,1
+ProyectoUsuarioPedidoSincronizacion,0,9,M03 Proyectos y produccion,0,0,1
+ProyectoUsuarioPermiso,0,10,M03 Proyectos y produccion,0,0,1
+ProyectoUsuarioUO,0,7,M03 Proyectos y produccion,0,5,1
+ProyectoVector,0,16,M03 Proyectos y produccion,0,0,1
+RecursoAlterno1,0,13,M03 Proyectos y produccion,0,0,1
+RecursoAlterno2,0,13,M03 Proyectos y produccion,0,0,1
+RecursoAlterno3,0,13,M03 Proyectos y produccion,0,0,1
+RecursoAlterno4,0,13,M03 Proyectos y produccion,0,0,1
+RecursoAlterno5,0,13,M03 Proyectos y produccion,0,0,1
+RecursoAnt,0,3,M03 Proyectos y produccion,0,0,1
+RecursoCategoria,0,13,M03 Proyectos y produccion,1,0,1
+RecursoEquivalente,0,24,M03 Proyectos y produccion,0,0,1
+RecursoTmp,0,4,M03 Proyectos y produccion,0,0,0
+TareaAppTMP,0,3,M03 Proyectos y produccion,0,0,0
+TareaAutomatica,0,34,M03 Proyectos y produccion,0,0,1
+TareaKF,0,2,M03 Proyectos y produccion,0,0,0
+TareaKKF,0,2,M03 Proyectos y produccion,0,0,0
+TareaKPC,0,2,M03 Proyectos y produccion,0,0,0
+TareaKPC_Confirmado,0,3,M03 Proyectos y produccion,0,0,0
+TareaKPC_SinConfirmar,0,3,M03 Proyectos y produccion,0,0,0
+TareaKPE,0,2,M03 Proyectos y produccion,0,0,0
+TareaMatriz,0,17,M03 Proyectos y produccion,0,0,1
+TareaWBS,0,28,M03 Proyectos y produccion,1,1,1
+Tarea_Dif_Cabecera,0,4,M03 Proyectos y produccion,0,0,0
+Tarea_Dif_Detalle_K,0,14,M03 Proyectos y produccion,0,0,0
+Tarea_Dif_Detalle_KF,0,5,M03 Proyectos y produccion,0,0,0
+ValorizacionPieProyecto,0,21,M03 Proyectos y produccion,0,2,1
+PrecioParticularInsumo,4790,59,M04 Logistica y compras,0,4,1
+PrecioParticularInsumoReporte,397,56,M04 Logistica y compras,0,0,1
+CentroCompraProyectoUsuarioPermiso,243,13,M04 Logistica y compras,0,2,1
+PedidoPlazoEntrega,168,12,M04 Logistica y compras,0,0,1
+PrecioParticularInsumoPropio,94,9,M04 Logistica y compras,0,2,1
+PrecioParticularPartidaReporte,79,14,M04 Logistica y compras,0,0,1
+OrdenDeCompraAprobacion,16,12,M04 Logistica y compras,0,0,1
+NotaPedidoRequisitoriaDetalle,13,31,M04 Logistica y compras,4,3,1
+OrdenCompraDetallePedido,13,16,M04 Logistica y compras,1,3,1
+OrdenDeCompraDetalle,13,46,M04 Logistica y compras,1,3,1
+PedidoDetalle,13,34,M04 Logistica y compras,0,4,1
+CentroCompraProyecto,11,9,M04 Logistica y compras,5,2,1
+PedidoEstado,10,2,M04 Logistica y compras,1,0,1
+CentroCompraProyectoUsuario,9,7,M04 Logistica y compras,1,2,1
+CotizacionProveedorEstado,9,2,M04 Logistica y compras,0,0,1
+NotaPedidoRequisitoria,9,16,M04 Logistica y compras,3,3,1
+OrdenCompraNotero,9,5,M04 Logistica y compras,0,3,1
+OrdenDeCompra,9,103,M04 Logistica y compras,5,7,1
+Pedido,9,60,M04 Logistica y compras,3,5,1
+GrupoAprobacionUsuario,8,14,M04 Logistica y compras,0,0,1
+OrdenDeCompraEstado,7,2,M04 Logistica y compras,1,0,1
+GrupoAprobacion,5,16,M04 Logistica y compras,0,0,1
+PedidoDetalleEstado,5,6,M04 Logistica y compras,0,0,1
+NotaPedidoRequisitoriaEstado,4,2,M04 Logistica y compras,1,0,1
+PedidosTipo,4,7,M04 Logistica y compras,0,0,1
+CentroCompraUsuario,3,13,M04 Logistica y compras,0,2,1
+CotizacionEstado,3,2,M04 Logistica y compras,1,0,1
+PrecioParticularPartida,2,26,M04 Logistica y compras,0,6,1
+CentroCompra,1,17,M04 Logistica y compras,7,1,1
+GrupoAprobacionNotificador,1,3,M04 Logistica y compras,0,0,1
+OrdenDeCompraPie,1,22,M04 Logistica y compras,0,0,0
+CentroCompraNotificador,0,3,M04 Logistica y compras,0,1,1
+CentroCompraProyectoNotificador,0,3,M04 Logistica y compras,0,1,1
+CompraPlus,0,25,M04 Logistica y compras,0,0,0
+Cotizacion,0,30,M04 Logistica y compras,1,2,1
+CotizacionAprobacion,0,13,M04 Logistica y compras,0,0,1
+CotizacionDetalle,0,6,M04 Logistica y compras,2,2,1
+CotizacionDetallePedido,0,7,M04 Logistica y compras,1,3,1
+CotizacionProveedor,0,28,M04 Logistica y compras,2,3,1
+CotizacionProveedorDetalle,0,27,M04 Logistica y compras,2,2,1
+CotizacionProveedorPedidoDetalle,0,4,M04 Logistica y compras,0,2,1
+Edicion,0,3,M04 Logistica y compras,4,1,1
+Nota,0,4,M04 Logistica y compras,0,3,1
+NotaCompra,0,13,M04 Logistica y compras,4,2,1
+NotaCompraDetalle,0,11,M04 Logistica y compras,0,2,1
+OrdenDeCompraPieEmpresa,0,23,M04 Logistica y compras,0,1,1
+OrdenTrabajo,0,24,M04 Logistica y compras,12,5,1
+OrdenTrabajoExcel,0,5,M04 Logistica y compras,0,0,1
+PedidoDeletedHistory,0,5,M04 Logistica y compras,0,0,1
+PedidoDetalleDeletedHistory,0,6,M04 Logistica y compras,0,0,1
+PedidoDetalleDestino,0,9,M04 Logistica y compras,0,0,1
+PedidoDetalleSaldo,0,6,M04 Logistica y compras,0,0,1
+Precio,0,14,M04 Logistica y compras,0,6,1
+PrecioGeneral,0,12,M04 Logistica y compras,0,2,1
+PrecioJerarquia,0,12,M04 Logistica y compras,1,0,1
+PrecioJerarquiaDetalle,0,2,M04 Logistica y compras,0,2,1
+PrecioParticularEstimada,0,9,M04 Logistica y compras,0,6,1
+PrecioParticularInsumoPendiente,0,33,M04 Logistica y compras,0,0,1
+Proveedor,0,16,M04 Logistica y compras,2,0,1
+ProveedorRecurso,0,6,M04 Logistica y compras,0,3,1
+TituloPrecio,0,7,M04 Logistica y compras,4,3,1
+GuiaAlmacenDetalle,1310,82,M05 Almacen e inventario,0,2,1
+Stock,1217,24,M05 Almacen e inventario,0,5,1
+ProyectoAlmacenUsuarioPermiso_Historial,396,15,M05 Almacen e inventario,0,0,1
+ProyectoAlmacenUsuarioPermiso,332,15,M05 Almacen e inventario,0,4,1
+TipoAlmacenMovimiento,204,2,M05 Almacen e inventario,0,2,1
+GuiaAlmacen,151,101,M05 Almacen e inventario,5,8,1
+ProyectoTipoAlmacen,95,7,M05 Almacen e inventario,0,2,1
+ProyectoAlmacen,93,52,M05 Almacen e inventario,22,5,1
+GuiaAlmacenMovimiento,55,17,M05 Almacen e inventario,4,0,1
+ProyectoAlmacenUsuario,25,14,M05 Almacen e inventario,3,4,1
+CierreProyectoAlmacen,24,9,M05 Almacen e inventario,0,0,1
+CierreAlmacen,23,11,M05 Almacen e inventario,1,0,1
+UbicacionAlmacen,17,14,M05 Almacen e inventario,3,0,1
+GuiaAlmacenDetallePedido,13,6,M05 Almacen e inventario,0,1,1
+GuiaRemisionMotivo,12,6,M05 Almacen e inventario,0,0,1
+ArbolProyectoAlmacen,6,11,M05 Almacen e inventario,0,0,1
+TipoAlmacen,6,11,M05 Almacen e inventario,3,0,1
+InventarioConteoRecursoDiferencia,5,4,M05 Almacen e inventario,0,0,1
+InventarioProcesoConteoRecurso,5,5,M05 Almacen e inventario,0,0,1
+InventarioProcesoRecurso,5,4,M05 Almacen e inventario,0,0,1
+InventarioConteoEncargado,2,7,M05 Almacen e inventario,0,1,1
+GuiaAlmacenFabricacion,1,6,M05 Almacen e inventario,0,0,1
+Inventario,1,16,M05 Almacen e inventario,1,0,1
+InventarioConteo,1,3,M05 Almacen e inventario,0,0,1
+InventarioProceso,1,4,M05 Almacen e inventario,0,0,1
+StockDetalleRecurso,1,8,M05 Almacen e inventario,0,0,1
+AlmacenVector,0,15,M05 Almacen e inventario,0,0,1
+CierreAlmacenDetalle,0,10,M05 Almacen e inventario,0,1,1
+DevolucionGarantia,0,7,M05 Almacen e inventario,0,0,1
+GuiaAlmacenAuditoria,0,3,M05 Almacen e inventario,0,1,1
+GuiaAlmacenAuditoriaNota,0,4,M05 Almacen e inventario,0,1,1
+GuiaAlmacenAuditoriaRespuesta,0,4,M05 Almacen e inventario,0,2,1
+GuiaAlmacenDetalleImpuesto,0,74,M05 Almacen e inventario,0,2,1
+GuiaAlmacenFabricacionActividad,0,6,M05 Almacen e inventario,0,2,1
+GuiaAlmacenFabricacionImpuesto,0,6,M05 Almacen e inventario,0,0,1
+GuiaAlmacenImpuesto,0,88,M05 Almacen e inventario,1,8,1
+GuiaRemision,0,58,M05 Almacen e inventario,0,0,1
+GuiaRemisionDetalle,0,12,M05 Almacen e inventario,0,0,1
+GuiaRemisionMotivoDetalle,0,2,M05 Almacen e inventario,0,0,1
+GuiaRemisionNotificacion,0,5,M05 Almacen e inventario,0,0,1
+GuiaRemisionRelacionado,0,5,M05 Almacen e inventario,0,0,1
+GuiaSalida,0,6,M05 Almacen e inventario,0,2,1
+GuiaSalidaActividadInsumo,0,13,M05 Almacen e inventario,0,1,1
+GuiaSalidaActividadInsumoReporte,0,25,M05 Almacen e inventario,0,0,1
+GuiaSalidaResumenReporte,0,24,M05 Almacen e inventario,0,0,1
+GuiaSubcontrato,0,6,M05 Almacen e inventario,0,2,1
+GuiaSubcontratoActividad,0,13,M05 Almacen e inventario,0,0,1
+GuiaSubcontratoActividadReporte,0,15,M05 Almacen e inventario,0,0,1
+GuiaSubcontratoResumenReporte,0,14,M05 Almacen e inventario,0,0,1
+IngresosEgresos,0,73,M05 Almacen e inventario,0,0,1
+InventarioConteoRecurso,0,6,M05 Almacen e inventario,0,1,1
+InventarioDiferenciaRecurso,0,4,M05 Almacen e inventario,0,0,1
+InventarioPlus,0,7,M05 Almacen e inventario,0,0,0
+PlantillaRepartoGuiaAlmacen,0,8,M05 Almacen e inventario,0,0,1
+PlantillaRepartoGuiaAlmacenGuiaReparto,0,4,M05 Almacen e inventario,0,0,1
+PlantillaRepartoGuiaAlmacenOrigen,0,10,M05 Almacen e inventario,0,0,1
+ProyectoAlmacenIdentificador,0,11,M05 Almacen e inventario,0,0,1
+ProyectoAlmacenInsumo,0,8,M05 Almacen e inventario,0,6,1
+ProyectoAlmacenUnidadOperativa,0,4,M05 Almacen e inventario,3,2,1
+ProyectoAlmacenUsuarioUO,0,8,M05 Almacen e inventario,0,6,1
+StockImpuesto,0,19,M05 Almacen e inventario,0,5,1
+TalonarioProyectoAlmacen,0,4,M05 Almacen e inventario,0,3,1
+TransferenciaPersonal,0,29,M05 Almacen e inventario,0,2,1
+Periodo,34066,22,M06 Contabilidad,22,1,1
+Contribuyente,29181,13,M06 Contabilidad,0,0,1
+InsumoEmpresaPlanContable,10254,5,M06 Contabilidad,0,4,1
+PeriodoCalendario,7920,11,M06 Contabilidad,0,0,1
+AsientoContable,6491,74,M06 Contabilidad,0,10,1
+PlanContableDetalle,5063,60,M06 Contabilidad,10,7,1
+AsientoManualDetalle,952,21,M06 Contabilidad,0,3,1
+PlanContable,926,21,M06 Contabilidad,2,0,1
+PeriodoContable,135,38,M06 Contabilidad,5,1,1
+DetraccionPorcentaje,89,10,M06 Contabilidad,0,1,1
+RubroContable,81,25,M06 Contabilidad,1,0,1
+Detraccion,41,17,M06 Contabilidad,3,0,1
+RubroContableProcedencia,36,4,M06 Contabilidad,0,0,0
+PeriodoContableAuditoria,30,36,M06 Contabilidad,0,0,1
+AsientoContableAuditoria,19,10,M06 Contabilidad,0,0,1
+Percepcion,19,13,M06 Contabilidad,0,0,1
+PeriodoUsuario,15,4,M06 Contabilidad,0,0,1
+PeriodoReporte,14,10,M06 Contabilidad,0,0,1
+Tercero,14,7,M06 Contabilidad,4,2,1
+Impuesto,13,22,M06 Contabilidad,3,0,1
+BI_PeriodoContableDP,9,4,M06 Contabilidad,0,0,1
+PeriodoContableProceso,8,7,M06 Contabilidad,0,0,1
+CentroCostoTipo,5,11,M06 Contabilidad,0,0,1
+InformeContable,4,18,M06 Contabilidad,1,0,1
+PlanContableCatalogo,3,14,M06 Contabilidad,0,0,1
+AgrupamientoDocumentoDetalle,2,13,M06 Contabilidad,1,2,1
+EmpresaParametroContable,2,33,M06 Contabilidad,0,11,1
+RetencionPorcentaje,2,9,M06 Contabilidad,0,0,1
+AgrupamientoDocumento,1,53,M06 Contabilidad,2,5,1
+AgrupamientoDocumentoAnticipo,1,7,M06 Contabilidad,0,0,1
+AsientoManual,1,28,M06 Contabilidad,1,3,1
+EmpresaEsquemaContable,1,17,M06 Contabilidad,0,0,1
+AgrupamientoDocumentoAprobacion,0,13,M06 Contabilidad,0,0,1
+AgrupamientoDocumentoRetencion,0,13,M06 Contabilidad,0,1,1
+AgrupamientoIdentificador,0,10,M06 Contabilidad,0,0,1
+AsientoContableDatoCierre,0,6,M06 Contabilidad,0,0,1
+AsientoContableDetalle,0,63,M06 Contabilidad,0,0,1
+AsientoContableFiltro,0,2,M06 Contabilidad,0,0,0
+AsientoContableInforme,0,88,M06 Contabilidad,0,0,1
+AsientoContableMayor,0,17,M06 Contabilidad,0,5,1
+AsientoContableProcesamiento,0,4,M06 Contabilidad,0,0,1
+AsientoManualTipo,0,12,M06 Contabilidad,0,0,1
+BI_SDP_PeriodoContable,0,2,M06 Contabilidad,0,0,1
+CasillaPlanContableDetalle,0,4,M06 Contabilidad,0,2,1
+CentroCosto,0,12,M06 Contabilidad,0,0,1
+CentroDeCosto,0,16,M06 Contabilidad,2,2,1
+CentroDeCostoVector,0,16,M06 Contabilidad,0,0,1
+ContribuyenteVigencia,0,12,M06 Contabilidad,0,0,1
+DetraccionEmpresaPlanContable,0,5,M06 Contabilidad,0,1,1
+ImpuestoEmpresaPlanContable,0,5,M06 Contabilidad,0,4,1
+LibroDiarioSimplificadoCuenta,0,9,M06 Contabilidad,0,0,1
+PeriodoContableControl,0,4,M06 Contabilidad,0,0,1
+PeriodoContableGeneral,0,16,M06 Contabilidad,0,0,1
+PeriodoContableHistorico,0,8,M06 Contabilidad,0,1,1
+PeriodoContableOperacion,0,4,M06 Contabilidad,0,0,1
+PeriodoNomina,0,21,M06 Contabilidad,0,1,1
+PeriodoSinActualizar,0,2,M06 Contabilidad,0,0,1
+PeriodoVisible,0,3,M06 Contabilidad,0,0,1
+Periodo_Historial,0,5,M06 Contabilidad,0,0,0
+PlanContableAgrupacion,0,16,M06 Contabilidad,0,0,1
+PlanContableAgrupacionPlanContable,0,2,M06 Contabilidad,0,0,1
+PlanContableCierre,0,4,M06 Contabilidad,1,1,1
+PlanContableCierreDetalle,0,5,M06 Contabilidad,0,2,1
+PlanContableDetalleSaldo,0,19,M06 Contabilidad,0,0,1
+PlanContableDetalle_Historial,0,49,M06 Contabilidad,0,0,0
+PlanContablePeriodo,0,30,M06 Contabilidad,20,3,1
+PlanContablePresupuesto,0,10,M06 Contabilidad,0,0,1
+PlanContablePresupuestoInsumo,0,9,M06 Contabilidad,0,0,1
+PlanContableProceso,0,8,M06 Contabilidad,0,0,1
+RubroContableCuenta,0,17,M06 Contabilidad,0,0,1
+RubroContableResultado,0,14,M06 Contabilidad,0,4,1
+TerceroConceptoPeriodo,0,10,M06 Contabilidad,0,2,1
+TerceroConceptoPeriodoIndependiente,0,10,M06 Contabilidad,0,2,1
+TerceroConceptoValor,0,5,M06 Contabilidad,0,3,1
+TipoDocumentoEmpresaPlanContable,0,5,M06 Contabilidad,0,4,1
+TipoOperacionContable,0,16,M06 Contabilidad,4,1,1
+CuentaGenerica,80,23,M07 Tesoreria y finanzas,3,0,1
+OB_CuentaBancoPeriodo,12,12,M07 Tesoreria y finanzas,0,0,1
+OB_Banco,6,25,M07 Tesoreria y finanzas,2,1,1
+OB_DetalleSeleccionPago,4,30,M07 Tesoreria y finanzas,0,2,1
+OB_Pago_H2H_Producto,4,5,M07 Tesoreria y finanzas,0,0,0
+Pago,3,40,M07 Tesoreria y finanzas,10,3,1
+Cuentas,2,3,M07 Tesoreria y finanzas,0,0,1
+OB_SeleccionPago,2,49,M07 Tesoreria y finanzas,1,3,1
+OB_CuentaBanco,1,34,M07 Tesoreria y finanzas,4,3,1
+OB_DetalleAsignacion,1,28,M07 Tesoreria y finanzas,0,3,1
+OB_Pago,1,85,M07 Tesoreria y finanzas,1,1,1
+Banco,0,12,M07 Tesoreria y finanzas,0,0,1
+Caja,0,20,M07 Tesoreria y finanzas,0,0,1
+CajaDetalle,0,8,M07 Tesoreria y finanzas,0,0,1
+Chequera,0,10,M07 Tesoreria y finanzas,0,0,1
+CompensacionDocumento,0,24,M07 Tesoreria y finanzas,2,3,1
+CompensacionDocumentoDetalle,0,11,M07 Tesoreria y finanzas,0,2,1
+CompensacionDocumentoPago,0,9,M07 Tesoreria y finanzas,0,2,1
+CompensacionRetencion,0,11,M07 Tesoreria y finanzas,0,0,1
+CreditoPersonal,0,12,M07 Tesoreria y finanzas,0,1,1
+CuentaCorriente,0,21,M07 Tesoreria y finanzas,5,5,1
+EntidadCreditoMes,0,15,M07 Tesoreria y finanzas,1,2,1
+FondoRotatorio,0,16,M07 Tesoreria y finanzas,2,5,1
+FondoRotatorioDetalle,0,8,M07 Tesoreria y finanzas,0,3,1
+FondoRotatorioPago,0,5,M07 Tesoreria y finanzas,0,2,1
+LiquidezAccesoEmpresa,0,8,M07 Tesoreria y finanzas,0,1,1
+LiquidezAccesoProyecto,0,8,M07 Tesoreria y finanzas,0,1,1
+LiquidezAccesoUsuario,0,10,M07 Tesoreria y finanzas,0,1,1
+LiquidezEmpresa,0,15,M07 Tesoreria y finanzas,0,0,1
+LiquidezMultiproyecto,0,16,M07 Tesoreria y finanzas,0,0,1
+LiquidezProceso,0,9,M07 Tesoreria y finanzas,0,0,1
+LiquidezProyecto,0,16,M07 Tesoreria y finanzas,0,0,1
+MovimientoCajaBanco,0,26,M07 Tesoreria y finanzas,0,8,1
+OB_BancoConcepto,0,5,M07 Tesoreria y finanzas,0,0,1
+OB_BancoConceptoEquivalencia,0,7,M07 Tesoreria y finanzas,0,0,1
+OB_BancoConceptoFormato,0,9,M07 Tesoreria y finanzas,0,0,1
+OB_Caja,0,16,M07 Tesoreria y finanzas,1,2,1
+OB_DetalleAsignacionProveedor,0,5,M07 Tesoreria y finanzas,0,0,1
+OB_DetalleCaja,0,35,M07 Tesoreria y finanzas,1,1,1
+OB_DetalleCajaLetra,0,10,M07 Tesoreria y finanzas,0,0,1
+OB_DetalleCajaNotaCredito,0,7,M07 Tesoreria y finanzas,0,0,1
+OB_DetalleLetra_Factura,0,8,M07 Tesoreria y finanzas,0,1,1
+OB_DetallePlanillaCobranza,0,10,M07 Tesoreria y finanzas,0,0,1
+OB_DetalleSeleccionPagoLetra,0,11,M07 Tesoreria y finanzas,1,0,1
+OB_DetalleSeleccionPagoNotaCredito,0,6,M07 Tesoreria y finanzas,0,0,1
+OB_DetalleSeleccionPagoRelacionado,0,7,M07 Tesoreria y finanzas,0,0,1
+OB_EstadoBanco,0,29,M07 Tesoreria y finanzas,0,0,1
+OB_EstadoBancoDetalle,0,34,M07 Tesoreria y finanzas,0,0,1
+OB_EstadoBancoProceso,0,6,M07 Tesoreria y finanzas,0,0,1
+OB_Factura,0,19,M07 Tesoreria y finanzas,0,0,1
+OB_LibroCaja,0,19,M07 Tesoreria y finanzas,2,3,1
+OB_LibroCaja_Integrantes,0,5,M07 Tesoreria y finanzas,0,2,1
+OB_PagoLetraDocumento,0,6,M07 Tesoreria y finanzas,0,0,1
+OB_Pago_H2H,0,25,M07 Tesoreria y finanzas,0,0,1
+OB_Pago_H2H_Credencial,0,13,M07 Tesoreria y finanzas,0,0,1
+OB_Pago_H2H_Credencial_Empresa,0,15,M07 Tesoreria y finanzas,0,0,1
+OB_Pago_H2H_Producto_Empresa,0,6,M07 Tesoreria y finanzas,0,0,0
+OB_Pago_TabuladoRecurso,0,5,M07 Tesoreria y finanzas,0,0,1
+OB_SeleccionPagoNotificacion,0,6,M07 Tesoreria y finanzas,0,0,1
+OperacionBancaria,0,12,M07 Tesoreria y finanzas,1,0,1
+OperacionFinanciera,0,16,M07 Tesoreria y finanzas,1,2,1
+PagoAdelanto,0,3,M07 Tesoreria y finanzas,0,4,1
+PagoCobranzaDetallado,0,135,M07 Tesoreria y finanzas,0,0,0
+PagoCobranzaDetalle,0,19,M07 Tesoreria y finanzas,0,0,1
+PagoCobranzaRecurso,0,53,M07 Tesoreria y finanzas,0,0,0
+PagoDevolucion,0,7,M07 Tesoreria y finanzas,0,0,1
+PagoDevolucionGarantia,0,3,M07 Tesoreria y finanzas,0,0,1
+PagoInsumo,0,4,M07 Tesoreria y finanzas,0,3,1
+PagoLiquidacion,0,3,M07 Tesoreria y finanzas,0,4,1
+PagoPagoaCuenta,0,3,M07 Tesoreria y finanzas,0,4,1
+PagoRetencion,0,4,M07 Tesoreria y finanzas,0,0,1
+PagoaCuenta,0,7,M07 Tesoreria y finanzas,6,1,1
+PagoaCuentaInsumo,0,5,M07 Tesoreria y finanzas,0,3,1
+Voucher,0,13,M07 Tesoreria y finanzas,2,2,1
+VoucherDetalle,0,28,M07 Tesoreria y finanzas,0,8,1
+ErrorFacturacionElectronica,1763,2,M08 Facturacion y ventas,0,0,1
+RDocumentoDetalle,1721,62,M08 Facturacion y ventas,1,5,1
+RDocumentoDetalleIndicadorGestion,1596,6,M08 Facturacion y ventas,0,2,1
+RDocumentoComplemento,1391,42,M08 Facturacion y ventas,0,0,0
+RDocumentoCronogramaPago,1390,30,M08 Facturacion y ventas,4,1,1
+RDocumento,1340,190,M08 Facturacion y ventas,16,9,1
+RDocumentoImpuesto,1327,7,M08 Facturacion y ventas,0,1,1
+RDocumentoRelacionado,125,18,M08 Facturacion y ventas,2,3,1
+RDocumentoDetalleImpresion,28,8,M08 Facturacion y ventas,0,0,1
+RDocumentoRelacionadoComplemento,5,7,M08 Facturacion y ventas,0,0,1
+FacturacionElectronicaConfiguracion,0,3,M08 Facturacion y ventas,0,1,1
+LibroElectronicoRectifica,0,14,M08 Facturacion y ventas,0,0,1
+LibrosElectronicosCab,0,13,M08 Facturacion y ventas,0,0,1
+LibrosElectronicosDet,0,55,M08 Facturacion y ventas,0,0,1
+RDocumentoAnexoTransaccional,0,7,M08 Facturacion y ventas,0,2,1
+RDocumentoAprobacion,0,13,M08 Facturacion y ventas,0,0,1
+RDocumentoAsiento,0,12,M08 Facturacion y ventas,0,3,1
+RDocumentoAuxiliar,0,31,M08 Facturacion y ventas,1,0,1
+RDocumentoCargo,0,6,M08 Facturacion y ventas,0,1,1
+RDocumentoCronogramaPagoNota,0,3,M08 Facturacion y ventas,0,0,1
+RDocumentoDescarga,0,9,M08 Facturacion y ventas,0,0,1
+RDocumentoDetalleAuxiliar,0,11,M08 Facturacion y ventas,0,1,1
+RDocumentoDetalleDeducible,0,4,M08 Facturacion y ventas,0,2,1
+RDocumentoElectronico,0,14,M08 Facturacion y ventas,0,1,1
+RDocumentoElectronicoBaja,0,15,M08 Facturacion y ventas,1,0,1
+RDocumentoElectronicoBajaDetalle,0,3,M08 Facturacion y ventas,0,2,1
+RDocumentoElectronicoEnvio,0,11,M08 Facturacion y ventas,0,0,1
+RDocumentoElectronicoEnvioRobot,0,11,M08 Facturacion y ventas,0,0,1
+RDocumentoElectronicoResumen,0,16,M08 Facturacion y ventas,2,0,1
+RDocumentoElectronicoResumenContenido,0,13,M08 Facturacion y ventas,0,0,1
+RDocumentoElectronicoResumenDetalle,0,4,M08 Facturacion y ventas,0,2,1
+RDocumentoElectronicoResumenLinea,0,14,M08 Facturacion y ventas,0,1,1
+RDocumentoPagoGalac,0,11,M08 Facturacion y ventas,0,0,1
+RDocumentoProveedor,0,5,M08 Facturacion y ventas,0,0,1
+RDocumentoQR,0,16,M08 Facturacion y ventas,0,0,1
+RDocumentoRecepcion,0,7,M08 Facturacion y ventas,0,3,1
+RDocumentoRelacionadoDetalle,0,6,M08 Facturacion y ventas,0,2,1
+RDocumentoTabulado,0,5,M08 Facturacion y ventas,0,0,1
+ConceptoEsquema,1100,5,M09 Planillas y personal,0,2,1
+Concepto,982,65,M09 Planillas y personal,41,0,1
+ConceptoGenerico,264,52,M09 Planillas y personal,7,0,1
+ConceptoPDT,171,14,M09 Planillas y personal,0,0,1
+ConceptoAuditoria,123,67,M09 Planillas y personal,0,0,1
+PlanillaPagoConfiguracion,63,21,M09 Planillas y personal,2,5,1
+ConfiguracionEstructuraPDT,40,17,M09 Planillas y personal,0,0,1
+BoletaNominaFormato,26,8,M09 Planillas y personal,0,0,1
+IdentificadorPDT,15,104,M09 Planillas y personal,0,0,1
+Cargo,14,11,M09 Planillas y personal,4,0,1
+EsquemaPlanillaConceptoGrupo,12,5,M09 Planillas y personal,0,1,1
+EsquemaPlanilla,5,34,M09 Planillas y personal,44,0,1
+PlanillaFechaEntrada,5,12,M09 Planillas y personal,0,1,1
+ConceptoPiePpto,2,13,M09 Planillas y personal,0,0,1
+EsquemaContable,1,23,M09 Planillas y personal,7,0,1
+AFPNetAfiliado,0,9,M09 Planillas y personal,0,0,1
+AFPNetConfiguracion,0,12,M09 Planillas y personal,0,0,1
+AFPNetPlanilla,0,23,M09 Planillas y personal,0,0,1
+AFPNetPlanillaEdicion,0,9,M09 Planillas y personal,0,0,1
+BoletaContenido,0,22,M09 Planillas y personal,2,1,1
+BoletaContenidoControlCambios,0,5,M09 Planillas y personal,0,0,1
+BoletaNomina,0,13,M09 Planillas y personal,5,1,1
+BoletaNominaDetalle,0,30,M09 Planillas y personal,0,2,1
+BoletaNominaDetallePeriodo,0,35,M09 Planillas y personal,0,2,1
+BoletaNominaDetallePeriodoProyecto,0,37,M09 Planillas y personal,0,2,1
+BoletaNominaFacturacion,0,9,M09 Planillas y personal,0,6,1
+BoletaNominaImpresion,0,5,M09 Planillas y personal,0,1,1
+CapacitacionAplicaciones,0,2,M09 Planillas y personal,0,0,1
+CapacitacionAsistencia,0,10,M09 Planillas y personal,0,0,1
+CapacitacionCurso,0,12,M09 Planillas y personal,0,0,1
+CapacitacionCursoAsistencia,0,30,M09 Planillas y personal,0,0,1
+CapacitacionCursoParticipante,0,7,M09 Planillas y personal,0,0,1
+CapacitacionCursosInteres,0,7,M09 Planillas y personal,0,0,1
+CapacitacionEmpresa,0,12,M09 Planillas y personal,0,0,1
+CapacitacionEncuesta,0,7,M09 Planillas y personal,0,0,1
+CapacitacionEncuestaPreguntas,0,3,M09 Planillas y personal,0,0,1
+CapacitacionFichaDatos,0,6,M09 Planillas y personal,0,0,1
+CompensacionLaboral,0,14,M09 Planillas y personal,1,3,1
+CompensacionLaboralPapeleta,0,3,M09 Planillas y personal,0,2,1
+ConceptoModo,0,13,M09 Planillas y personal,0,0,1
+ConceptoProyectoPropio,0,5,M09 Planillas y personal,0,3,1
+ContratoCambio,0,16,M09 Planillas y personal,0,1,1
+ContratoProvias,0,19,M09 Planillas y personal,0,0,1
+DescuentoPersonal,0,30,M09 Planillas y personal,0,11,1
+DescuentoPersonalConcepto,0,8,M09 Planillas y personal,0,1,1
+EmpresaIncidenteLaboral,0,6,M09 Planillas y personal,0,1,1
+EsquemaCombinacion,0,8,M09 Planillas y personal,0,0,1
+EsquemaCuentaContable,0,4,M09 Planillas y personal,0,2,1
+EsquemaPlanillaAsignacion,0,6,M09 Planillas y personal,0,3,1
+EsquemaPlanillaFeriado,0,9,M09 Planillas y personal,0,1,1
+IncidenteLaboral,0,22,M09 Planillas y personal,0,5,1
+PDTDHAlta,0,51,M09 Planillas y personal,0,0,1
+PDTDHBaja,0,17,M09 Planillas y personal,0,0,1
+PDTDatosCuentaRemuneracion,0,9,M09 Planillas y personal,0,0,1
+PDTDatosTercero,0,9,M09 Planillas y personal,0,0,1
+PDTDetalleTercero,0,9,M09 Planillas y personal,0,0,1
+PDTEstablecimiento,0,8,M09 Planillas y personal,0,0,1
+PDTEstablecimientoFormacion,0,9,M09 Planillas y personal,0,0,1
+PDTEstablecimientoTrabajador,0,9,M09 Planillas y personal,0,0,1
+PDTEstudiosConcluidos,0,12,M09 Planillas y personal,0,0,1
+PDTIngresoPensionista,0,11,M09 Planillas y personal,0,0,1
+PDTIngresoTrabajador,0,11,M09 Planillas y personal,0,0,1
+PDTJornadaLaboral,0,10,M09 Planillas y personal,0,0,1
+PDTPensionista,0,11,M09 Planillas y personal,0,0,1
+PDTPeriodo,0,13,M09 Planillas y personal,0,0,1
+PDTPeriodoBaja,0,13,M09 Planillas y personal,0,0,1
+PDTPrestadorFormativa,0,15,M09 Planillas y personal,0,0,1
+PDTPrestadorFormativaPago,0,7,M09 Planillas y personal,0,0,1
+PDTPrestadorRentaCuarta,0,11,M09 Planillas y personal,0,0,1
+PDTPrestadorRentaCuartaDetalle,0,15,M09 Planillas y personal,0,0,1
+PDTPrincipalTrabajador,0,45,M09 Planillas y personal,0,0,1
+PDTRenta5taOtraEmpresa,0,8,M09 Planillas y personal,0,0,1
+PDTTrabajador,0,26,M09 Planillas y personal,0,0,1
+PDTTrabajadorOtrasCondiciones,0,10,M09 Planillas y personal,0,0,1
+PDTTrabajadorSubsidios,0,8,M09 Planillas y personal,0,0,1
+PersonalTipoDescuento,0,11,M09 Planillas y personal,0,3,1
+PersonalTipoPrestamo,0,11,M09 Planillas y personal,0,0,1
+PlanillaConceptoEntrada,0,9,M09 Planillas y personal,0,3,1
+PlanillaFechaValor,0,11,M09 Planillas y personal,0,0,1
+PlanillaFechaValorConcepto,0,5,M09 Planillas y personal,0,1,1
+PlanillaGrupoProcesoPeriodo,0,9,M09 Planillas y personal,1,4,1
+PlanillaGrupoProcesoPeriodoDetalle,0,10,M09 Planillas y personal,0,4,1
+PlanillaLetra,0,12,M09 Planillas y personal,1,2,1
+PlanillaLetraDetalle,0,10,M09 Planillas y personal,0,1,1
+PlanillaObreroEntrada,0,10,M09 Planillas y personal,0,1,1
+PlanillaObreroEntradaHistorico,0,12,M09 Planillas y personal,0,0,1
+PlanillaObreroPeriodo,0,12,M09 Planillas y personal,0,1,1
+PlanillaObreroPeriodoEntrada,0,12,M09 Planillas y personal,0,1,1
+PlanillaObreroPeriodoEntradaHistorico,0,11,M09 Planillas y personal,0,0,1
+PlanillaPagoConfiguracionProceso,0,5,M09 Planillas y personal,0,2,1
+PlanillaPeriodoEntrada,0,10,M09 Planillas y personal,0,1,1
+PlanillaProcesoHistorial,0,8,M09 Planillas y personal,0,0,1
+PlanillaProcesoIdentificador,0,7,M09 Planillas y personal,1,2,1
+PlanillaProcesoIdentificadorPeriodo,0,9,M09 Planillas y personal,0,2,1
+PlanillaProcesoIdentificadorPeriodoConcepto,0,7,M09 Planillas y personal,0,2,0
+PlanillaProcesoPeriodo,0,6,M09 Planillas y personal,0,2,1
+PrestamoPersonal,0,39,M09 Planillas y personal,1,0,1
+PrestamoPersonalAprobacion,0,9,M09 Planillas y personal,0,1,1
+PrestamoPersonalCronograma,0,14,M09 Planillas y personal,0,0,1
+PrestamoPersonalDocumento,0,9,M09 Planillas y personal,0,2,1
+VacacionFraccionamiento,0,10,M09 Planillas y personal,0,0,1
+VacacionProgramada,0,28,M09 Planillas y personal,0,0,1
+VacacionProgramadaPapeleta,0,3,M09 Planillas y personal,0,0,1
+Horario,231,10,M10 Asistencia y tareo,0,2,1
+ProyectoTareoObrero,48,3,M10 Asistencia y tareo,0,0,1
+Permiso,27,4,M10 Asistencia y tareo,2,0,1
+HorarioDetalle,10,13,M10 Asistencia y tareo,0,1,1
+HorarioBase,7,8,M10 Asistencia y tareo,0,0,1
+HorarioCiclico,7,12,M10 Asistencia y tareo,0,0,1
+HorarioGlobal,5,21,M10 Asistencia y tareo,0,0,1
+HorarioAsistencia,4,10,M10 Asistencia y tareo,0,1,1
+HorarioDiario,4,38,M10 Asistencia y tareo,0,1,1
+HorarioTurno,3,14,M10 Asistencia y tareo,0,0,1
+HorarioTipo,2,14,M10 Asistencia y tareo,0,0,1
+ProyectoTareoPC,2,4,M10 Asistencia y tareo,0,0,1
+ProyectoTareo,1,7,M10 Asistencia y tareo,0,0,1
+ConceptoTareoHora,0,3,M10 Asistencia y tareo,0,1,1
+ConfiguracionTareoConcepto,0,11,M10 Asistencia y tareo,0,3,1
+ConfiguracionTareoHora,0,5,M10 Asistencia y tareo,0,2,1
+HorarioCondicion,0,12,M10 Asistencia y tareo,1,0,1
+HorarioCondicionDetalle,0,12,M10 Asistencia y tareo,0,2,1
+HorarioEspecial,0,14,M10 Asistencia y tareo,0,2,1
+HorarioFeriado,0,19,M10 Asistencia y tareo,0,0,1
+HorarioFlexible,0,9,M10 Asistencia y tareo,0,0,1
+MarcacionAuditoria,0,23,M10 Asistencia y tareo,0,0,1
+ProyectoEsquemaPeriodoTareo,0,24,M10 Asistencia y tareo,0,2,1
+ProyectoObreroTareo,0,43,M10 Asistencia y tareo,0,5,0
+ProyectoObreroTareoAdicional,0,10,M10 Asistencia y tareo,0,1,1
+ProyectoObreroTareoDetalle,0,17,M10 Asistencia y tareo,0,2,1
+ProyectoObreroTareoDia,0,14,M10 Asistencia y tareo,0,2,1
+ProyectoObreroTareoInsumo,0,6,M10 Asistencia y tareo,0,3,1
+ProyectoObreroTareoResumen,0,12,M10 Asistencia y tareo,0,2,1
+ProyectoTareoSincronizacion,0,28,M10 Asistencia y tareo,0,0,1
+ProyectoTareoSincronizacionHistorico,0,24,M10 Asistencia y tareo,0,0,1
+ResumenInterferenciaTareo,0,4,M10 Asistencia y tareo,0,1,1
+ResumenPartidaDeControlTareo,0,7,M10 Asistencia y tareo,0,0,1
+Tareo,0,6,M10 Asistencia y tareo,3,2,1
+TareoActividad,0,12,M10 Asistencia y tareo,8,0,1
+TareoActividadDia,0,9,M10 Asistencia y tareo,0,2,1
+TareoActividadGrupo,0,10,M10 Asistencia y tareo,1,4,1
+TareoActividadIdentificador,0,12,M10 Asistencia y tareo,0,3,1
+TareoActividadObrero,0,20,M10 Asistencia y tareo,0,6,1
+TareoActividadObreroHora,0,18,M10 Asistencia y tareo,0,0,1
+TareoActividadObreroReporte,0,25,M10 Asistencia y tareo,0,0,1
+TareoActividadPeriodo,0,3,M10 Asistencia y tareo,0,2,1
+TareoMovilEnvio,0,22,M10 Asistencia y tareo,0,0,1
+TareoMovilEnvioActividadDia,0,12,M10 Asistencia y tareo,0,0,0
+TareoMovilEnvioDetalle,0,19,M10 Asistencia y tareo,0,0,0
+TareoMovilEnvioDia,0,17,M10 Asistencia y tareo,0,0,0
+TareoMovilEnvioHistorial,0,18,M10 Asistencia y tareo,0,0,0
+TareoMovilEnvioTMP,0,14,M10 Asistencia y tareo,0,0,0
+TareoMultiproyecto,0,37,M10 Asistencia y tareo,1,4,1
+TareoMultiproyectoDestinoDia,0,9,M10 Asistencia y tareo,0,0,1
+TareoMultiproyectoDestinoDiaPersona,0,13,M10 Asistencia y tareo,0,0,1
+TareoMultiproyectoDetallado,0,20,M10 Asistencia y tareo,0,0,1
+TareoMultiproyectoDetalle,0,44,M10 Asistencia y tareo,0,3,1
+TareoMultiproyectoIdentificador,0,14,M10 Asistencia y tareo,0,3,1
+TareoMultiproyectoIdentificadorProyecto,0,12,M10 Asistencia y tareo,0,4,1
+TareoResumenReporte,0,24,M10 Asistencia y tareo,0,0,1
+TarjetaDeCredito,0,13,M10 Asistencia y tareo,0,0,1
+TiempoProcesado,0,37,M10 Asistencia y tareo,0,0,1
+TiempoProcesadoAsignado,0,28,M10 Asistencia y tareo,0,0,1
+TiempoResumen,0,17,M10 Asistencia y tareo,0,4,1
+SubcontratoCodigo,46578,1,M11 Subcontratos,0,0,1
+SubcontratoConcepto,15,24,M11 Subcontratos,2,0,1
+SubcontratoDisenoResumen,12,11,M11 Subcontratos,0,2,1
+SubcontratoLiquidacionResumen,12,12,M11 Subcontratos,0,0,1
+SubcontratoFiltro,4,4,M11 Subcontratos,0,0,1
+SubContratoRecursoFactorReajusteHistoria,2,6,M11 Subcontratos,0,0,0
+SubcontratoLiquidacionPago,2,8,M11 Subcontratos,0,4,1
+Subcontrato,1,69,M11 Subcontratos,7,3,1
+SubcontratoImpuesto,1,4,M11 Subcontratos,0,2,1
+SubcontratoImpuestoValorizacion,1,4,M11 Subcontratos,0,1,1
+SubcontratoLiquidacion,1,47,M11 Subcontratos,16,1,1
+SubcontratoLiquidacionDetalle,1,24,M11 Subcontratos,0,6,0
+SubcontratoLiquidacionDetalleAuditoria,1,23,M11 Subcontratos,0,0,0
+SubcontratoLiquidacionImpuesto,1,5,M11 Subcontratos,0,2,1
+SubcontratoOrdenServicio,1,3,M11 Subcontratos,0,2,1
+SubcontratoRecurso,1,33,M11 Subcontratos,0,6,0
+SubcontratoWBS,1,18,M11 Subcontratos,0,1,1
+SubcontratoActividad,0,9,M11 Subcontratos,0,0,1
+SubcontratoCartaFianza,0,16,M11 Subcontratos,6,5,1
+SubcontratoCartaFianzaCorreo,0,5,M11 Subcontratos,0,3,1
+SubcontratoCartaFianzaInsumo,0,5,M11 Subcontratos,0,4,1
+SubcontratoEstadoCuenta,0,36,M11 Subcontratos,0,2,1
+SubcontratoExpediente,0,9,M11 Subcontratos,2,2,1
+SubcontratoLiquidacionAdelanto,0,5,M11 Subcontratos,0,4,1
+SubcontratoLiquidacionConcepto,0,4,M11 Subcontratos,0,3,1
+SubcontratoLiquidacionDeduccion,0,9,M11 Subcontratos,0,3,1
+SubcontratoLiquidacionDetalleDistribucion,0,9,M11 Subcontratos,0,0,1
+SubcontratoLiquidacionEC,0,12,M11 Subcontratos,0,0,1
+SubcontratoLiquidacionPagoaCuenta,0,5,M11 Subcontratos,0,4,1
+SubcontratoOrdenTrabajo,0,3,M11 Subcontratos,0,1,1
+SubcontratoRecursoActividad,0,3,M11 Subcontratos,0,0,1
+SubcontratoRecursoAdicionalDeductivo,0,11,M11 Subcontratos,0,0,1
+SubcontratoRecursoDistribucion,0,7,M11 Subcontratos,0,0,1
+SubcontratoRecursoTemporal,0,7,M11 Subcontratos,0,0,0
+SubcontratoResumen,0,27,M11 Subcontratos,0,0,1
+Interferencia,7,14,M12 Activos y equipos,4,0,1
+Activo,0,19,M12 Activos y equipos,0,1,1
+EquipoEstadoCalidad,0,7,M12 Activos y equipos,0,0,1
+InterferenciaEQ,0,3,M12 Activos y equipos,1,0,1
+InterferenciaMO,0,3,M12 Activos y equipos,1,0,1
+OTActividad,0,29,M12 Activos y equipos,2,8,1
+OTActividadAvance,0,35,M12 Activos y equipos,0,3,1
+OTActividadRecurso,0,12,M12 Activos y equipos,0,1,1
+OTActividadRecursoReporte,0,29,M12 Activos y equipos,0,0,1
+OTActividadTemporal,0,9,M12 Activos y equipos,0,0,1
+OTInterferenciaEQ,0,11,M12 Activos y equipos,0,9,1
+OTInterferenciaMO,0,11,M12 Activos y equipos,0,9,1
+ParteEquipo,0,6,M12 Activos y equipos,0,2,1
+ParteEquipoActividad,0,11,M12 Activos y equipos,8,0,1
+ParteEquipoActividadEquipo,0,17,M12 Activos y equipos,0,2,1
+ParteEquipoActividadEquipoReporte,0,25,M12 Activos y equipos,0,0,1
+ParteEquipoResumenReporte,0,24,M12 Activos y equipos,0,0,1
+ParteMObra,0,13,M12 Activos y equipos,3,4,1
+ParteMObraActividad,0,13,M12 Activos y equipos,0,1,1
+ParteMObraDetallado,0,6,M12 Activos y equipos,0,0,1
+ParteMObraDetalle,0,28,M12 Activos y equipos,0,2,1
+Abonos_Sperant,0,22,M13 Inmobiliaria,0,0,1
+AgrupamientoNotaDeVenta,0,22,M13 Inmobiliaria,2,2,1
+AgrupamientoNotaDeVentaDetalle,0,4,M13 Inmobiliaria,0,2,1
+InmobiliariaClientes,0,34,M13 Inmobiliaria,0,0,0
+InmobiliariaConceptosGenerales,0,13,M13 Inmobiliaria,0,0,1
+InmobiliariaPrototipo,0,15,M13 Inmobiliaria,0,0,1
+InmobiliariaProyectos,0,28,M13 Inmobiliaria,0,0,1
+Letras_Sperant,0,18,M13 Inmobiliaria,0,0,1
+NotaDeVenta,0,80,M13 Inmobiliaria,5,6,1
+NotaDeVentaAnulacion,0,21,M13 Inmobiliaria,0,0,1
+NotaDeVentaAnulacionConcepto,0,6,M13 Inmobiliaria,0,0,0
+NotaDeVentaAnulacionConceptoDevolucion,0,6,M13 Inmobiliaria,0,0,1
+NotaDeVentaCoPropietario,0,5,M13 Inmobiliaria,0,2,1
+NotaDeVentaDescripcionRecursoPropio,0,4,M13 Inmobiliaria,0,1,1
+NotaDeVentaDetallado,0,36,M13 Inmobiliaria,0,0,1
+NotaDeVentaDetalle,0,45,M13 Inmobiliaria,0,2,1
+NotaDeVentaEdicion,0,7,M13 Inmobiliaria,0,0,1
+NotaDeVentaEquivalencia,0,25,M13 Inmobiliaria,0,0,1
+NotaDeVentaGratuito,0,12,M13 Inmobiliaria,0,0,1
+NotaDeVentaGrupo,0,7,M13 Inmobiliaria,0,0,1
+NotaDeVentaModalidad,0,7,M13 Inmobiliaria,0,0,1
+NotaDeVentaModulo,0,7,M13 Inmobiliaria,0,0,1
+NotaDeVentaNotificacion,0,5,M13 Inmobiliaria,0,0,1
+NotaDeVentaPagoDetalle,0,23,M13 Inmobiliaria,2,1,1
+NotaDeVentaPagoDetalleRecurso,0,6,M13 Inmobiliaria,0,2,1
+NotaDeVentaPagoDetalleSeguimiento,0,3,M13 Inmobiliaria,0,1,1
+NotaDeVentaRecurso,0,7,M13 Inmobiliaria,0,0,1
+NotaDeVentaVersion,0,7,M13 Inmobiliaria,0,0,1
+ProyectoPrototipo,0,18,M13 Inmobiliaria,0,0,1
+ProyectoPrototipoAccesorios,0,12,M13 Inmobiliaria,0,0,1
+ProyectoPrototipoCostoxEtapa,0,16,M13 Inmobiliaria,0,0,1
+ProyectoSperant,0,3,M13 Inmobiliaria,0,0,0
+RegistrarCobroSperant,0,3,M13 Inmobiliaria,0,0,0
+RegistroIdentificadorNotaDeVenta,0,4,M13 Inmobiliaria,0,0,1
+ESQUEMA_BASEDATOS_J_LOAD,18750,11,M14 Temporales y respaldo,0,0,0
+ESQUEMA_BASEDATOS_J_ESQ,18698,11,M14 Temporales y respaldo,0,0,0
+ESQUEMA_BASEDATOS_J,14589,11,M14 Temporales y respaldo,0,0,0
+TmpReporteAnalisisPrecioUnitario,3797,94,M14 Temporales y respaldo,0,0,0
+PlantillaFormulaConcepto_BK,3145,7,M14 Temporales y respaldo,0,0,0
+ESQUEMA_BASEDATOS_J_MOD,2541,4,M14 Temporales y respaldo,0,0,0
+ESQUEMA_BASEDATOS_J_MOD_ACC,2541,12,M14 Temporales y respaldo,0,0,0
+RDocumentoDetalleCopia,1721,58,M14 Temporales y respaldo,0,0,1
+TmpPartidaPropia,1295,1,M14 Temporales y respaldo,0,0,1
+TmpImportacionExcelError,1178,5,M14 Temporales y respaldo,0,0,1
+TmpCPP,772,10,M14 Temporales y respaldo,0,0,0
+ESQUEMA_BASEDATOS_J_EXE_ERR,552,5,M14 Temporales y respaldo,0,0,0
+Tmp_RregistroCompras,451,139,M14 Temporales y respaldo,0,0,0
+Periodo_Copia,420,17,M14 Temporales y respaldo,0,0,1
+TmpAsignacionClasificacion,385,24,M14 Temporales y respaldo,0,0,1
+ESQUEMA_BASEDATOS_J_DIFF_LEFT,304,22,M14 Temporales y respaldo,0,0,0
+ESQUEMA_BASEDATOS_J_EXE,304,9,M14 Temporales y respaldo,0,0,0
+TmpRDocumentoDetalleIndicadorGestion,212,6,M14 Temporales y respaldo,0,0,1
+TmpBalanceComprobacion,193,33,M14 Temporales y respaldo,0,0,1
+BitacoraLOG,121,6,M14 Temporales y respaldo,0,0,1
+BitacoraEnviosLOG,87,7,M14 Temporales y respaldo,0,0,1
+TmpSubpartidas,50,6,M14 Temporales y respaldo,0,0,1
+TmpTecho,43,16,M14 Temporales y respaldo,0,0,1
+TmpAsientoManual,37,16,M14 Temporales y respaldo,0,0,0
+TmpPeriodoVisible,34,6,M14 Temporales y respaldo,0,0,0
+TmpNRO,31,392,M14 Temporales y respaldo,0,0,1
+Log_Configuration,30,12,M14 Temporales y respaldo,0,0,1
+TmpPedidoDetalle,24,32,M14 Temporales y respaldo,0,0,1
+TmpAdelantoMateriales,18,49,M14 Temporales y respaldo,0,0,0
+PlantillaFormula_BK,14,18,M14 Temporales y respaldo,0,0,0
+OrdenCompraDetallePedido_Copia,13,16,M14 Temporales y respaldo,0,0,0
+TmpReportePCInsumosDetalle,13,14,M14 Temporales y respaldo,0,0,1
+RDocumentoRelacionadoCopia,9,6,M14 Temporales y respaldo,0,0,1
+TmpPlanContableDetalle,7,21,M14 Temporales y respaldo,0,0,0
+BitacoraEnviosAgrupacion,6,9,M14 Temporales y respaldo,0,0,1
+TmpCompuesta,6,10,M14 Temporales y respaldo,0,0,0
+TmpValorizacionPartidaDeControl,6,10,M14 Temporales y respaldo,0,0,1
+Logo,5,18,M14 Temporales y respaldo,2,0,1
+TmpB2KCopia,5,1,M14 Temporales y respaldo,0,0,0
+TmpOrdenDeCompraDetalle,5,29,M14 Temporales y respaldo,0,0,1
+TmpRegularizacion,5,2,M14 Temporales y respaldo,0,0,1
+Tmp_OB_DetalleAsignacion,5,41,M14 Temporales y respaldo,0,0,0
+Log_Variables,4,3,M14 Temporales y respaldo,0,0,0
+TmpCotizacionDetalle,3,10,M14 Temporales y respaldo,0,0,1
+TmpDocumentoRelacionado,3,2,M14 Temporales y respaldo,0,0,1
+TmpClasificacion,2,3,M14 Temporales y respaldo,0,0,1
+TmpOrdenDeCompra,2,94,M14 Temporales y respaldo,0,0,1
+TmpPedido,2,41,M14 Temporales y respaldo,0,0,1
+TmpReporteVoucher,2,42,M14 Temporales y respaldo,0,0,0
+BitacoraEnvios,1,8,M14 Temporales y respaldo,0,0,1
+TmpRecursoStock,1,3,M14 Temporales y respaldo,0,0,1
+ActividadPeriodoCronogramaCopia,0,97,M14 Temporales y respaldo,0,0,1
+ActividadPeriodoInsumoCronogramaCopia,0,37,M14 Temporales y respaldo,0,0,1
+AsientoContableCopia,0,70,M14 Temporales y respaldo,0,0,0
+AsientoContableCopiaDetalle,0,64,M14 Temporales y respaldo,0,0,0
+BitacoraEliminacion,0,9,M14 Temporales y respaldo,0,0,1
+BitacoraRecepcion,0,8,M14 Temporales y respaldo,0,0,1
+BitacoraRecepcionAgrupacion,0,9,M14 Temporales y respaldo,0,0,1
+BitacoraRecepcionSucesos,0,13,M14 Temporales y respaldo,0,0,1
+BitacoraRecodificacion,0,12,M14 Temporales y respaldo,0,0,1
+GuiaAlmacenDetalleCopia,0,74,M14 Temporales y respaldo,0,0,1
+LibrosElectronicosCab_Copia,0,14,M14 Temporales y respaldo,0,0,1
+LibrosElectronicosDet_Copia,0,63,M14 Temporales y respaldo,0,0,1
+Log_AuditTrail,0,10,M14 Temporales y respaldo,0,0,1
+Log_AuditTrail_Det,0,2,M14 Temporales y respaldo,0,0,0
+PeriodoContableCopia,0,8,M14 Temporales y respaldo,0,0,1
+PlantillaRepartoGuiaAlmacen_Copia,0,10,M14 Temporales y respaldo,0,0,1
+TmpAC,0,7,M14 Temporales y respaldo,0,0,1
+TmpAgrupamiento,0,71,M14 Temporales y respaldo,0,0,1
+TmpAnalisisPorMetrado,0,45,M14 Temporales y respaldo,0,0,1
+TmpAnaliticoCuentas,0,104,M14 Temporales y respaldo,0,0,0
+TmpAnaliticoCuentasResumen,0,42,M14 Temporales y respaldo,0,0,0
+TmpAnaliticoPorCuentas,0,125,M14 Temporales y respaldo,0,0,0
+TmpAsientoContable,0,27,M14 Temporales y respaldo,0,0,0
+TmpAsientoContableArchivado,0,103,M14 Temporales y respaldo,0,0,0
+TmpAsientoContableRefleja,0,74,M14 Temporales y respaldo,0,0,1
+TmpAsientoContable_Resumen,0,20,M14 Temporales y respaldo,0,0,0
+TmpAsientoContable_Trazabilidad,0,13,M14 Temporales y respaldo,0,0,0
+TmpAsientoDiferencia,0,12,M14 Temporales y respaldo,0,0,0
+TmpAsientoDiferenciaTraslacion,0,11,M14 Temporales y respaldo,0,0,0
+TmpAsignacionHorario,0,11,M14 Temporales y respaldo,0,0,0
+TmpAuxiliarAC,0,69,M14 Temporales y respaldo,0,0,0
+TmpBalanceComprobacion_Listar,0,141,M14 Temporales y respaldo,0,0,0
+TmpBalanceGeneral,0,217,M14 Temporales y respaldo,0,0,0
+TmpBalanceGeneral_Columnas,0,33,M14 Temporales y respaldo,0,0,0
+TmpCalendarioProyecto,0,17,M14 Temporales y respaldo,0,0,1
+TmpCambioTitularidad,0,34,M14 Temporales y respaldo,0,0,0
+TmpCategoria,0,8,M14 Temporales y respaldo,0,0,0
+TmpCertificadoPago,0,66,M14 Temporales y respaldo,0,0,0
+TmpCierre,0,25,M14 Temporales y respaldo,0,0,0
+TmpComparativoMateriales,0,2,M14 Temporales y respaldo,0,0,0
+TmpComparativoNominas,0,18,M14 Temporales y respaldo,0,0,0
+TmpCompensaciones,0,17,M14 Temporales y respaldo,0,0,0
+TmpConceptoGenerico,0,7,M14 Temporales y respaldo,0,0,0
+TmpConciliacionBancaria,0,73,M14 Temporales y respaldo,0,0,0
+TmpConsolidadoValorizacion,0,17,M14 Temporales y respaldo,0,0,1
+TmpCotizacionProveedor,0,22,M14 Temporales y respaldo,0,0,1
+TmpCotizacionProveedorDetalle,0,21,M14 Temporales y respaldo,0,0,1
+TmpCuadroComparativoDetalle,0,150,M14 Temporales y respaldo,0,0,1
+TmpCxP,0,48,M14 Temporales y respaldo,0,0,0
+TmpDetallePendientePago,0,8,M14 Temporales y respaldo,0,0,0
+TmpDetalleSeleccionPagoDesdoble,0,4,M14 Temporales y respaldo,0,0,1
+TmpDetalleSeleccionPagoProveedor,0,4,M14 Temporales y respaldo,0,0,1
+TmpDetalleSeleccionPagoProveedorDetalle,0,7,M14 Temporales y respaldo,0,0,1
+TmpDetalleSeleccionRecursosEgresoPC,0,8,M14 Temporales y respaldo,0,0,1
+TmpDocTributo,0,6,M14 Temporales y respaldo,0,0,0
+TmpDocumentoDetallePedido,0,102,M14 Temporales y respaldo,0,0,0
+TmpDocumentoGeneral,0,11,M14 Temporales y respaldo,0,0,0
+TmpDocumentos,0,6,M14 Temporales y respaldo,0,0,0
+TmpDocumentosTributo,0,13,M14 Temporales y respaldo,0,0,0
+TmpEntregaInmueble,0,6,M14 Temporales y respaldo,0,0,0
+TmpEntregaInmuebleAsiento,0,31,M14 Temporales y respaldo,0,0,0
+TmpEstadoBancoDetalle,0,11,M14 Temporales y respaldo,0,0,0
+TmpEstadoCuenta,0,35,M14 Temporales y respaldo,0,0,1
+TmpEstadoFinanciero,0,3,M14 Temporales y respaldo,0,0,0
+TmpFactorReajusteDetallado,0,22,M14 Temporales y respaldo,0,0,1
+TmpFecha,0,3,M14 Temporales y respaldo,0,0,0
+TmpFlujoEfectivo,0,16,M14 Temporales y respaldo,0,0,0
+TmpGrupoRegistroAgrupado,0,5,M14 Temporales y respaldo,0,0,0
+TmpGrupoRegistroCampos,0,5,M14 Temporales y respaldo,0,0,0
+TmpGrupos,0,10,M14 Temporales y respaldo,0,0,0
+TmpGruposCampos,0,9,M14 Temporales y respaldo,0,0,0
+TmpGuia,0,4,M14 Temporales y respaldo,0,0,0
+TmpGuiaAC,0,1,M14 Temporales y respaldo,0,0,0
+TmpGuiaAM,0,6,M14 Temporales y respaldo,0,0,0
+TmpGuiaAlmacen,0,61,M14 Temporales y respaldo,0,0,0
+TmpGuiaAlmacenDetalle,0,45,M14 Temporales y respaldo,0,0,0
+TmpGuiaAsiento,0,30,M14 Temporales y respaldo,0,0,0
+TmpGuiaAsiento2,0,32,M14 Temporales y respaldo,0,0,0
+TmpGuiaAsiento2AM,0,32,M14 Temporales y respaldo,0,0,0
+TmpGuiaAsiento3,0,31,M14 Temporales y respaldo,0,0,0
+TmpGuiaAsientoC,0,30,M14 Temporales y respaldo,0,0,0
+TmpGuiaNE,0,6,M14 Temporales y respaldo,0,0,0
+TmpGuiaVoucher,0,7,M14 Temporales y respaldo,0,0,0
+TmpGuiaVoucher2,0,6,M14 Temporales y respaldo,0,0,0
+TmpGuiaVoucher2AM,0,6,M14 Temporales y respaldo,0,0,0
+TmpHorarioDiario,0,29,M14 Temporales y respaldo,0,0,0
+TmpHorarioGlobal,0,21,M14 Temporales y respaldo,0,0,0
+TmpIdentificadorAsistencia,0,2,M14 Temporales y respaldo,0,0,1
+TmpIdentificadorIC,0,2,M14 Temporales y respaldo,0,0,0
+TmpIdentificadorSG,0,12,M14 Temporales y respaldo,0,0,0
+TmpIndicadorGestion,0,4,M14 Temporales y respaldo,0,0,1
+TmpInformeContableFiltro,0,4,M14 Temporales y respaldo,0,0,0
+TmpInformeContableResultado,0,98,M14 Temporales y respaldo,0,0,0
+TmpInformeContableResultadoResumen,0,28,M14 Temporales y respaldo,0,0,0
+TmpIngresoOrdenCompra,0,3,M14 Temporales y respaldo,0,0,0
+TmpIngresoOrdenCompraGuias,0,2,M14 Temporales y respaldo,0,0,1
+TmpInsumo,0,45,M14 Temporales y respaldo,0,0,0
+TmpLE_BalanceComprobacion,0,10,M14 Temporales y respaldo,0,0,0
+TmpLectora,0,13,M14 Temporales y respaldo,0,0,0
+TmpLibroDiario,0,176,M14 Temporales y respaldo,0,0,1
+TmpLibroDiario_BIMONEDA,0,30,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_10,0,15,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_11,0,19,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_12,0,21,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_13,0,21,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_14,0,21,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_15,0,17,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_2,0,17,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_3,0,22,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_4,0,22,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_5,0,21,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_6,0,21,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_7,0,30,M14 Temporales y respaldo,0,0,0
+TmpLibroRegistro_Formato_3_8,0,25,M14 Temporales y respaldo,0,0,0
+TmpLiquidacion,0,12,M14 Temporales y respaldo,0,0,0
+TmpMarcacionAnalisis,0,9,M14 Temporales y respaldo,0,0,0
+TmpNRO_Detalle,0,240,M14 Temporales y respaldo,0,0,0
+TmpNaturalezaFuncionDetalle,0,2,M14 Temporales y respaldo,0,0,0
+TmpNomina,0,14,M14 Temporales y respaldo,0,0,0
+TmpNominaAsiento,0,37,M14 Temporales y respaldo,0,0,0
+TmpNominaAsientoProyecto,0,33,M14 Temporales y respaldo,0,0,0
+TmpNominaBoleta,0,14,M14 Temporales y respaldo,0,0,0
+TmpNotaDeVenta,0,15,M14 Temporales y respaldo,0,0,0
+TmpNotaDeVenta_Anulacion,0,30,M14 Temporales y respaldo,0,0,0
+TmpNotaDeVenta_EnCola,0,19,M14 Temporales y respaldo,0,0,0
+TmpNotaDeVenta_Financiera,0,25,M14 Temporales y respaldo,0,0,0
+TmpNotaDeVenta_Financiera_EnCola,0,29,M14 Temporales y respaldo,0,0,0
+TmpOrdenCompraDetalleSG,0,16,M14 Temporales y respaldo,0,0,0
+TmpOrdenCompraSG,0,16,M14 Temporales y respaldo,0,0,0
+TmpOrdenDeCompraComplemento,0,5,M14 Temporales y respaldo,0,0,0
+TmpOrdenPagoErrado,0,3,M14 Temporales y respaldo,0,0,0
+TmpPCD1,0,7,M14 Temporales y respaldo,0,0,0
+TmpPCD2,0,6,M14 Temporales y respaldo,0,0,0
+TmpPagoCR,0,7,M14 Temporales y respaldo,0,0,1
+TmpPagoCRDetalle,0,7,M14 Temporales y respaldo,0,0,1
+TmpPagoDetallePedido,0,109,M14 Temporales y respaldo,0,0,0
+TmpPagoMesNuevo,0,7,M14 Temporales y respaldo,0,0,0
+TmpPagoRetencionErrado,0,3,M14 Temporales y respaldo,0,0,0
+TmpPartidaComparacionInsumo,0,5,M14 Temporales y respaldo,0,0,1
+TmpPedidoCompra,0,22,M14 Temporales y respaldo,0,0,0
+TmpPedidoPendiente,0,3,M14 Temporales y respaldo,0,0,1
+TmpPeriodoContable,0,4,M14 Temporales y respaldo,0,0,0
+TmpPeriodoEvaluacion,0,3,M14 Temporales y respaldo,0,0,1
+TmpPeriodoSuma,0,2,M14 Temporales y respaldo,0,0,1
+TmpPieValorizacion,0,25,M14 Temporales y respaldo,0,0,1
+TmpPlanificacionDiaria,0,10,M14 Temporales y respaldo,0,0,0
+TmpPlanillaPagoConfiguracion,0,2,M14 Temporales y respaldo,0,0,1
+TmpPlanillaPagoPersonal,0,2,M14 Temporales y respaldo,0,0,1
+TmpPlantillaRepartoTransferencia,0,7,M14 Temporales y respaldo,0,0,0
+TmpPortafolio,0,10,M14 Temporales y respaldo,0,0,0
+TmpPortafolioDetalle,0,53,M14 Temporales y respaldo,0,0,0
+TmpPreciosGenerales,0,18,M14 Temporales y respaldo,0,0,0
+TmpPresupuestoAgrupacion,0,9,M14 Temporales y respaldo,0,0,0
+TmpPresupuestoPartidaNoUtilizada,0,5,M14 Temporales y respaldo,0,0,1
+TmpProveedor,0,2,M14 Temporales y respaldo,0,0,1
+TmpProyecto,0,5,M14 Temporales y respaldo,0,0,1
+TmpProyectoAsiento,0,10,M14 Temporales y respaldo,0,0,0
+TmpProyectoGrupo,0,8,M14 Temporales y respaldo,0,3,1
+TmpProyectoObreroPapeleta,0,30,M14 Temporales y respaldo,0,0,1
+TmpProyectoObreroPapeletaDetalle,0,16,M14 Temporales y respaldo,0,0,1
+TmpProyectoPresupuestoEquivalencia,0,4,M14 Temporales y respaldo,0,0,1
+TmpProyectoRO,0,2,M14 Temporales y respaldo,0,0,1
+TmpRDocumento,0,2,M14 Temporales y respaldo,0,0,1
+TmpRDocumento01S10,0,38,M14 Temporales y respaldo,0,0,1
+TmpRDocumento01S10Comprobante,0,14,M14 Temporales y respaldo,0,0,1
+TmpRDocumento01S10Detalle,0,13,M14 Temporales y respaldo,0,0,0
+TmpRDocumento01S10DetalleCronograma,0,8,M14 Temporales y respaldo,0,0,0
+TmpRDocumentoCronograma,0,18,M14 Temporales y respaldo,0,0,0
+TmpRDocumentoDetalleCuenta,0,3,M14 Temporales y respaldo,0,0,1
+TmpRDocumentoPlanillaPagoDesdoble,0,4,M14 Temporales y respaldo,0,0,1
+TmpRDocumentoTransferencias,0,16,M14 Temporales y respaldo,0,0,1
+TmpRatioConsumo,0,2,M14 Temporales y respaldo,0,0,1
+TmpRecurso,0,2,M14 Temporales y respaldo,0,0,1
+TmpRecursoNRO,0,197,M14 Temporales y respaldo,0,0,1
+TmpRecursoProveedor,0,5,M14 Temporales y respaldo,0,0,1
+TmpRecursosOrdenCompra,0,26,M14 Temporales y respaldo,0,0,0
+TmpRefleja,0,14,M14 Temporales y respaldo,0,0,0
+TmpRegistroCompra_0801,0,55,M14 Temporales y respaldo,0,0,0
+TmpRegistroCompra_0802,0,43,M14 Temporales y respaldo,0,0,0
+TmpRegistroCompra_1301,0,66,M14 Temporales y respaldo,0,0,1
+TmpRegistroCompra_1401,0,41,M14 Temporales y respaldo,0,0,1
+TmpReporteActaCabecera,0,7,M14 Temporales y respaldo,0,0,1
+TmpReporteActaDetalle,0,21,M14 Temporales y respaldo,0,0,1
+TmpReporteActivoInsumosDetalle,0,11,M14 Temporales y respaldo,0,0,1
+TmpReporteAnticiposReembolsos,0,22,M14 Temporales y respaldo,0,0,0
+TmpReporteBalanceComprobacion,0,20,M14 Temporales y respaldo,0,0,0
+TmpReporteBalanceGeneral,0,12,M14 Temporales y respaldo,0,0,1
+TmpReporteBalanceGeneral14Columnas,0,15,M14 Temporales y respaldo,0,0,0
+TmpReporteBoletasPago,0,65,M14 Temporales y respaldo,0,0,0
+TmpReporteBoletasPagoFormato,0,203,M14 Temporales y respaldo,0,0,1
+TmpReporteCalificacionPersonalFormato,0,23,M14 Temporales y respaldo,0,0,0
+TmpReporteCalificacionPersonalResumen,0,30,M14 Temporales y respaldo,0,0,0
+TmpReporteConsolidadoAnalisis,0,38,M14 Temporales y respaldo,0,0,1
+TmpReporteConsolidadoConcepto,0,22,M14 Temporales y respaldo,0,0,0
+TmpReporteConsolidadoNominaTabulado,0,90,M14 Temporales y respaldo,0,0,0
+TmpReporteDEInsumosDetalle,0,10,M14 Temporales y respaldo,0,0,1
+TmpReporteEstadoFinanciero,0,23,M14 Temporales y respaldo,0,0,0
+TmpReporteFondoRotatorio,0,18,M14 Temporales y respaldo,0,0,0
+TmpReporteFrenteInsumosDetalle,0,10,M14 Temporales y respaldo,0,0,1
+TmpReporteInsumoClasificacionDetalle,0,6,M14 Temporales y respaldo,0,0,0
+TmpReporteInventarioBalance,0,17,M14 Temporales y respaldo,0,0,0
+TmpReporteKardexResumen,0,27,M14 Temporales y respaldo,0,0,1
+TmpReporteKardexResumenGeneral,0,32,M14 Temporales y respaldo,0,0,1
+TmpReporteLibroCaja,0,72,M14 Temporales y respaldo,0,0,0
+TmpReporteLibroMayor,0,32,M14 Temporales y respaldo,0,0,0
+TmpReporteLibroMayorComparativo,0,56,M14 Temporales y respaldo,0,0,0
+TmpReporteLibroMayorGeneral,0,13,M14 Temporales y respaldo,0,0,0
+TmpReporteLibroMayorMovimientos,0,45,M14 Temporales y respaldo,0,0,0
+TmpReporteMayorAnalitico,0,42,M14 Temporales y respaldo,0,0,0
+TmpReporteParteMObra,0,51,M14 Temporales y respaldo,0,0,0
+TmpReporteParteMultiproyecto,0,46,M14 Temporales y respaldo,0,0,0
+TmpReportePersonaInsumosDetalle,0,11,M14 Temporales y respaldo,0,0,1
+TmpReporteRecursoControlDetalle,0,6,M14 Temporales y respaldo,0,0,0
+TmpReporteRecursoDeduccion,0,23,M14 Temporales y respaldo,0,0,0
+TmpReporteResumenConciliacion,0,16,M14 Temporales y respaldo,0,0,0
+TmpReporteResumenTipoMovimiento,0,12,M14 Temporales y respaldo,0,0,0
+TmpReporteSaldosPorCentroDeCosto,0,11,M14 Temporales y respaldo,0,0,1
+TmpReporteSaldosPorCuenta,0,23,M14 Temporales y respaldo,0,0,0
+TmpReporteTalonario,0,31,M14 Temporales y respaldo,0,0,0
+TmpReporteTotalesRecursoGuia,0,7,M14 Temporales y respaldo,0,0,1
+TmpReporteUOInsumosDetalle,0,11,M14 Temporales y respaldo,0,0,1
+TmpReporteVistaNomina,0,72,M14 Temporales y respaldo,0,0,0
+TmpReporteVistaNominaAcumulado,0,20,M14 Temporales y respaldo,0,0,0
+TmpReporteVistaNominaTabulado,0,97,M14 Temporales y respaldo,0,0,0
+TmpReporteVistaNominaTabuladoColumna,0,8,M14 Temporales y respaldo,0,0,0
+TmpResumenValorizacion,0,29,M14 Temporales y respaldo,0,0,1
+TmpRubroContable,0,12,M14 Temporales y respaldo,0,0,0
+TmpSLR,0,3,M14 Temporales y respaldo,0,0,0
+TmpSaldoListadoAnalitico,0,124,M14 Temporales y respaldo,0,0,0
+TmpSaldoListadoComparativoAnio,0,38,M14 Temporales y respaldo,0,0,0
+TmpSaldoListadoComparativoMes,0,27,M14 Temporales y respaldo,0,0,0
+TmpSaldoListadoGeneral,0,21,M14 Temporales y respaldo,0,0,0
+TmpSeguimiento,0,18,M14 Temporales y respaldo,0,0,1
+TmpStockAnterior,0,16,M14 Temporales y respaldo,0,0,1
+TmpStockFecha,0,19,M14 Temporales y respaldo,0,0,1
+TmpStockKardexDetalle,0,72,M14 Temporales y respaldo,0,0,0
+TmpStockKardexDetalleGeneral,0,50,M14 Temporales y respaldo,0,0,0
+TmpSubcontratoEquipoSemana,0,17,M14 Temporales y respaldo,0,0,1
+TmpTareoMultiproyectoPeriodo,0,2,M14 Temporales y respaldo,0,0,1
+TmpTerminal,0,13,M14 Temporales y respaldo,0,0,0
+TmpTrazabilidad,0,2,M14 Temporales y respaldo,0,0,1
+TmpTributo,0,17,M14 Temporales y respaldo,0,0,0
+Tmp_CuentaLS,0,1,M14 Temporales y respaldo,0,0,0
+Tmp_LibroSimplificado,0,205,M14 Temporales y respaldo,0,0,0
+Tmp_Pago,0,86,M14 Temporales y respaldo,0,0,0
+Tmp_PagoDetalle,0,24,M14 Temporales y respaldo,0,0,0
+Tmp_Procesar_AsientoContable_Liquidacion,0,7,M14 Temporales y respaldo,0,0,0
+Tmp_Procesar_AsientoContable_Liquidacion_Doc,0,6,M14 Temporales y respaldo,0,0,0
+tmpAC_Documento,0,31,M14 Temporales y respaldo,0,0,1
+tmpAC_DocumentoAsiento,0,59,M14 Temporales y respaldo,0,0,0
+tmpAC_PagoNomina,0,15,M14 Temporales y respaldo,0,0,1
+tmpAC_PagoNominaDocumento,0,40,M14 Temporales y respaldo,0,0,0
+tmpEstructura,0,5,M14 Temporales y respaldo,0,0,1
+tmpProyectoEquipoParte,0,8,M14 Temporales y respaldo,0,0,1
+tmpValidaDocumentosElectDB,0,31,M14 Temporales y respaldo,0,0,0
+tmp_script_actualizadata,0,1,M14 Temporales y respaldo,0,0,0
+ActualizacionDetalle,63831,7,M15 Metadatos del propio sistema,0,0,1
+TablaTablas,17070,15,M15 Metadatos del propio sistema,6,0,1
+FiltroDetalleSumaRecurso,6267,20,M15 Metadatos del propio sistema,0,4,1
+Procedimiento,2614,4,M15 Metadatos del propio sistema,0,0,1
+FiltroDetalleSuma,1436,70,M15 Metadatos del propio sistema,4,0,1
+EstructuraCodificacion,1307,15,M15 Metadatos del propio sistema,0,0,1
+TableroRecurso,1164,47,M15 Metadatos del propio sistema,0,0,1
+Escenario,1074,17,M15 Metadatos del propio sistema,0,0,1
+CampoDelReporte,1043,8,M15 Metadatos del propio sistema,0,0,0
+TablaPrincipalLog_ConfigS10,944,14,M15 Metadatos del propio sistema,0,0,1
+CatalogoConfiguracion2,872,8,M15 Metadatos del propio sistema,0,0,1
+TablaPrincipalLog_ConfigS10_BK,668,14,M15 Metadatos del propio sistema,0,0,1
+Syscatalogo,637,29,M15 Metadatos del propio sistema,0,0,1
+Actualizacion,586,19,M15 Metadatos del propio sistema,0,0,1
+Tabla,584,23,M15 Metadatos del propio sistema,0,0,1
+EscenariosUnicos,537,3,M15 Metadatos del propio sistema,1,0,1
+GestorPermisos,532,21,M15 Metadatos del propio sistema,0,0,1
+CatalogoConfiguracion,453,7,M15 Metadatos del propio sistema,0,0,1
+AgrupacionTabla,406,3,M15 Metadatos del propio sistema,0,0,1
+IndiceCopiaDeSeguridad,327,2,M15 Metadatos del propio sistema,0,0,0
+SysCampo,254,6,M15 Metadatos del propio sistema,0,0,1
+SysCampoUsuario,184,5,M15 Metadatos del propio sistema,0,0,1
+VistaNominaConcepto,132,5,M15 Metadatos del propio sistema,0,2,1
+EstructuraItem,127,12,M15 Metadatos del propio sistema,0,1,1
+EstructuraSubpartida,127,12,M15 Metadatos del propio sistema,0,1,1
+sysparametros,113,14,M15 Metadatos del propio sistema,0,0,1
+IndiceUnificado,85,16,M15 Metadatos del propio sistema,4,0,1
+EscenarioBarra,60,6,M15 Metadatos del propio sistema,0,0,1
+ReporteValorizacionDetalle,28,21,M15 Metadatos del propio sistema,0,0,0
+EscenarioDimension,25,5,M15 Metadatos del propio sistema,0,0,1
+ActualizacionSesion,21,5,M15 Metadatos del propio sistema,0,0,1
+CampoListaEspecificacionDetalle,20,9,M15 Metadatos del propio sistema,1,1,1
+EscenarioControlActualizacion,15,3,M15 Metadatos del propio sistema,0,0,1
+IndiceUnificadoAreas,13,4,M15 Metadatos del propio sistema,0,0,1
+Agrupacion,11,18,M15 Metadatos del propio sistema,0,0,1
+EstructuraItemGeneral,10,12,M15 Metadatos del propio sistema,0,0,1
+EstructuraSubpartidaGeneral,10,11,M15 Metadatos del propio sistema,0,0,1
+VistaNomina,10,12,M15 Metadatos del propio sistema,1,1,1
+EstructuraTareaGeneral,6,11,M15 Metadatos del propio sistema,0,0,1
+CampoListaEspecificacion,4,13,M15 Metadatos del propio sistema,1,0,1
+TablaCalidad,4,10,M15 Metadatos del propio sistema,0,0,1
+EscenarioRegistro,3,3,M15 Metadatos del propio sistema,0,0,1
+ActualizacionDatos,1,6,M15 Metadatos del propio sistema,0,0,1
+IndiceUnificadoGrupo,1,12,M15 Metadatos del propio sistema,0,0,1
+CamposVisibles,0,5,M15 Metadatos del propio sistema,0,0,1
+CatalogoAsignacionContable,0,13,M15 Metadatos del propio sistema,0,3,1
+CatalogoAsignacionContableAuditoria,0,14,M15 Metadatos del propio sistema,0,0,0
+CatalogoDimension,0,16,M15 Metadatos del propio sistema,0,0,1
+Filtro,0,18,M15 Metadatos del propio sistema,2,1,1
+FiltroDetalle,0,16,M15 Metadatos del propio sistema,0,2,1
+FiltroVista,0,17,M15 Metadatos del propio sistema,0,0,1
+FiltroVistaCuenta,0,8,M15 Metadatos del propio sistema,0,0,1
+IndicePorTabla,0,9,M15 Metadatos del propio sistema,0,0,0
+ReporteResumenSubcontrato,0,13,M15 Metadatos del propio sistema,0,0,0
+ReporteValorizacion,0,75,M15 Metadatos del propio sistema,0,0,0
+TablaPrincipalLog,0,11,M15 Metadatos del propio sistema,0,0,1
+TablaReglas,0,3,M15 Metadatos del propio sistema,0,0,1
+TablaTablasS10,0,6,M15 Metadatos del propio sistema,3,0,1
+TableroPC,0,26,M15 Metadatos del propio sistema,0,0,1
+TableroUN,0,17,M15 Metadatos del propio sistema,0,0,1
+TableroUnidadNegocio,0,11,M15 Metadatos del propio sistema,0,0,1
+VistaAsistencia,0,11,M15 Metadatos del propio sistema,1,1,1
+VistaAsistenciaConcepto,0,5,M15 Metadatos del propio sistema,0,2,1
+sysDecimalesBase,0,3,M15 Metadatos del propio sistema,0,0,0
+sysMenu,0,10,M15 Metadatos del propio sistema,0,0,0
+sysdiagrams,0,5,M15 Metadatos del propio sistema,0,0,1
+Ocupacion,146,14,ZZ Sin clasificar,2,0,1
+Gasto,122,14,ZZ Sin clasificar,1,1,1
+ResultadoPieSubpresupuesto,117,8,ZZ Sin clasificar,0,2,1
+PieSubpresupuesto,115,10,ZZ Sin clasificar,0,2,1
+ResultadoOperativoPartidaControl,93,6,ZZ Sin clasificar,0,0,1
+OrganizadorDocumento,82,14,ZZ Sin clasificar,4,0,1
+EvaluacionCaracteristica,72,22,ZZ Sin clasificar,1,0,1
+OrganizadorRegistro,70,14,ZZ Sin clasificar,6,0,1
+ResumenPartidaDeControlParte,65,7,ZZ Sin clasificar,0,0,1
+Protocolo,56,18,ZZ Sin clasificar,3,0,1
+Postal,50,12,ZZ Sin clasificar,0,0,1
+Recosteo,46,4,ZZ Sin clasificar,0,3,1
+TransactionAuditConfig,39,11,ZZ Sin clasificar,0,0,1
+Alerta,37,8,ZZ Sin clasificar,0,0,1
+EvaluacionCaracteristicaEspecificacion,37,8,ZZ Sin clasificar,1,1,1
+ProtocoloDetalle,36,24,ZZ Sin clasificar,0,2,1
+CausaIncumplimiento,33,15,ZZ Sin clasificar,1,0,1
+FormaDePago,32,21,ZZ Sin clasificar,6,0,1
+FiltradoGrupo,31,6,ZZ Sin clasificar,0,0,1
+Procedencia,31,5,ZZ Sin clasificar,0,0,1
+ResultadoOperativo,31,43,ZZ Sin clasificar,0,0,1
+ResultadoOperativoTipo,31,44,ZZ Sin clasificar,0,0,1
+Aduana,30,14,ZZ Sin clasificar,0,0,1
+AuditoriaFileStorage,20,4,ZZ Sin clasificar,0,0,1
+FavoritoColor,16,3,ZZ Sin clasificar,0,0,1
+BI_RDocumento_Proveedor_Detalle,14,19,ZZ Sin clasificar,0,0,0
+FavoritoDetalle,14,12,ZZ Sin clasificar,0,5,1
+Arbol,13,3,ZZ Sin clasificar,0,0,1
+LugarDeEnvioAgrupacion,13,9,ZZ Sin clasificar,0,0,1
+VinculoFamiliarSustento,12,3,ZZ Sin clasificar,0,0,1
+BI_RDocumento_Proveedor,11,15,ZZ Sin clasificar,0,0,0
+EspecificacionDinamicaDetalle,11,16,ZZ Sin clasificar,1,1,1
+OutlookMensajes,11,11,ZZ Sin clasificar,0,0,1
+ProcesoNomina,11,22,ZZ Sin clasificar,6,1,1
+Prioridad,10,12,ZZ Sin clasificar,2,0,1
+ProtocoloNoConformidad,10,16,ZZ Sin clasificar,0,1,1
+SustentoTributario,10,13,ZZ Sin clasificar,1,0,1
+CasillaGenerico,9,2,ZZ Sin clasificar,0,0,1
+BI_LucroMargen,8,14,ZZ Sin clasificar,0,0,1
+FormaDePagoDetalle,8,7,ZZ Sin clasificar,0,1,1
+ResultadoOperativoPeriodoRecurso,8,49,ZZ Sin clasificar,0,0,1
+Categoria,7,13,ZZ Sin clasificar,2,0,1
+RubroIdentificador,7,9,ZZ Sin clasificar,1,0,1
+ArbolProyecto,6,10,ZZ Sin clasificar,0,0,1
+CorreoMasivo,6,10,ZZ Sin clasificar,0,0,0
+PieValorizacion,6,27,ZZ Sin clasificar,0,1,1
+Tratamiento,6,13,ZZ Sin clasificar,1,0,1
+BI_ProyectoDP,5,8,ZZ Sin clasificar,0,0,1
+LugarDeEnvio,5,29,ZZ Sin clasificar,0,0,1
+Accion,4,17,ZZ Sin clasificar,9,0,1
+FavoritoItemDeControlDetalle,4,5,ZZ Sin clasificar,0,3,1
+HistorialCambiosCarpeta,4,4,ZZ Sin clasificar,0,0,0
+MotivoPago,4,14,ZZ Sin clasificar,1,0,1
+ResultadoOperativoPC,4,81,ZZ Sin clasificar,0,0,1
+ResultadoOperativoPeriodo,4,45,ZZ Sin clasificar,0,0,1
+SubActividadCronogramaTarea,4,56,ZZ Sin clasificar,0,0,1
+EstiloAscendente,3,4,ZZ Sin clasificar,0,0,1
+MetodoPago,3,14,ZZ Sin clasificar,1,0,1
+DctoIngresoEgreso,2,3,ZZ Sin clasificar,0,2,1
+EspecificacionDinamica,2,14,ZZ Sin clasificar,2,0,1
+Favorito,2,3,ZZ Sin clasificar,1,0,1
+ReglaDocumento,2,8,ZZ Sin clasificar,2,2,1
+ReglaDocumentoCriterio,2,7,ZZ Sin clasificar,0,2,1
+ResultadoOperativoRecurso,2,96,ZZ Sin clasificar,0,0,0
+ServicioTransporteIdentificacion,2,7,ZZ Sin clasificar,0,0,1
+ArbolCentroCompra,1,10,ZZ Sin clasificar,0,0,1
+BI_EmpresaDP,1,2,ZZ Sin clasificar,0,0,1
+BI_Proyecto_Calendario,1,19,ZZ Sin clasificar,0,0,1
+BibliotecaConfiguracion,1,16,ZZ Sin clasificar,0,0,1
+FavoritoItemDeControl,1,14,ZZ Sin clasificar,2,0,1
+MatrizConceptoConfiguracion,1,10,ZZ Sin clasificar,0,2,1
+Piloto,1,1,ZZ Sin clasificar,0,0,0
+ReglaRegistro,1,8,ZZ Sin clasificar,2,2,1
+ReglaRegistroCriterio,1,7,ZZ Sin clasificar,0,2,1
+ServicioTransporteConfiguracion,1,6,ZZ Sin clasificar,0,0,1
+Titular,1,5,ZZ Sin clasificar,0,0,0
+Acta,0,33,ZZ Sin clasificar,3,2,1
+ActaAcuerdo,0,25,ZZ Sin clasificar,0,4,1
+ActaCorreo,0,7,ZZ Sin clasificar,0,1,1
+ActaIdentificador,0,3,ZZ Sin clasificar,0,0,1
+ActaResponsable,0,4,ZZ Sin clasificar,0,3,1
+ActualizaSatelite,0,7,ZZ Sin clasificar,0,0,1
+Adelanto,0,13,ZZ Sin clasificar,6,0,1
+AdelantoEfectivo,0,15,ZZ Sin clasificar,2,0,1
+AdelantoEfectivoAmortizacion,0,13,ZZ Sin clasificar,0,1,1
+AdelantoEfectivoDeduccion,0,17,ZZ Sin clasificar,0,1,1
+AdelantoInsumo,0,5,ZZ Sin clasificar,0,3,1
+AdelantoMaterial,0,7,ZZ Sin clasificar,1,3,1
+AdelantoMaterialAmortizacion,0,13,ZZ Sin clasificar,0,3,1
+AdelantoMaterialDeduccion,0,21,ZZ Sin clasificar,0,0,1
+AdelantoMaterialDetalle,0,8,ZZ Sin clasificar,2,1,1
+AdelantoMaterialPartida,0,6,ZZ Sin clasificar,0,4,1
+AgentePercepcion,0,12,ZZ Sin clasificar,0,0,1
+AgenteRetencion,0,12,ZZ Sin clasificar,0,0,1
+Aplicabilidad,0,14,ZZ Sin clasificar,1,0,1
+AppActivacion,0,18,ZZ Sin clasificar,0,0,1
+AppEmpresa,0,6,ZZ Sin clasificar,0,0,1
+AppMovil,0,5,ZZ Sin clasificar,0,0,1
+AppMovilDetail,0,6,ZZ Sin clasificar,0,0,1
+ArbolCompras,0,9,ZZ Sin clasificar,0,0,1
+ArbolEmpresaHistorial,0,5,ZZ Sin clasificar,0,0,0
+ArbolPreciosReporte,0,8,ZZ Sin clasificar,0,0,1
+ArchivoAyuda,0,17,ZZ Sin clasificar,1,0,1
+ArchivoAyudaEscenario,0,16,ZZ Sin clasificar,0,2,1
+Area,0,11,ZZ Sin clasificar,0,0,1
+AsignacionProtocoloCalidad,0,17,ZZ Sin clasificar,0,0,1
+Auditoria,0,10,ZZ Sin clasificar,0,0,1
+BI_Calendario,0,16,ZZ Sin clasificar,0,0,1
+BI_CalendarioFC,0,16,ZZ Sin clasificar,0,0,1
+BI_Empresa,0,2,ZZ Sin clasificar,1,0,1
+BI_EmpresaFC,0,2,ZZ Sin clasificar,0,0,1
+BI_FiltroTablero,0,8,ZZ Sin clasificar,0,0,1
+BI_FlujoCajaDiarioGeneral,0,14,ZZ Sin clasificar,0,0,0
+BI_FlujoCajaDiarioPCG,0,11,ZZ Sin clasificar,0,0,0
+BI_Gasto,0,15,ZZ Sin clasificar,0,5,0
+BI_GastoFamilia,0,5,ZZ Sin clasificar,0,3,1
+BI_GastoPartidaControlGeneral,0,15,ZZ Sin clasificar,0,0,0
+BI_GastoPartidaDeControl,0,16,ZZ Sin clasificar,0,2,0
+BI_Identificador,0,2,ZZ Sin clasificar,2,0,1
+BI_Insumo,0,8,ZZ Sin clasificar,2,0,1
+BI_InsumoFC,0,8,ZZ Sin clasificar,0,0,1
+BI_PartidaDeControl,0,22,ZZ Sin clasificar,2,0,1
+BI_Proyecto,0,2,ZZ Sin clasificar,2,0,1
+BI_ProyectoFC,0,7,ZZ Sin clasificar,0,0,1
+BI_ProyectoVectorDP,0,4,ZZ Sin clasificar,0,0,1
+BI_SDP_Calendario,0,15,ZZ Sin clasificar,0,0,1
+BI_SDP_Empresa,0,2,ZZ Sin clasificar,0,0,1
+BI_SDP_Proveedor,0,2,ZZ Sin clasificar,0,0,1
+BI_SDP_Proyecto,0,13,ZZ Sin clasificar,0,0,1
+BI_SDP_RDocumento,0,16,ZZ Sin clasificar,0,0,0
+BI_SDP_Retraso,0,2,ZZ Sin clasificar,0,0,1
+Bono,0,10,ZZ Sin clasificar,0,0,1
+CabeceraPieValorizacion,0,8,ZZ Sin clasificar,0,0,1
+CabeceraReporte,0,11,ZZ Sin clasificar,0,1,1
+CalculoK,0,5,ZZ Sin clasificar,0,2,1
+Calificacion,0,17,ZZ Sin clasificar,0,0,1
+CalificacionCriterio,0,15,ZZ Sin clasificar,1,0,1
+CalificacionCuentaNomina,0,5,ZZ Sin clasificar,0,0,1
+CalificacionEscala,0,15,ZZ Sin clasificar,1,0,1
+CalificacionGYM,0,17,ZZ Sin clasificar,0,0,1
+CambioInmuebleRecursos,0,4,ZZ Sin clasificar,0,0,0
+CambioTitularidad,0,9,ZZ Sin clasificar,0,0,1
+Canal,0,14,ZZ Sin clasificar,0,0,1
+CapacidadPropuesta,0,4,ZZ Sin clasificar,0,0,1
+CarpetaPersonal,0,14,ZZ Sin clasificar,1,0,1
+CarreterasProvias,0,5,ZZ Sin clasificar,0,0,1
+Casilla,0,13,ZZ Sin clasificar,1,1,1
+CasillaTemporal,0,10,ZZ Sin clasificar,0,0,1
+CasillaTemporalDetalle,0,2,ZZ Sin clasificar,0,0,1
+CategoriaTipoDocumento,0,11,ZZ Sin clasificar,1,0,1
+CentralizacionUsuarios,0,7,ZZ Sin clasificar,0,0,1
+CertificadoAcceso,0,13,ZZ Sin clasificar,0,0,1
+Chat,0,6,ZZ Sin clasificar,0,0,0
+ComparativoContabilidadRO,0,10,ZZ Sin clasificar,0,0,1
+ComponenteCAD,0,13,ZZ Sin clasificar,0,0,1
+ConsolidadoValorizacion,0,16,ZZ Sin clasificar,0,0,1
+Contacto,0,16,ZZ Sin clasificar,0,2,1
+ControlCambioActividad,0,12,ZZ Sin clasificar,0,7,1
+Corporacion,0,5,ZZ Sin clasificar,0,0,1
+CorporacionAplicacion,0,12,ZZ Sin clasificar,0,0,1
+CorporacionAplicacionAuditoria,0,9,ZZ Sin clasificar,0,0,1
+CorporacionDetalle,0,5,ZZ Sin clasificar,0,0,1
+CorporacionProyecto,0,13,ZZ Sin clasificar,0,0,1
+CorporacionProyectoNube,0,9,ZZ Sin clasificar,0,0,1
+CorreoMasivoReg,0,5,ZZ Sin clasificar,0,0,1
+Costos2KUser,0,4,ZZ Sin clasificar,0,0,0
+CriterioHorasExtras,0,5,ZZ Sin clasificar,4,1,1
+CriterioHorasExtrasDetalle,0,6,ZZ Sin clasificar,0,2,1
+Cubo,0,7,ZZ Sin clasificar,0,0,1
+CuboCampo,0,7,ZZ Sin clasificar,0,0,1
+CuboUsuario,0,7,ZZ Sin clasificar,0,0,1
+CuestionarioCriterio,0,22,ZZ Sin clasificar,2,1,1
+CuestionarioCriterioCalificacion,0,16,ZZ Sin clasificar,2,1,1
+CuestionarioEvaluacion,0,14,ZZ Sin clasificar,2,0,1
+CuestionarioEvaluacionDetalle,0,6,ZZ Sin clasificar,0,2,1
+Cupones,0,28,ZZ Sin clasificar,0,0,1
+CuponesDestinatariosAlertas,0,6,ZZ Sin clasificar,0,0,1
+DatoDynamics,0,17,ZZ Sin clasificar,0,0,1
+DatoDynamicsProgramacion,0,108,ZZ Sin clasificar,0,0,1
+DeclaracionDeterminativa,0,15,ZZ Sin clasificar,0,0,1
+DestinoEspecifico,0,22,ZZ Sin clasificar,8,1,1
+DestinoEspecificoGeneral,0,14,ZZ Sin clasificar,0,0,1
+DestinoEspecificoMatriz,0,17,ZZ Sin clasificar,0,0,1
+DestinoEspecificoProyectoEtiqueta,0,3,ZZ Sin clasificar,3,4,1
+DestinoEspecificoProyectoEtiquetaAccion,0,4,ZZ Sin clasificar,0,5,1
+DiaNoLaborable,0,8,ZZ Sin clasificar,0,2,1
+DiagramaCambio,0,14,ZZ Sin clasificar,0,0,1
+Division,0,14,ZZ Sin clasificar,1,0,1
+DocPorPagarEmpresaRobot,0,3,ZZ Sin clasificar,0,0,1
+EntregaInmueble,0,12,ZZ Sin clasificar,0,0,1
+EntregaInmuebleRecursos,0,9,ZZ Sin clasificar,0,0,0
+EnvioMateriales,0,8,ZZ Sin clasificar,1,2,1
+EnvioMaterialesDetalle,0,4,ZZ Sin clasificar,0,2,1
+EnvioPedido,0,3,ZZ Sin clasificar,0,1,1
+Envios,0,7,ZZ Sin clasificar,0,0,1
+EquivalenciaInsumoS10Costos,0,7,ZZ Sin clasificar,0,1,1
+ErrorDeImportacion,0,10,ZZ Sin clasificar,0,0,0
+Etiqueta,0,28,ZZ Sin clasificar,2,0,1
+EvaluacionCaracteristicaObservacion,0,17,ZZ Sin clasificar,0,0,1
+EvaluacionCaracteristicaObservacionEliminacion,0,4,ZZ Sin clasificar,0,0,1
+EvaluacionCaracteristicaObservacionHistory,0,6,ZZ Sin clasificar,0,0,1
+EvaluacionCaracteristicaValorDinamica,0,9,ZZ Sin clasificar,1,1,1
+EvaluacionCaracteristicaValorDinamicaDetalle,0,11,ZZ Sin clasificar,0,3,1
+FactorDeReajuste,0,12,ZZ Sin clasificar,0,0,1
+Fase,0,10,ZZ Sin clasificar,1,0,1
+Fecha,0,12,ZZ Sin clasificar,1,0,1
+FileStorage,0,9,ZZ Sin clasificar,0,0,1
+Filtrado,0,14,ZZ Sin clasificar,0,0,1
+Flujo,0,10,ZZ Sin clasificar,2,1,1
+FlujoCajaDocumento,0,534,ZZ Sin clasificar,0,0,0
+FlujoCajaDocumentoRecurso,0,136,ZZ Sin clasificar,0,0,0
+FlujoEconomico,0,11,ZZ Sin clasificar,0,0,1
+FlujoTrabajo,0,23,ZZ Sin clasificar,2,5,1
+FlujoTrabajoCarpetaPersonal,0,6,ZZ Sin clasificar,0,2,1
+FlujoTrabajoIdentificador,0,20,ZZ Sin clasificar,0,1,1
+FlujoTrabajoPredeterminado,0,11,ZZ Sin clasificar,1,1,1
+FormaDeFacturacion,0,14,ZZ Sin clasificar,0,0,1
+FormaDePagoValorizacion,0,8,ZZ Sin clasificar,0,1,1
+FrecuenciaPago,0,11,ZZ Sin clasificar,0,0,1
+FuncionEPP,0,15,ZZ Sin clasificar,1,0,1
+FuncionEPPDetalle,0,9,ZZ Sin clasificar,0,2,1
+GastoEquipo,0,4,ZZ Sin clasificar,0,0,1
+GastoEquipoDetalle,0,6,ZZ Sin clasificar,0,0,1
+GastoPresupuesto,0,3,ZZ Sin clasificar,0,2,1
+GastoPresupuestoDetalle,0,10,ZZ Sin clasificar,0,1,1
+Gaveta,0,12,ZZ Sin clasificar,0,0,1
+GrillaBarra,0,5,ZZ Sin clasificar,0,0,1
+HISTORIAL,0,8,ZZ Sin clasificar,0,0,0
+HistorialSatelite,0,10,ZZ Sin clasificar,0,0,1
+Inconsistencias,0,11,ZZ Sin clasificar,0,0,1
+InconsistenciasContabilidad,0,10,ZZ Sin clasificar,0,0,1
+KeyDisk,0,15,ZZ Sin clasificar,0,0,1
+KeyDiskLicencia,0,7,ZZ Sin clasificar,0,0,0
+KeyDiskRecurso,0,12,ZZ Sin clasificar,0,0,0
+Keylok,0,28,ZZ Sin clasificar,0,0,1
+KeylokAlquiler,0,3,ZZ Sin clasificar,0,0,1
+KeylokRecurso,0,19,ZZ Sin clasificar,2,0,1
+KeylokRecursoFacturas,0,5,ZZ Sin clasificar,0,2,1
+Lectora,0,15,ZZ Sin clasificar,0,1,1
+LineaBalanceCarpeta,0,5,ZZ Sin clasificar,0,0,1
+LineaBalanceConfiguracion,0,17,ZZ Sin clasificar,0,0,1
+LinkBaseNubeApp,0,4,ZZ Sin clasificar,0,0,1
+LugarDeEnvioReglas,0,4,ZZ Sin clasificar,0,0,1
+Marca,0,14,ZZ Sin clasificar,1,0,1
+MatrizConceptoValor,0,12,ZZ Sin clasificar,0,3,1
+MatrizConceptoValorHistorico,0,10,ZZ Sin clasificar,0,3,1
+Mensaje,0,11,ZZ Sin clasificar,0,0,1
+MensajeArchivoBinario,0,3,ZZ Sin clasificar,0,0,1
+MensajeAuditoria,0,5,ZZ Sin clasificar,0,0,1
+MensajePaquetesEnvio,0,2,ZZ Sin clasificar,0,0,0
+Mes,0,2,ZZ Sin clasificar,1,0,1
+Modalidad,0,12,ZZ Sin clasificar,1,0,1
+Modelo,0,16,ZZ Sin clasificar,0,2,1
+ModeloCarga,0,9,ZZ Sin clasificar,0,0,1
+OptimizedViewColumns,0,6,ZZ Sin clasificar,0,0,0
+OptimizedViewJoins,0,18,ZZ Sin clasificar,0,0,0
+OptimizedViewJoins_ConditionColumns,0,9,ZZ Sin clasificar,0,0,0
+OptimizedViewJoins_Query,0,7,ZZ Sin clasificar,0,0,0
+OptimizedViewJoins_QueryColumns,0,7,ZZ Sin clasificar,0,0,0
+OptimizedViews,0,11,ZZ Sin clasificar,0,0,0
+OrganizacionRol,0,15,ZZ Sin clasificar,1,0,1
+OrganizacionUnidadOperativa,0,16,ZZ Sin clasificar,2,0,1
+Paquete,0,14,ZZ Sin clasificar,3,3,1
+PaqueteDocumento,0,2,ZZ Sin clasificar,0,2,1
+PaqueteDocumentoOrganizadorUsuario,0,3,ZZ Sin clasificar,0,0,1
+PaqueteRegistro,0,10,ZZ Sin clasificar,2,3,1
+PaqueteRegistroDetalle,0,2,ZZ Sin clasificar,0,2,1
+PaqueteRegistroOrganizadorUsuario,0,3,ZZ Sin clasificar,0,3,1
+Paso,0,10,ZZ Sin clasificar,4,2,1
+PasoAccion,0,4,ZZ Sin clasificar,0,3,1
+PasoInstruccion,0,3,ZZ Sin clasificar,0,3,1
+PieSubpresupuestoAnalisis,0,8,ZZ Sin clasificar,0,0,1
+PortalEmpleadoEnvio,0,29,ZZ Sin clasificar,0,0,1
+PortalProveedorEnvio,0,16,ZZ Sin clasificar,0,0,1
+Precalificacion,0,12,ZZ Sin clasificar,1,0,1
+PrincipalLogAsync,0,3,ZZ Sin clasificar,0,0,0
+Proceso,0,3,ZZ Sin clasificar,0,0,0
+Producto,0,6,ZZ Sin clasificar,0,0,1
+ProductoRecurso,0,3,ZZ Sin clasificar,0,0,1
+ProtocoloDetalleEstadoCalidad,0,7,ZZ Sin clasificar,0,0,1
+ProyeccionPC,0,14,ZZ Sin clasificar,0,0,1
+ProyeccionPCResultadoPeriodo,0,6,ZZ Sin clasificar,0,0,1
+ProyeccionPartidaDeControlRecursoControl,0,9,ZZ Sin clasificar,0,0,1
+ProyeccionPartidaDeControlRecursoControlPeriodo,0,22,ZZ Sin clasificar,0,0,1
+ProyeccionRC,0,17,ZZ Sin clasificar,0,0,1
+ProyeccionResultado,0,33,ZZ Sin clasificar,0,0,1
+ProyeccionSaldo,0,5,ZZ Sin clasificar,0,2,1
+PublicacionIndiceUnificado,0,10,ZZ Sin clasificar,2,0,1
+PublicacionIndiceUnificadoDetalle,0,16,ZZ Sin clasificar,0,3,1
+ReajustePeriodo,0,7,ZZ Sin clasificar,0,2,1
+ReajustePeriodoProgramado,0,6,ZZ Sin clasificar,0,4,1
+Reajustes,0,28,ZZ Sin clasificar,0,4,1
+RealGyM,0,15,ZZ Sin clasificar,0,6,1
+RecosteoEmpresaRobot,0,3,ZZ Sin clasificar,0,0,1
+RecosteoIgvEmpresaRobot,0,3,ZZ Sin clasificar,0,0,1
+ReglaIndicadorGestion,0,15,ZZ Sin clasificar,1,0,1
+Reparto,0,8,ZZ Sin clasificar,1,5,1
+RepartoDetalle,0,9,ZZ Sin clasificar,0,5,1
+RepartoSubpartida,0,24,ZZ Sin clasificar,0,0,0
+RepartoUtilidad,0,16,ZZ Sin clasificar,1,0,1
+RepartoUtilidadConfiguracionConcepto,0,10,ZZ Sin clasificar,0,3,1
+RepartoUtilidadDetalle,0,16,ZZ Sin clasificar,0,0,1
+RepartoUtilidadEsquemaPlanilla,0,5,ZZ Sin clasificar,0,2,1
+ReplicacionEmpresa,0,3,ZZ Sin clasificar,0,0,0
+Reserva,0,7,ZZ Sin clasificar,0,0,1
+ResultaOperProyectoRobot,0,3,ZZ Sin clasificar,0,0,1
+ResultadoCategoria,0,17,ZZ Sin clasificar,0,0,1
+ResultadoCategoriaPresupuesto,0,4,ZZ Sin clasificar,0,0,1
+ResultadoCategoriaPresupuestoRecurso,0,4,ZZ Sin clasificar,0,0,1
+ResultadoCategoriaRecurso,0,17,ZZ Sin clasificar,0,0,1
+ResultadoGestion,0,13,ZZ Sin clasificar,0,1,1
+ResultadoGestionEstructura,0,13,ZZ Sin clasificar,0,0,1
+ResultadoGestionGeneral,0,13,ZZ Sin clasificar,0,0,1
+ResultadoOperativoPeriodoActividad,0,53,ZZ Sin clasificar,0,0,1
+ResultadoOperativoPeriodoProyecto,0,48,ZZ Sin clasificar,0,0,1
+ResultadoOperativoPeriodoProyectoRecurso,0,52,ZZ Sin clasificar,0,0,1
+ResultadoOperativoProyeccion,0,25,ZZ Sin clasificar,0,0,1
+ResultadoOperativoRecursoSubcontrato,0,7,ZZ Sin clasificar,0,0,1
+ResultadoOperativoTipoGrupo,0,83,ZZ Sin clasificar,0,0,1
+ResultadoOperativoTipoPresupuesto,0,12,ZZ Sin clasificar,0,0,1
+ResultadoOperativoTipoProyecto,0,95,ZZ Sin clasificar,0,0,1
+ResultadoOperativoTipoRecurso,0,96,ZZ Sin clasificar,0,0,1
+ResultadoOperativoTipoRecursoPresupuesto,0,13,ZZ Sin clasificar,0,0,1
+ResultadoVentaProyecto,0,54,ZZ Sin clasificar,0,0,1
+ResumenCostoPlanilla,0,9,ZZ Sin clasificar,0,0,1
+ResumenDestinoEspecificoParte,0,6,ZZ Sin clasificar,0,0,1
+ResumenEquiposReporte,0,7,ZZ Sin clasificar,0,0,1
+ResumenInterferenciaParteEquipo,0,4,ZZ Sin clasificar,0,1,1
+ResumenMaterialesReporte,0,6,ZZ Sin clasificar,0,0,1
+ResumenObrerosReporte,0,9,ZZ Sin clasificar,0,0,1
+ResumenPeriodoInsumoCronograma,0,22,ZZ Sin clasificar,0,5,1
+ResumenSubcontratosReporte,0,5,ZZ Sin clasificar,0,0,1
+Rubro,0,15,ZZ Sin clasificar,0,0,1
+RubroInsumo,0,4,ZZ Sin clasificar,0,0,1
+RubroRecurso,0,2,ZZ Sin clasificar,0,0,1
+Ruta,0,4,ZZ Sin clasificar,1,0,1
+RutaUsuario,0,4,ZZ Sin clasificar,0,2,1
+S10Robot_LibroDiario,0,33,ZZ Sin clasificar,0,0,1
+S10Robot_LibroDiario_Periodo,0,4,ZZ Sin clasificar,0,0,1
+SeguridadOpciones,0,7,ZZ Sin clasificar,0,0,1
+Servicio,0,1,ZZ Sin clasificar,0,0,0
+ServicioSignalRAgente,0,3,ZZ Sin clasificar,0,0,1
+ServicioSignalr,0,1,ZZ Sin clasificar,0,0,0
+ServicioTransporteEnvio,0,15,ZZ Sin clasificar,0,0,1
+ServicioTransporteSincronizacion,0,15,ZZ Sin clasificar,0,0,1
+SistemaLicitacion,0,13,ZZ Sin clasificar,0,0,1
+SistemaRetencionPension,0,8,ZZ Sin clasificar,0,0,0
+SubActividadCronograma,0,56,ZZ Sin clasificar,12,2,1
+SubActividadCronogramaCambio,0,40,ZZ Sin clasificar,0,0,1
+SubActividadCronogramaEtiqueta,0,5,ZZ Sin clasificar,0,6,1
+SubActividadCronogramaEtiquetaCambio,0,6,ZZ Sin clasificar,0,0,1
+SubActividadCronogramaPeriodoEtiqueta,0,6,ZZ Sin clasificar,0,0,1
+SubActividadCronogramaTareaHistorial,0,9,ZZ Sin clasificar,0,0,1
+SubactividadCronogramaCI,0,7,ZZ Sin clasificar,0,1,1
+SubactividadCronogramaCumplimiento,0,39,ZZ Sin clasificar,0,0,1
+SubactividadCronogramaTareaEstadoCalidad,0,7,ZZ Sin clasificar,0,0,1
+SubordinacionEQ,0,18,ZZ Sin clasificar,4,2,1
+SubordinacionEQDetalle,0,3,ZZ Sin clasificar,0,4,1
+SubordinacionMO,0,34,ZZ Sin clasificar,10,2,1
+SubordinacionMODetalle,0,5,ZZ Sin clasificar,0,4,1
+SubordinacionSC,0,13,ZZ Sin clasificar,2,1,1
+SubordinacionSCDetalle,0,3,ZZ Sin clasificar,0,3,1
+SubpartidaDistribucion,0,14,ZZ Sin clasificar,0,2,1
+SubpartidaDistribucionDetalle,0,13,ZZ Sin clasificar,0,0,1
+SubpartidaInsumoPeriodo,0,13,ZZ Sin clasificar,0,1,1
+SubproyectoActividad,0,6,ZZ Sin clasificar,0,6,1
+SubproyectoPartida,0,11,ZZ Sin clasificar,0,5,1
+Sunat,0,4,ZZ Sin clasificar,0,0,0
+Support,0,3,ZZ Sin clasificar,0,0,0
+Talonario,0,26,ZZ Sin clasificar,5,3,1
+TalonarioDetalle,0,9,ZZ Sin clasificar,0,1,1
+TalonarioDocumento,0,3,ZZ Sin clasificar,0,2,1
+TalonarioProyecto,0,3,ZZ Sin clasificar,0,2,1
+TalonarioUsuario,0,6,ZZ Sin clasificar,0,2,1
+TechoIncremento,0,20,ZZ Sin clasificar,0,0,1
+TechoIncrementoHistoria,0,7,ZZ Sin clasificar,0,0,1
+TechoIncrementoProcesado,0,2,ZZ Sin clasificar,0,0,1
+TechoLibre,0,5,ZZ Sin clasificar,0,0,1
+Terminal,0,20,ZZ Sin clasificar,1,0,1
+TopfilterAndGraphTable,0,40,ZZ Sin clasificar,0,0,1
+Trace_Configuration,0,3,ZZ Sin clasificar,0,0,1
+Trace_Procesos,0,15,ZZ Sin clasificar,0,0,1
+TramosProvias,0,9,ZZ Sin clasificar,0,0,1
+VectorCaracteristica,0,17,ZZ Sin clasificar,0,0,1
+VectorEspecificacion,0,21,ZZ Sin clasificar,0,0,1
+VinculoMedicionManual,0,10,ZZ Sin clasificar,0,0,1
+XPDeletedObject,0,3,ZZ Sin clasificar,0,0,0
+XPOVersion,0,1,ZZ Sin clasificar,0,0,0
+XPObjectType,0,4,ZZ Sin clasificar,0,0,1
+dtEsquema_7777777,0,9,ZZ Sin clasificar,0,0,0
+dtproperties,0,7,ZZ Sin clasificar,0,0,1
+vMarcaciones,0,7,ZZ Sin clasificar,0,0,1
+vMarcacionesControl,0,4,ZZ Sin clasificar,0,0,1

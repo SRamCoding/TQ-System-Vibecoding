@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Oportunidad · Competidores</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="oportunidades" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:20px 28px 44px;display:flex;flex-direction:column;gap:14px">
+<nav aria-label="Ruta" style="font-size:12.5px;color:#5E6A66"><a href="Oportunidades.dc.html" style="color:#5E6A66">Oportunidades</a> › Videovigilancia · Muni. de Pimentel › Competidores</nav>
+<section style="background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;overflow:hidden">
+<dc-import name="CabOportunidad" tab="competidores" hint-size="100%,300px"></dc-import>
+<div style="padding:20px 18px 26px;display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+
+<section style="flex:2 1 520px;min-width:0">
+<div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
+<h2 style="margin:0;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Quién compite</h2>
+<button type="button" style="font:inherit;font-size:13.5px;font-weight:500;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;cursor:pointer">Agregar competidor</button>
+</div>
+<div style="overflow-x:auto;border:1px solid #E8E6DE;border-radius:10px">
+<table style="width:100%;border-collapse:collapse;min-width:520px;font-size:13.5px">
+<thead>
+<tr style="background:#F8F7F2;text-align:left">
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Competidor</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66;text-align:right">Precio estimado (S/)</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Ganador</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top:1px solid #E8E6DE"><td style="padding:12px 14px;font-weight:500">Seguridad Norte S.A.C.</td><td style="padding:12px 14px;text-align:right;color:#5E6A66">—</td><td style="padding:12px 14px;color:#5E6A66">Se marca al cerrar</td></tr>
+<tr style="border-top:1px solid #E8E6DE"><td style="padding:12px 14px;font-weight:500">Andes Tech E.I.R.L.</td><td style="padding:12px 14px;text-align:right;color:#5E6A66">—</td><td style="padding:12px 14px;color:#5E6A66">Se marca al cerrar</td></tr>
+</tbody>
+</table>
+</div>
+<p style="margin:10px 0 0;font-size:13px;color:#5E6A66">El precio estimado es opcional: se llena si se conoce. Cada competidor es una organización del mismo registro único de personas y empresas.</p>
+<div style="margin-top:16px;border:1px solid #E8E6DE;border-radius:10px;padding:16px 18px;background:#FFFFFF;display:flex;flex-direction:column;gap:14px">
+<h3 style="margin:0;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Agregar competidor</h3>
+<div style="display:flex;flex-wrap:wrap;gap:14px">
+<label style="flex:2 1 260px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Competidor
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Buscar una organización del registro único</option></select>
+</label>
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Precio estimado (S/) <span style="font-weight:400;color:#5E6A66">· opcional</span>
+<input type="text" placeholder="0.00" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+</div>
+<div><button type="button" style="font:inherit;font-size:13.5px;font-weight:600;min-height:44px;padding:0 18px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;cursor:pointer">Guardar competidor</button></div>
+</div>
+</section>
+
+<aside style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:12px">
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Antecedentes</div>
+<p style="margin:8px 0 0;font-size:13.5px;color:#5E6A66">[Convocatorias anteriores de Muni. de Pimentel en las que participaron estos competidores]</p>
+</section>
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Para qué sirve</div>
+<p style="margin:8px 0 0;font-size:13.5px">Marcar al ganador al cerrar convierte el CRM en inteligencia comercial: tras unas veinte oportunidades se sabe contra quién se pierde y a qué precio.</p>
+</section>
+</aside>
+
+</div>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

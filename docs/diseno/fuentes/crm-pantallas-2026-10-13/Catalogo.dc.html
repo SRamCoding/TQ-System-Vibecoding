@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Catálogo comercial</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="catalogo" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:24px 28px 44px;display:flex;flex-direction:column;gap:16px">
+
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+<h1 style="margin:0;font-size:22px;font-weight:600">Catálogo comercial</h1>
+<span style="flex:1"></span>
+<button type="button" style="font:inherit;font-size:13.5px;font-weight:600;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;cursor:pointer">Nuevo ítem</button>
+</div>
+
+<nav aria-label="Vistas del catálogo" style="display:flex;overflow-x:auto;border-bottom:1px solid #E8E6DE">
+<a href="Catalogo.dc.html" aria-current="page" style="padding:0 14px;min-height:44px;display:flex;align-items:center;font-size:13.5px;font-weight:600;white-space:nowrap;color:#0F6E56;text-decoration:none;border-bottom:2px solid #0F6E56">Activos</a>
+<a href="#" style="padding:0 14px;min-height:44px;display:flex;align-items:center;gap:6px;font-size:13.5px;white-space:nowrap;color:#5E6A66;text-decoration:none;border-bottom:2px solid transparent">Sin precio vigente <span style="padding:0 8px;border-radius:10px;background:#FFF1D6;color:#7A4A00;font-weight:600;font-size:12px">6</span></a>
+<a href="#" style="padding:0 14px;min-height:44px;display:flex;align-items:center;gap:6px;font-size:13.5px;white-space:nowrap;color:#5E6A66;text-decoration:none;border-bottom:2px solid transparent">Sin código del Estado <span style="padding:0 8px;border-radius:10px;background:#FFF1D6;color:#7A4A00;font-weight:600;font-size:12px">14</span></a>
+<a href="#" style="padding:0 14px;min-height:44px;display:flex;align-items:center;gap:6px;font-size:13.5px;white-space:nowrap;color:#5E6A66;text-decoration:none;border-bottom:2px solid transparent">Por catalogar <span style="padding:0 8px;border-radius:10px;background:#E4EEF9;color:#1D5FA5;font-weight:600;font-size:12px">3</span></a>
+<a href="#" style="padding:0 14px;min-height:44px;display:flex;align-items:center;font-size:13.5px;white-space:nowrap;color:#5E6A66;text-decoration:none;border-bottom:2px solid transparent">Descontinuados</a>
+</nav>
+
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+
+<aside style="flex:0 0 200px">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600;margin-bottom:8px">Familias</div>
+<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px">
+<li><a href="#" style="display:flex;align-items:center;min-height:44px;padding:0 10px;border-radius:8px;color:#1E2B28;text-decoration:none;font-weight:600">▾ Videovigilancia</a>
+<ul style="margin:0;padding:0 0 0 20px;list-style:none">
+<li><a href="#" style="display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:0 10px;border-radius:8px;background:#E1F5EE;color:#0B5A47;text-decoration:none;font-weight:600">Cámaras <span style="font-weight:400;font-size:13px">42</span></a></li>
+<li><a href="#" style="display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:0 10px;border-radius:8px;color:#1E2B28;text-decoration:none">Grabadores <span style="color:#5E6A66;font-size:13px">12</span></a></li>
+</ul></li>
+<li><a href="#" style="display:flex;align-items:center;min-height:44px;padding:0 10px;border-radius:8px;color:#1E2B28;text-decoration:none">▸ Redes</a></li>
+<li><a href="#" style="display:flex;align-items:center;min-height:44px;padding:0 10px;border-radius:8px;color:#1E2B28;text-decoration:none">▸ Cómputo</a></li>
+<li><a href="#" style="display:flex;align-items:center;min-height:44px;padding:0 10px;border-radius:8px;color:#1E2B28;text-decoration:none">▸ Servicios</a></li>
+</ul>
+</aside>
+
+<section style="flex:1 1 480px;min-width:0">
+<div style="overflow-x:auto;border:1px solid #E8E6DE;border-radius:10px;background:#FFFFFF">
+<table style="width:100%;border-collapse:collapse;min-width:620px;font-size:13.5px">
+<thead>
+<tr style="background:#F8F7F2;text-align:left">
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Código</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Descripción</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Und.</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66;text-align:right">Precio (S/)</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66;text-align:right">Margen obj.</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Cód. Estado</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top:1px solid #E8E6DE;background:#F2FAF6">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">CAM-D4M</td>
+<td style="padding:12px 14px">Cámara IP domo 4MP</td>
+<td style="padding:12px 14px">UND</td>
+<td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">1 180.00</td>
+<td style="padding:12px 14px;text-align:right">28 %</td>
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px">46171610</td>
+</tr>
+<tr style="border-top:1px solid #E8E6DE">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">CAM-B8M</td>
+<td style="padding:12px 14px">Cámara IP bullet 8MP</td>
+<td style="padding:12px 14px">UND</td>
+<td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">1 640.00</td>
+<td style="padding:12px 14px;text-align:right">26 %</td>
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px">46171610</td>
+</tr>
+<tr style="border-top:1px solid #E8E6DE">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">CAM-PTZ2</td>
+<td style="padding:12px 14px">Cámara PTZ 2MP 25x</td>
+<td style="padding:12px 14px">UND</td>
+<td style="padding:12px 14px;text-align:right"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#FFF1D6;color:#7A4A00">Sin precio</span></td>
+<td style="padding:12px 14px;text-align:right;color:#5E6A66">—</td>
+<td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#FCEBE8;color:#A4261E">Falta</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p style="margin:10px 0 0;font-size:13px;color:#5E6A66">Es el mismo catálogo que usan compras y almacén en el ERP: un solo maestro. Si el CRM y el ERP tuvieran cada uno su lista, en seis meses no se hablarían.</p>
+</section>
+
+<aside style="flex:0 0 280px;display:flex;flex-direction:column;gap:12px">
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Ítem</div>
+<div style="font-weight:600;margin-top:4px">Cámara IP domo 4MP</div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:#5E6A66">CAM-D4M</div>
+</section>
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Precios · no se sobrescriben</div>
+<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px;font-size:13.5px">
+<div style="display:flex;justify-content:space-between;gap:8px"><span>Lista general 2026 · 1 jul 2026</span><span style="padding:2px 10px;border-radius:10px;background:#DDF3E6;color:#0B5A32;font-weight:600;font-size:12px">Vigente</span></div>
+<div style="display:flex;justify-content:space-between;gap:8px"><span>Lista general 2026 · 1 ene 2026</span><span style="padding:2px 10px;border-radius:10px;background:#EEEDE6;color:#4A5551;font-weight:600;font-size:12px">Histórico</span></div>
+</div>
+</section>
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Dónde se usa</div>
+<div style="margin-top:6px;font-size:13.5px">14 cotizaciones en 6 meses<br>Stock: 30 en Central · 10 asignados</div>
+</section>
+</aside>
+
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

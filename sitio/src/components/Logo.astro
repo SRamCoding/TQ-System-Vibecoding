@@ -1,0 +1,28 @@
+---
+// La T de Techquk, con las mismas piezas que el logo de la aplicación (Nucleo\Saludo\LogoTechquk::PIEZAS).
+// La pieza blanca lleva un borde fino en modo claro: sobre fondo claro no se vería.
+interface Props {
+  etiqueta?: string;
+}
+const { etiqueta } = Astro.props;
+---
+<svg class="logo-t" viewBox="0 0 122 119" role={etiqueta ? 'img' : undefined} aria-label={etiqueta} aria-hidden={etiqueta ? undefined : 'true'}>
+  <polygon points="2,2 40,2 40,40 2,40" fill="#00DAFF" />
+  <polygon points="80,2 120,2 120,40 42,40" fill="#7C6EFF" />
+  <polygon class="logo-blanca" points="40,41 80,81 80,117 40,117" fill="#FFFFFF" />
+</svg>
+
+<style>
+  .logo-blanca {
+    stroke: color-mix(in srgb, var(--marco) 45%, transparent);
+    stroke-width: 2;
+  }
+  :global(:root[data-theme='dark']) .logo-blanca {
+    stroke: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .logo-blanca {
+      stroke: none;
+    }
+  }
+</style>

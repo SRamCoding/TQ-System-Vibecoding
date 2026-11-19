@@ -1,0 +1,112 @@
+# Menú del sitio de documentación: secciones y el orden de sus documentos.
+# Una entrada es «Título: ruta/dentro/de/docs.md» o solo la ruta (el título sale del # del documento).
+# Un documento que no está aquí igual se publica y aparece en el índice de su carpeta.
+  - Cómo se organiza docs/: README.md
+  - Análisis de sistemas:
+      - analisis/README.md
+      - La historia: analisis/historia.md
+      - Cómo se versiona: analisis/versionado.md
+      - CRM: analisis/bloques/crm.md
+      - Pantallas del CRM: analisis/bloques/crm-pantallas.md
+      - ERP: analisis/bloques/erp.md
+      - Común y frontera: analisis/bloques/comun.md
+      - Validaciones: analisis/validaciones.md
+      - Registro de cambios: analisis/cambios.md
+      - Archivo · agosto 2026:
+          - analisis/archivo/2026-08-24-analisis-funcional/README.md
+          - Cómo funciona la empresa: analisis/archivo/2026-08-24-analisis-funcional/Techquk_Como_Funciona_la_Empresa.md
+          - Metodología y resultados:
+              - "00 — Resumen ejecutivo y guía de lectura": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/00-Resumen-Ejecutivo-y-Guia.md
+              - "01 — Plan de construcción del ERP y el CRM": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/01-Plan-ERP-CRM.md
+              - "02 — Catálogo de proyectos de Techquk y descomposición en procesos": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/02-Proyectos-y-Procesos.md
+              - "02-A · Anexo — Flujogramas de los procesos de Recursos Humanos": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/02A-Anexo-Flujogramas-RRHH.md
+              - "02-A — Procesos de Recursos Humanos": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/02A-Procesos-Recursos-Humanos.md
+              - "03 — Organigrama propuesto, catálogo de roles y casos de uso": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/03-Organigrama-Propuesto.md
+              - "04 — Formulario de Levantamiento Organizacional y Funcional": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/04-Formulario-Levantamiento.md
+              - "04-A — Método del levantamiento": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/04A-Metodo-de-Levantamiento.md
+              - "05 — Plan de construcción técnica": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/05-Plan-Construccion-Tecnica.md
+              - "06 — Arquitectura del núcleo de datos": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/06-Arquitectura-Nucleo-Datos.md
+              - "06-A — Cómo está estructurado el sistema, explicado": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/06A-Arquitectura-Explicada.md
+              - "07 — Modelo conceptual completo": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/07-Modelo-Conceptual-Completo.md
+              - "08 — Detalle de columnas y funcionamiento": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/08-Detalle-Columnas-y-Funcionamiento.md
+              - "09-A — Procesos operativos de S10, reconstruidos desde la base de datos": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/09A-Procesos-S10-Actuales.md
+              - "09-B — Procesos propuestos para el ERP/CRM de Techquk": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/09B-Procesos-Propuestos-Techquk.md
+              - "10 — Sistema de módulos, procesos y paneles": analisis/archivo/2026-08-24-analisis-funcional/metodologia-y-resultados/10-Sistema-Modulos-Procesos-Paneles.md
+          - Análisis de S10:
+              - "ERP S10 — primeros resultados": analisis/archivo/2026-08-24-analisis-funcional/s10/S10_firstSteps.md
+              - "Arquitectura de la base de datos S10": analisis/archivo/2026-08-24-analisis-funcional/s10/S10_arquitectura_completa.md
+              - "Mapa de relaciones de la base de datos S10": analisis/archivo/2026-08-24-analisis-funcional/s10/S10_mapa_relaciones.md
+  - Decisiones:
+      - Pendientes: decisiones/pendientes.md
+      - 0001 Monolito modular: decisiones/0001-monolito-modular.md
+      - 0002 PostgreSQL: decisiones/0002-postgresql.md
+      - 0003 Empresa única: decisiones/0003-empresa-unica.md
+      - 0004 Servidor propio: decisiones/0004-servidor-propio.md
+      - 0005 Repositorio personal: decisiones/0005-repositorio-personal.md
+      - 0006 Alcance y etapas: decisiones/0006-alcance-y-etapas.md
+      - 0007 API móvil preparada: decisiones/0007-api-movil-preparada.md
+      - 0008 Quién decide: decisiones/0008-quien-decide.md
+      - 0009 Fuentes de verdad: decisiones/0009-fuentes-de-verdad.md
+      - 0010 Migraciones editables: decisiones/0010-migraciones-editables.md
+      - 0011 Traducciones propias: decisiones/0011-traducciones-propias.md
+      - 0012 Tipo de cambio de SUNAT: decisiones/0012-tipo-cambio-automatico-sunat.md
+      - 0013 Catálogos editables: decisiones/0013-catalogos-editables-por-pantalla.md
+      - 0014 Versionado del análisis: decisiones/0014-versionado-del-analisis.md
+      - 0015 Un solo dominio (propuesta): decisiones/0015-un-solo-dominio.md
+  - Diseño funcional:
+      - diseno/README.md
+      - Especificación v4:
+          - diseno/v4/README.md
+          - 0 · Cómo leer: diseno/v4/parte-0-como-leer.md
+          - 1 · Modelo mental: diseno/v4/parte-1-modelo-mental.md
+          - 2 · CRM: diseno/v4/parte-2-crm.md
+          - 3 · Frontera: diseno/v4/parte-3-frontera.md
+          - 4 · Los diez flujos: diseno/v4/parte-4-flujos-erp.md
+          - F01 Contrato a proyecto: diseno/v4/parte-4-flujo-01.md
+          - F02 Necesidad a costo: diseno/v4/parte-4-flujo-02.md
+          - F03 Horas de la gente: diseno/v4/parte-4-flujo-03.md
+          - F04 Conformidad a cobro: diseno/v4/parte-4-flujo-04.md
+          - F05 Dinero que sale: diseno/v4/parte-4-flujo-05.md
+          - F06 Cierre del proyecto: diseno/v4/parte-4-flujo-06.md
+          - F07 Gastos generales: diseno/v4/parte-4-flujo-07.md
+          - F08 Postventa: diseno/v4/parte-4-flujo-08.md
+          - F09 Las personas: diseno/v4/parte-4-flujo-09.md
+          - F10 Obra pública: diseno/v4/parte-4-flujo-10.md
+          - 5 · Interfaz y roles: diseno/v4/parte-5-interfaz-roles.md
+          - 6 · Fichas de documentos: diseno/v4/parte-6-fichas-documentos.md
+          - 7 · Transversal: diseno/v4/parte-7-transversal.md
+          - 8 · Criterios de aceptación: diseno/v4/parte-8-criterios-aceptacion.md
+          - 9 · Construcción y decisiones: diseno/v4/parte-9-construccion-decisiones.md
+      - Fuente · diseño del CRM (13 oct): diseno/fuentes/crm-pantallas-2026-10-13/LEEME.md
+      - Flujograma de gastos: diseno/flujograma-gastos.md
+      - Recorrido central: diseno/Techquk-Flujo-Central.md
+      - Reconciliación con la v4: diseno/00-Reconciliacion-con-v4.md
+      - "Agosto (3.0) · 01 Plan ERP y CRM": diseno/01-Plan-ERP-CRM.md
+      - "Agosto (3.0) · 05 Construcción técnica": diseno/05-Plan-Construccion-Tecnica.md
+      - "Agosto (3.0) · 06 Núcleo de datos": diseno/06-Arquitectura-Nucleo-Datos.md
+      - "Agosto (3.0) · 08 Columnas": diseno/08-Detalle-Columnas-y-Funcionamiento.md
+      - "Agosto (3.0) · 09-B Procesos": diseno/09B-Procesos-Propuestos-Techquk.md
+      - "Agosto (3.0) · 10 Módulos y paneles": diseno/10-Sistema-Modulos-Procesos-Paneles.md
+  - Convenciones:
+      - Base de datos: convenciones/base-de-datos.md
+      - Código: convenciones/codigo.md
+      - IA: convenciones/ia.md
+      - Interfaz: convenciones/interfaz.md
+  - Glosario: glosario.md
+  - Construcción:
+      - Mapa de etapas: planes/mapa-etapas.md
+      - Planes: planes/README.md
+      - "Hecho · versionado del análisis": planes/completados/2026-10-15-analisis-versionado.md
+      - "Hecho · etapa 0": planes/completados/2026-10-etapa-0-base.md
+      - "Hecho · 1.1 auditoría": planes/completados/2026-10-09-nucleo-auditoria-acciones.md
+      - "Hecho · 1.2 catálogos": planes/completados/2026-10-09-nucleo-catalogos-parametros.md
+      - "Hecho · 1.2b edición de catálogos": planes/completados/2026-10-10-nucleo-edicion-catalogos.md
+      - Instalación: setup.md
+  - Operaciones:
+      - operaciones/README.md
+      - Requisitos del servidor: operaciones/requisitos-servidor.md
+      - Despliegue: operaciones/despliegue.md
+      - Respaldos: operaciones/respaldos.md
+      - Restauración: operaciones/restauracion.md
+      - Monitoreo: operaciones/monitoreo.md
+      - Responsabilidades: operaciones/responsabilidades.md

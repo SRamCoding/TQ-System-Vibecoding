@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yair · Obra, personas y almacén</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+
+/* Layout: guía de equipo; índice fijo a la izquierda en escritorio, arriba en el celular; secciones numeradas porque son un orden real de lectura */
+:root {
+  --bg: #f6f7fb; --surface: #ffffff; --fg: #141a2e; --muted: #556079; --line: #dde1ec;
+  --accent: #1b2f8a; --accent-soft: #e7ebfb; --teal: #0d7472; --teal-soft: #dff2f1;
+  --amber: #a85a06; --amber-soft: #fdf1df; --red: #b42318; --red-soft: #fdeceb; --green: #187a3d; --green-soft: #e3f4e8;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.envoltura { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2.5rem; max-width: 72rem; margin: 0 auto;
+  padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.5rem); align-self: start; font-size: 0.9rem; }
+nav.indice b { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+nav.indice ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; counter-reset: i; }
+nav.indice li { counter-increment: i; }
+nav.indice a { display: flex; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 6px; color: var(--fg); text-decoration: none; }
+nav.indice a::before { content: counter(i); font-family: var(--mono); color: var(--muted); min-width: 1.2rem; }
+nav.indice a:hover, nav.indice a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+main { min-width: 0; display: grid; gap: 3rem; }
+header.cabeza { display: grid; gap: 0.75rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
+h1 { font-family: var(--display); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; color: var(--fg); }
+.bajada { color: var(--muted); max-width: 62ch; margin: 0; font-size: 1.05rem; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+h2 { font-size: 1.45rem; margin: 0; display: flex; gap: 0.75rem; align-items: baseline; text-wrap: balance; }
+h2 .n { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); }
+h3 { font-size: 1.05rem; margin: 0.5rem 0 0; }
+p { margin: 0; max-width: 68ch; }
+.caja { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; }
+.nota { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; max-width: 68ch; }
+.nota.ambar { border-color: var(--amber); background: var(--amber-soft); }
+.nota.roja { border-color: var(--red); background: var(--red-soft); }
+.equipo { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.2rem; }
+.persona b { font-size: 1.05rem; }
+.persona span { color: var(--muted); font-size: 0.9rem; }
+
+/* ciclo */
+.ciclo { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; counter-reset: c; list-style: none; padding: 0; margin: 0; }
+.ciclo li { counter-increment: c; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem 0.4rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+.ciclo li::before { content: counter(c); display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: 0.8rem; }
+.ciclo li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 0.4rem; }
+
+/* tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+/* camino de una tarea */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: p; }
+.pasos > li { counter-increment: p; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details[open] { border-color: var(--accent); }
+summary { cursor: pointer; list-style: none; display: flex; gap: 0.75rem; align-items: center; padding: 0.8rem 1rem; font-weight: 600; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: counter(p); display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--mono); font-size: 0.85rem; }
+summary::after { content: "+"; margin-left: auto; color: var(--muted); font-family: var(--mono); }
+details[open] summary::after { content: "−"; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.det { padding: 0 1rem 1rem 3.55rem; display: grid; gap: 0.5rem; }
+.det ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+/* vida de una costura */
+.linea { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+.etapa { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.etapa b { font-size: 0.95rem; }
+.etapa small { font-family: var(--mono); color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* reglas */
+.reglas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; counter-reset: r; }
+.reglas li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem 0.7rem 2.8rem; position: relative; font-size: 0.93rem; }
+.reglas li::before { content: counter(r); position: absolute; left: 0.8rem; top: 0.7rem; font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+/* lista de verificación */
+.check { display: grid; gap: 0.4rem; }
+.check label { display: flex; gap: 0.7rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--green); flex: 0 0 auto; }
+.check label:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.check label:has(input:checked) span { text-decoration: line-through; color: var(--muted); }
+.check-pie { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.check-pie button { font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.check-pie button:hover, .check-pie button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.progreso { font-family: var(--mono); color: var(--green); font-weight: 500; }
+
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+@media (max-width: 860px) {
+  .envoltura { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  nav.indice { position: static; }
+  nav.indice ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .linea { grid-template-columns: minmax(0, 1fr); }
+  .det { padding-left: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.cabeza-persona { display: grid; gap: 0.6rem; border-top: 6px solid var(--c); padding-top: 1rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip { font-family: var(--mono); font-size: 0.8rem; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 0.15rem 0.65rem; }
+.chip.fuerte { background: var(--c); border-color: var(--c); color: var(--surface); }
+.tareas { display: grid; gap: 0.5rem; }
+.tarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.25rem 0.8rem; }
+.tarea input { width: 1.15rem; height: 1.15rem; margin-top: 0.25rem; accent-color: var(--green); grid-row: span 3; }
+.tarea b { font-size: 1rem; }
+.tarea .que { color: var(--muted); font-size: 0.93rem; }
+.tarea .meta { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+.tarea:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.tarea:has(input:checked) b { text-decoration: line-through; color: var(--muted); }
+.avance { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 0.92rem; }
+.avance .num { font-family: var(--mono); color: var(--green); font-weight: 500; }
+.barra-av { flex: 1; min-width: 8rem; height: 0.5rem; border-radius: 999px; background: var(--line); overflow: hidden; }
+.barra-av span { display: block; height: 100%; width: 0; background: var(--green); border-radius: 999px; }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.75rem; }
+.bloque { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.5rem; align-content: start; }
+.bloque h3 { margin: 0; font-size: 0.95rem; }
+.bloque ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; font-size: 0.93rem; }
+.bloque.ofrece { border-top: 4px solid var(--green); }
+.bloque.usa { border-top: 4px solid var(--teal); }
+.cod { font-family: var(--mono); font-size: 0.82rem; background: var(--accent-soft); color: var(--accent); border-radius: 5px; padding: 0.05rem 0.4rem; margin-right: 0.3rem; }
+.conversar { border-left: 4px solid var(--amber); background: var(--amber-soft); border-radius: 0 8px 8px 0; padding: 0.8rem 1rem; display: grid; gap: 0.35rem; max-width: 68ch; }
+.riesgo-p { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; display: grid; gap: 0.25rem; }
+.riesgo-p p { color: var(--muted); font-size: 0.93rem; }
+.escenario-p { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; }
+.modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 0.6rem; }
+.modulo { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem; display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0.8rem; align-items: center; }
+.modulo svg { width: 5.5rem; height: 5.5rem; transform: rotate(0deg); }
+.modulo circle { transition: opacity 0.15s; }
+.modulo svg:hover circle[stroke-dasharray]:not(:hover) { opacity: 0.45; }
+.dona-num { font-family: var(--mono); font-size: 7px; font-weight: 500; fill: var(--fg); }
+.modulo figcaption { display: grid; gap: 0.3rem; min-width: 0; }
+.modulo figcaption b { font-size: 0.98rem; }
+.modulo ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; font-size: 0.86rem; color: var(--muted); }
+.modulo li { display: flex; align-items: center; gap: 0.4rem; }
+.modulo li b { white-space: nowrap; margin-left: auto; font-family: var(--mono); font-size: 0.82rem; color: var(--fg); font-weight: 500; font-variant-numeric: tabular-nums; }
+.pt { width: 0.65rem; height: 0.65rem; border-radius: 3px; flex: 0 0 auto; }
+.compartido { justify-self: start; font-size: 0.72rem; font-weight: 600; color: var(--amber); background: var(--amber-soft); border-radius: 999px; padding: 0.05rem 0.5rem; }
+@media (prefers-reduced-motion: reduce) { .modulo circle { transition: none; } }
+.escenario-p .cifra { font-family: var(--mono); font-size: 1.3rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.limpiar { font: inherit; font-size: 0.88rem; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.3rem 0.75rem; cursor: pointer; } .limpiar:hover, .limpiar:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+
+
+.areas4 { display:grid; grid-template-columns:repeat(auto-fit,minmax(12.5rem,1fr)); gap:0.6rem; }
+.area4 { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.8rem 0.95rem; display:grid; gap:0.25rem; align-content:start; }
+.area4.tuya { border:2px solid var(--accent); background:var(--accent-soft); }
+.area4 b { font-size:0.98rem; } .area4 span { color:var(--muted); font-size:0.88rem; } .area4 .pts { font-family:var(--mono); font-size:0.8rem; color:var(--accent); }
+.flujo { display:flex; flex-wrap:wrap; gap:0.35rem; align-items:center; }
+.fpaso { border:1px solid var(--line); background:var(--surface); border-radius:8px; padding:0.4rem 0.6rem; font-size:0.88rem; }
+.fpaso.tuyo { background:var(--teal-soft); border-color:var(--teal); font-weight:600; }
+.flecha { color:var(--muted); }
+.tarjeta-t { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.9rem 1.05rem; display:grid; gap:0.4rem; }
+.tarjeta-t .num { font-family:var(--mono); font-size:0.8rem; color:var(--accent); }
+.tarjeta-t h3 { margin:0; font-size:1.05rem; }
+.tarjeta-t p { color:var(--fg); font-size:0.95rem; }
+.tarjeta-t .por { color:var(--muted); font-size:0.92rem; }
+.tarjeta-t .hecho { border-left:3px solid var(--green); padding-left:0.6rem; font-size:0.92rem; }
+.pasos-t { counter-reset:p; list-style:none; margin:0; padding:0; display:grid; gap:0.5rem; max-width:70ch; }
+.pasos-t li { counter-increment:p; display:grid; grid-template-columns:2rem minmax(0,1fr); gap:0.6rem; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.7rem 0.9rem; }
+.pasos-t li::before { content:counter(p); font-family:var(--mono); color:var(--accent); font-weight:500; }
+.recibe { display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:0.6rem; }
+.recibe div { background:var(--green-soft); border:1px solid var(--line); border-radius:10px; padding:0.7rem 0.9rem; font-size:0.93rem; }
+dl.glos { display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:0.6rem; margin:0; }
+dl.glos div { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.65rem 0.9rem; }
+dl.glos dt { font-weight:600; } dl.glos dd { margin:0.2rem 0 0; color:var(--muted); font-size:0.92rem; }
+.dedica { display:inline-flex; gap:0.5rem; align-items:center; font-size:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:0.25rem 0.8rem; justify-self:start; }
+@media (max-width: 760px) { .envoltura { grid-template-columns: minmax(0,1fr); } nav.indice { position: static; } }
+
+</style>
+</head>
+<body>
+<div class="envoltura">
+<nav class="indice" aria-label="Índice"><b>Índice</b><ol><li><a href="#frase">Tu trabajo en una frase</a></li><li><a href="#contexto">El contexto</a></li><li><a href="#recibe">Lo que recibes hecho</a></li><li><a href="#construyes">Lo que construyes</a></li><li><a href="#costuras">Con quién te hablas</a></li><li><a href="#vale">Cómo se sabe que vale</a></li><li><a href="#como">Cómo trabajas cada tarea</a></li><li><a href="#reglas">Reglas que no se negocian</a></li><li><a href="#riesgos">Riesgos y preguntas</a></li><li><a href="#palabras">Las palabras de tu área</a></li></ol></nav>
+<main>
+<header class="cabeza">
+  <span class="eyebrow">Guía de la etapa 2 · Área 4 · Obra, personas y almacén</span>
+  <h1>Yair · Obra, personas y almacén</h1>
+  <p class="bajada">Lo que te toca en la etapa 2: el proyecto en obra, la gente que trabaja en él, sus horas, el almacén que la abastece y lo que se le cobra al cliente.</p>
+  <span class="dedica">Tiempo completo · unos 24 puntos de esfuerzo</span>
+  <div class="nota ambar"><p>Este reparto lo decidió Sebastián el 16 de noviembre de 2026 y empieza a correr cuando se fusione la 2.21d (Oportunidades). Si algo de aquí no coincide con <code>AGENTS.md</code> o con el mapa, mandan ellos.</p></div>
+</header>
+
+<section id="frase"><h2><span class="n">01</span>Tu trabajo en una frase</h2>
+<p style="font-size:1.12rem">Que lo que pasa en la obra quede registrado y cueste lo que de verdad cuesta: quién trabajó, cuántas horas y en qué partida, qué material salió del almacén hacia qué proyecto, cuánto avanzó la obra y cuánto se le valoriza al cliente.</p>
+<div class="nota"><p><b>Por qué te tocó esto:</b> estás a tiempo completo, así que llevas el área más grande. Sumaste el almacén, que antes era de Lennart, porque está pegado a la obra: el almacén de obra, el despacho y las series se viven en el proyecto.</p></div>
+</section>
+
+<section id="contexto"><h2><span class="n">02</span>El contexto: para qué existe todo esto</h2>
+<p>Techquk es un integrador tecnológico de Chiclayo: gana obras y servicios, la mayoría del Estado (cámaras, redes, data centers, software), compra equipos, los instala y cobra. Hoy usa S10, un ERP comercial que no responde la pregunta que más le importa a la gerencia: <b>¿cuánto se gana realmente en cada proyecto?</b> Este sistema, un ERP y CRM propio, existe para responderla.</p>
+<p>Se construye en seis etapas, una detrás de otra. La 0 (base) y la 1 (núcleo: usuarios, permisos, estados, aprobaciones, numeración, imputación) ya están cerradas. Ahora va la <b>etapa 2, «Control de costos»</b>: todo el camino de un proyecto, desde que aparece el cliente hasta que se gasta y se valoriza. Es tan grande que se reparte en cuatro áreas, cada una con su dueño. Esta es la tuya, resaltada:</p>
+<div class="areas4"><div class="area4"><b>Sebastián</b><span>1 · Presupuesto y costo + núcleo</span><span>Presupuesto, árbol y dinero del proyecto; presupuesto de la empresa; núcleo; OECE; revisión de PR</span><span class="pts">Completo</span></div><div class="area4"><b>Ander</b><span>2 · Comercial</span><span>Licitaciones y Actividades (Cuentas, Oportunidades y Cotizaciones ya están)</span><span class="pts">Parcial · ~10 pts</span></div><div class="area4"><b>Lennart</b><span>3 · Contratos y compras</span><span>Contratos y Compras</span><span class="pts">Parcial · ~13 pts</span></div><div class="area4 tuya"><b>Yair</b><span>4 · Obra, personas y almacén</span><span>Proyectos, valorizaciones, subcontratos, personal, tareo, catálogo y almacén</span><span class="pts">Completo · ~24 pts</span></div></div>
+<p>Y este es el recorrido completo de un proyecto. Lo resaltado es lo que construyes tú; lo demás lo construyen otros, y tu parte se habla con la de ellos por las «costuras» de la sección 05.</p>
+<div class="flujo" role="img" aria-label="Recorrido de un proyecto, con lo tuyo resaltado"><span class="fpaso">Cuenta</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Oportunidad</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Costeo</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Cotización</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Licitación (si es pública)</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Ganada</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Contrato</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso tuyo">Proyecto</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Presupuesto y árbol</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Requerimiento</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Orden de compra</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso tuyo">Recepción y almacén</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso tuyo">Despacho a obra</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso tuyo">Personal y tareo</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso tuyo">Valorización</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso tuyo">Cierre</span></div>
+<p>La etapa 2 se cierra cuando pasan, como pruebas automáticas, los escenarios de los flujos 1, 2, 3 y 7 del diseño v4, con sus números exactos. Para eso hacen falta las piezas de los cuatro.</p>
+</section>
+
+<section id="recibe"><h2><span class="n">03</span>Lo que recibes ya hecho</h2>
+<p>No empiezas de cero. Esto ya existe y lo usas tal cual:</p>
+<div class="recibe"><div><b>Proyectos (2.1 y 2.61):</b> la tabla, sus estados (en preparación, en ejecución, cerrado, anulado), <code>ProyectosService</code> (C2), la portada con fotos y la ficha con su resumen y el registro de pestañas y tarjetas para que cada módulo sume la suya.</div><div><b>El catálogo (2.60):</b> el esqueleto de C4, con <code>CatalogoService::buscar</code> y <code>resumen</code> y la tabla <code>productos</code> mínima, sin pantallas.</div><div><b>El selector de imputación y el exceso de partida (2.2):</b> tus documentos con costo (despacho, tareo) lo usan tal cual.</div><div><b>El ADR 0024:</b> cómo se relacionan el usuario y el colaborador (una ficha, el puesto con un solo dueño, la foto de la persona).</div></div>
+</section>
+
+<section id="construyes"><h2><span class="n">04</span>Lo que construyes, en el orden sugerido</h2>
+<p>Tu primera tarea es la costura que otros esperan (el costo de las horas, que espera el APU de Sebastián). El resto lo ordenas tú en los planes; esta es una propuesta.</p>
+<article class="tarjeta-t"><span class="num">Tarea 1 · C5 y C2</span><h3>El costo de las horas y la anulación del proyecto</h3><p><code>CostoHoraService::vigente(categoría, fecha)</code>: el costo estándar por hora de cada categoría, que el APU usa como precio sugerido. Y <code>ProyectosService::anularEnPreparacion</code>, que Contratos necesita para anular un borrador (ADR 0020, C2).</p><p class="por"><b>Por qué importa:</b> Son piezas que otras áreas ya esperan: sin ellas usan versiones falsas.</p><p class="hecho"><b>Está terminada cuando:</b> las dos pasan las mismas pruebas que sus versiones falsas.</p></article><article class="tarjeta-t"><span class="num">Tarea 2 · Personal</span><h3>Colaboradores, habilitación y asignación</h3><p>La ficha laboral de cada persona sobre su ficha de Personas y empresas, con las reglas del ADR 0024 (el puesto lo define RRHH y se copia al usuario; la unidad sale del puesto; la foto es de la persona). La habilitación de campo (SCTR, exámenes, inducción) con sus vencimientos, la asignación a proyectos y las certificaciones (C9).</p><p class="por"><b>Por qué importa:</b> Nadie entra a obra sin estar habilitado, y las licitaciones de Ander necesitan saber qué personal certificado hay.</p><p class="hecho"><b>Está terminada cuando:</b> los escenarios de habilitación y sobreasignación de la sección 06 dan sus números.</p></article><article class="tarjeta-t"><span class="num">Tarea 3 · Tareo</span><h3>Las horas de cada semana</h3><p>La grilla de horas (también en el celular), bloqueada para quien no está habilitado, imputada a la partida con C1. Al cerrar la semana se valoriza al costo de la categoría y se emite <code>SemanaTareoCerrada</code>.</p><p class="por"><b>Por qué importa:</b> La mano de obra es costo real del proyecto: sin tareo, el margen sale inflado.</p><p class="hecho"><b>Está terminada cuando:</b> el escenario de la semana 37 da sus números exactos.</p></article><article class="tarjeta-t"><span class="num">Tarea 4 · Almacén</span><h3>Stock, recepción y despacho</h3><p>El almacén central y el de obra, con concurrencia en el stock, series y costo promedio. La recepción de una orden de Lennart (desde el celular, con sus series) y el despacho a obra, que mueve el costo a <b>ejecutado</b> en la partida y genera la guía. Con la costura nueva con Compras: el requerimiento pregunta el stock y reserva.</p><p class="por"><b>Por qué importa:</b> Lo que entra y sale del almacén es la mitad del costo de una obra de equipos. Una serie mal registrada es una garantía perdida.</p><p class="hecho"><b>Está terminada cuando:</b> los escenarios de recepción y despacho de la sección 06 dan sus números.</p></article><article class="tarjeta-t"><span class="num">Tarea 5 · Proyectos</span><h3>Fases, hitos, avance y cierre</h3><p>Las fases, hitos y entregables del proyecto, con el avance físico que la 2.61 dejó pendiente y obligatorio (la barra, «Atrasados» y la línea de tiempo), y el cierre con sus condiciones.</p><p class="por"><b>Por qué importa:</b> Es lo que el jefe de proyecto mira cada día, y el cierre es lo que congela el margen real.</p><p class="hecho"><b>Está terminada cuando:</b> un proyecto con una orden abierta y tareo sin cerrar no se puede cerrar, y la lista dice las dos condiciones.</p></article><article class="tarjeta-t"><span class="num">Tarea 6 · Obra pública</span><h3>Valorizaciones y subcontratos</h3><p>La valorización mensual de lo avanzado (lo que se le cobra al cliente, sobre el contrato de Lennart, C10) y los subcontratos con sus propias valorizaciones. El adelanto de un subcontrato se registra con su porcentaje; el descuento y el reajuste por fórmula polinómica llegan en la etapa 3.</p><p class="por"><b>Por qué importa:</b> Es como cobra Techquk en obra pública.</p><p class="hecho"><b>Está terminada cuando:</b> una valorización sale del avance y queda lista para facturar en la etapa 3.</p></article><article class="tarjeta-t"><span class="num">Cuando haga falta</span><h3>Las pantallas del catálogo</h3><p>Crear, editar y desactivar productos sobre el esqueleto de C4. El módulo vive en el CRM: Ander revisa tus cambios.</p><p class="por"><b>Por qué importa:</b> Hoy los productos solo se crean desde los selectores con su «+».</p><p class="hecho"><b>Está terminada cuando:</b> el catálogo se administra desde su pantalla.</p></article>
+</section>
+
+<section id="costuras"><h2><span class="n">05</span>Con quién te hablas: tus costuras</h2>
+<p>Una <b>costura</b> es un contrato entre dos áreas: un servicio que una ofrece y otra usa, o un evento que una dispara y otra escucha. Nadie lee las tablas de otro módulo (regla 2). Mientras la pieza de la otra área no exista, trabajas con su <b>versión falsa</b>, que pasa las mismas pruebas que la real; cuando llega la real, tu código no cambia. Las costuras viven en el ADR 0020; crear o cambiar una se decide con quien la usa.</p>
+<div class="dos"><div class="bloque ofrece"><h3>Ofreces</h3><ul><li><span class="cod">C2</span><b>El proyecto</b>: <code>resumen</code>, <code>activos</code>, <code>crearDesdeContrato</code>, <code>iniciarEjecucion</code> y <code>anularEnPreparacion</code>; los eventos <code>ProyectoCreado</code> y <code>ProyectoCerrado</code>. Lo usan todos.</li><li><span class="cod">C4</span><b>El catálogo</b>: <code>buscar</code> y <code>resumen</code>. Lo usan Sebastián, Lennart y Ander.</li><li><span class="cod">C5</span><b>El costo de las horas y la habilitación</b>: <code>CostoHoraService::vigente</code>, <code>PersonalService::habilitado</code> y el evento <code>SemanaTareoCerrada</code>.</li><li><span class="cod">C9</span><b>Las certificaciones</b>: <code>PersonalService::certificacionesVigentes</code>, para las licitaciones de Ander.</li><li><span class="cod">Nueva</span><b>El stock y la recepción</b>, para las compras de Lennart (se escribe en el ADR 0020 al aplicar el reparto).</li></ul></div><div class="bloque usa"><h3>Usas</h3><ul><li><span class="cod">C1 y C12</span><b>La partida y el exceso</b> (de Sebastián): el selector en tus líneas de despacho y de tareo.</li><li><span class="cod">C10</span><b>El contrato</b> (de Lennart): monto, plazo y adendas para las valorizaciones.</li><li><span class="cod">C6</span><b>La orden de compra</b> (de Lennart): lo que llega a recibirse.</li><li><span class="cod">C7 y ADR 0024</span><b>Personas, usuarios y organigrama</b> (del núcleo): la ficha de la persona, el puesto y la foto.</li></ul></div></div>
+</section>
+
+<section id="vale"><h2><span class="n">06</span>Cómo se sabe que vale</h2>
+<p>Algo está terminado cuando lo prueba una prueba automática, no cuando «se ve bien». Tu trabajo vale si:</p>
+<ul style="max-width:70ch;display:grid;gap:0.35rem;margin:0;padding-left:1.2rem">
+<li>cada tarea cumple el <b>criterio de aceptación</b> que escribiste en su plan, con pruebas que lo demuestran;</li>
+<li><code>composer check:tarea</code> sale en verde (formato, análisis estático, migraciones, límites entre módulos y tus pruebas);</li>
+<li>los <b>escenarios del v4</b> que te tocan dan exactamente estos números:</li>
+</ul>
+<div class="escenario-p"><span class="cifra">1,248.00</span><span>Se confirma en obra la recepción de 520 m de OC-2026-0142: la orden pasa a «recibida parcial» y el ejecutado de PC-02.01 = 1,248.00; el comprometido sigue en 1,560.00 (flujo 2, junto con Lennart).</span></div><div class="escenario-p"><span class="cifra">9 de 10</span><span>La recepción de OC-2026-0138 con 9 series escaneadas de 10 no se puede confirmar: falta una serie.</span></div><div class="escenario-p"><span class="cifra">5,780.00</span><span>Se despachan 10 cámaras y 20 conectores a PRY-012: el stock baja en 10 y 20, el ejecutado de PC-01.01 = 5,780.00 y se genera la guía.</span></div><div class="escenario-p"><span class="cifra">68 h</span><span>Al cerrar el tareo de la semana 37: ejecutado PC-02.03 = 648.00 y PC-01.02 = 432.00 (72 %); la semana ya no se edita (flujo 3).</span></div><div class="escenario-p"><span class="cifra">30 días</span><span>Un SCTR con vencimiento en 30 días aparece en «vencen en 30 días» y la alerta llega al responsable y al jefe de proyecto.</span></div><div class="escenario-p"><span class="cifra">120 %</span><span>Asignar a una persona 60 % a dos proyectos en la misma semana marca sobreasignación de 120 %.</span></div>
+<ul style="max-width:70ch;display:grid;gap:0.35rem;margin:0;padding-left:1.2rem">
+<li>el <b>revisor de arquitectura</b> no encuentra que un módulo toque lo de otro, y Sebastián aprueba el PR de la entrega.</li>
+</ul>
+</section>
+
+<section id="como"><h2><span class="n">07</span>Cómo trabajas cada tarea, paso a paso</h2>
+<ol class="pasos-t"><li><div><b>Lee antes de tocar nada.</b> Abre <code>AGENTS.md</code> (el mapa del repo), <code>docs/planes/mapa-etapas.md</code> (qué va ahora) y el plan o el ADR de tu tarea. Si la tarea no tiene plan, el primer paso es escribirlo.</div></li><li><div><b>Escribe el plan.</b> Copia <code>docs/planes/plantilla.md</code> a <code>docs/planes/activos/</code>: objetivo, lo que leíste, decisiones, pasos, «preparado para lo diferido» y criterio de aceptación. Lo que dependa de la empresa no lo inventas: va a <code>pendientes.md</code> y se pregunta (regla 12).</div></li><li><div><b>Trabaja en la rama de tu entrega.</b> Una entrega agrupa tareas que juntas dan algo usable: rama <code>entrega/&lt;nombre&gt;</code>, hasta 6 tareas, 7 días o unos 60 archivos. Trabaja en tu propia copia (<code>php scripts/nueva-copia.php &lt;nombre&gt;</code>), nunca en la carpeta principal.</div></li><li><div><b>Avanza por pasos pequeños.</b> En cada paso: el código, las pruebas de lo que tocaste (<code>php artisan test &lt;archivos&gt;</code>), pint y phpstan, un commit y push, y la bitácora del plan al día. La bitácora es tu punto de guardado: si la sesión se corta, la siguiente lee el plan y sigue.</div></li><li><div><b>Cierra la tarea.</b> <code>composer check:tarea</code> en verde (corre solo las pruebas de lo que cambió). Si cambió una regla, su documento. Usa el flujo <code>/cerrar-tarea</code>.</div></li><li><div><b>Cierra la entrega.</b> Si hubo cambios de estructura (módulos, migraciones, efectos entre módulos), pide revisión al subagente <code>revisor-arquitectura</code>. Otra vez <code>composer check:tarea</code> en verde. Sube la rama y avisa a Sebastián con los enlaces a los planes.</div></li><li><div><b>El PR lo abre y fusiona Sebastián.</b> Título «Entrega &lt;nombre&gt;: &lt;resumen&gt;», con las tareas y sus planes. Ningún agente abre ni fusiona PR. Si otra entrega se fusionó antes, traes <code>main</code> a tu rama con <em>merge</em>, nunca con <em>rebase</em>.</div></li></ol>
+
+</section>
+
+<section id="reglas"><h2><span class="n">08</span>Las reglas que no se negocian</h2>
+<p>Cada una viene de un error real o de una decisión registrada. Las pruebas de <code>tests/Arch</code> vigilan varias: si las rompes, <code>check:tarea</code> falla.</p>
+<ul style="max-width:72ch;display:grid;gap:0.35rem;margin:0;padding-left:1.2rem"><li>Un módulo no toca los modelos de otro: usa sus <code>Services/</code> o escucha sus eventos.</li><li>Toda línea de costo tiene destino: una partida de control, o el gasto directo con su centro de costo y su sede (ADR 0025).</li><li>Nunca <code>float</code> para dinero, nunca código de negocio como llave primaria. Si un dato importa, es <code>NOT NULL</code> y su unicidad la garantiza la base.</li><li>Los estados y las transiciones son datos; cada efecto es una pieza aparte. Un documento aprobado no se edita; anular exige motivo.</li><li>Toda acción de usuario es una acción registrada que se puede ejecutar sin la interfaz. La lógica vive en servicios, nunca en Filament.</li><li>Cada flujo tiene su escenario del v4 como prueba, con los números exactos.</li><li>La IA sugiere y una persona confirma. Nada de datos reales en el repo ni en las pruebas. Los agentes nunca tocan producción.</li></ul>
+</section>
+
+<section id="riesgos"><h2><span class="n">09</span>Riesgos y preguntas abiertas de tu área</h2>
+<div class="riesgo-p"><b>Las tipologías T1 a T6</b><p>Sin definirlas, no se pueden hacer la columna de tipología del proyecto ni las plantillas de fases. Es de la empresa (<code>pendientes.md</code>): pregúntalo, no lo inventes.</p></div><div class="riesgo-p"><b>El organigrama está en espera</b><p>La empresa lo está definiendo. Personal se construye con datos de prueba hasta que Sebastián lo entregue.</p></div><div class="riesgo-p"><b>La planilla es de la etapa 4</b><p>En la 2 el costo de la hora es el estándar de la categoría; el costo real sale de la planilla después.</p></div><div class="riesgo-p"><b>El almacén y la concurrencia</b><p>Dos despachos a la vez sobre el mismo stock: necesita prueba de concurrencia real, como la numeración (tests/Concurrencia).</p></div>
+</section>
+
+<section id="palabras"><h2><span class="n">10</span>Las palabras de tu área</h2>
+<dl class="glos"><div><dt>Colaborador</dt><dd>La ficha laboral de una persona. No es su usuario: muchos técnicos no entran al sistema (ADR 0024).</dd></div><div><dt>Habilitación</dt><dd>Lo que una persona necesita para entrar a obra: SCTR, examen, inducción. Si vence, no puede tarear.</dd></div><div><dt>Tareo</dt><dd>El registro de horas por persona, día y partida. Al cerrarse la semana, se vuelve costo.</dd></div><div><dt>Ejecutado</dt><dd>Lo ya consumido en una partida: material despachado a obra, horas tareadas.</dd></div><div><dt>Valorización</dt><dd>Lo que se le cobra al cliente cada mes según lo avanzado en la obra.</dd></div><div><dt>Guía de remisión</dt><dd>El documento que acompaña la mercadería al salir. En la etapa 2 se registra su número; la emisión queda pendiente.</dd></div></dl>
+<p class="nota">Si te topas con un término que no está aquí, búscalo en <code>docs/glosario.md</code>. Si tampoco está, pregúntalo antes de suponer.</p>
+</section>
+</main>
+</div>
+</body>
+</html>

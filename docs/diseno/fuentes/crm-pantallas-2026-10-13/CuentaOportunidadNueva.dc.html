@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cuenta · Nueva oportunidad</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="cuentas" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:20px 28px 44px;display:flex;flex-direction:column;gap:14px">
+<nav aria-label="Ruta" style="font-size:12.5px;color:#5E6A66"><a href="Cuentas.dc.html" style="color:#5E6A66">Cuentas</a> › Municipalidad de Pimentel › Oportunidades › Nueva</nav>
+<section style="background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;overflow:hidden">
+<dc-import name="CabCuenta" tab="oportunidades" hint-size="100%,150px"></dc-import>
+<div style="padding:18px 18px 26px;display:flex;flex-direction:column;gap:16px">
+
+<nav aria-label="Vistas de oportunidades" style="display:flex;flex-wrap:wrap;gap:8px">
+<a href="CuentaOportunidades.dc.html" style="display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;font-size:13.5px;text-decoration:none">Tabla</a>
+<a href="CuentaOportunidadesTablero.dc.html" style="display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;font-size:13.5px;text-decoration:none">Tablero</a>
+<a href="CuentaOportunidadNueva.dc.html" aria-current="page" style="display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #0F6E56;background:#E1F5EE;color:#0B5A47;font-size:13.5px;font-weight:600;text-decoration:none">Nueva oportunidad</a>
+</nav>
+
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+<section style="flex:2 1 520px;min-width:0;border:1px solid #E8E6DE;border-radius:10px;padding:18px 20px;background:#FFFFFF;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;border:1px solid #E8E6DE;border-radius:8px;padding:10px 14px;background:#F8F7F2"><span style="font-size:13px;color:#5E6A66">Cuenta</span><b style="font-weight:600">Municipalidad de Pimentel</b><span style="font-size:12.5px;color:#5E6A66">· ya viene elegida</span></div>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Nombre
+<input type="text" placeholder="Ej.: Ampliación de cámaras en el malecón" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<div style="display:flex;flex-wrap:wrap;gap:14px">
+<label style="flex:1 1 200px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Línea de solución
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Videovigilancia</option><option>Redes</option><option>Cómputo</option><option>Servicios</option></select>
+</label>
+<label style="flex:1 1 120px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Tipología
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>T1</option><option>T2</option><option>T3</option><option>T4</option><option>T5</option><option>T6</option></select>
+</label>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:14px">
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Monto estimado
+<input type="text" placeholder="S/ 0.00" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<label style="flex:1 1 120px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Moneda
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Soles</option><option>Dólares</option></select>
+</label>
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Cierre estimado
+<input type="text" placeholder="dd / mm / aaaa" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:14px">
+<label style="flex:1 1 220px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Origen
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Convocatoria pública</option><option>Referencia</option><option>Feria</option><option>Sitio web</option><option>Visita en frío</option></select>
+</label>
+<fieldset style="flex:1 1 280px;margin:0;padding:0;border:0">
+<legend style="padding:0;margin-bottom:6px;font-size:13px;font-weight:500">Próxima acción <span style="font-weight:400;color:#5E6A66">· obligatoria</span></legend>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="prox" style="width:18px;height:18px;accent-color:#0F6E56">Mañana</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid #0F6E56;border-radius:8px;background:#E1F5EE"><input type="radio" name="prox" checked="" style="width:18px;height:18px;accent-color:#0F6E56">3 días</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="prox" style="width:18px;height:18px;accent-color:#0F6E56">1 semana</label>
+</div>
+</fieldset>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px;border-top:1px solid #E8E6DE;padding-top:16px">
+<a href="CuentaOportunidades.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:600;min-height:44px;padding:0 18px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;text-decoration:none">Crear oportunidad</a>
+<a href="CuentaOportunidades.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;text-decoration:none">Cancelar</a>
+</div>
+</section>
+
+<aside style="flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:12px">
+<section style="border:1px solid #B9D2EE;border-radius:10px;padding:14px 16px;background:#F3F8FD"><div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#17497F;font-weight:600">Etapa inicial</div><div style="font-size:18px;font-weight:600;margin-top:4px">Prospecto · 10 %</div><p style="margin:6px 0 0;font-size:13px;color:#17497F">La probabilidad la define la etapa; nadie la edita.</p></section>
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Opcional</div>
+<a href="OportunidadNueva.dc.html" style="display:inline-block;margin-top:6px;font-size:13.5px">Abrir este formulario en el módulo Oportunidades ›</a>
+</section>
+</aside>
+</div>
+
+</div>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

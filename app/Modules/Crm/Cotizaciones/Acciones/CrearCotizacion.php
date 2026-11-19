@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\Crm\Cotizaciones\Acciones;
+
+use App\Modules\Crm\Cotizaciones\Models\Cotizacion;
+use App\Modules\Crm\Cotizaciones\Services\CotizacionesService;
+use App\Modules\Crm\Cotizaciones\Services\DatosCotizacion;
+use App\Modules\Nucleo\Enums\Catalogo;
+use App\Modules\Nucleo\Models\User;
+use App\Modules\Nucleo\RegistroAcciones\Accion;
+use App\Modules\Nucleo\RegistroAcciones\Campo;
+
+/** Crea la versión 1 de una cotización sobre una oportunidad abierta (plan 2.22, D4). */
+final class CrearCotizacion extends Accion
+{
+    public function clave(): string
+    {
+        return CotizacionesService::PERMISO_CREAR;
+    }
+
+    public function nombre(): string
+    {
+        return 'Crear cotización';
+    }
+
+    public function campos(): array
+    {
+        return [
+            Campo::entero('oportunidad_id', 'Oportunidad')->conReglas('min:1'),
+            Campo::entero('contacto_id', 'Atención')->opcional(),
+            Campo::elementoDe('moneda_id', 'Moneda', Catalogo::Monedas)->opcional(),
+            Campo::entero('dias_validez', 'Días de validez')->conReglas('min:1', 'max:365')->opcional(),
+            Campo::entero('plazo_entrega_dias', 'Plazo de entrega (días calendario)')->conReglas('min:0')->opcional(),
+            Campo::elementoDe('forma_pago_id', 'Forma de pago', Catalogo::FormasPago)->opcional(),
+            Campo::texto('forma_pago_detalle', 'Detalle de la forma de pago', maximo: 200)->opcional(),
+            Campo::entero('garantia_meses', 'Garantía (meses)')->conReglas('min:0')->opcional(),
+            Campo::texto('lugar_entrega', 'Lugar de entrega', maximo: 200)->opcional(),
+        ];
+    }
+
+    public function permiso(): string
+    {
+        return CotizacionesService::PERMISO_CREAR;
+    }
+
+    public function ejecutar(array $datos, User $usuario): Cotizacion
+    {
+        return app(CotizacionesService::class)->crear($datos['oportunidad_id'], new DatosCotizacion($datos['contacto_id'] ?? null, $datos['moneda_id'] ?? null, $datos['dias_validez'] ?? null, $datos['plazo_entrega_dias'] ?? null, $datos['forma_pago_id'] ?? null, $datos['forma_pago_detalle'] ?? null, $datos['garantia_meses'] ?? null, $datos['lugar_entrega'] ?? null), $usuario);
+    }
+}

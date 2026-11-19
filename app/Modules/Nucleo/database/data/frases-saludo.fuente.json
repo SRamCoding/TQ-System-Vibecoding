@@ -1,0 +1,21 @@
+{
+    "archivo": "frases-saludo.php",
+    "descripcion": "Saludos, frases y agradecimientos de inicio del saludo personalizado (plan 1.4b).",
+    "fuentes": {
+        "propias, saludos y agradecimientos": "Escritas para el sistema; sin datos de la empresa ni de personas. Portugués y alemán (plan 1.4aa, paso 7): escritos para el sistema, no traducidos al pie de la letra.",
+        "refranes": "Refranes y proverbios tradicionales de uso común en español, inglés, francés, portugués y alemán.",
+        "autores": "Obras de dominio público. Atribución cotejada el 2026-10-19 con búsquedas en la web; se descartaron las de atribución dudosa (una atribuida a José Martí y una a Ralph Waldo Emerson). Portugués y alemán (2026-11-09, plan 1.4aa, paso 7), cotejadas palabra por palabra en Wikisource contra la edición original escaneada: Fernando Pessoa, Mensagem (1934), «O Infante» y «Mar Portuguez» (pt.wikisource.org, Página:Mensagem.djvu/55 y /68); Friedrich Schiller, «Das Lied von der Glocke» (Musen-Almanach für das Jahr 1800) y Wilhelm Tell, tercer acto (de.wikisource.org); Johann Wolfgang von Goethe, «Das Göttliche» (Goethes Schriften, tomo 8, Göschen, 1789). Con la ortografía de esas ediciones («Portuguez», «sey», «Hülfreich»).",
+        "versiculos": {
+            "sitio": "https://www.biblegateway.com",
+            "versiones": {
+                "RVR1960": "Reina-Valera 1960 (Sociedades Bíblicas Unidas; citas breves permitidas)",
+                "KJV": "King James Version (dominio público)",
+                "LSG": "Louis Segond 1910 (dominio público)",
+                "Luther 1912": "Lutherbibel 1912 (dominio público), cotejada en https://ebible.org/deu1912; ortografía de 1912 («daß», «HERR»). ebible numera los salmos como las versiones inglesas: Psalm 4,9 y 65,12 de Lutero son ahí 4:8 y 65:11",
+                "BPM": "Bíblia Portuguesa Mundial (dominio público, según https://ebible.org/porbrbsl/copyright.htm; borrador en revisión, texto cotejado el 2026-11-09 en ebible.org/porbrbsl). Se eligió porque no hay una Almeida de dominio público cotejable en línea: la Revista e Corrigida en línea es la edición 2009 de la SBB, con derechos; la Almeida de 1819 de Wikisource no tiene los libros necesarios, y la Tradução Brasileira de Wikisource es una transcripción de segunda mano con capítulos mezclados (Provérbios XVI trae el XV en otra traducción). Se quitan solo comillas que abren o cierran en otro versículo (Josué 1:9, Mateus 11:28)"
+            },
+            "cotejado": "2026-10-19 (primera y segunda tanda) y 2026-10-21 (tercera tanda, RVR1960) y 2026-11-09 (BPM y Luther 1912, en ebible.org)",
+            "nota": "Texto exacto de cada versión, con sus mayúsculas: en la poesía cada verso empieza con mayúscula."
+        }
+    }
+}

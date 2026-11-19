@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Nueva campaña</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="leads" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:24px 28px 44px;display:flex;flex-direction:column;gap:16px">
+
+<nav aria-label="Ruta" style="font-size:12.5px;color:#5E6A66"><a href="Leads.dc.html" style="color:#5E6A66">Campañas y leads</a> › Nueva campaña</nav>
+<h1 style="margin:0;font-size:22px;font-weight:600">Nueva campaña</h1>
+
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+
+<section style="flex:2 1 560px;min-width:0;border:1px solid #E8E6DE;border-radius:10px;padding:20px 22px;background:#FFFFFF;display:flex;flex-direction:column;gap:16px">
+<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Nombre
+<input type="text" placeholder="Ej.: Feria tecnológica regional 2026" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<fieldset style="margin:0;padding:0;border:0">
+<legend style="padding:0;margin-bottom:6px;font-size:13px;font-weight:500">Tipo</legend>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #0F6E56;border-radius:8px;background:#E1F5EE"><input type="radio" name="tipo" checked="" style="width:18px;height:18px;accent-color:#0F6E56">Feria</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="tipo" style="width:18px;height:18px;accent-color:#0F6E56">Correo masivo</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="tipo" style="width:18px;height:18px;accent-color:#0F6E56">Publicidad</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1px solid #9AA39F;border-radius:8px"><input type="radio" name="tipo" style="width:18px;height:18px;accent-color:#0F6E56">Evento</label>
+</div>
+</fieldset>
+<div style="display:flex;flex-wrap:wrap;gap:14px">
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Desde
+<input type="text" placeholder="dd / mm / aaaa" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Hasta <span style="font-weight:400;color:#5E6A66">· opcional</span>
+<input type="text" placeholder="dd / mm / aaaa" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Presupuesto (S/) <span style="font-weight:400;color:#5E6A66">· opcional</span>
+<input type="text" placeholder="0.00" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+</div>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Objetivo
+<textarea rows="4" placeholder="Qué se busca con esta campaña" style="font:inherit;font-size:14px;font-weight:400;padding:10px 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28;resize:vertical"></textarea>
+</label>
+<div style="display:flex;flex-wrap:wrap;gap:10px;border-top:1px solid #E8E6DE;padding-top:16px">
+<a href="CampaniaDetalle.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:600;min-height:44px;padding:0 18px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;text-decoration:none">Crear campaña</a>
+<a href="Leads.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;text-decoration:none">Cancelar</a>
+</div>
+</section>
+
+<aside style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:12px">
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Qué se mide después</div>
+<ul style="margin:8px 0 0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px">
+<li>Leads recibidos y cuántos se convierten.</li>
+<li>Cuántas oportunidades se ganan y por cuánto.</li>
+<li>Costo por venta ganada, si se registró el presupuesto.</li>
+</ul>
+</section>
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Cómo entran los leads</div>
+<p style="margin:8px 0 0;font-size:13.5px">Cada lead lleva su campaña y su origen. Los que vienen del sitio web o de la tienda pueden llegar solos; los de ferias se cargan a mano.</p>
+</section>
+</aside>
+
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

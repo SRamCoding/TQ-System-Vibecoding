@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Arriba a la izquierda: Instagram (cámara redondeada, lente y luz). -->
+  <rect x="1.75" y="1.75" width="8.5" height="8.5" rx="2.5"/>
+  <circle cx="6" cy="6" r="2"/>
+  <circle cx="8.3" cy="3.7" r="0.35" fill="currentColor" stroke="none"/>
+  <!-- Arriba a la derecha: TikTok (la nota con su bandera). -->
+  <path d="M18.5 1.75v6.5a2.25 2.25 0 1 1-2.25-2.25"/>
+  <path d="M18.5 1.75c.25 1.5 1.4 2.55 2.9 2.7"/>
+  <!-- Abajo al centro: X (la banda y el trazo que la cruza). -->
+  <path d="M8 13.75h2.4l5.6 8.5h-2.4z"/>
+  <path d="M15.75 13.75 8.25 22.25"/>
+</svg>

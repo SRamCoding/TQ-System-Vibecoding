@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sebastián · Presupuesto y costo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+
+/* Layout: guía de equipo; índice fijo a la izquierda en escritorio, arriba en el celular; secciones numeradas porque son un orden real de lectura */
+:root {
+  --bg: #f6f7fb; --surface: #ffffff; --fg: #141a2e; --muted: #556079; --line: #dde1ec;
+  --accent: #1b2f8a; --accent-soft: #e7ebfb; --teal: #0d7472; --teal-soft: #dff2f1;
+  --amber: #a85a06; --amber-soft: #fdf1df; --red: #b42318; --red-soft: #fdeceb; --green: #187a3d; --green-soft: #e3f4e8;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.envoltura { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2.5rem; max-width: 72rem; margin: 0 auto;
+  padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.5rem); align-self: start; font-size: 0.9rem; }
+nav.indice b { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+nav.indice ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; counter-reset: i; }
+nav.indice li { counter-increment: i; }
+nav.indice a { display: flex; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 6px; color: var(--fg); text-decoration: none; }
+nav.indice a::before { content: counter(i); font-family: var(--mono); color: var(--muted); min-width: 1.2rem; }
+nav.indice a:hover, nav.indice a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+main { min-width: 0; display: grid; gap: 3rem; }
+header.cabeza { display: grid; gap: 0.75rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
+h1 { font-family: var(--display); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; color: var(--fg); }
+.bajada { color: var(--muted); max-width: 62ch; margin: 0; font-size: 1.05rem; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+h2 { font-size: 1.45rem; margin: 0; display: flex; gap: 0.75rem; align-items: baseline; text-wrap: balance; }
+h2 .n { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); }
+h3 { font-size: 1.05rem; margin: 0.5rem 0 0; }
+p { margin: 0; max-width: 68ch; }
+.caja { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; }
+.nota { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; max-width: 68ch; }
+.nota.ambar { border-color: var(--amber); background: var(--amber-soft); }
+.nota.roja { border-color: var(--red); background: var(--red-soft); }
+.equipo { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.2rem; }
+.persona b { font-size: 1.05rem; }
+.persona span { color: var(--muted); font-size: 0.9rem; }
+
+/* ciclo */
+.ciclo { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; counter-reset: c; list-style: none; padding: 0; margin: 0; }
+.ciclo li { counter-increment: c; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem 0.4rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+.ciclo li::before { content: counter(c); display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: 0.8rem; }
+.ciclo li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 0.4rem; }
+
+/* tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+/* camino de una tarea */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: p; }
+.pasos > li { counter-increment: p; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details[open] { border-color: var(--accent); }
+summary { cursor: pointer; list-style: none; display: flex; gap: 0.75rem; align-items: center; padding: 0.8rem 1rem; font-weight: 600; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: counter(p); display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--mono); font-size: 0.85rem; }
+summary::after { content: "+"; margin-left: auto; color: var(--muted); font-family: var(--mono); }
+details[open] summary::after { content: "−"; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.det { padding: 0 1rem 1rem 3.55rem; display: grid; gap: 0.5rem; }
+.det ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+/* vida de una costura */
+.linea { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+.etapa { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.etapa b { font-size: 0.95rem; }
+.etapa small { font-family: var(--mono); color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* reglas */
+.reglas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; counter-reset: r; }
+.reglas li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem 0.7rem 2.8rem; position: relative; font-size: 0.93rem; }
+.reglas li::before { content: counter(r); position: absolute; left: 0.8rem; top: 0.7rem; font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+/* lista de verificación */
+.check { display: grid; gap: 0.4rem; }
+.check label { display: flex; gap: 0.7rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--green); flex: 0 0 auto; }
+.check label:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.check label:has(input:checked) span { text-decoration: line-through; color: var(--muted); }
+.check-pie { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.check-pie button { font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.check-pie button:hover, .check-pie button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.progreso { font-family: var(--mono); color: var(--green); font-weight: 500; }
+
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+@media (max-width: 860px) {
+  .envoltura { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  nav.indice { position: static; }
+  nav.indice ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .linea { grid-template-columns: minmax(0, 1fr); }
+  .det { padding-left: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.cabeza-persona { display: grid; gap: 0.6rem; border-top: 6px solid var(--c); padding-top: 1rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.chip { font-family: var(--mono); font-size: 0.8rem; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 0.15rem 0.65rem; }
+.chip.fuerte { background: var(--c); border-color: var(--c); color: var(--surface); }
+.tareas { display: grid; gap: 0.5rem; }
+.tarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0.25rem 0.8rem; }
+.tarea input { width: 1.15rem; height: 1.15rem; margin-top: 0.25rem; accent-color: var(--green); grid-row: span 3; }
+.tarea b { font-size: 1rem; }
+.tarea .que { color: var(--muted); font-size: 0.93rem; }
+.tarea .meta { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+.tarea:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.tarea:has(input:checked) b { text-decoration: line-through; color: var(--muted); }
+.avance { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 0.92rem; }
+.avance .num { font-family: var(--mono); color: var(--green); font-weight: 500; }
+.barra-av { flex: 1; min-width: 8rem; height: 0.5rem; border-radius: 999px; background: var(--line); overflow: hidden; }
+.barra-av span { display: block; height: 100%; width: 0; background: var(--green); border-radius: 999px; }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.75rem; }
+.bloque { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.5rem; align-content: start; }
+.bloque h3 { margin: 0; font-size: 0.95rem; }
+.bloque ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; font-size: 0.93rem; }
+.bloque.ofrece { border-top: 4px solid var(--green); }
+.bloque.usa { border-top: 4px solid var(--teal); }
+.cod { font-family: var(--mono); font-size: 0.82rem; background: var(--accent-soft); color: var(--accent); border-radius: 5px; padding: 0.05rem 0.4rem; margin-right: 0.3rem; }
+.conversar { border-left: 4px solid var(--amber); background: var(--amber-soft); border-radius: 0 8px 8px 0; padding: 0.8rem 1rem; display: grid; gap: 0.35rem; max-width: 68ch; }
+.riesgo-p { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; display: grid; gap: 0.25rem; }
+.riesgo-p p { color: var(--muted); font-size: 0.93rem; }
+.escenario-p { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; }
+.modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 0.6rem; }
+.modulo { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem; display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 0.8rem; align-items: center; }
+.modulo svg { width: 5.5rem; height: 5.5rem; transform: rotate(0deg); }
+.modulo circle { transition: opacity 0.15s; }
+.modulo svg:hover circle[stroke-dasharray]:not(:hover) { opacity: 0.45; }
+.dona-num { font-family: var(--mono); font-size: 7px; font-weight: 500; fill: var(--fg); }
+.modulo figcaption { display: grid; gap: 0.3rem; min-width: 0; }
+.modulo figcaption b { font-size: 0.98rem; }
+.modulo ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; font-size: 0.86rem; color: var(--muted); }
+.modulo li { display: flex; align-items: center; gap: 0.4rem; }
+.modulo li b { white-space: nowrap; margin-left: auto; font-family: var(--mono); font-size: 0.82rem; color: var(--fg); font-weight: 500; font-variant-numeric: tabular-nums; }
+.pt { width: 0.65rem; height: 0.65rem; border-radius: 3px; flex: 0 0 auto; }
+.compartido { justify-self: start; font-size: 0.72rem; font-weight: 600; color: var(--amber); background: var(--amber-soft); border-radius: 999px; padding: 0.05rem 0.5rem; }
+@media (prefers-reduced-motion: reduce) { .modulo circle { transition: none; } }
+.escenario-p .cifra { font-family: var(--mono); font-size: 1.3rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.limpiar { font: inherit; font-size: 0.88rem; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.3rem 0.75rem; cursor: pointer; } .limpiar:hover, .limpiar:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+
+
+.areas4 { display:grid; grid-template-columns:repeat(auto-fit,minmax(12.5rem,1fr)); gap:0.6rem; }
+.area4 { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.8rem 0.95rem; display:grid; gap:0.25rem; align-content:start; }
+.area4.tuya { border:2px solid var(--accent); background:var(--accent-soft); }
+.area4 b { font-size:0.98rem; } .area4 span { color:var(--muted); font-size:0.88rem; } .area4 .pts { font-family:var(--mono); font-size:0.8rem; color:var(--accent); }
+.flujo { display:flex; flex-wrap:wrap; gap:0.35rem; align-items:center; }
+.fpaso { border:1px solid var(--line); background:var(--surface); border-radius:8px; padding:0.4rem 0.6rem; font-size:0.88rem; }
+.fpaso.tuyo { background:var(--teal-soft); border-color:var(--teal); font-weight:600; }
+.flecha { color:var(--muted); }
+.tarjeta-t { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.9rem 1.05rem; display:grid; gap:0.4rem; }
+.tarjeta-t .num { font-family:var(--mono); font-size:0.8rem; color:var(--accent); }
+.tarjeta-t h3 { margin:0; font-size:1.05rem; }
+.tarjeta-t p { color:var(--fg); font-size:0.95rem; }
+.tarjeta-t .por { color:var(--muted); font-size:0.92rem; }
+.tarjeta-t .hecho { border-left:3px solid var(--green); padding-left:0.6rem; font-size:0.92rem; }
+.pasos-t { counter-reset:p; list-style:none; margin:0; padding:0; display:grid; gap:0.5rem; max-width:70ch; }
+.pasos-t li { counter-increment:p; display:grid; grid-template-columns:2rem minmax(0,1fr); gap:0.6rem; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.7rem 0.9rem; }
+.pasos-t li::before { content:counter(p); font-family:var(--mono); color:var(--accent); font-weight:500; }
+.recibe { display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:0.6rem; }
+.recibe div { background:var(--green-soft); border:1px solid var(--line); border-radius:10px; padding:0.7rem 0.9rem; font-size:0.93rem; }
+dl.glos { display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:0.6rem; margin:0; }
+dl.glos div { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:0.65rem 0.9rem; }
+dl.glos dt { font-weight:600; } dl.glos dd { margin:0.2rem 0 0; color:var(--muted); font-size:0.92rem; }
+.dedica { display:inline-flex; gap:0.5rem; align-items:center; font-size:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:0.25rem 0.8rem; justify-self:start; }
+@media (max-width: 760px) { .envoltura { grid-template-columns: minmax(0,1fr); } nav.indice { position: static; } }
+
+</style>
+</head>
+<body>
+<div class="envoltura">
+<nav class="indice" aria-label="Índice"><b>Índice</b><ol><li><a href="#frase">Tu trabajo en una frase</a></li><li><a href="#contexto">El contexto</a></li><li><a href="#recibe">Lo que recibes hecho</a></li><li><a href="#construyes">Lo que construyes</a></li><li><a href="#costuras">Con quién te hablas</a></li><li><a href="#vale">Cómo se sabe que vale</a></li><li><a href="#como">Cómo trabajas cada tarea</a></li><li><a href="#reglas">Reglas que no se negocian</a></li><li><a href="#riesgos">Riesgos y preguntas</a></li><li><a href="#palabras">Las palabras de tu área</a></li></ol></nav>
+<main>
+<header class="cabeza">
+  <span class="eyebrow">Guía de la etapa 2 · Área 1 · Presupuesto y costo, y el núcleo</span>
+  <h1>Sebastián · Presupuesto, núcleo y revisión</h1>
+  <p class="bajada">Lo que te toca en la etapa 2: que cada sol tenga presupuesto y destino, que el núcleo sostenga a las otras tres áreas y que lo que se fusiona respete la arquitectura.</p>
+  <span class="dedica">Tiempo completo · tu área, el núcleo, el OECE y la revisión</span>
+  <div class="nota ambar"><p>Este reparto lo decidió Sebastián el 16 de noviembre de 2026 y empieza a correr cuando se fusione la 2.21d (Oportunidades). Si algo de aquí no coincide con <code>AGENTS.md</code> o con el mapa, mandan ellos.</p></div>
+</header>
+
+<section id="frase"><h2><span class="n">01</span>Tu trabajo en una frase</h2>
+<p style="font-size:1.12rem">Que el sistema sepa cuánto debía costar cada proyecto y cuánto se lleva gastado, partida por partida, y también lo que gasta la empresa por sede; y que las piezas de los demás encajen sin romper las reglas.</p>
+<div class="nota"><p><b>Por qué te tocó esto:</b> eres el responsable técnico. Además de tu área, desempatas, revisas y fusionas los PR, y llevas el núcleo, del que dependen todos. Por eso construyes un poco menos de lo que te tocaría por promedio, más las convocatorias del OECE.</p></div>
+</section>
+
+<section id="contexto"><h2><span class="n">02</span>El contexto: para qué existe todo esto</h2>
+<p>Techquk es un integrador tecnológico de Chiclayo: gana obras y servicios, la mayoría del Estado (cámaras, redes, data centers, software), compra equipos, los instala y cobra. Hoy usa S10, un ERP comercial que no responde la pregunta que más le importa a la gerencia: <b>¿cuánto se gana realmente en cada proyecto?</b> Este sistema, un ERP y CRM propio, existe para responderla.</p>
+<p>Se construye en seis etapas, una detrás de otra. La 0 (base) y la 1 (núcleo: usuarios, permisos, estados, aprobaciones, numeración, imputación) ya están cerradas. Ahora va la <b>etapa 2, «Control de costos»</b>: todo el camino de un proyecto, desde que aparece el cliente hasta que se gasta y se valoriza. Es tan grande que se reparte en cuatro áreas, cada una con su dueño. Esta es la tuya, resaltada:</p>
+<div class="areas4"><div class="area4 tuya"><b>Sebastián</b><span>1 · Presupuesto y costo + núcleo</span><span>Presupuesto, árbol y dinero del proyecto; presupuesto de la empresa; núcleo; OECE; revisión de PR</span><span class="pts">Completo</span></div><div class="area4"><b>Ander</b><span>2 · Comercial</span><span>Licitaciones y Actividades (Cuentas, Oportunidades y Cotizaciones ya están)</span><span class="pts">Parcial · ~10 pts</span></div><div class="area4"><b>Lennart</b><span>3 · Contratos y compras</span><span>Contratos y Compras</span><span class="pts">Parcial · ~13 pts</span></div><div class="area4"><b>Yair</b><span>4 · Obra, personas y almacén</span><span>Proyectos, valorizaciones, subcontratos, personal, tareo, catálogo y almacén</span><span class="pts">Completo · ~24 pts</span></div></div>
+<p>Y este es el recorrido completo de un proyecto. Lo resaltado es lo que construyes tú; lo demás lo construyen otros, y tu parte se habla con la de ellos por las «costuras» de la sección 05.</p>
+<div class="flujo" role="img" aria-label="Recorrido de un proyecto, con lo tuyo resaltado"><span class="fpaso">Cuenta</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Oportunidad</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso tuyo">Costeo</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Cotización</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Licitación (si es pública)</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Ganada</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Contrato</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Proyecto</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso tuyo">Presupuesto y árbol</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Requerimiento</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Orden de compra</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Recepción y almacén</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Despacho a obra</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Personal y tareo</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Valorización</span><span class="flecha" aria-hidden="true">→</span><span class="fpaso">Cierre</span></div>
+<p>La etapa 2 se cierra cuando pasan, como pruebas automáticas, los escenarios de los flujos 1, 2, 3 y 7 del diseño v4, con sus números exactos. Para eso hacen falta las piezas de los cuatro.</p>
+</section>
+
+<section id="recibe"><h2><span class="n">03</span>Lo que recibes ya hecho</h2>
+<p>No empiezas de cero. Esto ya existe y lo usas tal cual:</p>
+<div class="recibe"><div><b>Hecho por ti antes del reparto:</b> el presupuesto con APU (2.9), sus pantallas (2.10), el árbol desde el presupuesto (2.9b), las plantillas (2.11), el selector de imputación (2.2) y los gastos no presupuestados (2.6).</div><div><b>También hecho:</b> el CRM base (cuentas, oportunidades y cotizaciones), la portada y ficha de Proyectos (2.61) y el esqueleto del catálogo (2.60). Ahora tienen dueño: Ander y Yair.</div><div><b>Decidido hoy:</b> ADR 0023 (numeración por dueño y copia al ganar), ADR 0024 (persona, usuario y colaborador), ADR 0025 (la sede en el gasto directo) y los planes 2.12, 2.13, 2.14 y 2.62.</div></div>
+</section>
+
+<section id="construyes"><h2><span class="n">04</span>Lo que construyes, en el orden sugerido</h2>
+<p>Tu orden sugerido: primero lo que los demás esperan de ti, después lo tuyo.</p>
+<article class="tarjeta-t"><span class="num">Al repartir</span><h3>Aplicar el reparto</h3><p><b>Hecho el 16 de noviembre de 2026.</b> Cuando se fusionó la 2.21d: se quitó el bloque «Modo actual» de AGENTS.md, poner los responsables en el mapa, escribir el reparto en el ADR 0020 con la costura nueva entre Compras y Almacén, y mover el corte a completados.</p><p class="por"><b>Por qué importa:</b> Hasta que esté aplicado, nadie sabe oficialmente qué le toca.</p><p class="hecho"><b>Está terminada cuando:</b> los cuatro tienen su área en el repo y su primera tarea clara.</p></article><article class="tarjeta-t"><span class="num">2.12</span><h3>Copia al ganar y numeración por dueño</h3><p>La cotización ganada se copia como PRE-01 v1 del proyecto; los números cuelgan de su oportunidad o proyecto; la ficha compara lo ofertado contra el presupuesto; la versión nueva del árbol por adenda o corrección interna, con Gerencia.</p><p class="por"><b>Por qué importa:</b> Cambia la numeración de dos módulos: cuanto antes, menos datos de prueba que rehacer.</p><p class="hecho"><b>Está terminada cuando:</b> el escenario «OP-2026-0007 → PRY-2026-0013 · PRE-01 v1» pasa entero.</p></article><article class="tarjeta-t"><span class="num">Núcleo</span><h3>La sede en el gasto directo y la tarjeta de persona</h3><p>ADR 0025: la sede o «Empresa» en toda imputación de gasto directo y el enchufe del saldo. ADR 0024: la foto pasa a la persona y la tarjeta común de persona para Usuarios y Personal.</p><p class="por"><b>Por qué importa:</b> Las dos tocan lo que usan los demás: van antes de que Lennart y Yair armen sus formularios.</p><p class="hecho"><b>Está terminada cuando:</b> el selector pide la sede y Yair puede construir Personal sobre la tarjeta.</p></article><article class="tarjeta-t"><span class="num">2.14, 2.13, 2.8</span><h3>Polinómica, presupuesto de la empresa y reclasificación</h3><p>La fórmula polinómica con el presupuesto (se aplica en la etapa 3); el presupuesto de la empresa por sede y mes (D1 a D6 decididas); mover un gasto ya aprobado de una partida a otra con motivo e historial.</p><p class="por"><b>Por qué importa:</b> Completan el control del costo.</p><p class="hecho"><b>Está terminada cuando:</b> cada una con su escenario de números exactos.</p></article><article class="tarjeta-t"><span class="num">Cuando llegue C10</span><h3>El margen</h3><p><code>MargenService::estimado</code> con la venta del contrato de Lennart.</p><p class="por"><b>Por qué importa:</b> Es la respuesta a la pregunta de todo el sistema.</p><p class="hecho"><b>Está terminada cuando:</b> el margen de PRY-012 da 1,372.00 y, tras el taxi, 1,327.00.</p></article><article class="tarjeta-t"><span class="num">OECE y otros</span><h3>Convocatorias, seeder y lo abierto de la etapa 1</h3><p>Las convocatorias del OECE (ADR 0018; hay una rama <code>spike/convocatorias-oece</code>) para la bandeja de Ander; el seeder de la cartera (2.62); las solicitudes de permiso (2.0b, en espera) y las tareas abiertas de la etapa 1 (1.4d, 1.4d2, 1.4k, 1.14).</p><p class="por"><b>Por qué importa:</b> La bandeja alimenta las licitaciones; el seeder deja la base de desarrollo con datos para probar todo.</p><p class="hecho"><b>Está terminada cuando:</b> cada una con su plan cerrado.</p></article>
+</section>
+
+<section id="costuras"><h2><span class="n">05</span>Con quién te hablas: tus costuras</h2>
+<p>Una <b>costura</b> es un contrato entre dos áreas: un servicio que una ofrece y otra usa, o un evento que una dispara y otra escucha. Nadie lee las tablas de otro módulo (regla 2). Mientras la pieza de la otra área no exista, trabajas con su <b>versión falsa</b>, que pasa las mismas pruebas que la real; cuando llega la real, tu código no cambia. Las costuras viven en el ADR 0020; crear o cambiar una se decide con quien la usa.</p>
+<div class="dos"><div class="bloque ofrece"><h3>Ofreces</h3><ul><li><span class="cod">C1</span><b>La partida como destino</b>: buscar, saldo, destino, PC-99 y resumen. Lo usan Lennart y Yair.</li><li><span class="cod">C8</span><b>El presupuesto de una cotización</b>: resumen, de la oportunidad y ofertar. Lo usa Ander.</li><li><span class="cod">C11 y C12</span><b>El posible adicional y el exceso de partida</b>: lo usan Lennart y Yair.</li><li><span class="cod">OECE</span><b>Las convocatorias</b> para las licitaciones de Ander.</li><li><span class="cod">Núcleo</span><b>Todo lo común</b>: imputación, aprobaciones, estados, numeración, alertas, la tarjeta de persona.</li></ul></div><div class="bloque usa"><h3>Usas</h3><ul><li><span class="cod">C2</span><b>El proyecto</b> (de Yair): iniciar la ejecución al aprobar el árbol.</li><li><span class="cod">C5</span><b>El costo de las horas</b> (de Yair): precio sugerido en el APU.</li><li><span class="cod">C10</span><b>El contrato</b> (de Lennart): la venta para el margen.</li><li><span class="cod">C13</span><b>La oportunidad</b> (de Ander): para enlazar el costeo.</li></ul></div></div>
+</section>
+
+<section id="vale"><h2><span class="n">06</span>Cómo se sabe que vale</h2>
+<p>Algo está terminado cuando lo prueba una prueba automática, no cuando «se ve bien». Tu trabajo vale si:</p>
+<ul style="max-width:70ch;display:grid;gap:0.35rem;margin:0;padding-left:1.2rem">
+<li>cada tarea cumple el <b>criterio de aceptación</b> que escribiste en su plan, con pruebas que lo demuestran;</li>
+<li><code>composer check:tarea</code> sale en verde (formato, análisis estático, migraciones, límites entre módulos y tus pruebas);</li>
+<li>los <b>escenarios del v4</b> que te tocan dan exactamente estos números:</li>
+</ul>
+<div class="escenario-p"><span class="cifra">24,715.10</span><span>El presupuesto PRE-2026-031: costo directo 17,750.00, gastos generales 1,775.00, utilidad 1,420.00, IGV 3,770.10 (flujo 1). Ya pasa.</span></div><div class="escenario-p"><span class="cifra">19,525.00</span><span>El árbol de 9 partidas aprobado: el proyecto pasa a «en ejecución»; existe la PC-99 en 0.00 y no se puede eliminar.</span></div><div class="escenario-p"><span class="cifra">1,327.00</span><span>El taxi de 45.00 aprobado en la PC-99: el margen estimado pasa de 1,372.00 a 1,327.00 (flujo 7). Necesita el contrato de Lennart.</span></div>
+<ul style="max-width:70ch;display:grid;gap:0.35rem;margin:0;padding-left:1.2rem">
+<li>el <b>revisor de arquitectura</b> no encuentra que un módulo toque lo de otro, y Sebastián aprueba el PR de la entrega.</li>
+</ul>
+</section>
+
+<section id="como"><h2><span class="n">07</span>Cómo trabajas cada tarea, paso a paso</h2>
+<ol class="pasos-t"><li><div><b>Lee antes de tocar nada.</b> Abre <code>AGENTS.md</code> (el mapa del repo), <code>docs/planes/mapa-etapas.md</code> (qué va ahora) y el plan o el ADR de tu tarea. Si la tarea no tiene plan, el primer paso es escribirlo.</div></li><li><div><b>Escribe el plan.</b> Copia <code>docs/planes/plantilla.md</code> a <code>docs/planes/activos/</code>: objetivo, lo que leíste, decisiones, pasos, «preparado para lo diferido» y criterio de aceptación. Lo que dependa de la empresa no lo inventas: va a <code>pendientes.md</code> y se pregunta (regla 12).</div></li><li><div><b>Trabaja en la rama de tu entrega.</b> Una entrega agrupa tareas que juntas dan algo usable: rama <code>entrega/&lt;nombre&gt;</code>, hasta 6 tareas, 7 días o unos 60 archivos. Trabaja en tu propia copia (<code>php scripts/nueva-copia.php &lt;nombre&gt;</code>), nunca en la carpeta principal.</div></li><li><div><b>Avanza por pasos pequeños.</b> En cada paso: el código, las pruebas de lo que tocaste (<code>php artisan test &lt;archivos&gt;</code>), pint y phpstan, un commit y push, y la bitácora del plan al día. La bitácora es tu punto de guardado: si la sesión se corta, la siguiente lee el plan y sigue.</div></li><li><div><b>Cierra la tarea.</b> <code>composer check:tarea</code> en verde (corre solo las pruebas de lo que cambió). Si cambió una regla, su documento. Usa el flujo <code>/cerrar-tarea</code>.</div></li><li><div><b>Cierra la entrega.</b> Si hubo cambios de estructura (módulos, migraciones, efectos entre módulos), pide revisión al subagente <code>revisor-arquitectura</code>. Otra vez <code>composer check:tarea</code> en verde. Sube la rama y avisa a Sebastián con los enlaces a los planes.</div></li><li><div><b>El PR lo abre y fusiona Sebastián.</b> Título «Entrega &lt;nombre&gt;: &lt;resumen&gt;», con las tareas y sus planes. Ningún agente abre ni fusiona PR. Si otra entrega se fusionó antes, traes <code>main</code> a tu rama con <em>merge</em>, nunca con <em>rebase</em>.</div></li></ol>
+<div class="nota"><p><b>Como revisor:</b> antes de fusionar una entrega con cambios de estructura, que haya pasado el <code>revisor-arquitectura</code>; fusiona con <em>merge commit</em> y borra la rama. Una lección nueva para los agentes va a AGENTS.md por PR, revisada por al menos un compañero.</p></div>
+</section>
+
+<section id="reglas"><h2><span class="n">08</span>Las reglas que no se negocian</h2>
+<p>Cada una viene de un error real o de una decisión registrada. Las pruebas de <code>tests/Arch</code> vigilan varias: si las rompes, <code>check:tarea</code> falla.</p>
+<ul style="max-width:72ch;display:grid;gap:0.35rem;margin:0;padding-left:1.2rem"><li>Un módulo no toca los modelos de otro: usa sus <code>Services/</code> o escucha sus eventos.</li><li>Toda línea de costo tiene destino: una partida de control, o el gasto directo con su centro de costo y su sede (ADR 0025).</li><li>Nunca <code>float</code> para dinero, nunca código de negocio como llave primaria. Si un dato importa, es <code>NOT NULL</code> y su unicidad la garantiza la base.</li><li>Los estados y las transiciones son datos; cada efecto es una pieza aparte. Un documento aprobado no se edita; anular exige motivo.</li><li>Toda acción de usuario es una acción registrada que se puede ejecutar sin la interfaz. La lógica vive en servicios, nunca en Filament.</li><li>Cada flujo tiene su escenario del v4 como prueba, con los números exactos.</li><li>La IA sugiere y una persona confirma. Nada de datos reales en el repo ni en las pruebas. Los agentes nunca tocan producción.</li></ul>
+</section>
+
+<section id="riesgos"><h2><span class="n">09</span>Riesgos y preguntas abiertas de tu área</h2>
+<div class="riesgo-p"><b>Eres el cuello de botella</b><p>Todos esperan tu revisión y tus costuras. Reserva tiempo fijo para revisar, y entrega primero lo que otros esperan (núcleo y C1).</p></div><div class="riesgo-p"><b>Los pendientes de presupuesto</b><p>Cuándo APU completo y cuándo precio por ítem, la cuadrilla y los materiales que no se compran: Ronal y Lisset. Hoy configurables.</p></div><div class="riesgo-p"><b>El margen depende de otro</b><p>Sin el contrato de Lennart, la ficha del proyecto sigue mostrando solo costos.</p></div>
+</section>
+
+<section id="palabras"><h2><span class="n">10</span>Las palabras de tu área</h2>
+<dl class="glos"><div><dt>Partida de control</dt><dd>Una caja del árbol del proyecto contra la que se carga el gasto. No es la partida del presupuesto.</dd></div><div><dt>PC-99</dt><dd>«No presupuestados»: empieza en cero, no se borra y todo lo que cae ahí exige motivo y aprobación.</dd></div><div><dt>Costura</dt><dd>El contrato entre dos áreas: un servicio o un evento con una versión falsa para probar.</dd></div><div><dt>Gasto directo</dt><dd>Gasto que no es de ningún proyecto: va a un centro de costo y a una sede (o «Empresa»).</dd></div><div><dt>Margen estimado</dt><dd>Venta sin IGV menos el mayor entre presupuestado y comprometido, partida por partida.</dd></div><div><dt>Entrega</dt><dd>Un grupo de tareas que juntas dan algo usable, con una rama y un PR.</dd></div></dl>
+<p class="nota">Si te topas con un término que no está aquí, búscalo en <code>docs/glosario.md</code>. Si tampoco está, pregúntalo antes de suponer.</p>
+</section>
+</main>
+</div>
+</body>
+</html>

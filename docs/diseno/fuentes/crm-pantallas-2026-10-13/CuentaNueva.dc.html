@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Crear cuenta</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="cuentas" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:24px 28px 44px;display:flex;flex-direction:column;gap:16px">
+
+<nav aria-label="Ruta" style="font-size:12.5px;color:#5E6A66"><a href="Cuentas.dc.html" style="color:#5E6A66">Cuentas</a> › Nueva cuenta</nav>
+<h1 style="margin:0;font-size:22px;font-weight:600">Nueva cuenta</h1>
+<p style="margin:0;font-size:13.5px;color:#5E6A66;max-width:720px">Se abre con un solo campo, el RUC. Si ya existe, el sistema lo dice antes de crear nada; si no existe, lo busca en el padrón de SUNAT.</p>
+
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+
+<section style="flex:1 1 420px;min-width:0;border:1px solid #E8E6DE;border-radius:10px;padding:18px 20px;background:#FFFFFF;display:flex;flex-direction:column;gap:14px">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Estado 1 · Paso 1 de 2 · RUC ya registrado</div>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">RUC
+<input type="text" value="20176543210" style="font:inherit;font-family:'IBM Plex Mono',monospace;font-size:15px;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<div role="alert" style="background:#FCEBE8;border:1px solid #E7B8B1;color:#7A1F17;border-radius:8px;padding:12px 14px;font-size:13.5px"><b style="font-weight:600">Esta cuenta ya existe.</b><br>Municipalidad de Pimentel · 3 oportunidades · A. Ruiz</div>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<a href="Cuenta.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:600;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;text-decoration:none">Abrir la existente</a>
+</div>
+<p style="margin:0;font-size:12.5px;color:#5E6A66">No se crea una cuenta con un RUC ya registrado.</p>
+</section>
+
+<section style="flex:1 1 420px;min-width:0;border:1px solid #E8E6DE;border-radius:10px;padding:18px 20px;background:#FFFFFF;display:flex;flex-direction:column;gap:14px">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Estado 2 · Paso 2 de 2 · RUC no registrado</div>
+<div style="background:#E4F4EC;border:1px solid #B5DEC6;color:#0B4A2A;border-radius:8px;padding:12px 14px;font-size:13.5px">Encontrado en el padrón de SUNAT: razón social y dirección precargadas.</div>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Razón social
+<input type="text" value="Municipalidad Distrital de Monsefú" style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<div style="display:flex;flex-wrap:wrap;gap:14px">
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Tipo
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Pública · Gobierno local</option><option>Pública · Gobierno regional</option><option>Privada</option></select>
+</label>
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Ejecutivo
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>A. Ruiz</option><option>M. Torres</option></select>
+</label>
+</div>
+<label style="display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500">Origen <span style="font-weight:400;color:#5E6A66">· obligatorio</span>
+<select style="font:inherit;font-size:14px;font-weight:400;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Convocatoria pública</option><option>Referencia</option><option>Feria</option><option>Sitio web</option><option>Visita en frío</option></select>
+</label>
+<div style="display:flex;flex-wrap:wrap;gap:10px">
+<button type="button" style="font:inherit;font-size:13.5px;font-weight:600;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;cursor:pointer">Crear</button>
+<a href="Cuentas.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;text-decoration:none">Cancelar</a>
+</div>
+</section>
+
+</div>
+
+<p style="margin:0;font-size:13px;color:#5E6A66;max-width:760px">Es la pantalla que decide si el CRM sirve a los dos años o es un basurero de duplicados. Toda cuenta tiene ejecutivo y origen desde el primer día.</p>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

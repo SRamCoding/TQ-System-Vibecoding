@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Menú lateral</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<nav aria-label="Módulos del CRM" style="padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:'IBM Plex Sans',system-ui,sans-serif">
+<sc-for list="{{items}}" as="it" hint-placeholder-count="8">
+<a href="{{it.href}}" aria-label="{{it.t}}" aria-current="{{it.cur}}" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:{{it.bg}};color:{{it.fg}}"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{it.d}}"></path></svg></a>
+</sc-for>
+</nav>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"text","default":"inicio"},"links":{"editor":"text","default":"on"},"$preview":{"width":56,"height":340}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const active = this.props.active ?? 'inicio';
+    const base = [
+      { k: 'inicio', t: 'Inicio', href: 'Main.dc.html', d: 'M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z' },
+      { k: 'cuentas', t: 'Cuentas', href: 'Cuentas.dc.html', d: 'M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 9h5a1 1 0 0 1 1 1v11M8 8h2M8 12h2M8 16h2M3 21h18' },
+      { k: 'oportunidades', t: 'Oportunidades', href: 'Oportunidades.dc.html', d: 'M3 5h18l-7 8v6l-4 2v-8z' },
+      { k: 'cotizaciones', t: 'Cotizaciones', href: 'CotizacionesLista.dc.html', d: 'M7 3h8l4 4v14H7zM15 3v4h4M10 12h6M10 16h6' },
+      { k: 'licitaciones', t: 'Licitaciones', href: 'Licitaciones.dc.html', d: 'M9 4h6v3H9zM7 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-1M9 14l2 2 4-4' },
+      { k: 'agenda', t: 'Agenda', href: 'Agenda.dc.html', d: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4' },
+      { k: 'catalogo', t: 'Catálogo', href: 'Catalogo.dc.html', d: 'M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10' },
+      { k: 'leads', t: 'Leads', href: 'Leads.dc.html', d: 'M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6' }
+    ];
+    return {
+      items: base.map((it) => ({
+        ...it,
+        href: this.props.links === 'off' ? '#' : it.href,
+        cur: it.k === active ? 'page' : 'false',
+        bg: it.k === active ? '#E1F5EE' : 'transparent',
+        fg: it.k === active ? '#0F6E56' : '#5E6A66'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

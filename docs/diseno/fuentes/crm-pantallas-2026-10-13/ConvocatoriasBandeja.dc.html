@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Bandeja de convocatorias</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" iniciales="LV" rol="L. Vargas · Licitaciones" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="licitaciones" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:24px 28px 44px;display:flex;flex-direction:column;gap:16px">
+
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+<h1 style="margin:0;font-size:22px;font-weight:600">Licitaciones</h1>
+<span style="flex:1"></span>
+<a href="LicitacionNueva.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;text-decoration:none">Registrar convocatoria a mano</a>
+</div>
+
+<nav aria-label="Vistas de licitaciones" style="display:flex;overflow-x:auto;border-bottom:1px solid #E8E6DE">
+<a href="ConvocatoriasBandeja.dc.html" aria-current="page" style="padding:0 14px;min-height:44px;display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;white-space:nowrap;color:#0F6E56;text-decoration:none;border-bottom:2px solid #0F6E56">Bandeja de convocatorias</a>
+<a href="Licitaciones.dc.html" style="padding:0 14px;min-height:44px;display:flex;align-items:center;font-size:13.5px;white-space:nowrap;color:#5E6A66;text-decoration:none;border-bottom:2px solid transparent">En seguimiento</a>
+<a href="LicitacionesCalendario.dc.html" style="padding:0 14px;min-height:44px;display:flex;align-items:center;font-size:13.5px;white-space:nowrap;color:#5E6A66;text-decoration:none;border-bottom:2px solid transparent">Calendario</a>
+<a href="MisPendientes.dc.html" style="padding:0 14px;min-height:44px;display:flex;align-items:center;font-size:13.5px;white-space:nowrap;color:#5E6A66;text-decoration:none;border-bottom:2px solid transparent">Lo que me tocó</a>
+</nav>
+
+<section aria-label="Filtros" style="border:1px solid #E8E6DE;border-radius:10px;padding:14px 16px;background:#FFFFFF;display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;flex-wrap:wrap;gap:12px 14px;align-items:flex-end">
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#5E6A66;letter-spacing:.4px;text-transform:uppercase">Palabra clave
+<input type="search" value="videovigilancia" style="font:inherit;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<label style="flex:1 1 180px;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#5E6A66;letter-spacing:.4px;text-transform:uppercase">Entidad
+<input type="search" placeholder="Nombre o RUC" style="font:inherit;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;min-height:44px;padding:0 12px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28">
+</label>
+<label style="flex:1 1 150px;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#5E6A66;letter-spacing:.4px;text-transform:uppercase">Departamento
+<select style="font:inherit;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Lambayeque</option><option>La Libertad</option><option>Todos</option></select>
+</label>
+<label style="flex:1 1 150px;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#5E6A66;letter-spacing:.4px;text-transform:uppercase">Estado
+<select style="font:inherit;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Todos</option><option>Nueva</option><option>En evaluación</option><option>En preparación</option><option>Presentada</option><option>Adjudicada</option></select>
+</label>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:12px 14px;align-items:flex-end">
+<label style="flex:1 1 170px;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#5E6A66;letter-spacing:.4px;text-transform:uppercase">Valor referencial
+<select style="font:inherit;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Cualquier rango</option><option>Hasta S/ 100 000</option><option>S/ 100 000 a 500 000</option><option>Más de S/ 500 000</option></select>
+</label>
+<label style="flex:1 1 170px;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#5E6A66;letter-spacing:.4px;text-transform:uppercase">Tipo de procedimiento
+<select style="font:inherit;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Todos</option><option>Licitación pública</option><option>Adjudicación simplificada</option></select>
+</label>
+<label style="flex:1 1 170px;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#5E6A66;letter-spacing:.4px;text-transform:uppercase">Próximo hito
+<select style="font:inherit;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Cualquiera</option><option>En menos de 7 días</option><option>En menos de 15 días</option></select>
+</label>
+<label style="flex:1 1 150px;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:#5E6A66;letter-spacing:.4px;text-transform:uppercase">Responsable
+<select style="font:inherit;font-size:14px;font-weight:400;letter-spacing:0;text-transform:none;min-height:44px;padding:0 10px;border:1px solid #9AA39F;border-radius:8px;background:#FFFFFF;color:#1E2B28"><option>Todos</option><option>L. Vargas</option><option>A. Ruiz</option></select>
+</label>
+<label style="display:flex;align-items:center;gap:8px;min-height:44px;font-size:13.5px"><input type="checkbox" style="width:18px;height:18px;accent-color:#0F6E56">Solo mías</label>
+</div>
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;border-top:1px solid #E8E6DE;padding-top:12px">
+<span style="font-size:12.5px;color:#5E6A66">Filtros activos:</span>
+<span style="display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 6px 0 12px;border-radius:18px;background:#E1F5EE;color:#0B4A3A;font-size:13px">Palabra clave: videovigilancia <button type="button" aria-label="Quitar palabra clave" style="font:inherit;width:28px;height:28px;border:0;border-radius:50%;background:transparent;color:#0B4A3A;cursor:pointer">✕</button></span>
+<span style="display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 6px 0 12px;border-radius:18px;background:#E1F5EE;color:#0B4A3A;font-size:13px">Departamento: Lambayeque <button type="button" aria-label="Quitar departamento" style="font:inherit;width:28px;height:28px;border:0;border-radius:50%;background:transparent;color:#0B4A3A;cursor:pointer">✕</button></span>
+<span style="flex:1"></span>
+<button type="button" style="font:inherit;font-size:13.5px;font-weight:500;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;cursor:pointer">Guardar como perfil de búsqueda</button>
+</div>
+</section>
+
+<div style="overflow-x:auto;border:1px solid #E8E6DE;border-radius:10px;background:#FFFFFF">
+<table style="width:100%;border-collapse:collapse;min-width:1020px;font-size:13.5px">
+<thead>
+<tr style="background:#F8F7F2;text-align:left">
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Convocatoria</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Entidad y objeto</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66;text-align:right">Valor ref. (S/)</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Próximo hito</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Estado</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Atajos</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top:1px solid #E8E6DE;background:#FAFDFB">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">[código]</td>
+<td style="padding:12px 14px;color:#5E6A66">[entidad]<br>[objeto de la convocatoria detectada]</td>
+<td style="padding:12px 14px;text-align:right;color:#5E6A66">[valor]</td>
+<td style="padding:12px 14px;color:#5E6A66">[hito · fecha]</td>
+<td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Nueva</span></td>
+<td style="padding:12px 14px"><div style="display:flex;flex-wrap:wrap;gap:6px">
+<button type="button" style="font:inherit;font-size:13px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;cursor:pointer">Seguimiento</button>
+<button type="button" style="font:inherit;font-size:13px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;cursor:pointer">Asignar</button>
+<button type="button" style="font:inherit;font-size:13px;font-weight:600;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;cursor:pointer">Participar</button>
+<button type="button" style="font:inherit;font-size:13px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #E7B8B1;background:#FFFFFF;color:#A4261E;cursor:pointer">Descartar</button>
+</div></td>
+</tr>
+<tr style="border-top:1px solid #E8E6DE">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">AS-2026-031</td>
+<td style="padding:12px 14px">UGEL Chiclayo<br><span style="color:#5E6A66">Equipos de cómputo</span></td>
+<td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">92 000.00</td>
+<td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#FFF1D6;color:#7A4A00">Consultas · en 6 días</span></td>
+<td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#EEEDE6;color:#4A5551">En evaluación</span><br><span style="font-size:12.5px;color:#5E6A66">L. Vargas</span></td>
+<td style="padding:12px 14px"><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+<span style="font-size:12.5px;color:#0B5A32;font-weight:600">En seguimiento ✓</span>
+<button type="button" style="font:inherit;font-size:13px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;cursor:pointer">Asignar</button>
+<button type="button" style="font:inherit;font-size:13px;font-weight:600;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;cursor:pointer">Participar</button>
+<button type="button" style="font:inherit;font-size:13px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #E7B8B1;background:#FFFFFF;color:#A4261E;cursor:pointer">Descartar</button>
+</div></td>
+</tr>
+<tr style="border-top:1px solid #E8E6DE">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500">LP-2026-009</td>
+<td style="padding:12px 14px">GORE Lambayeque<br><span style="color:#5E6A66">Infraestructura de red</span></td>
+<td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">480 000.00</td>
+<td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#EEEDE6;color:#4A5551">Absolución · en 11 días</span></td>
+<td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#EEEDE6;color:#4A5551">En evaluación</span><br><span style="font-size:12.5px;color:#5E6A66">A. Ruiz</span></td>
+<td style="padding:12px 14px"><div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+<span style="font-size:12.5px;color:#0B5A32;font-weight:600">En seguimiento ✓</span>
+<button type="button" style="font:inherit;font-size:13px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;cursor:pointer">Asignar</button>
+<button type="button" style="font:inherit;font-size:13px;font-weight:600;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;cursor:pointer">Participar</button>
+<button type="button" style="font:inherit;font-size:13px;min-height:44px;padding:0 10px;border-radius:8px;border:1px solid #E7B8B1;background:#FFFFFF;color:#A4261E;cursor:pointer">Descartar</button>
+</div></td>
+</tr>
+<tr style="border-top:1px solid #E8E6DE;background:#FCFBF8">
+<td style="padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500"><a href="LicDatos.dc.html">LP-2026-014</a></td>
+<td style="padding:12px 14px">Muni. de Pimentel<br><span style="color:#5E6A66">Videovigilancia urbana</span></td>
+<td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">260 000.00</td>
+<td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#FCEBE8;color:#A4261E">Presentación · en 2 días</span></td>
+<td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">En preparación</span><br><span style="font-size:12.5px;color:#5E6A66">L. Vargas</span></td>
+<td style="padding:12px 14px"><a href="LicDatos.dc.html" style="font-size:13.5px">Abrir la ficha</a><div style="font-size:12px;color:#5E6A66">Ya se decidió participar</div></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:8px 24px;font-size:13px;color:#5E6A66;max-width:980px">
+<span><b style="font-weight:600;color:#1E2B28">Seguimiento:</b> crea la participación «en evaluación».</span>
+<span><b style="font-weight:600;color:#1E2B28">Asignar:</b> elige responsable y avisa.</span>
+<span><b style="font-weight:600;color:#1E2B28">Participar:</b> crea expediente, cronograma y oportunidad.</span>
+<span><b style="font-weight:600;color:#1E2B28">Descartar:</b> pide motivo de una lista cerrada.</span>
+</div>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

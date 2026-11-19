@@ -1,0 +1,110 @@
+---
+// La construcción: las etapas del MVP y cada plan, del más reciente al más antiguo.
+import Base from '../layouts/Base.astro';
+import Cajetin from '../components/Cajetin.astro';
+import { etapas, fechaCorta, planes } from '../lib/proyecto';
+import { url } from '../lib/sitio';
+
+const obra = await etapas();
+const lista = await planes();
+const activos = lista.filter((p) => p.activo);
+const cerrados = lista.filter((p) => !p.activo);
+const hechas = obra.tareas.filter((t) => t.hecha).length;
+
+// Los planes cerrados agrupados por mes, para leerlos como una bitácora.
+const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const porMes = new Map<string, typeof cerrados>();
+for (const p of cerrados) {
+  const [a, m] = p.fecha.split('-');
+  const clave = `${MESES[Number(m) - 1]} de ${a}`;
+  if (!porMes.has(clave)) porMes.set(clave, []);
+  porMes.get(clave)!.push(p);
+}
+---
+<Base titulo="Construcción" fija="construccion" seccion="Construcción" descripcion="Etapas del MVP y planes de trabajo de TechQuk Integral System.">
+  <p class="ruta-archivo">docs / planes</p>
+  <div class="prosa">
+    <h1>Construcción</h1>
+    <p>
+      El MVP es toda la especificación v4 en versión base, construida en seis etapas. Cada etapa se cierra con sus pruebas en
+      verde antes de abrir la siguiente, y cada tarea tiene un plan: qué debe quedar verdad, qué se leyó, los pasos y una
+      bitácora que permite retomar el trabajo donde quedó. El orden y el detalle están en el
+      <a href={url('planes/mapa-etapas')}>mapa de etapas</a>.
+    </p>
+
+    <h2>Etapas</h2>
+    <ul class="listado">
+      {obra.lista.map((e) => (
+        <li>
+          <span class="clave">Etapa {e.n}</span>
+          <strong>{e.nombre}</strong>
+          {e.cerrada ? <span class="sello ok">Cerrada{e.fecha ? ` ${fechaCorta(e.fecha)}` : ''}</span>
+            : e === obra.actual ? <span class="sello en-curso">En curso · {hechas} de {obra.tareas.length}</span>
+            : <span class="sello">Por abrir</span>}
+          <span class="detalle"><b>Lista cuando:</b> {e.lista}</span>
+        </li>
+      ))}
+    </ul>
+
+    {obra.actual && (
+      <>
+        <h2>Tareas de la etapa {obra.actual.n}</h2>
+        <p>En el orden en que se hacen. Las cerradas tienen su plan en la bitácora de abajo.</p>
+        <ul class="listado tareas">
+          {obra.tareas.map((t) => (
+            <li class={t.hecha ? 'hecha' : ''}>
+              <span class="clave">{t.id}</span>
+              <span>{t.desc}</span>
+              <span class={`sello ${t.hecha ? 'ok' : ''}`}>{t.hecha ? 'Cerrada' : 'Por hacer'}</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+
+    <h2>Bitácora de planes</h2>
+    {activos.length > 0 ? (
+      <ul class="listado">
+        {activos.map((p) => (
+          <li>
+            <span class="clave">{fechaCorta(p.fecha)}</span>
+            <a href={url(p.doc.ruta)}>{p.titulo}</a>
+            <span class="sello en-curso">En curso</span>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No hay ningún plan abierto ahora mismo.</p>
+    )}
+    {[...porMes].map(([mes, ps]) => (
+      <>
+        <h3>{mes.charAt(0).toUpperCase() + mes.slice(1)}</h3>
+        <ul class="listado">
+          {ps.map((p) => (
+            <li>
+              <span class="clave">{fechaCorta(p.fecha)}</span>
+              <a href={url(p.doc.ruta)}>{p.titulo}</a>
+              <span class="sello ok">Terminado</span>
+            </li>
+          ))}
+        </ul>
+      </>
+    ))}
+
+    <Cajetin titulo="Construcción" codigo="CO-00" seccion="Construcción" archivo="docs/planes" editable={false} />
+  </div>
+</Base>
+
+<style>
+  .tareas li {
+    grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+  }
+  .tareas .hecha span:nth-child(2) {
+    color: var(--tinta-suave);
+  }
+  .listado strong {
+    font-family: var(--f-rotulo);
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+</style>

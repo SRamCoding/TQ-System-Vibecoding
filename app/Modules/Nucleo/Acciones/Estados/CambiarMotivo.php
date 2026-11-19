@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\Nucleo\Acciones\Estados;
+
+use App\Modules\Nucleo\Models\User;
+use App\Modules\Nucleo\RegistroAcciones\Accion;
+use App\Modules\Nucleo\RegistroAcciones\Campo;
+use App\Modules\Nucleo\Services\MotivosService;
+
+/** Renombra un motivo; el historial que lo usó muestra el nombre nuevo (plan 1.5, D9). */
+final class CambiarMotivo extends Accion
+{
+    public function clave(): string
+    {
+        return 'nucleo.motivos.cambiar';
+    }
+
+    public function nombre(): string
+    {
+        return 'Renombrar motivo';
+    }
+
+    public function campos(): array
+    {
+        return [
+            Campo::entero('motivo_id', 'Motivo')->conReglas('min:1'),
+            Campo::entero('version', 'Versión')->conReglas('min:1')->deControl(),
+            Campo::texto('nombre', 'Nombre', maximo: 160),
+        ];
+    }
+
+    public function permiso(): string
+    {
+        return 'nucleo.motivos.editar';
+    }
+
+    public function ejecutar(array $datos, User $usuario): mixed
+    {
+        return app(MotivosService::class)->renombrar($datos['motivo_id'], $datos['version'], $datos['nombre']);
+    }
+}

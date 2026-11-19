@@ -1,0 +1,30 @@
+---
+// Un nivel del índice. Se llama a sí mismo para los grupos anidados (el archivo de agosto, la v4…).
+import type { ItemMenu } from '../lib/sitio';
+import { cargar, url } from '../lib/sitio';
+
+interface Props {
+  items: ItemMenu[];
+  actual?: string;
+}
+const { items, actual } = Astro.props;
+const { docs } = await cargar();
+---
+<ul>
+  {items.map((it) => {
+    if (it.rel) {
+      const d = docs.get(it.rel)!;
+      return (
+        <li>
+          <a href={url(d.ruta)} aria-current={d.rel === actual ? 'page' : undefined}>{/^(readme|leeme)\.md$/i.test(d.rel.split('/').at(-1) ?? '') && it.titulo === d.titulo ? 'Presentación' : it.titulo}</a>
+        </li>
+      );
+    }
+    return (
+      <li>
+        <span class="grupo">{it.titulo}</span>
+        <Astro.self items={it.hijos ?? []} actual={actual} />
+      </li>
+    );
+  })}
+</ul>

@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>El reparto en gráficos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: guía de equipo; índice fijo a la izquierda en escritorio, arriba en el celular; secciones numeradas porque son un orden real de lectura */
+:root {
+  --bg: #f6f7fb; --surface: #ffffff; --fg: #141a2e; --muted: #556079; --line: #dde1ec;
+  --accent: #1b2f8a; --accent-soft: #e7ebfb; --teal: #0d7472; --teal-soft: #dff2f1;
+  --amber: #a85a06; --amber-soft: #fdf1df; --red: #b42318; --red-soft: #fdeceb; --green: #187a3d; --green-soft: #e3f4e8;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.envoltura { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2.5rem; max-width: 72rem; margin: 0 auto;
+  padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.5rem); align-self: start; font-size: 0.9rem; }
+nav.indice b { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+nav.indice ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; counter-reset: i; }
+nav.indice li { counter-increment: i; }
+nav.indice a { display: flex; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 6px; color: var(--fg); text-decoration: none; }
+nav.indice a::before { content: counter(i); font-family: var(--mono); color: var(--muted); min-width: 1.2rem; }
+nav.indice a:hover, nav.indice a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+main { min-width: 0; display: grid; gap: 3rem; }
+header.cabeza { display: grid; gap: 0.75rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
+h1 { font-family: var(--display); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; color: var(--fg); }
+.bajada { color: var(--muted); max-width: 62ch; margin: 0; font-size: 1.05rem; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+h2 { font-size: 1.45rem; margin: 0; display: flex; gap: 0.75rem; align-items: baseline; text-wrap: balance; }
+h2 .n { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); }
+h3 { font-size: 1.05rem; margin: 0.5rem 0 0; }
+p { margin: 0; max-width: 68ch; }
+.caja { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; }
+.nota { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; max-width: 68ch; }
+.nota.ambar { border-color: var(--amber); background: var(--amber-soft); }
+.nota.roja { border-color: var(--red); background: var(--red-soft); }
+.equipo { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.2rem; }
+.persona b { font-size: 1.05rem; }
+.persona span { color: var(--muted); font-size: 0.9rem; }
+
+/* ciclo */
+.ciclo { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; counter-reset: c; list-style: none; padding: 0; margin: 0; }
+.ciclo li { counter-increment: c; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem 0.4rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+.ciclo li::before { content: counter(c); display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: 0.8rem; }
+.ciclo li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 0.4rem; }
+
+/* tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+/* camino de una tarea */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: p; }
+.pasos > li { counter-increment: p; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details[open] { border-color: var(--accent); }
+summary { cursor: pointer; list-style: none; display: flex; gap: 0.75rem; align-items: center; padding: 0.8rem 1rem; font-weight: 600; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: counter(p); display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--mono); font-size: 0.85rem; }
+summary::after { content: "+"; margin-left: auto; color: var(--muted); font-family: var(--mono); }
+details[open] summary::after { content: "−"; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.det { padding: 0 1rem 1rem 3.55rem; display: grid; gap: 0.5rem; }
+.det ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+/* vida de una costura */
+.linea { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+.etapa { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.etapa b { font-size: 0.95rem; }
+.etapa small { font-family: var(--mono); color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* reglas */
+.reglas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; counter-reset: r; }
+.reglas li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem 0.7rem 2.8rem; position: relative; font-size: 0.93rem; }
+.reglas li::before { content: counter(r); position: absolute; left: 0.8rem; top: 0.7rem; font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+/* lista de verificación */
+.check { display: grid; gap: 0.4rem; }
+.check label { display: flex; gap: 0.7rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--green); flex: 0 0 auto; }
+.check label:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.check label:has(input:checked) span { text-decoration: line-through; color: var(--muted); }
+.check-pie { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.check-pie button { font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.check-pie button:hover, .check-pie button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.progreso { font-family: var(--mono); color: var(--green); font-weight: 500; }
+
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+@media (max-width: 860px) {
+  .envoltura { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  nav.indice { position: static; }
+  nav.indice ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .linea { grid-template-columns: minmax(0, 1fr); }
+  .det { padding-left: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tabs button, .chipbtn { font: inherit; font-size: 0.92rem; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; }
+.tabs button:hover, .tabs button:focus-visible, .chipbtn:hover, .chipbtn:focus-visible { border-color: var(--accent); outline: none; }
+.tabs button[aria-selected="true"], .chipbtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.15rem; display: grid; gap: 0.6rem; }
+.panel p, .panel li { max-width: 68ch; }
+.panel ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.75rem; }
+.tres { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; }
+.bloque { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.45rem; align-content: start; }
+.bloque h3 { margin: 0; font-size: 1rem; }
+.bloque ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; font-size: 0.93rem; }
+.bloque.azul { border-top: 4px solid var(--accent); } .bloque.teal { border-top: 4px solid var(--teal); }
+.bloque.ambar { border-top: 4px solid var(--amber); } .bloque.verde { border-top: 4px solid var(--green); } .bloque.gris { border-top: 4px solid var(--muted); }
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; }
+.cifra { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 0.9rem; display: grid; gap: 0.15rem; }
+.cifra b { font-family: var(--mono); font-size: 1.45rem; color: var(--accent); font-weight: 500; font-variant-numeric: tabular-nums; }
+.cifra span { color: var(--muted); font-size: 0.88rem; }
+.flujo { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.4rem; }
+.flujo .paso { flex: 1 1 8rem; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c, var(--accent)); border-radius: 8px; padding: 0.6rem 0.7rem; font-size: 0.88rem; display: grid; gap: 0.15rem; }
+.flujo .paso b { font-size: 0.95rem; }
+.flujo .paso span { color: var(--muted); }
+.flecha { align-self: center; color: var(--muted); font-family: var(--mono); }
+.numeros4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-radius: 10px; overflow: hidden; }
+.numeros4 div { padding: 0.8rem; color: var(--surface); display: grid; gap: 0.2rem; font-size: 0.88rem; }
+.numeros4 div b { font-size: 1rem; }
+.viaje { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.viaje button { width: 100%; text-align: left; font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; display: flex; gap: 0.7rem; align-items: center; }
+.viaje button:hover, .viaje button:focus-visible { border-color: var(--accent); outline: none; }
+.viaje button[aria-expanded="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.viaje .et { font-family: var(--mono); font-size: 0.78rem; color: var(--surface); background: var(--c, var(--accent)); border-radius: 5px; padding: 0.1rem 0.45rem; min-width: 2.2rem; text-align: center; }
+.viaje .tt { font-weight: 600; flex: 1; min-width: 0; }
+.viaje .mm { color: var(--muted); font-size: 0.82rem; font-family: var(--mono); }
+.viaje .det { padding: 0.6rem 0.8rem 0.4rem 3.6rem; font-size: 0.94rem; display: grid; gap: 0.3rem; }
+.buscar { font: inherit; width: 100%; max-width: 26rem; padding: 0.5rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); }
+.buscar:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tl { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.4rem; }
+.tl div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem; font-size: 0.85rem; display: grid; gap: 0.2rem; align-content: start; }
+.tl div b { font-size: 0.92rem; }
+.tl .ok { border-color: var(--green); background: var(--green-soft); }
+.tl .casi { border-color: var(--amber); background: var(--amber-soft); }
+.tl .sig { border-color: var(--accent); background: var(--accent-soft); }
+.estado { font-family: var(--mono); font-size: 0.72rem; font-weight: 500; }
+.tarea-h { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 0.6rem; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--line); font-size: 0.93rem; }
+.tarea-h:last-child { border-bottom: 0; }
+.tarea-h .id { font-family: var(--mono); color: var(--accent); font-weight: 500; }
+.tarea-h .abierta { color: var(--amber); }
+.lista-h { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.pie-dato { color: var(--muted); font-size: 0.88rem; }
+@media (max-width: 860px) { .numeros4, .tl { grid-template-columns: repeat(2, minmax(0, 1fr)); } .viaje .det { padding-left: 0.8rem; } .viaje .mm { display: none; } }
+
+</style>
+</head>
+<body>
+
+<style>
+.resumen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.6rem; }
+.res { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 10px; padding: 0.8rem 0.9rem; display: grid; gap: 0.1rem; }
+.res b { font-size: 1rem; }
+.res .pct { font-family: var(--mono); font-size: 1.6rem; color: var(--fg); font-variant-numeric: tabular-nums; }
+.res span { color: var(--muted); font-size: 0.86rem; }
+.lienzo { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem; overflow-x: auto; }
+.fila-barra { display: grid; grid-template-columns: 7rem minmax(0, 1fr) 3.5rem; gap: 0.75rem; align-items: center; margin-bottom: 0.9rem; }
+.fila-barra:last-child { margin-bottom: 0; }
+.nombre-fila { font-weight: 600; font-size: 0.95rem; }
+.nombre-fila small { display: block; color: var(--muted); font-weight: 400; font-size: 0.78rem; }
+.barra-seg { display: flex; gap: 2px; height: 2.4rem; }
+.seg { border-radius: 4px; display: flex; align-items: center; justify-content: center; min-width: 0; overflow: hidden; font-size: 0.76rem; font-weight: 600; color: #fff; cursor: default; padding: 0 0.3rem; white-space: nowrap; text-overflow: ellipsis; }
+.seg span { overflow: hidden; text-overflow: ellipsis; }
+.total { font-family: var(--mono); font-size: 0.9rem; text-align: right; font-variant-numeric: tabular-nums; }
+.eje { display: grid; grid-template-columns: 7rem minmax(0, 1fr) 3.5rem; gap: 0.75rem; margin-top: 0.4rem; font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+.eje div { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 0.2rem; }
+.carril { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: 0.75rem; align-items: stretch; margin-bottom: 0.7rem; }
+.carril:last-child { margin-bottom: 0; }
+.bloques { display: flex; gap: 3px; min-width: 56rem; }
+.bloque-t { flex-basis: 0; min-width: 5.2rem; border-radius: 5px; padding: 0.35rem 0.4rem; font-size: 0.74rem; line-height: 1.25; min-width: 0; border: 1.5px solid var(--c); background: color-mix(in srgb, var(--c) 14%, var(--surface)); color: var(--fg); display: grid; align-content: space-between; gap: 0.2rem; cursor: default; }
+.bloque-t.primero { background: var(--c); color: var(--surface); }
+.bloque-t b { font-weight: 600; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.bloque-t .pts { font-family: var(--mono); font-size: 0.68rem; opacity: 0.85; }
+.bloque-t .usa { font-family: var(--mono); font-size: 0.64rem; opacity: 0.85; }
+.leyenda-c { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.84rem; color: var(--muted); margin-top: 0.6rem; }
+.leyenda-c span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.mues { width: 0.9rem; height: 0.9rem; border-radius: 3px; display: inline-block; }
+.matriz { border-collapse: separate; border-spacing: 3px; width: 100%; min-width: 34rem; }
+.matriz th { font-size: 0.78rem; color: var(--muted); text-transform: none; letter-spacing: 0; padding: 0.4rem; border: 0; text-align: center; }
+.matriz th.izq { text-align: left; }
+.matriz td { border: 0; border-radius: 6px; padding: 0.45rem; text-align: center; vertical-align: middle; font-size: 0.82rem; background: var(--bg); }
+.matriz td.si { background: var(--accent-soft); }
+.matriz td.yo { background: repeating-linear-gradient(45deg, var(--bg), var(--bg) 4px, var(--line) 4px, var(--line) 5px); }
+.cc { display: inline-block; font-family: var(--mono); font-size: 0.74rem; font-weight: 500; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 0.05rem 0.35rem; margin: 0.1rem; cursor: default; }
+.complejidad { display: grid; gap: 0.35rem; }
+.comp-fila { display: grid; grid-template-columns: 13rem minmax(0, 1fr) 2.5rem; gap: 0.6rem; align-items: center; font-size: 0.88rem; }
+.comp-barra { height: 0.9rem; border-radius: 0 4px 4px 0; background: var(--c); }
+.comp-fila .p { font-family: var(--mono); font-size: 0.8rem; text-align: right; font-variant-numeric: tabular-nums; }
+.tip { position: fixed; z-index: 20; pointer-events: none; background: var(--fg); color: var(--bg); font-size: 0.82rem; line-height: 1.35; padding: 0.45rem 0.6rem; border-radius: 6px; max-width: 18rem; box-shadow: 0 4px 14px rgb(0 0 0 / 0.2); }
+@media (max-width: 860px) { .resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); } .comp-fila { grid-template-columns: 9rem minmax(0, 1fr) 2.2rem; } }
+</style>
+
+<div class="envoltura">
+  <nav class="indice" aria-label="Índice">
+    <b>Índice</b>
+    <ol>
+      <li><a href="#carga">La carga de cada uno</a></li>
+      <li><a href="#orden">El orden de las tareas</a></li>
+      <li><a href="#costuras">Quién le ofrece qué a quién</a></li>
+      <li><a href="#modulos">La complejidad de cada módulo</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="cabeza">
+      <span class="eyebrow">TechQuk Integral System · etapa 2</span>
+      <h1>El reparto en gráficos</h1>
+      <p class="bajada">Cómo está repartida la etapa 2 entre los cuatro, medida en puntos de esfuerzo. Pasa el mouse por cualquier parte para ver el detalle. Los puntos son relativos, no horas.</p>
+    </header>
+
+    <section id="resumen-sec">
+      <div class="resumen" id="resumen"></div>
+    </section>
+
+    <section id="carga">
+      <h2><span class="n">01</span>La carga de cada uno</h2>
+      <p>Una barra por persona, partida en sus módulos. El largo es su total de puntos; cada tramo, un módulo.</p>
+      <div class="lienzo" id="barras"></div>
+    </section>
+
+    <section id="orden">
+      <h2><span class="n">02</span>El orden de las tareas</h2>
+      <p>Un carril por persona, de izquierda a derecha en el orden sugerido. El ancho de cada bloque son sus puntos. Los bloques rellenos van primero porque otros los esperan; «usa» indica la costura de otra área que necesita (con su versión falsa mientras no exista la real).</p>
+      <div class="lienzo" id="carriles"></div>
+      <div class="leyenda-c">
+        <span><i class="mues" style="background: var(--accent)"></i>Va primero: otros lo esperan</span>
+        <span><i class="mues" style="background: color-mix(in srgb, var(--accent) 14%, var(--surface)); border: 1.5px solid var(--accent)"></i>Tarea del área</span>
+      </div>
+    </section>
+
+    <section id="costuras">
+      <h2><span class="n">03</span>Quién le ofrece qué a quién</h2>
+      <p>Cada fila es quien ofrece la costura; cada columna, quien la usa. Las celdas con códigos son los puntos de contacto entre dos áreas: ahí conviene hablar seguido.</p>
+      <div class="lienzo"><table class="matriz" id="matriz"></table></div>
+    </section>
+
+    <section id="modulos">
+      <h2><span class="n">04</span>La complejidad de cada módulo</h2>
+      <p>Los puntos de cada módulo, ordenados de mayor a menor, con el color de quien lo construye. Campañas queda sin dueño hasta que se valide.</p>
+      <div class="lienzo"><div class="complejidad" id="complejidad"></div></div>
+    </section>
+
+    <footer>Esta guía vive en el repositorio, en <code>docs/equipo/9-reparto-en-graficos.html</code>. Los datos salen del ADR 0020; si no coinciden, manda el repositorio.</footer>
+  </main>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(function () {
+  const PERSONAS = [
+    { id: 'sebastian', nombre: 'Sebastián', area: 'Presupuesto y costo', c: 'var(--accent)',
+      modulos: [['Presupuestos', 20, 'APU, árbol con versiones, saldos, selector de imputación, margen'], ['Gastos no presupuestados', 3, 'PC-99 y posible adicional']],
+      tareas: [['Esqueleto C1', 2, true, ''], ['Presupuesto con APU', 8, false, 'C4 · C5'], ['Árbol y saldos', 4, false, ''], ['Selector de imputación', 3, false, ''], ['Resumen para el CRM (C8)', 1, false, ''], ['Gastos no presupuestados', 3, false, ''], ['Margen y cierre', 2, false, 'C10']] },
+    { id: 'ander', nombre: 'Ander', area: 'Comercial', c: 'var(--teal)',
+      modulos: [['Cuentas', 3, 'Sobre el registro único de personas'], ['Oportunidades', 5, 'Embudo y tablero del ejecutivo'], ['Cotizaciones', 5, 'Versiones, comparador, PDF'], ['Licitaciones', 8, 'Públicas y privadas, cronograma, expediente'], ['Actividades', 2, 'Próxima acción']],
+      tareas: [['Cuentas', 3, false, ''], ['Oportunidades y tablero', 4, false, ''], ['Actividades', 2, false, ''], ['Cotizaciones', 5, false, 'C4 · C8'], ['Licitaciones', 8, false, 'C9'], ['Oportunidad ganada (C3)', 1, false, '']] },
+    { id: 'lennart', nombre: 'Lennart', area: 'Contratos y abastecimiento', c: 'var(--amber)',
+      modulos: [['Contratos', 5, 'Hitos, carta fianza, penalidad'], ['Compras', 8, 'Requerimientos, cuadro, órdenes'], ['Almacén', 8, 'Stock, series, recepciones, despachos'], ['Subcontratos', 3, 'En Obra pública']],
+      tareas: [['Almacenes y tipos de compra', 2, false, ''], ['Contratos', 5, false, 'C2 · C3'], ['Requerimientos', 2, false, 'C1'], ['Cotizaciones y cuadro comparativo', 2, false, ''], ['Órdenes', 4, false, 'C1 · C4'], ['Recepciones y stock', 4, false, ''], ['Despachos a obra', 2, false, 'C1'], ['Subcontratos', 3, false, 'C1']] },
+    { id: 'yair', nombre: 'Yair', area: 'Obra y personas', c: 'var(--green)',
+      modulos: [['Proyectos', 3, 'El proyecto y la costura C2'], ['Catálogo', 3, 'Vive en el CRM; revisa Ander'], ['Personal', 3, 'Colaboradores, certificaciones, asignaciones'], ['Tareo', 5, 'Habilitación y horas desde el celular'], ['Valorizaciones', 3, 'Avance del periodo'], ['OECE', 8, 'Convocatorias diarias y explorador de todas; revisa Ander']],
+      tareas: [['Esqueletos C2 y C4', 2, true, ''], ['Catálogo', 2, false, ''], ['Proyectos', 2, false, ''], ['Colaboradores y costo por hora', 2, false, ''], ['Habilitación de campo', 2, false, ''], ['Asignaciones y tareo', 4, false, 'C1'], ['Valorizaciones', 3, false, 'C10'], ['OECE y su explorador', 8, false, '']] },
+  ];
+  const COSTURAS = [
+    ['C1', 'sebastian', ['lennart', 'yair'], 'La partida, su saldo, el selector y el margen'],
+    ['C2', 'yair', ['sebastian', 'ander', 'lennart'], 'El proyecto'],
+    ['C3', 'ander', ['lennart'], 'La oportunidad ganada'],
+    ['C4', 'yair', ['sebastian', 'lennart', 'ander'], 'El catálogo'],
+    ['C5', 'yair', ['sebastian', 'lennart'], 'El costo de las horas y la habilitación'],
+    ['C6', 'lennart', ['sebastian'], 'Compras y almacén como costo'],
+    ['C8', 'sebastian', ['ander'], 'El presupuesto de una cotización'],
+    ['C9', 'yair', ['ander'], 'Las certificaciones del personal'],
+    ['C10', 'lennart', ['sebastian', 'yair'], 'El contrato y sus adendas'],
+    ['C11', 'sebastian', ['lennart'], 'El posible adicional'],
+  ];
+  const total = PERSONAS.reduce((s, p) => s + p.modulos.reduce((a, m) => a + m[1], 0), 0);
+  const maximo = Math.max(...PERSONAS.map((p) => p.modulos.reduce((a, m) => a + m[1], 0)));
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // Resumen
+  document.getElementById('resumen').innerHTML = PERSONAS.map((p) => {
+    const pts = p.modulos.reduce((a, m) => a + m[1], 0);
+    return `<div class="res" style="--c:${p.c}"><b>${p.nombre}</b><span class="pct">${Math.round(100 * pts / total)} %</span><span>${p.area} · ${pts} puntos</span></div>`;
+  }).join('');
+
+  // Barras apiladas: mismo color de la persona, más claro en cada módulo siguiente
+  document.getElementById('barras').innerHTML = PERSONAS.map((p) => {
+    const pts = p.modulos.reduce((a, m) => a + m[1], 0);
+    const segs = p.modulos.map((m, i) => {
+      const mezcla = 100 - i * 11;
+      return `<div class="seg" style="flex:${m[1]};background:color-mix(in srgb, ${p.c} ${mezcla}%, black)" data-tip="<b>${esc(m[0])}</b> · ${m[1]} puntos<br>${esc(m[2])}"><span>${esc(m[0])}</span></div>`;
+    }).join('');
+    return `<div class="fila-barra"><div class="nombre-fila">${p.nombre}<small>${p.area}</small></div><div class="barra-seg" style="width:${100 * pts / maximo}%">${segs}</div><div class="total">${pts} pts</div></div>`;
+  }).join('') + `<div class="eje"><span></span><div><span>0</span><span>${Math.round(maximo / 2)}</span><span>${maximo}</span></div><span></span></div>`;
+
+  // Carriles
+  document.getElementById('carriles').innerHTML = PERSONAS.map((p) => {
+    const bloques = p.tareas.map((t, i) => `<div class="bloque-t${t[2] ? ' primero' : ''}" style="flex:${t[1]};--c:${p.c}" data-tip="<b>${i + 1}. ${esc(t[0])}</b> · ${t[1]} puntos${t[2] ? '<br>Va primero: otros la esperan' : ''}${t[3] ? '<br>Usa ' + esc(t[3]) + ' de otra área' : ''}"><b>${i + 1}. ${esc(t[0])}</b><span class="pts">${t[1]} pts</span>${t[3] ? `<span class="usa">usa ${esc(t[3])}</span>` : ''}</div>`).join('');
+    return `<div class="carril"><div class="nombre-fila">${p.nombre}<small>${p.area}</small></div><div class="bloques">${bloques}</div></div>`;
+  }).join('');
+
+  // Matriz
+  const cab = '<tr><th class="izq">Ofrece ↓ · Usa →</th>' + PERSONAS.map((p) => `<th>${p.nombre}</th>`).join('') + '</tr>';
+  const filas = PERSONAS.map((o) => '<tr><th class="izq">' + o.nombre + '</th>' + PERSONAS.map((u) => {
+    if (o.id === u.id) return '<td class="yo" aria-label="Misma persona"></td>';
+    const cs = COSTURAS.filter((c) => c[1] === o.id && c[2].includes(u.id));
+    return `<td class="${cs.length ? 'si' : ''}">${cs.map((c) => `<span class="cc" data-tip="<b>${c[0]}</b> · ${esc(c[3])}<br>${o.nombre} se la ofrece a ${u.nombre}">${c[0]}</span>`).join('') || '—'}</td>`;
+  }).join('') + '</tr>');
+  document.getElementById('matriz').innerHTML = cab + filas.join('') + '<tr><th class="izq">Núcleo</th>' + PERSONAS.map(() => '<td class="si"><span class="cc" data-tip="<b>C7</b> · Personas y empresas, que ya existen">C7</span></td>').join('') + '</tr>';
+
+  // Complejidad
+  const mods = PERSONAS.flatMap((p) => p.modulos.map((m) => [m[0], m[1], p.c, p.nombre])).concat([['Campañas', 2, 'var(--line)', 'sin dueño']]);
+  mods.sort((a, b) => b[1] - a[1]);
+  const mx = mods[0][1];
+  document.getElementById('complejidad').innerHTML = mods.map((m) => `<div class="comp-fila" data-tip="<b>${esc(m[0])}</b> · ${m[1]} puntos<br>${esc(m[3])}"><span>${esc(m[0])} <small style="color:var(--muted)">· ${esc(m[3])}</small></span><div><div class="comp-barra" style="width:${100 * m[1] / mx}%;--c:${m[2]}"></div></div><span class="p">${m[1]}</span></div>`).join('');
+
+  // Detalle al pasar el mouse
+  const tip = document.getElementById('tip');
+  document.addEventListener('mousemove', (e) => {
+    const el = e.target.closest('[data-tip]');
+    if (!el) { tip.hidden = true; return; }
+    tip.innerHTML = el.dataset.tip; tip.hidden = false;
+    const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    const y = Math.min(e.clientY + 14, window.innerHeight - tip.offsetHeight - 8);
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  });
+  document.addEventListener('scroll', () => { tip.hidden = true; }, { passive: true });
+})();
+</script>
+
+</body>
+</html>

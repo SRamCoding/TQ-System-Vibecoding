@@ -1,0 +1,235 @@
+---
+// El armazón de todas las páginas: cabecera, índice a la izquierda y la lámina al centro.
+import '@fontsource/barlow-condensed/500.css';
+import '@fontsource/barlow-condensed/600.css';
+import '@fontsource/barlow-condensed/700.css';
+import '@fontsource-variable/public-sans';
+import '@fontsource-variable/public-sans/wght-italic.css';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import Logo from '../components/Logo.astro';
+import Menu from '../components/Menu.astro';
+import { cargar, url } from '../lib/sitio';
+
+interface Props {
+  titulo: string;
+  descripcion?: string;
+  /** Documento abierto (ruta dentro de docs/), para marcarlo en el índice. */
+  actual?: string;
+  /** Página propia del sitio abierta: portada, decisiones o construcción. */
+  fija?: 'portada' | 'decisiones' | 'construccion';
+  /** Sección del índice que se abre. */
+  seccion?: string;
+  /** Si la página entra a la búsqueda. */
+  buscable?: boolean;
+}
+
+const { titulo, descripcion, actual, fija, seccion, buscable = true } = Astro.props;
+const { menu, docs } = await cargar();
+const tituloPagina = fija === 'portada' ? 'TechQuk Integral System · Documentación' : `${titulo} · TechQuk`;
+const FIJAS = [
+  { clave: 'portada', titulo: 'Portada', href: url('') },
+  { clave: 'decisiones', titulo: 'Decisiones', href: url('decisiones') },
+  { clave: 'construccion', titulo: 'Construcción', href: url('construccion') },
+] as const;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tituloPagina}</title>
+    <meta name="description" content={descripcion ?? 'Análisis, diseño, decisiones y construcción del ERP + CRM de Techquk S.A.C.'} />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('tema');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <a class="salto" href="#contenido">Ir al contenido</a>
+
+    <header class="cabecera">
+      <button class="boton solo-celular" type="button" id="abrir-menu" aria-controls="indice" aria-expanded="false">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" fill="none" /></svg>
+        <span class="visualmente-oculto">Abrir el índice</span>
+      </button>
+      <a class="marca" href="/">
+        <Logo />
+        <span>TechQuk<span class="largo"> Integral System</span> <small>· documentación</small></span>
+      </a>
+      <span class="espacio"></span>
+      <button class="boton" type="button" id="abrir-busqueda" aria-haspopup="dialog">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.8" fill="none" /><path d="m13 13 4.5 4.5" stroke="currentColor" stroke-width="1.8" /></svg>
+        <span class="rotulo">Buscar</span>
+        <kbd>/</kbd>
+      </button>
+      <button class="boton" type="button" id="tema" aria-live="polite">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.6" fill="none" /><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor" /></svg>
+        <span class="rotulo" id="tema-rotulo">Modo oscuro</span>
+      </button>
+    </header>
+
+    <div class="armazon">
+      <nav class="indice" id="indice" aria-label="Índice de la documentación">
+        <ul class="indice-fijo">
+          {FIJAS.map((f) => (
+            <li><a href={f.href} aria-current={fija === f.clave ? 'page' : undefined}>{f.titulo}</a></li>
+          ))}
+        </ul>
+        {menu.map((s) =>
+          s.rel ? (
+            <a class="suelta" href={url(docs.get(s.rel)!.ruta)} aria-current={s.rel === actual ? 'page' : undefined}><span class="sigla">{s.codigo}</span>{s.titulo}</a>
+          ) : (
+            <details open={s.titulo === seccion}>
+              <summary><span class="sigla">{s.codigo}</span>{s.titulo}</summary>
+              <Menu items={s.items} actual={actual} />
+            </details>
+          )
+        )}
+      </nav>
+
+      <div class="columna">
+        <main class="lamina" id="contenido" data-pagefind-body={buscable ? '' : undefined}>
+          <slot />
+        </main>
+        <footer class="pie">
+          <span>Se genera desde <code>docs/</code> en cada cambio de <code>main</code>. No se edita a mano.</span>
+          <a href="https://github.com/SRamCoding/TechQuk-IntegralSystem">Repositorio en GitHub</a>
+        </footer>
+      </div>
+    </div>
+
+    <dialog class="buscador" id="buscador" aria-label="Buscar en la documentación">
+      <div class="buscador-cabeza">
+        <span>Buscar en la documentación</span>
+        <button class="boton" type="button" id="cerrar-busqueda">Cerrar</button>
+      </div>
+      <div id="busqueda"></div>
+    </dialog>
+
+    <script is:inline>
+      (function () {
+        // Tema claro / oscuro, recordado en este navegador.
+        var raiz = document.documentElement;
+        var boton = document.getElementById('tema');
+        var rotulo = document.getElementById('tema-rotulo');
+        var oscuro = function () {
+          return raiz.dataset.theme ? raiz.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        };
+        var rotular = function () {
+          rotulo.textContent = oscuro() ? 'Modo claro' : 'Modo oscuro';
+          boton.setAttribute('aria-label', oscuro() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+        };
+        rotular();
+        boton.addEventListener('click', function () {
+          var nuevo = oscuro() ? 'light' : 'dark';
+          raiz.dataset.theme = nuevo;
+          try { localStorage.setItem('tema', nuevo); } catch (e) {}
+          rotular();
+          document.dispatchEvent(new CustomEvent('tema-cambiado'));
+        });
+
+        // Índice en el celular.
+        var abrir = document.getElementById('abrir-menu');
+        abrir.addEventListener('click', function () {
+          var abierto = document.body.classList.toggle('menu-abierto');
+          abrir.setAttribute('aria-expanded', String(abierto));
+        });
+        document.addEventListener('click', function (e) {
+          if (document.body.classList.contains('menu-abierto') && !e.target.closest('#indice, #abrir-menu')) {
+            document.body.classList.remove('menu-abierto');
+            abrir.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        // El documento abierto, visible en el índice.
+        var marcado = document.querySelector('.indice a[aria-current="page"]');
+        if (marcado) marcado.scrollIntoView({ block: 'center' });
+
+        // Búsqueda (Pagefind se genera al construir el sitio).
+        var dialogo = document.getElementById('buscador');
+        var cargada = false;
+        var abrirBusqueda = function () {
+          dialogo.showModal();
+          if (cargada) {
+            var campo = dialogo.querySelector('input');
+            if (campo) campo.focus();
+            return;
+          }
+          cargada = true;
+          var css = document.createElement('link');
+          css.rel = 'stylesheet';
+          css.href = '/pagefind/pagefind-ui.css';
+          document.head.appendChild(css);
+          var js = document.createElement('script');
+          js.src = '/pagefind/pagefind-ui.js';
+          js.onload = function () {
+            new PagefindUI({
+              element: '#busqueda',
+              showSubResults: true,
+              showImages: false,
+              autofocus: true,
+              translations: { placeholder: 'Qué buscas: imputación, partida de control, ADR 0009…', zero_results: 'Nada con «[SEARCH_TERM]». Prueba con otra palabra o con el término del glosario.' },
+            });
+          };
+          js.onerror = function () {
+            document.getElementById('busqueda').innerHTML =
+              '<p class="sin-busqueda">La búsqueda se arma al construir el sitio (npm run build). En modo de desarrollo no está.</p>';
+          };
+          document.head.appendChild(js);
+        };
+        document.getElementById('abrir-busqueda').addEventListener('click', abrirBusqueda);
+        document.getElementById('cerrar-busqueda').addEventListener('click', function () { dialogo.close(); });
+        dialogo.addEventListener('click', function (e) { if (e.target === dialogo) dialogo.close(); });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === '/' && !dialogo.open && !/input|textarea|select/i.test(document.activeElement.tagName)) {
+            e.preventDefault();
+            abrirBusqueda();
+          }
+        });
+      })();
+    </script>
+
+    <script>
+      // Diagramas Mermaid: solo se carga la librería si la página tiene alguno.
+      const bloques = document.querySelectorAll<HTMLElement>('pre.mermaid');
+      if (bloques.length) {
+        bloques.forEach((b) => (b.dataset.fuente = b.textContent ?? ''));
+        const { default: mermaid } = await import('mermaid');
+        const dibujar = async () => {
+          const css = getComputedStyle(document.documentElement);
+          const v = (n: string) => css.getPropertyValue(n).trim();
+          mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'strict',
+            theme: 'base',
+            fontFamily: 'Public Sans Variable, system-ui, sans-serif',
+            themeVariables: {
+              background: v('--lamina'),
+              primaryColor: v('--lamina'),
+              primaryBorderColor: v('--marco'),
+              primaryTextColor: v('--tinta'),
+              lineColor: v('--tinta-suave'),
+              secondaryColor: v('--resalte'),
+              tertiaryColor: v('--lamina'),
+              textColor: v('--tinta'),
+              noteBkgColor: v('--resalte'),
+              noteTextColor: v('--tinta'),
+            },
+          });
+          bloques.forEach((b) => {
+            b.removeAttribute('data-processed');
+            b.textContent = b.dataset.fuente ?? '';
+          });
+          await mermaid.run({ nodes: [...bloques] });
+        };
+        await dibujar();
+        document.addEventListener('tema-cambiado', dibujar);
+      }
+    </script>
+  </body>
+</html>

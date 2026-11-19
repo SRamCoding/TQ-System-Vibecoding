@@ -1,0 +1,7 @@
+{
+    "archivo": "rubros-ciiu.php",
+    "descripcion": "Secciones (A a U) de la Clasificación Industrial Internacional Uniforme de todas las actividades económicas, Revisión 4 (plan 2.20a, N3).",
+    "fuente": "Naciones Unidas, CIIU Rev. 4 (2008), en la versión en español que adoptó el INEI para el Perú y que SUNAT usa para la actividad económica del RUC.",
+    "nombres": "El nombre oficial es el de la sección; el abreviado lo escribió el sistema para la pantalla y se puede editar.",
+    "pendiente": "Cotejar los 21 nombres oficiales con la publicación del INEI (CIIU Rev. 4 adaptada al Perú) antes de producción."
+}

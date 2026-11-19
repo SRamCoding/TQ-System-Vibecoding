@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cuenta · Oportunidades (tablero)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+summary::-webkit-details-marker{display:none}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="cuentas" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:20px 28px 44px;display:flex;flex-direction:column;gap:14px">
+<nav aria-label="Ruta" style="font-size:12.5px;color:#5E6A66"><a href="Cuentas.dc.html" style="color:#5E6A66">Cuentas</a> › Municipalidad de Pimentel › Oportunidades › Tablero</nav>
+<section style="background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;overflow:hidden">
+<dc-import name="CabCuenta" tab="oportunidades" hint-size="100%,150px"></dc-import>
+<div style="padding:18px 18px 26px;display:flex;flex-direction:column;gap:16px">
+
+<nav aria-label="Vistas de oportunidades" style="display:flex;flex-wrap:wrap;gap:8px">
+<a href="CuentaOportunidades.dc.html" style="display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;font-size:13.5px;text-decoration:none">Tabla</a>
+<a href="CuentaOportunidadesTablero.dc.html" aria-current="page" style="display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #0F6E56;background:#E1F5EE;color:#0B5A47;font-size:13.5px;font-weight:600;text-decoration:none">Tablero</a>
+<a href="CuentaOportunidadNueva.dc.html" style="display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;font-size:13.5px;text-decoration:none">Nueva oportunidad</a>
+</nav>
+
+<div style="display:flex;flex-wrap:wrap;gap:12px">
+<div style="flex:1 1 180px;border:1px solid #E8E6DE;border-radius:8px;padding:10px 14px"><div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Oportunidades</div><div style="font-size:20px;font-weight:600">3</div></div>
+<div style="flex:1 1 180px;border:1px solid #E8E6DE;border-radius:8px;padding:10px 14px"><div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Ponderado de la cuenta</div><div style="font-size:20px;font-weight:600">[monto] <span style="font-size:13px;font-weight:400;color:#5E6A66">· Videovigilancia aporta S/ 60 000</span></div></div>
+</div>
+
+<div style="display:flex;gap:12px;overflow:visible;padding-bottom:8px;align-items:flex-start">
+<section aria-label="Prospecto" style="position:relative;flex:1 0 200px;background:#EEEDE6;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:150px"><details style="position:absolute;top:0;right:-28px;z-index:5"><summary aria-label="Requisitos para pasar de Prospecto a Calificada" style="list-style:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer"><span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#B3261E;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;box-shadow:0 0 0 3px #F4F3EE">i</span></summary><div style="position:absolute;top:48px;left:50%;transform:translateX(-50%);width:330px;box-sizing:border-box;background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;padding:14px 16px;box-shadow:0 8px 24px rgba(30,43,40,.18);color:#1E2B28;font-size:13.5px;line-height:1.45;text-align:left"><div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Para pasar de Prospecto a Calificada</div><ul style="margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px"><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Necesidad confirmada</span></li><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Presupuesto confirmado</span></li><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Decisor identificado</span></li><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Próxima acción con fecha</span></li></ul><span style="display:inline-block;margin-top:10px;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#FFF1D6;color:#7A4A00">Por validar en la Fase 0</span></div></details>
+<div style="display:flex;justify-content:space-between;padding:2px 22px 2px 4px"><b style="font-weight:600">Prospecto</b><span style="font-size:12.5px;color:#5E6A66">10 %</span></div>
+<div style="border:1px dashed #B8B5A8;border-radius:8px;padding:10px 12px;font-size:13px;color:#5E6A66">Aquí aparecen las oportunidades de la cuenta en esta etapa.</div>
+</section>
+<section aria-label="Calificada" style="position:relative;flex:1 0 200px;background:#EEEDE6;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:150px"><details open style="position:absolute;top:0;right:-28px;z-index:5"><summary aria-label="Requisitos para pasar de Calificada a Propuesta enviada" style="list-style:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer"><span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#B3261E;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;box-shadow:0 0 0 3px #F4F3EE">i</span></summary><div style="position:absolute;top:48px;left:50%;transform:translateX(-50%);width:330px;box-sizing:border-box;background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;padding:14px 16px;box-shadow:0 8px 24px rgba(30,43,40,.18);color:#1E2B28;font-size:13.5px;line-height:1.45;text-align:left"><div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Para pasar de Calificada a Propuesta enviada</div><ul style="margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px"><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Decisor identificado</span></li><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Presupuesto confirmado</span></li><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Al menos una cotización emitida</span></li><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Próxima acción obligatoria, con fecha</span></li></ul><p style="margin:10px 0 0;font-size:12.5px;color:#5E6A66">No se salta etapas hacia adelante.</p></div></details>
+<div style="display:flex;justify-content:space-between;padding:2px 22px 2px 4px"><b style="font-weight:600">Calificada</b><span style="font-size:12.5px;color:#5E6A66">25 %</span></div>
+<div style="border:2px solid #0F6E56;border-radius:8px;padding:10px 12px;background:#FFFFFF"><b style="font-weight:600">Videovigilancia</b><br><span style="font-size:12.5px;color:#5E6A66">S/ 240 000 · cierre 28 oct</span><br><span style="font-size:12px;color:#5E6A66">4 días en la etapa · A. Ruiz</span></div>
+</section>
+<section aria-label="Propuesta enviada" style="position:relative;flex:1 0 200px;background:#EEEDE6;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:150px"><details style="position:absolute;top:0;right:-28px;z-index:5"><summary aria-label="Requisitos para pasar de Propuesta enviada a Negociación" style="list-style:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer"><span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#B3261E;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;box-shadow:0 0 0 3px #F4F3EE">i</span></summary><div style="position:absolute;top:48px;left:50%;transform:translateX(-50%);width:330px;box-sizing:border-box;background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;padding:14px 16px;box-shadow:0 8px 24px rgba(30,43,40,.18);color:#1E2B28;font-size:13.5px;line-height:1.45;text-align:left"><div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Para pasar de Propuesta enviada a Negociación</div><ul style="margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px"><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>[Requisito por definir con el equipo comercial]</span></li><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span>Próxima acción con fecha</span></li></ul><span style="display:inline-block;margin-top:10px;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#FFF1D6;color:#7A4A00">Por definir en la Fase 0</span></div></details>
+<div style="display:flex;justify-content:space-between;padding:2px 22px 2px 4px"><b style="font-weight:600">Propuesta enviada</b><span style="font-size:12.5px;color:#5E6A66">50 %</span></div>
+</section>
+<section aria-label="Negociación" style="position:relative;flex:1 0 200px;background:#EEEDE6;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:150px"><details style="position:absolute;top:0;right:-28px;z-index:5"><summary aria-label="Requisitos para pasar de Negociación a Cierre" style="list-style:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;cursor:pointer"><span aria-hidden="true" style="width:30px;height:30px;border-radius:50%;background:#B3261E;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;box-shadow:0 0 0 3px #F4F3EE">i</span></summary><div style="position:absolute;top:48px;left:50%;transform:translateX(-50%);width:330px;box-sizing:border-box;background:#FFFFFF;border:1px solid #DAD8CF;border-radius:10px;padding:14px 16px;box-shadow:0 8px 24px rgba(30,43,40,.18);color:#1E2B28;font-size:13.5px;line-height:1.45;text-align:left"><div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Para pasar de Negociación a Cierre</div><ul style="margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px"><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span><b style="font-weight:600">Si se gana:</b> una cotización aceptada (solo una versión puede estar aceptada). Se genera el contrato.</span></li><li style="display:flex;gap:8px;align-items:flex-start"><span aria-hidden="true" style="flex:0 0 8px;height:8px;margin-top:6px;border-radius:2px;background:#B3261E"></span><span><b style="font-weight:600">Si se pierde:</b> motivo (lista cerrada), quién ganó y a qué precio.</span></li></ul></div></details>
+<div style="display:flex;justify-content:space-between;padding:2px 22px 2px 4px"><b style="font-weight:600">Negociación</b><span style="font-size:12.5px;color:#5E6A66">75 %</span></div>
+</section>
+<section aria-label="Cierre" style="flex:1 0 200px;background:#EEEDE6;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:150px">
+<div style="display:flex;justify-content:space-between;padding:2px 22px 2px 4px"><b style="font-weight:600">Cierre</b><span style="font-size:12.5px;color:#5E6A66">ganada · perdida</span></div>
+</section>
+</div>
+<p style="margin:0;font-size:13px;color:#5E6A66">Las otras dos oportunidades de la cuenta se ubican en la columna que les corresponda cuando se carguen sus etapas.</p>
+
+<section style="border:1px solid #E8E6DE;border-radius:10px;padding:16px 18px;background:#FFFFFF;display:flex;flex-wrap:wrap;align-items:center;gap:14px 24px">
+<div style="flex:1 1 320px">
+<div style="font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#5E6A66;font-weight:600">Tarjeta seleccionada</div>
+<div style="font-weight:600;font-size:16px;margin-top:2px">Videovigilancia · Calificada · 25 %</div>
+<div style="font-size:13.5px;color:#5E6A66">Necesidad, presupuesto y decisor confirmados · cotización COT-2026-0184 v2 pendiente de aprobación · origen LP-2026-014</div>
+</div>
+<div>
+<a href="Oportunidad.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;text-decoration:none">Ver más detallado en Oportunidades ›</a>
+<div style="font-size:12px;color:#5E6A66;margin-top:6px">Opcional: abre la ficha completa en su módulo.</div>
+</div>
+</section>
+
+</div>
+</section>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

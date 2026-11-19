@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Etapa 2 · Control de costos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: guía de la etapa; índice fijo a la izquierda, selector de persona que resalta lo suyo en toda la página */
+:root {
+  --bg: #f6f7fb; --surface: #ffffff; --fg: #141a2e; --muted: #556079; --line: #dde1ec;
+  --accent: #1b2f8a; --accent-soft: #e7ebfb; --teal: #0d7472; --teal-soft: #dff2f1;
+  --amber: #a85a06; --amber-soft: #fdf1df; --red: #b42318; --red-soft: #fdeceb; --green: #187a3d; --green-soft: #e3f4e8;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.envoltura { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2.5rem; max-width: 72rem; margin: 0 auto;
+  padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.5rem); align-self: start; font-size: 0.9rem; }
+nav.indice b { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+nav.indice ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; counter-reset: i; }
+nav.indice li { counter-increment: i; }
+nav.indice a { display: flex; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 6px; color: var(--fg); text-decoration: none; }
+nav.indice a::before { content: counter(i); font-family: var(--mono); color: var(--muted); min-width: 1.2rem; }
+nav.indice a:hover, nav.indice a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+main { min-width: 0; display: grid; gap: 3rem; }
+header.cabeza { display: grid; gap: 0.75rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
+h1 { font-family: var(--display); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; color: var(--fg); }
+.bajada { color: var(--muted); max-width: 62ch; margin: 0; font-size: 1.05rem; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+h2 { font-size: 1.45rem; margin: 0; display: flex; gap: 0.75rem; align-items: baseline; text-wrap: balance; }
+h2 .n { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); }
+h3 { font-size: 1.05rem; margin: 0.5rem 0 0; }
+p { margin: 0; max-width: 68ch; }
+.caja { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; }
+.nota { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; max-width: 68ch; }
+.nota.ambar { border-color: var(--amber); background: var(--amber-soft); }
+.nota.roja { border-color: var(--red); background: var(--red-soft); }
+.equipo { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.2rem; }
+.persona b { font-size: 1.05rem; }
+.persona span { color: var(--muted); font-size: 0.9rem; }
+
+/* ciclo */
+.ciclo { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; counter-reset: c; list-style: none; padding: 0; margin: 0; }
+.ciclo li { counter-increment: c; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem 0.4rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+.ciclo li::before { content: counter(c); display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: 0.8rem; }
+.ciclo li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 0.4rem; }
+
+/* tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+/* camino de una tarea */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: p; }
+.pasos > li { counter-increment: p; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details[open] { border-color: var(--accent); }
+summary { cursor: pointer; list-style: none; display: flex; gap: 0.75rem; align-items: center; padding: 0.8rem 1rem; font-weight: 600; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: counter(p); display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--mono); font-size: 0.85rem; }
+summary::after { content: "+"; margin-left: auto; color: var(--muted); font-family: var(--mono); }
+details[open] summary::after { content: "−"; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.det { padding: 0 1rem 1rem 3.55rem; display: grid; gap: 0.5rem; }
+.det ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+/* vida de una costura */
+.linea { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+.etapa { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.etapa b { font-size: 0.95rem; }
+.etapa small { font-family: var(--mono); color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* reglas */
+.reglas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; counter-reset: r; }
+.reglas li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem 0.7rem 2.8rem; position: relative; font-size: 0.93rem; }
+.reglas li::before { content: counter(r); position: absolute; left: 0.8rem; top: 0.7rem; font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+/* lista de verificación */
+.check { display: grid; gap: 0.4rem; }
+.check label { display: flex; gap: 0.7rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--green); flex: 0 0 auto; }
+.check label:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.check label:has(input:checked) span { text-decoration: line-through; color: var(--muted); }
+.check-pie { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.check-pie button { font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.check-pie button:hover, .check-pie button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.progreso { font-family: var(--mono); color: var(--green); font-weight: 500; }
+
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+@media (max-width: 860px) {
+  .envoltura { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  nav.indice { position: static; }
+  nav.indice ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .linea { grid-template-columns: minmax(0, 1fr); }
+  .det { padding-left: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+/* selector de persona */
+.filtro { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-top: 0.5rem; }
+.filtro span { color: var(--muted); font-size: 0.9rem; margin-right: 0.25rem; }
+.filtro button { font: inherit; font-size: 0.92rem; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 0.3rem 0.9rem; cursor: pointer; }
+.filtro button:hover, .filtro button:focus-visible { border-color: var(--accent); outline: none; }
+.filtro button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.apagado { opacity: 0.32; }
+[data-de], .costura { transition: opacity 0.2s; }
+@media (prefers-reduced-motion: reduce) { [data-de], .costura { transition: none; } }
+
+/* áreas */
+.areas { display: grid; grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr)); gap: 0.75rem; }
+.area { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 10px; padding: 1rem; display: grid; gap: 0.45rem; align-content: start; }
+.area header { display: flex; justify-content: space-between; align-items: baseline; }
+.area header b { font-size: 1.1rem; }
+.area .pct { font-family: var(--mono); color: var(--c); font-weight: 500; }
+.area h3 { margin: 0; color: var(--c); font-size: 1rem; }
+.area p { font-size: 0.93rem; }
+.area .mods { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); }
+.area .primera { border-top: 1px dashed var(--line); padding-top: 0.45rem; }
+.barra { display: flex; border-radius: 8px; overflow: hidden; }
+.barra span { padding: 0.45rem 0.4rem; color: var(--surface); font-size: 0.82rem; font-weight: 600; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pie-dato { color: var(--muted); font-size: 0.88rem; }
+
+/* costuras */
+.costuras { display: grid; gap: 0.5rem; }
+.costura summary { gap: 0.8rem; }
+.costura summary::before { content: none; }
+.costura .cod { font-family: var(--mono); font-size: 0.85rem; background: var(--accent-soft); color: var(--accent); border-radius: 6px; padding: 0.15rem 0.45rem; }
+.costura .tit { flex: 1; min-width: 0; }
+.costura .quien { color: var(--muted); font-weight: 400; font-size: 0.85rem; white-space: nowrap; }
+.costura .det { padding-left: 1rem; }
+.costura.ofrece { border-color: var(--green); background: var(--green-soft); }
+.costura.usa { border-color: var(--teal); background: var(--teal-soft); }
+.costura.ofrece .quien::after { content: " · la ofrece"; color: var(--green); font-weight: 600; }
+.costura.usa .quien::after { content: " · la usa"; color: var(--teal); font-weight: 600; }
+
+/* fases */
+.fases { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; counter-reset: f; }
+.fases li { counter-increment: f; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.25rem; font-size: 0.92rem; }
+.fases li b::before { content: counter(f) " · "; font-family: var(--mono); color: var(--accent); }
+
+/* escenarios */
+.escenarios { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.6rem; }
+.escenario { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem; display: grid; gap: 0.3rem; }
+.escenario .cifra { font-family: var(--mono); font-size: 1.35rem; font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; }
+.escenario .duenio { color: var(--muted); font-size: 0.85rem; }
+
+/* riesgos */
+.riesgos { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; }
+.riesgo { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.85rem 0.95rem; display: grid; gap: 0.35rem; align-content: start; font-size: 0.93rem; }
+.riesgo p { color: var(--muted); }
+.marcas { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.nv { font-size: 0.72rem; font-weight: 600; border-radius: 999px; padding: 0.1rem 0.55rem; }
+.nv.alto { background: var(--red-soft); color: var(--red); }
+.nv.medio { background: var(--amber-soft); color: var(--amber); }
+.nv.bajo { background: var(--green-soft); color: var(--green); }
+.resp { font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+@media (max-width: 860px) { .fases { grid-template-columns: repeat(2, minmax(0, 1fr)); } .costura .quien { white-space: normal; } .costura summary { flex-wrap: wrap; } }
+</style>
+</head>
+<body>
+
+
+<div class="envoltura">
+  <nav class="indice" aria-label="Índice">
+    <b>Índice</b>
+    <ol>
+      <li><a href="#objetivo">Qué es la etapa 2</a></li>
+      <li><a href="#medicion">Cómo se midió</a></li>
+      <li><a href="#reparto">El reparto</a></li>
+      <li><a href="#costuras">Las once costuras</a></li>
+      <li><a href="#arranque">Cómo arrancamos</a></li>
+      <li><a href="#cierre">Cómo se cierra</a></li>
+      <li><a href="#revision">Revisión y ritmo</a></li>
+      <li><a href="#riesgos">Riesgos</a></li>
+      <li><a href="#pendientes">Pendientes y decisiones</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="cabeza">
+      <span class="eyebrow">TechQuk Integral System · etapa 2</span>
+      <h1>Etapa 2 · Control de costos</h1>
+      <p class="bajada">Quién construye qué, cómo se conectan las áreas y cómo se cierra la etapa. La forma de trabajar está en la guía «Cómo trabajamos en TechQuk».</p>
+      <div class="filtro" role="group" aria-label="Ver lo de una persona">
+        <span>Ver lo de:</span>
+        <button type="button" data-ver="todos" aria-pressed="true">Todos</button>
+        <button type="button" data-ver="sebastian" aria-pressed="false">Sebastián</button>
+        <button type="button" data-ver="ander" aria-pressed="false">Ander</button>
+        <button type="button" data-ver="lennart" aria-pressed="false">Lennart</button>
+        <button type="button" data-ver="yair" aria-pressed="false">Yair</button>
+      </div>
+    </header>
+
+    <section id="objetivo">
+      <h2><span class="n">01</span>Qué es la etapa 2</h2>
+      <p>Es la etapa que empieza a responder la pregunta del sistema: <b>¿cuánto se gana realmente en cada proyecto?</b> Construye todo lo que hace falta para controlar el costo de un proyecto, desde que se vende hasta que se gasta.</p>
+      <div class="tabla"><table>
+        <tr><th>Contenido</th><th>Flujos del v4</th></tr>
+        <tr><td>CRM: cuentas, oportunidades, cotizaciones, licitaciones, actividades, catálogo</td><td>Partes 2 y 3</td></tr>
+        <tr><td>Contratos, proyectos y el presupuesto con APU y árbol de partidas</td><td>Flujo 1</td></tr>
+        <tr><td>Compras y almacén: de la necesidad al costo</td><td>Flujo 2</td></tr>
+        <tr><td>Personal, habilitación y horas</td><td>Flujo 3</td></tr>
+        <tr><td>Gastos no presupuestados (PC-99)</td><td>Flujo 7</td></tr>
+        <tr><td>Subcontratos y valorizaciones de obra</td><td>Parte del flujo 10</td></tr>
+      </table></div>
+      <div class="nota">La etapa 2 se abre con la etapa 1 todavía abierta en cuatro tareas (la ayuda con IA y el gran momento de las fechas), que no tocan nada de lo que la etapa 2 usa.</div>
+    </section>
+
+    <section id="medicion">
+      <h2><span class="n">02</span>Cómo se midió</h2>
+      <p>Cada módulo se midió por lo que de verdad cuesta construirlo: documentos con estados, transiciones y efectos entre módulos, pantallas, reglas de cálculo, concurrencia, escenarios de prueba y dependencias. Cada uno tiene una complejidad de 1 a 5, convertida a puntos de esfuerzo (1→2, 2→3, 3→5, 4→8, 5→13). Los puntos son relativos, no horas: se recalibran con lo que tomen las primeras tareas.</p>
+      <div class="tabla"><table>
+        <tr><th>Módulo</th><th>Compl.</th><th>Puntos</th><th>Lo que más pesa</th></tr>
+        <tr data-de="sebastian"><td>Presupuestos (con C1, el selector y la imputación)</td><td>5</td><td>20</td><td>APU, árbol con versiones, saldos; base de todas las imputaciones</td></tr>
+        <tr data-de="lennart"><td>Compras</td><td>4</td><td>8</td><td>Doce tipos de compra, orden con seis estados, reservas</td></tr>
+        <tr data-de="lennart"><td>Almacén</td><td>4</td><td>8</td><td>Stock con concurrencia, series, recepción desde el celular</td></tr>
+        <tr data-de="ander"><td>Licitaciones</td><td>4</td><td>8</td><td>Quince pantallas, cronograma, expediente</td></tr>
+        <tr data-de="lennart"><td>Contratos</td><td>3</td><td>5</td><td>Penalidad calculada, carta fianza con alertas</td></tr>
+        <tr data-de="ander"><td>Oportunidades</td><td>3</td><td>5</td><td>Trece pantallas, tablero con requisitos por etapa</td></tr>
+        <tr data-de="ander"><td>Cotizaciones</td><td>3</td><td>5</td><td>Versiones, comparador, PDF</td></tr>
+        <tr data-de="yair"><td>Tareo</td><td>3</td><td>5</td><td>Grilla en el celular, bloqueo por habilitación</td></tr>
+        <tr data-de="yair"><td>Convocatorias del OECE</td><td>4</td><td>8</td><td>Integración externa con cola propia; explorador de todas las convocatorias</td></tr>
+        <tr data-de="yair"><td>Proyectos (con C2)</td><td>2</td><td>3</td><td>Casi todo es la costura C2</td></tr>
+        <tr data-de="sebastian lennart yair ander"><td>Gastos no presupuestados · Subcontratos · Valorizaciones · Personal · Catálogo · Cuentas</td><td>2</td><td>3 c/u</td><td>—</td></tr>
+        <tr data-de="ander"><td>Actividades</td><td>1</td><td>2</td><td>—</td></tr>
+        <tr data-de="todos"><td>Campañas</td><td>1</td><td>2</td><td>En validación: sin dueño hasta confirmarse</td></tr>
+      </table></div>
+    </section>
+
+    <section id="reparto">
+      <h2><span class="n">03</span>El reparto</h2>
+      <p>Cuatro áreas, cada una con su dueño. Entre áreas solo se habla por las costuras de la sección siguiente.</p>
+      <div class="areas">
+        <article class="area" data-de="sebastian" style="--c: var(--accent)">
+          <header><b>Sebastián</b><span class="pct">~24 %</span></header>
+          <h3>Presupuesto y costo</h3>
+          <p class="mods">Presupuestos · Gastos no presupuestados · Imputación</p>
+          <p>El presupuesto con APU, el árbol de partidas con la PC-99 y los saldos, el selector de imputación que usan todos, el margen y los gastos no presupuestados. Además fusiona, revisa, desempata y sigue con la etapa 1.</p>
+          <p class="primera"><b>Primera tarea:</b> el esqueleto de C1.</p>
+        </article>
+        <article class="area" data-de="ander" style="--c: var(--teal)">
+          <header><b>Ander</b><span class="pct">~24 %</span></header>
+          <h3>Comercial</h3>
+          <p class="mods">Cuentas · Oportunidades · Cotizaciones · Licitaciones · Actividades</p>
+          <p>El embudo por etapas, el tablero del ejecutivo, las cotizaciones sobre el presupuesto real, las licitaciones públicas y privadas con cronograma y expediente.</p>
+          <p class="primera"><b>Primera tarea:</b> cuentas.</p>
+        </article>
+        <article class="area" data-de="lennart" style="--c: var(--amber)">
+          <header><b>Lennart</b><span class="pct">~25 %</span></header>
+          <h3>Contratos y abastecimiento</h3>
+          <p class="mods">Contratos · Compras · Almacén · Subcontratos</p>
+          <p>Todo lo que se firma: el contrato con hitos, carta fianza y penalidad; requerimientos, cuadro comparativo, órdenes, recepciones, stock, despachos; los subcontratos.</p>
+          <p class="primera"><b>Primera tarea:</b> almacenes y tipos de compra.</p>
+        </article>
+        <article class="area" data-de="yair" style="--c: var(--green)">
+          <header><b>Yair</b><span class="pct">~26 %</span></header>
+          <h3>Obra y personas</h3>
+          <p class="mods">Proyectos · Personal · Tareo · Valorizaciones · Catálogo · OECE</p>
+          <p>El proyecto, su gente, la habilitación, las horas y el avance; el catálogo único y, al final, la carga de convocatorias del OECE con un explorador de todas las convocatorias.</p>
+          <p class="primera"><b>Primera tarea:</b> los esqueletos de C2 y C4.</p>
+        </article>
+      </div>
+      <div class="barra" aria-label="Carga de cada área">
+        <span style="flex:24;background:var(--accent)">Sebastián 24 %</span>
+        <span style="flex:24;background:var(--teal)">Ander 24 %</span>
+        <span style="flex:25;background:var(--amber)">Lennart 25 %</span>
+        <span style="flex:26;background:var(--green)">Yair 26 %</span>
+      </div>
+      <p class="pie-dato">Las campañas quedan sin dueño hasta que se validen. Sebastián construye algo menos porque también coordina.</p>
+      <div class="nota ambar">Tres piezas viven en un módulo de otra área: el catálogo y el OECE (los construye Yair en el CRM; revisa Ander) y las valorizaciones (Yair, en Obra pública, que comparte con los subcontratos de Lennart). El dueño del módulo revisa esos cambios.</div>
+    </section>
+
+    <section id="costuras">
+      <h2><span class="n">04</span>Las once costuras</h2>
+      <p>Toca una costura para ver qué ofrece. Con el selector de arriba, se resaltan las que ofrece o usa esa persona.</p>
+      <div class="costuras">
+        <details class="costura" data-ofrece="sebastian" data-usan="lennart yair">
+          <summary><span class="cod">C1</span><span class="tit">La partida, su saldo, el selector y el margen</span><span class="quien">Sebastián → Lennart, Yair</span></summary>
+          <div class="det"><ul>
+            <li><code>PartidasService</code>: <code>buscar</code>, <code>saldo</code>, <code>destino</code> (para la imputación del núcleo) y <code>noPresupuestada</code> (la PC-99). Nadie más calcula saldos.</li>
+            <li>El <b>selector de imputación</b>: un solo componente para todos los documentos con costo.</li>
+            <li><code>MargenService::estimado(proyecto)</code>, con el monto del contrato (C10).</li>
+          </ul></div>
+        </details>
+        <details class="costura" data-ofrece="yair" data-usan="sebastian ander lennart">
+          <summary><span class="cod">C2</span><span class="tit">El proyecto</span><span class="quien">Yair → todos</span></summary>
+          <div class="det"><ul>
+            <li><code>ProyectosService</code>: <code>resumen</code>, <code>activos</code> y <code>crearDesdeContrato</code> (el proyecto «en preparación»).</li>
+            <li>Eventos <code>ProyectoCreado</code> y <code>ProyectoCerrado</code>.</li>
+          </ul></div>
+        </details>
+        <details class="costura" data-ofrece="ander" data-usan="lennart">
+          <summary><span class="cod">C3</span><span class="tit">La oportunidad ganada</span><span class="quien">Ander → Lennart</span></summary>
+          <div class="det"><ul>
+            <li>Evento <code>OportunidadGanada</code>: cliente, cotización aceptada, monto, condiciones, presupuesto enlazado, convocatoria de origen.</li>
+            <li>Lennart crea el contrato en borrador y pide el proyecto a C2.</li>
+          </ul></div>
+        </details>
+        <details class="costura" data-ofrece="yair" data-usan="sebastian lennart ander">
+          <summary><span class="cod">C4</span><span class="tit">El catálogo</span><span class="quien">Yair → Sebastián, Lennart, Ander</span></summary>
+          <div class="det"><p><code>CatalogoService::buscar</code> y <code>resumen</code>. Un solo catálogo, sin copias. Vive en el CRM: Ander revisa sus cambios.</p></div>
+        </details>
+        <details class="costura" data-ofrece="yair" data-usan="sebastian lennart">
+          <summary><span class="cod">C5</span><span class="tit">El costo de las horas y la habilitación</span><span class="quien">Yair → Sebastián, Lennart</span></summary>
+          <div class="det"><ul>
+            <li><code>CostoHoraService::vigente</code> y <code>PersonalService::habilitado</code>.</li>
+            <li>Evento <code>SemanaTareoCerrada</code> (ya imputada con C1).</li>
+          </ul></div>
+        </details>
+        <details class="costura" data-ofrece="lennart" data-usan="sebastian">
+          <summary><span class="cod">C6</span><span class="tit">Compras y almacén como costo</span><span class="quien">Lennart → Sebastián</span></summary>
+          <div class="det"><ul>
+            <li>La orden aprobada compromete; el despacho a obra ejecuta. Todo con C1.</li>
+            <li>Eventos <code>OrdenCompraAprobada</code>, <code>RecepcionConfirmada</code>, <code>DespachoConfirmado</code>; <code>ComprasService::resumenOrden</code>.</li>
+          </ul></div>
+        </details>
+        <details class="costura" data-ofrece="nucleo" data-usan="sebastian ander lennart yair">
+          <summary><span class="cod">C7</span><span class="tit">Personas y empresas</span><span class="quien">Núcleo → todos</span></summary>
+          <div class="det"><p><code>PartiesService</code> y <code>EmpresaService</code>, que ya existen. Nadie crea su propia tabla de personas.</p></div>
+        </details>
+        <details class="costura" data-ofrece="sebastian" data-usan="ander">
+          <summary><span class="cod">C8</span><span class="tit">El presupuesto de una cotización</span><span class="quien">Sebastián → Ander</span></summary>
+          <div class="det"><p><code>PresupuestosService::resumen</code>: para que la cotización se arme sobre el presupuesto real sin copiarlo.</p></div>
+        </details>
+        <details class="costura" data-ofrece="yair" data-usan="ander">
+          <summary><span class="cod">C9</span><span class="tit">Las certificaciones del personal</span><span class="quien">Yair → Ander</span></summary>
+          <div class="det"><p><code>PersonalService::certificacionesVigentes</code>: cuántas personas tienen vigente lo que exige una licitación.</p></div>
+        </details>
+        <details class="costura" data-ofrece="lennart" data-usan="sebastian yair">
+          <summary><span class="cod">C10</span><span class="tit">El contrato</span><span class="quien">Lennart → Sebastián, Yair</span></summary>
+          <div class="det"><ul>
+            <li><code>ContratosService::resumen</code>: monto con adendas, plazo, hitos, forma de pago, penalidad.</li>
+            <li>Evento <code>AdendaAprobada</code>.</li>
+          </ul></div>
+        </details>
+        <details class="costura" data-ofrece="sebastian" data-usan="lennart">
+          <summary><span class="cod">C11</span><span class="tit">El posible adicional</span><span class="quien">Sebastián → Lennart</span></summary>
+          <div class="det"><p>Evento <code>PosibleAdicionalRegistrado</code>: Contratos avisa a Administración de Contratos para cobrarlo con una adenda.</p></div>
+        </details>
+      </div>
+      <div class="nota">Crear o cambiar una costura lo decide el equipo, con la IA ayudando a proponer opciones, y queda en el ADR 0020. Si no hay acuerdo, Sebastián desempata.</div>
+    </section>
+
+    <section id="arranque">
+      <h2><span class="n">05</span>Cómo arrancamos</h2>
+      <p>Todos empiezan el mismo día. Nadie espera a que otro termine.</p>
+      <ol class="fases">
+        <li><b>Arranque</b><span>Sebastián hace el esqueleto de C1; Yair, los de C2 y C4. Ander y Lennart empiezan por lo que no depende de nadie.</span></li>
+        <li><b>Construcción</b><span>Cada uno avanza en su área. Quien necesita algo de otro usa su versión falsa.</span></li>
+        <li><b>Integración</b><span>Cada costura real reemplaza a su falsa apenas está lista, una a la vez.</span></li>
+        <li><b>Cierre</b><span>Pasan los cuatro escenarios con sus números.</span></li>
+      </ol>
+      <div class="tabla"><table>
+        <tr><th>Quién</th><th>Empieza con</th><th>Usa una versión falsa cuando…</th></tr>
+        <tr data-de="sebastian"><td>Sebastián</td><td>El esqueleto de C1; luego el presupuesto con APU</td><td>Necesita el catálogo, el costo por hora o el contrato (C4, C5, C10)</td></tr>
+        <tr data-de="ander"><td>Ander</td><td>Cuentas, oportunidades, actividades</td><td>Arma la cotización (C4, C8) o verifica personal certificado (C9)</td></tr>
+        <tr data-de="lennart"><td>Lennart</td><td>Almacenes y tipos de compra; luego contratos</td><td>Imputa a una partida (C1) o pide el proyecto (C2)</td></tr>
+        <tr data-de="yair"><td>Yair</td><td>Los esqueletos de C2 y C4; luego el catálogo y los proyectos</td><td>Carga horas a una partida (C1) o valoriza contra el contrato (C10)</td></tr>
+      </table></div>
+      <div class="nota roja">La única dependencia real está al final: para que pasen los escenarios con números, las partidas y los saldos tienen que ser los reales.</div>
+    </section>
+
+    <section id="cierre">
+      <h2><span class="n">06</span>Cómo se cierra</h2>
+      <p>La etapa 2 está lista cuando pasan los escenarios del v4 (parte 8) con sus números exactos, como pruebas, y <code>composer check</code> está en verde. Cada escenario tiene un dueño que lo lleva de punta a punta.</p>
+      <div class="escenarios">
+        <div class="escenario" data-de="sebastian"><span class="cifra">S/ 1,327.00</span><b>Margen del proyecto al cerrarlo</b><span class="duenio">Sebastián</span></div>
+        <div class="escenario" data-de="sebastian"><span class="cifra">PC-99</span><b>El taxi imprevisto, con motivo y aprobación</b><span class="duenio">Sebastián</span></div>
+        <div class="escenario" data-de="lennart"><span class="cifra">S/ 205.96</span><b>Penalidad por cada día de atraso</b><span class="duenio">Lennart</span></div>
+        <div class="escenario" data-de="lennart"><span class="cifra">S/ 1,248.00</span><b>Costo del cable en su partida</b><span class="duenio">Lennart</span></div>
+      </div>
+      <p class="pie-dato">Caso del v4: Videovigilancia Plaza de Armas, contrato CT-2026-018 por S/ 24,715.10.</p>
+    </section>
+
+    <section id="revision">
+      <h2><span class="n">07</span>Revisión y ritmo</h2>
+      <div class="tabla"><table>
+        <tr><th>Autor del PR</th><th>Lo revisa</th></tr>
+        <tr data-de="yair"><td>Yair</td><td>Lennart (y Ander en el catálogo y el OECE)</td></tr>
+        <tr data-de="lennart"><td>Lennart</td><td>Ander</td></tr>
+        <tr data-de="ander"><td>Ander</td><td>Yair</td></tr>
+        <tr data-de="sebastian"><td>Sebastián</td><td>Cualquiera de los tres</td></tr>
+      </table></div>
+      <ul>
+        <li><b>Solo Sebastián fusiona</b>, y nada se fusiona con pruebas en rojo.</li>
+        <li>Un cambio en un módulo de otra área lo revisa también su dueño.</li>
+        <li><b>Una vez por semana:</b> qué costuras ya son reales, y cuánto tomaron las tareas frente a sus puntos, para recalibrar el reparto.</li>
+        <li><b>Pantallas:</b> todas siguen los patrones que ya tiene el sistema. La mejora visual se hace al final, a cargo de Sebastián.</li>
+      </ul>
+    </section>
+
+    <section id="riesgos">
+      <h2><span class="n">08</span>Riesgos de la etapa</h2>
+      <p>Con el selector de arriba se resaltan los de cada uno.</p>
+      <div class="riesgos">
+        <div class="riesgo" data-de="sebastian yair"><div class="marcas"><span class="nv alto">Prob. alta</span><span class="nv alto">Impacto alto</span></div><b>Los esqueletos se demoran y frenan a los demás.</b><p>C1, C2 y C4 salen primero y cortos; las versiones falsas evitan que alguien espere.</p><span class="resp">Sebastián y Yair</span></div>
+        <div class="riesgo" data-de="todos"><div class="marcas"><span class="nv medio">Prob. media</span><span class="nv alto">Impacto alto</span></div><b>Una costura cambia sin avisar.</b><p>Se crea o cambia solo en el ADR 0020, decidida en equipo y avisando antes a quien la usa.</p><span class="resp">Todos</span></div>
+        <div class="riesgo" data-de="todos"><div class="marcas"><span class="nv medio">Prob. media</span><span class="nv medio">Impacto medio</span></div><b>La versión falsa no se parece a la real.</b><p>Las mismas pruebas corren contra la falsa y contra la real.</p><span class="resp">Dueño de cada costura</span></div>
+        <div class="riesgo" data-de="todos"><div class="marcas"><span class="nv alto">Prob. alta</span><span class="nv bajo">Impacto bajo</span></div><b>Choques al fusionar.</b><p>Entregas cortas (hasta 6 tareas o 7 días), fusiones seguidas, traer <code>main</code> con <i>merge</i>, un proveedor de servicios por módulo, revisar el orden de las migraciones.</p><span class="resp">Todos</span></div>
+        <div class="riesgo" data-de="yair"><div class="marcas"><span class="nv medio">Prob. media</span><span class="nv medio">Impacto medio</span></div><b>Ir rápido baja la calidad.</b><p>Pasos chicos con pruebas, revisor de arquitectura al cerrar y la revisión de Lennart.</p><span class="resp">Yair, con Lennart</span></div>
+        <div class="riesgo" data-de="lennart"><div class="marcas"><span class="nv medio">Prob. media</span><span class="nv medio">Impacto medio</span></div><b>El área con más reglas de dinero se alarga.</b><p>Alcance cerrado por tarea en su plan; lo que no entra se anota para después.</p><span class="resp">Lennart</span></div>
+        <div class="riesgo" data-de="ander"><div class="marcas"><span class="nv medio">Prob. media</span><span class="nv medio">Impacto medio</span></div><b>Muchas pantallas en poco tiempo.</b><p>Los patrones que ya tiene el sistema, sin rediseñar; la mejora visual queda para el final.</p><span class="resp">Ander</span></div>
+        <div class="riesgo" data-de="todos"><div class="marcas"><span class="nv medio">Prob. media</span><span class="nv alto">Impacto alto</span></div><b>Alguien decide un pendiente por su cuenta.</b><p>Regla 12: se para y se pregunta.</p><span class="resp">Todos</span></div>
+        <div class="riesgo" data-de="sebastian lennart"><div class="marcas"><span class="nv medio">Prob. media</span><span class="nv alto">Impacto alto</span></div><b>Los escenarios fallan al integrar.</b><p>Cada escenario tiene dueño; su prueba se arma temprano con versiones falsas.</p><span class="resp">Sebastián y Lennart</span></div>
+        <div class="riesgo" data-de="todos"><div class="marcas"><span class="nv medio">Prob. media</span><span class="nv medio">Impacto medio</span></div><b>La estimación por puntos se equivoca.</b><p>Se compara cada semana con lo que tomaron las tareas y se reparte de nuevo si hace falta.</p><span class="resp">Todos</span></div>
+        <div class="riesgo" data-de="sebastian"><div class="marcas"><span class="nv alto">Prob. alta</span><span class="nv bajo">Impacto bajo</span></div><b>Roles reales sin definir</b> (organigrama en espera).<p>Se construye con roles de prueba; se configuran por pantalla.</p><span class="resp">Sebastián</span></div>
+        <div class="riesgo" data-de="todos"><div class="marcas"><span class="nv bajo">Prob. baja</span><span class="nv alto">Impacto alto</span></div><b>Alguien se atrasa o deja su área a medias.</b><p>El plan con su bitácora y las costuras escritas permiten que otro continúe.</p><span class="resp">Todos</span></div>
+      </div>
+    </section>
+
+    <section id="pendientes">
+      <h2><span class="n">09</span>Pendientes y decisiones abiertas</h2>
+      <div class="tabla"><table>
+        <tr><th>Tema</th><th>Quién lo lleva</th><th>¿Frena el arranque?</th></tr>
+        <tr data-de="sebastian"><td>Documento de los gastos no presupuestados (tienen ficha con estados pero no tabla)</td><td>Sebastián, en su plan</td><td>No</td></tr>
+        <tr data-de="sebastian"><td>Si el escenario de la fórmula polinómica entra en la etapa 2</td><td>Sebastián, en su plan</td><td>No</td></tr>
+        <tr data-de="lennart"><td>Adelantos: el escenario del subcontrato descuenta uno del 20 %, y están anotados para la etapa 3</td><td>Lennart lo plantea al equipo</td><td>No</td></tr>
+        <tr data-de="ander"><td>La librería de PDF (la elige la cotización para todo el sistema)</td><td>Ander, con el equipo</td><td>No</td></tr>
+        <tr data-de="yair"><td>Si la etapa 2 necesita algún contrato laboral</td><td>Yair, con el equipo</td><td>No</td></tr>
+        <tr data-de="sebastian"><td>Árbol de partidas real, camino corto del presupuesto, centros de costo</td><td>Sebastián</td><td>No: configurable</td></tr>
+        <tr data-de="lennart"><td>Penalidades, tipos de compra, almacén de obra, umbral del cuadro, guías de remisión</td><td>Lennart</td><td>No: configurable o se registra el número</td></tr>
+        <tr data-de="ander"><td>Líneas de solución, CUBSO, umbrales de cotización</td><td>Ander</td><td>No</td></tr>
+        <tr data-de="yair"><td>Filtros y nombres de personas del OECE; feriados del tareo</td><td>Yair</td><td>No: antes de esas tareas</td></tr>
+        <tr data-de="todos"><td>Campañas en validación; organigrama real</td><td>Todos</td><td>No</td></tr>
+      </table></div>
+    </section>
+
+    <footer>Esta guía vive en el repositorio, en <code>docs/equipo/2-etapa-2.html</code>. La fuente es el ADR 0020 y el mapa de etapas; si no coinciden, manda el repositorio.</footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  const botones = [...document.querySelectorAll('.filtro button')];
+  const aplicar = (quien) => {
+    botones.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ver === quien)));
+    document.querySelectorAll('[data-de]').forEach((el) => {
+      const de = el.dataset.de.split(' ');
+      el.classList.toggle('apagado', quien !== 'todos' && !de.includes(quien) && !de.includes('todos'));
+    });
+    document.querySelectorAll('.costura').forEach((el) => {
+      const ofrece = el.dataset.ofrece === quien, usa = el.dataset.usan.split(' ').includes(quien);
+      el.classList.toggle('ofrece', quien !== 'todos' && ofrece);
+      el.classList.toggle('usa', quien !== 'todos' && usa && !ofrece);
+      el.classList.toggle('apagado', quien !== 'todos' && !ofrece && !usa);
+    });
+    try { localStorage.setItem('tq-etapa2-ver', quien); } catch (e) {}
+  };
+  botones.forEach((b) => b.addEventListener('click', () => aplicar(b.dataset.ver)));
+  let inicial = 'todos';
+  try { inicial = localStorage.getItem('tq-etapa2-ver') || 'todos'; } catch (e) {}
+  if (!botones.some((b) => b.dataset.ver === inicial)) inicial = 'todos';
+  aplicar(inicial);
+})();
+</script>
+
+</body>
+</html>

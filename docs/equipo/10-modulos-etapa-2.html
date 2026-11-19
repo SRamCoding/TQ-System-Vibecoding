@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Módulos de la etapa 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: guía de equipo; índice fijo a la izquierda en escritorio, arriba en el celular; secciones numeradas porque son un orden real de lectura */
+:root {
+  --bg: #f6f7fb; --surface: #ffffff; --fg: #141a2e; --muted: #556079; --line: #dde1ec;
+  --accent: #1b2f8a; --accent-soft: #e7ebfb; --teal: #0d7472; --teal-soft: #dff2f1;
+  --amber: #a85a06; --amber-soft: #fdf1df; --red: #b42318; --red-soft: #fdeceb; --green: #187a3d; --green-soft: #e3f4e8;
+  --display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f1320; --surface: #161b2c; --fg: #e6e9f2; --muted: #9aa3ba; --line: #2a3147;
+  --accent: #9fb0ff; --accent-soft: #1e2648; --teal: #5fd0cb; --teal-soft: #12302f;
+  --amber: #f0b45e; --amber-soft: #352612; --red: #ff8b80; --red-soft: #3a1714; --green: #6fd492; --green-soft: #12301d; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.envoltura { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 2.5rem; max-width: 72rem; margin: 0 auto;
+  padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+nav.indice { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1.5rem); align-self: start; font-size: 0.9rem; }
+nav.indice b { display: block; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+nav.indice ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; counter-reset: i; }
+nav.indice li { counter-increment: i; }
+nav.indice a { display: flex; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 6px; color: var(--fg); text-decoration: none; }
+nav.indice a::before { content: counter(i); font-family: var(--mono); color: var(--muted); min-width: 1.2rem; }
+nav.indice a:hover, nav.indice a:focus-visible { background: var(--accent-soft); color: var(--accent); outline: none; }
+main { min-width: 0; display: grid; gap: 3rem; }
+header.cabeza { display: grid; gap: 0.75rem; }
+.eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.06em; color: var(--teal); text-transform: uppercase; }
+h1 { font-family: var(--display); font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0; text-wrap: balance; color: var(--fg); }
+.bajada { color: var(--muted); max-width: 62ch; margin: 0; font-size: 1.05rem; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1.5rem; }
+h2 { font-size: 1.45rem; margin: 0; display: flex; gap: 0.75rem; align-items: baseline; text-wrap: balance; }
+h2 .n { font-family: var(--mono); font-size: 0.95rem; color: var(--accent); }
+h3 { font-size: 1.05rem; margin: 0.5rem 0 0; }
+p { margin: 0; max-width: 68ch; }
+.caja { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; }
+.nota { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; padding: 0.85rem 1.1rem; max-width: 68ch; }
+.nota.ambar { border-color: var(--amber); background: var(--amber-soft); }
+.nota.roja { border-color: var(--red); background: var(--red-soft); }
+.equipo { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem; }
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.2rem; }
+.persona b { font-size: 1.05rem; }
+.persona span { color: var(--muted); font-size: 0.9rem; }
+
+/* ciclo */
+.ciclo { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; counter-reset: c; list-style: none; padding: 0; margin: 0; }
+.ciclo li { counter-increment: c; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 0.4rem 0.9rem 0.4rem 0.5rem; display: flex; gap: 0.5rem; align-items: center; font-weight: 500; }
+.ciclo li::before { content: counter(c); display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: 0.8rem; }
+.ciclo li:not(:last-child)::after { content: "→"; color: var(--muted); margin-left: 0.4rem; }
+
+/* tablas */
+.tabla { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+th { text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); }
+td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-weight: 600; }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--accent-soft); color: var(--accent); padding: 0.05rem 0.35rem; border-radius: 4px; }
+
+/* camino de una tarea */
+.pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: p; }
+.pasos > li { counter-increment: p; }
+details { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+details[open] { border-color: var(--accent); }
+summary { cursor: pointer; list-style: none; display: flex; gap: 0.75rem; align-items: center; padding: 0.8rem 1rem; font-weight: 600; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: counter(p); display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-family: var(--mono); font-size: 0.85rem; }
+summary::after { content: "+"; margin-left: auto; color: var(--muted); font-family: var(--mono); }
+details[open] summary::after { content: "−"; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 10px; }
+.det { padding: 0 1rem 1rem 3.55rem; display: grid; gap: 0.5rem; }
+.det ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; }
+
+/* vida de una costura */
+.linea { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.5rem; }
+.etapa { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 8px; padding: 0.75rem; display: grid; gap: 0.3rem; font-size: 0.92rem; }
+.etapa b { font-size: 0.95rem; }
+.etapa small { font-family: var(--mono); color: var(--teal); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* reglas */
+.reglas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.6rem; counter-reset: r; }
+.reglas li { counter-increment: r; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.7rem 0.9rem 0.7rem 2.8rem; position: relative; font-size: 0.93rem; }
+.reglas li::before { content: counter(r); position: absolute; left: 0.8rem; top: 0.7rem; font-family: var(--mono); color: var(--accent); font-weight: 500; }
+
+/* lista de verificación */
+.check { display: grid; gap: 0.4rem; }
+.check label { display: flex; gap: 0.7rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; }
+.check input { width: 1.1rem; height: 1.1rem; margin-top: 0.2rem; accent-color: var(--green); flex: 0 0 auto; }
+.check label:has(input:checked) { background: var(--green-soft); border-color: var(--green); }
+.check label:has(input:checked) span { text-decoration: line-through; color: var(--muted); }
+.check-pie { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.92rem; color: var(--muted); }
+.check-pie button { font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.check-pie button:hover, .check-pie button:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
+.progreso { font-family: var(--mono); color: var(--green); font-weight: 500; }
+
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+@media (max-width: 860px) {
+  .envoltura { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  nav.indice { position: static; }
+  nav.indice ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .linea { grid-template-columns: minmax(0, 1fr); }
+  .det { padding-left: 1rem; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tabs button, .chipbtn { font: inherit; font-size: 0.92rem; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 999px; padding: 0.35rem 0.9rem; cursor: pointer; }
+.tabs button:hover, .tabs button:focus-visible, .chipbtn:hover, .chipbtn:focus-visible { border-color: var(--accent); outline: none; }
+.tabs button[aria-selected="true"], .chipbtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.15rem; display: grid; gap: 0.6rem; }
+.panel p, .panel li { max-width: 68ch; }
+.panel ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; }
+.dos { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.75rem; }
+.tres { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; }
+.bloque { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.45rem; align-content: start; }
+.bloque h3 { margin: 0; font-size: 1rem; }
+.bloque ul { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; font-size: 0.93rem; }
+.bloque.azul { border-top: 4px solid var(--accent); } .bloque.teal { border-top: 4px solid var(--teal); }
+.bloque.ambar { border-top: 4px solid var(--amber); } .bloque.verde { border-top: 4px solid var(--green); } .bloque.gris { border-top: 4px solid var(--muted); }
+.cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; }
+.cifra { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 0.9rem; display: grid; gap: 0.15rem; }
+.cifra b { font-family: var(--mono); font-size: 1.45rem; color: var(--accent); font-weight: 500; font-variant-numeric: tabular-nums; }
+.cifra span { color: var(--muted); font-size: 0.88rem; }
+.flujo { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.4rem; }
+.flujo .paso { flex: 1 1 8rem; background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c, var(--accent)); border-radius: 8px; padding: 0.6rem 0.7rem; font-size: 0.88rem; display: grid; gap: 0.15rem; }
+.flujo .paso b { font-size: 0.95rem; }
+.flujo .paso span { color: var(--muted); }
+.flecha { align-self: center; color: var(--muted); font-family: var(--mono); }
+.numeros4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-radius: 10px; overflow: hidden; }
+.numeros4 div { padding: 0.8rem; color: var(--surface); display: grid; gap: 0.2rem; font-size: 0.88rem; }
+.numeros4 div b { font-size: 1rem; }
+.viaje { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.viaje button { width: 100%; text-align: left; font: inherit; background: var(--surface); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem 0.8rem; cursor: pointer; display: flex; gap: 0.7rem; align-items: center; }
+.viaje button:hover, .viaje button:focus-visible { border-color: var(--accent); outline: none; }
+.viaje button[aria-expanded="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.viaje .et { font-family: var(--mono); font-size: 0.78rem; color: var(--surface); background: var(--c, var(--accent)); border-radius: 5px; padding: 0.1rem 0.45rem; min-width: 2.2rem; text-align: center; }
+.viaje .tt { font-weight: 600; flex: 1; min-width: 0; }
+.viaje .mm { color: var(--muted); font-size: 0.82rem; font-family: var(--mono); }
+.viaje .det { padding: 0.6rem 0.8rem 0.4rem 3.6rem; font-size: 0.94rem; display: grid; gap: 0.3rem; }
+.buscar { font: inherit; width: 100%; max-width: 26rem; padding: 0.5rem 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); }
+.buscar:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.tl { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.4rem; }
+.tl div { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.6rem; font-size: 0.85rem; display: grid; gap: 0.2rem; align-content: start; }
+.tl div b { font-size: 0.92rem; }
+.tl .ok { border-color: var(--green); background: var(--green-soft); }
+.tl .casi { border-color: var(--amber); background: var(--amber-soft); }
+.tl .sig { border-color: var(--accent); background: var(--accent-soft); }
+.estado { font-family: var(--mono); font-size: 0.72rem; font-weight: 500; }
+.tarea-h { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 0.6rem; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--line); font-size: 0.93rem; }
+.tarea-h:last-child { border-bottom: 0; }
+.tarea-h .id { font-family: var(--mono); color: var(--accent); font-weight: 500; }
+.tarea-h .abierta { color: var(--amber); }
+.lista-h { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.pie-dato { color: var(--muted); font-size: 0.88rem; }
+@media (max-width: 860px) { .numeros4, .tl { grid-template-columns: repeat(2, minmax(0, 1fr)); } .viaje .det { padding-left: 0.8rem; } .viaje .mm { display: none; } }
+
+</style>
+</head>
+<body>
+
+<style>
+/* Bocetos: un marco que imita el panel del sistema (barra superior, barra lateral angosta, contenido) */
+.boceto { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); font-size: 0.8rem; }
+.b-barra { display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.8rem; background: var(--accent); color: var(--surface); font-weight: 600; font-size: 0.78rem; }
+.b-barra .ruta { font-weight: 400; opacity: 0.85; }
+.b-cuerpo { display: grid; grid-template-columns: 2.6rem minmax(0, 1fr); min-height: 10rem; }
+.b-lateral { background: var(--bg); border-right: 1px solid var(--line); display: grid; align-content: start; gap: 0.5rem; padding: 0.6rem 0.4rem; }
+.b-lateral i { display: block; width: 1.6rem; height: 1.6rem; border-radius: 6px; background: var(--line); }
+.b-lateral i.on { background: var(--accent); }
+.b-main { padding: 0.8rem; display: grid; gap: 0.6rem; min-width: 0; position: relative; }
+.b-fila { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.b-titulo { font-size: 0.95rem; font-weight: 700; }
+.b-sub { color: var(--muted); }
+.b-btn { display: inline-block; border-radius: 6px; padding: 0.25rem 0.6rem; background: var(--accent); color: var(--surface); font-weight: 600; font-size: 0.74rem; }
+.b-btn.gris { background: var(--bg); color: var(--fg); border: 1px solid var(--line); }
+.b-btn.rojo { background: var(--red); }
+.b-input { border: 1px solid var(--line); border-radius: 6px; padding: 0.25rem 0.5rem; background: var(--surface); color: var(--muted); min-width: 10rem; }
+.b-badge { display: inline-block; border-radius: 999px; padding: 0.05rem 0.5rem; font-size: 0.7rem; font-weight: 600; }
+.b-badge.v { background: var(--green-soft); color: var(--green); } .b-badge.a { background: var(--amber-soft); color: var(--amber); }
+.b-badge.r { background: var(--red-soft); color: var(--red); } .b-badge.z { background: var(--accent-soft); color: var(--accent); } .b-badge.g { background: var(--bg); color: var(--muted); }
+.b-cajas { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 0.5rem; }
+.b-caja { border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem; display: grid; gap: 0.2rem; background: var(--surface); }
+.b-caja i { width: 1.4rem; height: 1.4rem; border-radius: 6px; background: var(--accent-soft); }
+.b-caja b { font-size: 0.8rem; } .b-caja span { color: var(--muted); font-size: 0.7rem; }
+.b-tabla { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+.b-tabla th { text-align: left; color: var(--muted); font-weight: 600; padding: 0.3rem 0.45rem; border-bottom: 1px solid var(--line); font-size: 0.7rem; text-transform: none; letter-spacing: 0; }
+.b-tabla td { padding: 0.3rem 0.45rem; border-bottom: 1px solid var(--line); }
+.b-tabla td.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.b-tabla tr.tot td { font-weight: 700; border-top: 2px solid var(--line); }
+.b-tabla td:first-child { font-weight: 400; }
+.b-estados { display: flex; gap: 2px; }
+.b-estados span { flex: 1; text-align: center; padding: 0.25rem 0.2rem; font-size: 0.68rem; font-weight: 600; background: var(--bg); color: var(--muted); clip-path: polygon(0 0, 92% 0, 100% 50%, 92% 100%, 0 100%, 8% 50%); }
+.b-estados span.on { background: var(--accent); color: var(--surface); }
+.b-estados span.ok { background: var(--accent-soft); color: var(--accent); }
+.b-tabs { display: flex; gap: 0.2rem; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.b-tabs span { padding: 0.25rem 0.55rem; font-size: 0.72rem; color: var(--muted); }
+.b-tabs span.on { color: var(--accent); border-bottom: 2px solid var(--accent); font-weight: 600; }
+.b-dos { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.6rem; }
+.b-panel { border: 1px solid var(--line); border-radius: 8px; padding: 0.55rem; background: var(--bg); display: grid; gap: 0.35rem; align-content: start; }
+.b-panel.deslizante { position: absolute; top: 0; right: 0; bottom: 0; width: 46%; background: var(--surface); border-left: 1px solid var(--line); border-radius: 0; box-shadow: -6px 0 18px rgb(0 0 0 / 0.12); padding: 0.8rem; }
+.b-kanban { display: grid; grid-template-columns: repeat(5, minmax(6.5rem, 1fr)); gap: 0.4rem; overflow-x: auto; }
+.b-col { background: var(--bg); border-radius: 8px; padding: 0.4rem; display: grid; gap: 0.35rem; align-content: start; }
+.b-col > b { font-size: 0.7rem; color: var(--muted); }
+.b-tarjeta { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 0.35rem; display: grid; gap: 0.1rem; font-size: 0.72rem; }
+.b-tarjeta.frio { border-left: 3px solid var(--amber); }
+.b-saldo { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.3rem; }
+.b-saldo div { border-radius: 6px; padding: 0.3rem; background: var(--bg); display: grid; font-size: 0.68rem; color: var(--muted); }
+.b-saldo div b { font-family: var(--mono); font-size: 0.78rem; color: var(--fg); }
+.b-saldo div.mal { background: var(--red-soft); } .b-saldo div.mal b { color: var(--red); }
+.b-arbol { font-family: var(--mono); font-size: 0.74rem; display: grid; gap: 0.1rem; }
+.b-arbol div { display: grid; grid-template-columns: minmax(0, 1fr) 5rem 5rem 5rem; gap: 0.4rem; padding: 0.15rem 0.3rem; border-radius: 4px; }
+.b-arbol div.cab { color: var(--muted); font-size: 0.66rem; }
+.b-arbol div.sel { background: var(--accent-soft); }
+.b-arbol span.n { text-align: right; }
+.b-aviso { border-radius: 6px; padding: 0.4rem 0.55rem; font-size: 0.74rem; }
+.b-aviso.a { background: var(--amber-soft); color: var(--amber); } .b-aviso.r { background: var(--red-soft); color: var(--red); } .b-aviso.v { background: var(--green-soft); color: var(--green); }
+.b-movil { width: 15rem; margin: 0 auto; border: 6px solid var(--fg); border-radius: 1.4rem; overflow: hidden; background: var(--surface); }
+.b-movil .b-barra { justify-content: center; }
+.b-movil .b-main { padding: 0.6rem; }
+.b-grilla { width: 100%; border-collapse: collapse; font-size: 0.7rem; }
+.b-grilla td, .b-grilla th { border: 1px solid var(--line); padding: 0.2rem; text-align: center; font-weight: 400; }
+.b-grilla th { color: var(--muted); font-size: 0.64rem; text-transform: none; letter-spacing: 0; }
+.b-grilla td:first-child { text-align: left; }
+.b-check { display: grid; gap: 0.2rem; font-size: 0.74rem; }
+.b-check span::before { content: "✓ "; color: var(--green); font-weight: 700; }
+.b-check span.no::before { content: "○ "; color: var(--muted); }
+.b-nota { font-size: 0.72rem; color: var(--muted); padding: 0 0.8rem 0.6rem; }
+
+/* módulos */
+.area-cab { display: flex; align-items: baseline; gap: 0.7rem; flex-wrap: wrap; border-bottom: 3px solid var(--c); padding-bottom: 0.4rem; }
+.area-cab h2 { margin: 0; }
+.area-cab span { color: var(--muted); }
+.modulo-ficha { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 10px; padding: 1rem; display: grid; gap: 0.7rem; }
+.modulo-ficha h3 { margin: 0; display: flex; gap: 0.6rem; align-items: baseline; flex-wrap: wrap; }
+.modulo-ficha h3 small { font-family: var(--mono); font-weight: 400; font-size: 0.78rem; color: var(--muted); }
+.espera { margin: 0; padding-left: 1.1rem; display: grid; gap: 0.25rem; font-size: 0.93rem; }
+.tras { font-size: 0.9rem; background: var(--bg); border-radius: 8px; padding: 0.6rem 0.8rem; }
+.tras b { color: var(--c); }
+.ver-boceto { font: inherit; font-size: 0.88rem; justify-self: start; background: var(--surface); color: var(--accent); border: 1px solid var(--line); border-radius: 6px; padding: 0.3rem 0.8rem; cursor: pointer; }
+.ver-boceto:hover, .ver-boceto:focus-visible { border-color: var(--accent); outline: none; }
+.solo-texto { font-size: 0.85rem; color: var(--muted); }
+@media (max-width: 760px) { .b-dos { grid-template-columns: minmax(0, 1fr); } .b-panel.deslizante { position: static; width: auto; box-shadow: none; border: 1px solid var(--line); border-radius: 8px; } .b-saldo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+
+<div class="envoltura">
+  <nav class="indice" aria-label="Índice">
+    <b>Índice</b>
+    <ol>
+      <li><a href="#como-leer">Cómo leer esto</a></li>
+      <li><a href="#a-sebastian">Presupuesto y costo</a></li>
+      <li><a href="#a-ander">Comercial</a></li>
+      <li><a href="#a-lennart">Contratos y abastecimiento</a></li>
+      <li><a href="#a-yair">Obra y personas</a></li>
+    </ol>
+  </nav>
+  <main>
+    <header class="cabeza">
+      <span class="eyebrow">TechQuk Integral System · etapa 2</span>
+      <h1>Los módulos de la etapa 2</h1>
+      <p class="bajada">Qué se espera de cada módulo, en qué tarea aparece y, en los principales, un boceto de cómo se verá la pantalla al terminar esa tarea. Ordenado por área y en el orden de sus tareas.</p>
+    </header>
+
+    <section id="como-leer">
+      <h2><span class="n">00</span>Cómo leer esto</h2>
+      <div class="nota">Los bocetos son una idea de la pantalla, no el diseño final: la real usa los componentes y patrones que ya tiene el sistema (cajas con buscador, ficha con pestañas, barra de estados, panel que se desliza desde la derecha), y la mejora visual se hace al final. Los datos son los del caso del v4: Videovigilancia Plaza de Armas.</div>
+      <div class="nota ambar">Dos ajustes propuestos que aún no están en el ADR 0020: la primera tarea de Sebastián crea también lo mínimo del proyecto (la tabla y la costura C2), porque las partidas apuntan a un proyecto real; y la fórmula polinómica se <b>define</b> con el presupuesto en la etapa 2 (tarea 2.2b) y se <b>aplica</b> en las valorizaciones en la etapa 3.</div>
+    </section>
+
+    <!-- ================= SEBASTIÁN ================= -->
+    <section id="a-sebastian" style="--c: var(--accent)">
+      <div class="area-cab"><h2>Presupuesto y costo</h2><span>Sebastián · ~25 %</span></div>
+
+      <article class="modulo-ficha">
+        <h3>Proyectos (lo mínimo) <small>tarea 2.1 · luego lo continúa Obra y personas</small></h3>
+        <ul class="espera">
+          <li>El proyecto existe con su código, cliente, jefe y estado (en preparación, en ejecución, cerrado).</li>
+          <li>Ofrece la costura C2 a todos: su resumen, los activos y si acepta costos.</li>
+          <li>Junto con él, el esqueleto de C1 (partida, saldo, margen) con sus versiones falsas.</li>
+        </ul>
+        <div class="tras">Tras la <b>2.1</b>: todavía casi nada visible; existen los «enchufes» que las otras áreas usan y una lista simple de proyectos.</div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Presupuestos <small>tareas 2.2 · 2.2b · 2.3 · 2.4 · 2.5</small></h3>
+        <ul class="espera">
+          <li><b>2.2</b> El presupuesto con su APU: cada partida con su receta de insumos (cantidad, rendimiento, desperdicio) da su costo unitario; suma costo directo, gastos generales, utilidad e IGV. Con versiones.</li>
+          <li><b>2.2b</b> La fórmula polinómica definida con el presupuesto (monomios y coeficientes) y la carga mensual de índices. Se aplica en la etapa 3.</li>
+          <li><b>2.3</b> El árbol de partidas de control, de profundidad libre, con la PC-99 creada sola, y los cuatro números de cada partida.</li>
+          <li><b>2.4</b> El selector de imputación: uno solo para todos los documentos con costo, con el saldo visible antes de pedir.</li>
+          <li><b>2.5</b> El resumen del presupuesto para la cotización del CRM (C8).</li>
+        </ul>
+        <div class="tras">El caso del v4 tiene que dar exacto: costo directo <b>S/ 17,750.00</b>, costo total <b>S/ 19,525.00</b>, venta <b>S/ 24,715.10</b>.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: editor del presupuesto (tras la 2.2)</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Proyectos › Presupuestos › PRE-2026-031 v2</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i class="on"></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-titulo">PRE-2026-031 · Videovigilancia Plaza de Armas</span><span class="b-badge z">Versión 2</span><span style="flex:1"></span><span class="b-btn gris">Nueva versión</span><span class="b-btn">Enviar a aprobar</span></div>
+              <div class="b-estados"><span class="ok">Borrador</span><span class="on">Por aprobar</span><span>Aprobado</span></div>
+              <div class="b-dos">
+                <table class="b-tabla">
+                  <tr><th>Partida</th><th>Und.</th><th>Metrado</th><th>C. unit.</th><th>Parcial</th></tr>
+                  <tr><td>01 Cámaras domo IP</td><td>und</td><td class="n">10</td><td class="n">643.00</td><td class="n">6,430.00</td></tr>
+                  <tr style="background: var(--accent-soft)"><td>02.01 Cable UTP cat6</td><td>m</td><td class="n">600</td><td class="n">2.52</td><td class="n">1,512.00</td></tr>
+                  <tr><td>02.02 Postes</td><td>und</td><td class="n">4</td><td class="n">1,315.00</td><td class="n">5,260.00</td></tr>
+                  <tr><td>03 Centro de monitoreo</td><td>glb</td><td class="n">1</td><td class="n">4,548.00</td><td class="n">4,548.00</td></tr>
+                  <tr class="tot"><td>Costo directo</td><td></td><td></td><td></td><td class="n">17,750.00</td></tr>
+                  <tr><td>Gastos generales</td><td></td><td></td><td></td><td class="n">1,775.00</td></tr>
+                  <tr class="tot"><td>Venta con IGV</td><td></td><td></td><td></td><td class="n">24,715.10</td></tr>
+                </table>
+                <div class="b-panel"><b>APU · 02.01 Cable UTP cat6 (por metro)</b>
+                  <table class="b-tabla"><tr><th>Insumo</th><th>Cant.</th><th>P.U.</th></tr>
+                    <tr><td>Cable UTP cat6</td><td class="n">1.05</td><td class="n">1.40</td></tr>
+                    <tr><td>Técnico (0.05 h)</td><td class="n">0.05</td><td class="n">21.00</td></tr>
+                    <tr class="tot"><td>Costo unitario</td><td></td><td class="n">2.52</td></tr></table>
+                  <span class="b-sub">1.05 = 5 % de desperdicio · 0.05 h por metro</span></div>
+              </div>
+            </div></div>
+          <div class="b-nota">Boceto. Cifras de los totales del v4; el desglose de las partidas es ilustrativo.</div>
+        </div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: árbol de partidas con saldos (tras la 2.3)</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Proyectos › PRY-2026-012 › Árbol de partidas</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i class="on"></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-titulo">Árbol de control · versión 1</span><span class="b-badge v">Aprobado</span><span style="flex:1"></span><span class="b-input">Buscar partida…</span></div>
+              <div class="b-arbol">
+                <div class="cab"><span>Partida</span><span class="n">Presup.</span><span class="n">Comprom.</span><span class="n">Disponible</span></div>
+                <div><span>PC-01 Cámaras</span><span class="n">6,430.00</span><span class="n">6,430.00</span><span class="n">0.00</span></div>
+                <div><span>PC-02 Cableado y postes</span><span class="n">6,772.00</span><span class="n">1,560.00</span><span class="n">5,212.00</span></div>
+                <div class="sel"><span>  └ PC-02.01 Cable</span><span class="n">1,512.00</span><span class="n">1,560.00</span><span class="n" style="color: var(--red)">−48.00</span></div>
+                <div><span>PC-03 Centro de monitoreo</span><span class="n">4,548.00</span><span class="n">0.00</span><span class="n">4,548.00</span></div>
+                <div><span>PC-04 Gastos generales</span><span class="n">1,775.00</span><span class="n">180.00</span><span class="n">1,595.00</span></div>
+                <div><span>PC-99 No presupuestados</span><span class="n">0.00</span><span class="n">0.00</span><span class="n">0.00</span></div>
+              </div>
+              <div class="b-aviso r">PC-02.01 excede en S/ 48.00: la orden que lo excede quedó marcada con motivo y aprobación.</div>
+            </div></div>
+          <div class="b-nota">Boceto. El exceso de S/ 48.00 es el ejemplo del v4 (parte 1).</div>
+        </div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: selector de imputación (tras la 2.4)</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Compras › Requerimientos › Nuevo</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i></i><i class="on"></i><i></i></div>
+            <div class="b-main" style="min-height: 14rem">
+              <div class="b-titulo">Imputar a</div>
+              <div class="b-fila"><span class="b-btn">Proyecto › partida</span><span class="b-btn gris">Gasto directo</span></div>
+              <div class="b-input" style="max-width: 22rem">PRY-2026-012 · Videovigilancia Plaza de Armas</div>
+              <div class="b-input" style="max-width: 22rem; color: var(--fg)">PC-02 › PC-02.01 Cable</div>
+              <div class="b-saldo">
+                <div>Presupuestado<b>1,512.00</b></div><div>Comprometido<b>0.00</b></div><div>Esta línea<b>1,560.00</b></div><div class="mal">Disponible<b>−48.00</b></div><div>Pagado<b>0.00</b></div>
+              </div>
+              <div class="b-aviso a">Se puede continuar, pero la línea se marca y exige motivo y aprobación.</div>
+            </div></div>
+          <div class="b-nota">Boceto. Es el mismo selector en el requerimiento, la orden, el tareo y el gasto no presupuestado.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Gastos no presupuestados <small>tarea 2.6</small></h3>
+        <ul class="espera">
+          <li>Un gasto del proyecto que no estaba previsto cae en la PC-99, con motivo obligatorio y aprobación.</li>
+          <li>Si el motivo es un cambio pedido por el cliente, se marca como posible adicional y Contratos recibe el aviso (C11).</li>
+          <li>Muestra cómo baja el margen antes de aprobar.</li>
+        </ul>
+        <div class="tras">Escenario: un taxi de <b>S/ 45.00</b> sin comentario queda bloqueado; aprobado, cae en la PC-99.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: registrar un gasto no presupuestado</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Proyectos › PRY-2026-012 › Gasto no presupuestado</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i class="on"></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-dos">
+                <div style="display:grid; gap:0.4rem">
+                  <span class="b-sub">Concepto</span><span class="b-input" style="color: var(--fg)">Taxi imprevisto a la obra</span>
+                  <span class="b-sub">Monto</span><span class="b-input" style="color: var(--fg)">S/ 45.00</span>
+                  <span class="b-sub">Motivo</span><span class="b-input" style="color: var(--fg)">Traslado urgente de un equipo</span>
+                  <span class="b-sub">Comentario (obligatorio)</span><span class="b-input">—</span>
+                </div>
+                <div class="b-panel"><b>Efecto en el proyecto</b><span>Cae en: PC-99 No presupuestados</span><span>Margen estimado: <b>1,372.00 → 1,327.00</b></span><span class="b-badge a">Requiere aprobación</span></div>
+              </div>
+              <div class="b-aviso r">Falta el comentario: sin él no se puede enviar a aprobar.</div>
+              <div class="b-fila"><span class="b-btn gris">Guardar borrador</span><span class="b-btn">Enviar a aprobar</span></div>
+            </div></div>
+          <div class="b-nota">Boceto con el escenario del v4.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Margen y cierre de la etapa <small>tarea 2.7</small></h3>
+        <ul class="espera">
+          <li>El margen estimado del proyecto con el monto del contrato (C10).</li>
+          <li>El escenario del margen de punta a punta, con todas las piezas reales al final de la etapa.</li>
+        </ul>
+        <div class="tras">Escenario: margen al cerrar <b>S/ 1,327.00</b>.</div>
+      </article>
+    </section>
+
+    <!-- ================= ANDER ================= -->
+    <section id="a-ander" style="--c: var(--teal)">
+      <div class="area-cab"><h2>Comercial</h2><span>Ander · ~25 %</span></div>
+
+      <article class="modulo-ficha">
+        <h3>Cuentas <small>tarea 1 del área</small></h3>
+        <ul class="espera">
+          <li>Clientes y prospectos sobre el registro único de personas y empresas: se crean desde el RUC y no se duplican.</li>
+          <li>Pestañas de la ficha: datos, contactos, oportunidades, cotizaciones, actividades, historial.</li>
+          <li>La pestaña «sin actividad 90 días», la que más sirve.</li>
+        </ul>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: lista de cuentas</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">CRM › Cuentas</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i class="on"></i><i></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-input">Buscar por nombre o RUC…</span><span style="flex:1"></span><span class="b-btn">Nueva cuenta</span></div>
+              <div class="b-tabs"><span class="on">Todas</span><span>Mías</span><span>Clientes activos</span><span>Prospectos</span><span>Sin actividad 90 días</span></div>
+              <table class="b-tabla">
+                <tr><th>Tipo</th><th>Razón social</th><th>RUC</th><th>Oport.</th><th>Último contacto</th></tr>
+                <tr><td><span class="b-badge z">Pública</span></td><td>Municipalidad Distrital de Ejemplo</td><td>20100000001</td><td class="n">3</td><td>hace 6 días</td></tr>
+                <tr><td><span class="b-badge g">Privada</span></td><td>Clínica Ejemplo S.A.C.</td><td>20100000002</td><td class="n">1</td><td>hace 94 días</td></tr>
+                <tr><td><span class="b-badge z">Pública</span></td><td>Gobierno Regional de Ejemplo</td><td>20100000003</td><td class="n">5</td><td>ayer</td></tr>
+              </table>
+            </div></div>
+          <div class="b-nota">Boceto con nombres inventados.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Oportunidades <small>tareas 2 y 6 del área</small></h3>
+        <ul class="espera">
+          <li>El embudo por etapas: prospecto, calificada, propuesta enviada, negociación, cierre. La probabilidad la pone la etapa, nadie la edita.</li>
+          <li>Cada etapa exige lo suyo (por ejemplo, no se pasa a propuesta sin cotización).</li>
+          <li>El tablero del ejecutivo: lo que cierra este mes, lo que se enfría, lo que no tiene próxima acción.</li>
+          <li>Al ganarse, emite «oportunidad ganada» (C3) y nace el contrato.</li>
+        </ul>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: tablero de oportunidades</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">CRM › Oportunidades › Tablero</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i class="on"></i><i></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-badge z">Embudo S/ 2,840,000</span><span class="b-badge z">Ponderado S/ 1,065,000</span><span class="b-badge a">4 sin próxima acción</span></div>
+              <div class="b-kanban">
+                <div class="b-col"><b>Prospecto · 10 %</b><div class="b-tarjeta"><b>Cámaras I.E.</b>S/ 45,000</div></div>
+                <div class="b-col"><b>Calificada · 25 %</b><div class="b-tarjeta"><b>Red municipal</b>S/ 120,000</div></div>
+                <div class="b-col"><b>Propuesta · 50 %</b><div class="b-tarjeta frio"><b>Data center</b>S/ 410,000<span class="b-sub">18 días en la etapa</span></div></div>
+                <div class="b-col"><b>Negociación · 75 %</b><div class="b-tarjeta"><b>Ampliación CCTV</b>S/ 88,000</div></div>
+                <div class="b-col"><b>Cierre</b><div class="b-tarjeta"><b>Plaza de Armas</b>S/ 24,715.10<span class="b-badge v">Ganada</span></div></div>
+              </div>
+            </div></div>
+          <div class="b-nota">Boceto. Las tarjetas se arrastran entre etapas; si falta un requisito, la etapa no avanza.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Cotizaciones <small>tarea 4 del área</small></h3>
+        <ul class="espera">
+          <li>Cotización con versiones (solo una aceptada), armada sobre el presupuesto real (C8) y el catálogo (C4).</li>
+          <li>Margen por línea; bajo el mínimo pide aprobación. Comparador de versiones y PDF.</li>
+        </ul>
+        <div class="tras">Escenario: un margen de <b>19.4 %</b> frente al mínimo de 22 % pide aprobación.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: cotización</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">CRM › Cotizaciones › COT-2026-0190</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i class="on"></i><i></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-titulo">COT-2026-0190 · v1</span><span class="b-badge v">Aceptada</span><span style="flex:1"></span><span class="b-btn gris">Comparar versiones</span><span class="b-btn gris">PDF</span></div>
+              <table class="b-tabla">
+                <tr><th>Ítem</th><th>Cant.</th><th>Precio</th><th>Margen</th></tr>
+                <tr><td>Cámara domo IP</td><td class="n">10</td><td class="n">843.00</td><td><span class="b-badge v">24 %</span></td></tr>
+                <tr><td>Cableado y postes</td><td class="n">1</td><td class="n">8,410.00</td><td><span class="b-badge a">19.4 %</span></td></tr>
+                <tr class="tot"><td>Total con IGV</td><td></td><td class="n">24,715.10</td><td></td></tr>
+              </table>
+              <span class="b-sub">Presupuesto enlazado: PRE-2026-031 v2 (no se copia)</span>
+            </div></div>
+          <div class="b-nota">Boceto; precios por línea ilustrativos.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Licitaciones <small>tarea 5 del área</small></h3>
+        <ul class="espera">
+          <li>La convocatoria con su cronograma (seis hitos) y la participación con su expediente.</li>
+          <li>No se marca «presentada» si falta un documento; verifica personal certificado (C9).</li>
+          <li>Públicas y privadas, registradas a mano. Las públicas llegarán solas desde el OECE al final.</li>
+        </ul>
+        <div class="tras">Escenario: marcar presentada con <b>3 de 5</b> documentos queda bloqueado.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: participación en una licitación</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">CRM › Licitaciones › AS-2026-022</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i class="on"></i><i></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-titulo">AS-2026-022 · Videovigilancia Plaza de Armas</span><span class="b-badge z">Pública</span><span class="b-badge a">Presentación en 2 días</span></div>
+              <div class="b-tabs"><span>Convocatoria</span><span>Cronograma</span><span class="on">Expediente</span><span>Bases</span><span>Resultado</span></div>
+              <div class="b-dos">
+                <div class="b-check"><span>Declaración jurada</span><span>Constancia RNP</span><span>Propuesta técnica</span><span class="no">Carta fianza de seriedad</span><span class="no">Personal certificado (2 de 3)</span></div>
+                <div class="b-panel"><b>3 de 5 documentos</b><span class="b-btn rojo">Marcar presentada</span><span class="b-sub">Bloqueado: faltan 2 documentos</span></div>
+              </div>
+            </div></div>
+          <div class="b-nota">Boceto.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Actividades <small>tarea 3 del área</small></h3>
+        <ul class="espera">
+          <li>Llamadas, visitas y reuniones con sus participantes; cada oportunidad muestra su próxima acción.</li>
+        </ul>
+        <p class="solo-texto">Pantalla simple de lista y formulario, con los patrones de siempre.</p>
+      </article>
+    </section>
+
+    <!-- ================= LENNART ================= -->
+    <section id="a-lennart" style="--c: var(--amber)">
+      <div class="area-cab"><h2>Contratos y abastecimiento</h2><span>Lennart · ~26 %</span></div>
+
+      <article class="modulo-ficha">
+        <h3>Contratos <small>tarea 2 del área</small></h3>
+        <ul class="espera">
+          <li>Nace en borrador al ganarse la oportunidad (C3), y pide su proyecto (C2).</li>
+          <li>Hitos, adendas que mueven plazo y monto, conformidades, carta fianza con alertas a 60, 30 y 15 días (su comisión es una orden de servicio).</li>
+          <li>La penalidad diaria se calcula, no se digita: 0.10 × monto ÷ (0.40 × plazo), con tope.</li>
+        </ul>
+        <div class="tras">Escenario: penalidad <b>S/ 205.96</b> por día, tope <b>S/ 2,471.51</b>.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: ficha del contrato</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Contratos › CT-2026-018</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i class="on"></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-titulo">CT-2026-018 · Municipalidad de Ejemplo</span><span style="flex:1"></span><span class="b-btn gris">Registrar adenda</span><span class="b-btn">Registrar conformidad</span></div>
+              <div class="b-estados"><span class="ok">Borrador</span><span class="on">Vigente</span><span>Por liquidar</span><span>Cerrado</span></div>
+              <div class="b-tabs"><span class="on">Resumen</span><span>Hitos</span><span>Adendas</span><span>Garantías</span><span>Conformidades</span><span>Archivos</span><span>Historial</span></div>
+              <div class="b-cajas">
+                <div class="b-caja"><span>Monto</span><b>S/ 24,715.10</b></div>
+                <div class="b-caja"><span>Plazo</span><b>30 días · fin 30 set</b></div>
+                <div class="b-caja"><span>Penalidad diaria</span><b>S/ 205.96</b><span>tope S/ 2,471.51</span></div>
+                <div class="b-caja"><span>Carta fianza</span><b>S/ 2,471.51</b><span class="b-badge a">vence en 28 días</span></div>
+              </div>
+            </div></div>
+          <div class="b-nota">Boceto con el contrato del v4 (entidad con nombre inventado).</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Compras <small>tareas 1, 3, 4 y 5 del área</small></h3>
+        <ul class="espera">
+          <li>Requerimiento con aprobación y su imputación con el selector (ve el saldo antes de pedir).</li>
+          <li>Cotizaciones de proveedores y cuadro comparativo; órdenes de compra y servicio de doce tipos configurables.</li>
+          <li>La orden aprobada compromete el saldo de la partida (C6).</li>
+        </ul>
+        <div class="tras">Escenario: una orden de <b>S/ 1,560.00</b> contra una partida de S/ 1,512.00 deja disponible −48.00 y exige motivo.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: orden de compra con panel deslizante</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Compras › Órdenes</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i></i><i class="on"></i><i></i></div>
+            <div class="b-main" style="min-height: 15rem">
+              <div class="b-fila"><span class="b-input">Buscar orden o proveedor…</span></div>
+              <table class="b-tabla" style="width: 52%">
+                <tr><th>Orden</th><th>Estado</th></tr>
+                <tr style="background: var(--accent-soft)"><td>OC-2026-0142</td><td><span class="b-badge z">Aprobada</span></td></tr>
+                <tr><td>OC-2026-0141</td><td><span class="b-badge v">Recibida</span></td></tr>
+                <tr><td>OC-2026-0140</td><td><span class="b-badge g">Borrador</span></td></tr>
+              </table>
+              <div class="b-panel deslizante">
+                <b>OC-2026-0142 · Proveedor de ejemplo</b>
+                <div class="b-estados"><span class="ok">Borrador</span><span class="ok">Por aprobar</span><span class="on">Aprobada</span><span>Enviada</span><span>Recibida</span></div>
+                <span>600 m cable UTP cat6 · S/ 1,560.00</span>
+                <span>Imputado a PC-02.01 Cable</span>
+                <div class="b-aviso a">Excede la partida en S/ 48.00 · motivo registrado</div>
+                <div class="b-fila"><span class="b-btn">Enviar al proveedor</span><span class="b-btn gris">Anular</span></div>
+              </div>
+            </div></div>
+          <div class="b-nota">Boceto. La orden se abre en el panel que se desliza desde la derecha, sin recargar.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Almacén <small>tareas 1, 6 y 7 del área</small></h3>
+        <ul class="espera">
+          <li>Almacenes central y de obra, recepciones parciales, stock por almacén con concurrencia real, series únicas.</li>
+          <li>El despacho a obra pasa el costo a ejecutado en la partida (C6); la guía registra su número.</li>
+        </ul>
+        <div class="tras">Escenarios: el cable llega a su partida por <b>S/ 1,248.00</b>; recibir 9 de 10 series queda bloqueado.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: recepción con series</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Almacén › Recepciones › OC-2026-0139</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i></i><i></i><i class="on"></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-titulo">Recepción · 10 cámaras domo IP</span><span class="b-badge a">Parcial</span></div>
+              <table class="b-tabla"><tr><th>Ítem</th><th>Pedido</th><th>Recibido</th><th>Series</th></tr>
+                <tr><td>Cámara domo IP</td><td class="n">10</td><td class="n">10</td><td><span class="b-badge r">9 de 10 leídas</span></td></tr></table>
+              <div class="b-aviso r">Falta leer 1 serie: no se puede confirmar la recepción.</div>
+              <div class="b-fila"><span class="b-btn gris">Leer serie con el celular</span><span class="b-btn" style="opacity:.5">Confirmar recepción</span></div>
+            </div></div>
+          <div class="b-nota">Boceto con el escenario del v4.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Subcontratos <small>tarea 8 del área · viven en Obra pública</small></h3>
+        <ul class="espera">
+          <li>El subcontrato y las partidas que ejecuta un tercero; al aprobarse, compromete el saldo.</li>
+          <li>Por decidir con el equipo: el escenario descuenta un adelanto del 20 %, y los adelantos están anotados para la etapa 3.</li>
+        </ul>
+        <p class="solo-texto">Ficha con pestañas, como la del contrato.</p>
+      </article>
+    </section>
+
+    <!-- ================= YAIR ================= -->
+    <section id="a-yair" style="--c: var(--green)">
+      <div class="area-cab"><h2>Obra y personas</h2><span>Yair · ~24 %</span></div>
+
+      <article class="modulo-ficha">
+        <h3>Catálogo <small>tareas 1 y 2 del área · vive en el CRM</small></h3>
+        <ul class="espera">
+          <li>Un solo catálogo de productos y servicios: marcas, familias, precios con vigencia (sin sobrescribir), proveedores y carga masiva.</li>
+          <li>Lo usan presupuestos, compras, almacén y cotizaciones (C4).</li>
+        </ul>
+        <p class="solo-texto">Cajas por familia con buscador y la ficha del producto en el panel deslizante.</p>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Proyectos <small>tarea 3 del área · continúa lo mínimo de la 2.1</small></h3>
+        <ul class="espera">
+          <li>El proyecto nace «en preparación» con el contrato y pasa a «en ejecución» al aprobarse el árbol.</li>
+          <li>Fases desde plantillas, hitos y entregables; eventos de creado y cerrado (C2).</li>
+        </ul>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: ficha del proyecto</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Proyectos › PRY-2026-012</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i class="on"></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-titulo">PRY-2026-012 · Videovigilancia Plaza de Armas</span><span class="b-badge z">En ejecución</span></div>
+              <div class="b-tabs"><span class="on">Resumen</span><span>Árbol de partidas</span><span>Equipo</span><span>Horas</span><span>Compras</span><span>Avance</span></div>
+              <div class="b-cajas">
+                <div class="b-caja"><span>Contrato</span><b>CT-2026-018</b></div>
+                <div class="b-caja"><span>Avance</span><b>45 %</b></div>
+                <div class="b-caja"><span>Margen estimado</span><b>S/ 1,372.00</b></div>
+                <div class="b-caja"><span>Personas asignadas</span><b>4</b></div>
+              </div>
+            </div></div>
+          <div class="b-nota">Boceto; cada pestaña la llena el área que corresponde.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Personal <small>tareas 4, 5 y 6 del área</small></h3>
+        <ul class="espera">
+          <li>Colaboradores sobre la ficha de personas, competencias y certificaciones con vencimiento (C9).</li>
+          <li>Habilitación de campo: examen, SCTR, inducción y equipo de protección; si algo vence, bloquea asignación y tareo, con alerta 15 días antes. Del examen solo se ve el resultado.</li>
+          <li>Asignaciones a proyectos con dedicación y alerta de sobreasignación.</li>
+        </ul>
+        <div class="tras">Escenario: una asignación del <b>120 %</b> avisa sobreasignación.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: habilitación de campo</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">Personal › Técnico de ejemplo</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i></i><i></i><i class="on"></i><i></i></div>
+            <div class="b-main">
+              <div class="b-tabs"><span>Datos</span><span>Contrato</span><span class="on">Habilitación de campo</span><span>Asignaciones</span><span>Competencias</span></div>
+              <table class="b-tabla"><tr><th>Requisito</th><th>Estado</th><th>Vence</th></tr>
+                <tr><td>Examen médico ocupacional</td><td><span class="b-badge v">Apto</span></td><td>mar 2027</td></tr>
+                <tr><td>SCTR para PRY-2026-012</td><td><span class="b-badge r">Vencido</span></td><td>30 set</td></tr>
+                <tr><td>Inducción de seguridad</td><td><span class="b-badge v">Hecha</span></td><td>—</td></tr>
+                <tr><td>Equipo de protección</td><td><span class="b-badge v">Entregado</span></td><td>—</td></tr></table>
+              <div class="b-aviso r">SCTR vencido: no puede tarearse en obra hasta regularizarlo.</div>
+            </div></div>
+          <div class="b-nota">Boceto con un nombre inventado.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Tareo <small>tareas 4 y 6 del área</small></h3>
+        <ul class="espera">
+          <li>Categorías con su costo estándar por hora y vigencia (C5).</li>
+          <li>Horas por persona, día y partida desde el celular; al cerrar la semana se valorizan y se imputan (C1).</li>
+          <li>No se puede tarear a quien tiene la habilitación vencida.</li>
+        </ul>
+        <div class="tras">Escenario: horas valorizadas por <b>S/ 648.00</b> y <b>S/ 432.00</b>; bloqueo con SCTR vencido.</div>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: tareo semanal en el celular</button>
+        <div class="boceto" hidden style="padding: 0.8rem; background: var(--bg)">
+          <div class="b-movil">
+            <div class="b-barra">Tareo · semana 37</div>
+            <div class="b-main">
+              <b>PRY-2026-012</b>
+              <table class="b-grilla"><tr><th>Persona</th><th>L</th><th>M</th><th>M</th><th>J</th><th>V</th></tr>
+                <tr><td>Técnico A</td><td>8</td><td>8</td><td>8</td><td>8</td><td>4</td></tr>
+                <tr><td>Técnico B</td><td>8</td><td>8</td><td>8</td><td>—</td><td>—</td></tr>
+                <tr><td style="color: var(--red)">Ayudante C</td><td colspan="5" style="color: var(--red)">SCTR vencido</td></tr></table>
+              <span class="b-sub">Partida: PC-02.01 Cable</span>
+              <span class="b-btn" style="text-align:center">Cerrar semana</span>
+            </div>
+          </div>
+          <div class="b-nota" style="text-align:center">Boceto con nombres inventados.</div>
+        </div>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Valorizaciones <small>tarea 7 del área</small></h3>
+        <ul class="espera">
+          <li>El avance de cada periodo por línea del contrato (C10), para cobrarlo; al aprobarse, mueve el ejecutado.</li>
+          <li>Sin reajuste en la etapa 2: deja preparado dónde se enchufa la fórmula polinómica, que se aplica en la etapa 3.</li>
+        </ul>
+        <p class="solo-texto">Ficha con sus líneas y una barra de estados (borrador, observada, aprobada).</p>
+      </article>
+
+      <article class="modulo-ficha">
+        <h3>Convocatorias del OECE <small>tarea 8 del área · al final</small></h3>
+        <ul class="espera">
+          <li>Cada día llegan solas las convocatorias que pasan los filtros, con sus bases adjuntas, a la bandeja de licitaciones.</li>
+          <li><b>El explorador:</b> los datos básicos de todas las convocatorias del país, buscables y filtrables, por si el filtro falla. «Seguir esta» pasa una a la bandeja y recién ahí se descargan sus bases. Una vista muestra lo que el filtro descartó, para ajustarlo.</li>
+          <li>Corre en su propia cola; una alerta avisa si un día no llega nada. Siempre queda la carga a mano.</li>
+        </ul>
+        <button type="button" class="ver-boceto" aria-expanded="false">Ver boceto: explorador de convocatorias</button>
+        <div class="boceto" hidden>
+          <div class="b-barra">TechQuk <span class="ruta">CRM › Licitaciones › Explorador</span></div>
+          <div class="b-cuerpo"><div class="b-lateral"><i class="on"></i><i></i><i></i><i></i></div>
+            <div class="b-main">
+              <div class="b-fila"><span class="b-input">Buscar por objeto, entidad o nomenclatura…</span><span class="b-badge g">Región: todas</span><span class="b-badge g">Monto: todos</span></div>
+              <div class="b-tabs"><span class="on">Todas (412 hoy)</span><span>Pasaron el filtro (9)</span><span>Descartadas por el filtro (403)</span><span>Siguiendo (14)</span></div>
+              <table class="b-tabla">
+                <tr><th>Objeto</th><th>Entidad</th><th>Región</th><th>Monto</th><th></th></tr>
+                <tr><td>Sistema de videovigilancia</td><td>Municipalidad de ejemplo</td><td>Lambayeque</td><td class="n">180,000</td><td><span class="b-badge v">Pasó el filtro</span></td></tr>
+                <tr><td>Cableado estructurado de sede</td><td>Hospital de ejemplo</td><td>Piura</td><td class="n">95,000</td><td><span class="b-btn">Seguir esta</span></td></tr>
+                <tr><td>Adquisición de mobiliario</td><td>UGEL de ejemplo</td><td>Lima</td><td class="n">40,000</td><td><span class="b-btn gris">Seguir esta</span></td></tr>
+              </table>
+            </div></div>
+          <div class="b-nota">Boceto con datos inventados. El cableado no pasó el filtro pero interesa: «Seguir esta» lo lleva a la bandeja.</div>
+        </div>
+        <p class="solo-texto">Además, una pantalla de configuración de los filtros.</p>
+      </article>
+    </section>
+
+    <footer>Esta guía vive en el repositorio, en <code>docs/equipo/10-modulos-etapa-2.html</code>. Fuentes: ADR 0020, la especificación v4 (flujos 1, 2, 3, 7 y 10; partes 2, 6 y 8) y el diseño de pantallas del CRM. Si no coinciden, manda el repositorio.</footer>
+  </main>
+</div>
+<script>
+(function () {
+  document.querySelectorAll('.ver-boceto').forEach((b) => {
+    const boceto = b.nextElementSibling;
+    const texto = b.textContent;
+    b.addEventListener('click', () => {
+      const abrir = boceto.hidden;
+      boceto.hidden = !abrir;
+      b.setAttribute('aria-expanded', String(abrir));
+      b.textContent = abrir ? texto.replace('Ver boceto', 'Ocultar boceto') : texto;
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

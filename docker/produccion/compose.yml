@@ -1,0 +1,108 @@
+# Compose de producción (plan 1.12b; docs/operaciones/despliegue.md y requisitos-servidor.md). Lo levanta TI en su
+# servidor, desde la raíz del repositorio y con su .env al lado (nunca en el repositorio ni en la imagen):
+#   docker compose -f docker/produccion/compose.yml up -d --build
+# No migra al arrancar: TI respalda y migra a mano. Todos los servicios vuelven solos tras un corte de energía o un
+# reinicio del servidor (`unless-stopped`). El de desarrollo es el docker-compose.yml de la raíz (solo PostgreSQL).
+
+x-aplicacion: &aplicacion
+    image: techquk/app:${VERSION:-local}
+    # La imagen se construye aquí; nunca se baja de un registro (un `docker compose pull` traería la de un tercero).
+    pull_policy: never
+    env_file: ${ENV_ARCHIVO:-../../.env}
+    environment:
+        # Fijos, aunque el .env diga otra cosa (si apuntara por error a uno de desarrollo).
+        APP_ENV: production
+        APP_DEBUG: "false"
+        # Las vistas compiladas, en cada contenedor: en el volumen compartido, el `optimize` de una cola que se reinicia
+        # borraba las de todos mientras FPM atendía.
+        VIEW_COMPILED_PATH: /var/www/html/bootstrap/cache/views
+        # La base va por la red interna del compose; usuario, clave y nombre salen del .env.
+        DB_CONNECTION: pgsql
+        DB_HOST: postgres
+        DB_PORT: 5432
+        # Las colas son de base de datos: la página de salud las revisa así (ComprobacionCola).
+        QUEUE_CONNECTION: database
+    volumes:
+        - storage:/var/www/html/storage
+    depends_on:
+        postgres:
+            condition: service_healthy
+    restart: unless-stopped
+
+services:
+    app:
+        <<: *aplicacion
+        pull_policy: build
+        build:
+            context: ../..
+            dockerfile: docker/produccion/Dockerfile
+            target: app
+        command: ["php-fpm"]
+        healthcheck:
+            test: ["CMD-SHELL", "php-fpm -t >/dev/null 2>&1 && php -r 'exit(@fsockopen(\"127.0.0.1\", 9000) ? 0 : 1);'"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+
+    web:
+        image: techquk/web:${VERSION:-local}
+        pull_policy: build
+        build:
+            context: ../..
+            dockerfile: docker/produccion/Dockerfile
+            target: web
+        ports:
+            # Si el proxy de TI corre en el mismo servidor, WEB_IP=127.0.0.1 evita que alguien lo salte.
+            - "${WEB_IP:-0.0.0.0}:${WEB_PUERTO:-80}:80"
+        depends_on:
+            app:
+                condition: service_healthy
+        restart: unless-stopped
+        healthcheck:
+            # /up es la ruta de salud de Laravel: responde si la aplicación arranca.
+            test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/up || exit 1"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+
+    # La de siempre: correos de avisos, tipo de cambio.
+    cola:
+        <<: *aplicacion
+        command: ["php", "artisan", "queue:work", "database", "--queue=default", "--sleep=3", "--max-time=3600"]
+        # Más que el `$timeout` de sus trabajos (60 s): uno que está terminando no se corta.
+        stop_grace_period: 90s
+
+    # La de la IA (plan 1.11c), aparte: una sugerencia que tarda minutos no detiene lo demás.
+    cola-ia:
+        <<: *aplicacion
+        command: ["php", "artisan", "queue:work", "ia", "--queue=ia", "--timeout=660", "--sleep=3", "--max-time=3600"]
+        stop_grace_period: 700s
+
+    # El programador: latido, respaldos, alertas, limpiezas.
+    programador:
+        <<: *aplicacion
+        command: ["php", "artisan", "schedule:work"]
+        # Un respaldo en curso (02:00) termina antes de parar: cortado, su candado de `withoutOverlapping()` quedaría
+        # 24 horas y se saltaría el de la noche siguiente.
+        stop_grace_period: 30m
+
+    postgres:
+        image: postgres:16
+        # Solo sus tres variables: nunca los secretos de la aplicación.
+        environment:
+            POSTGRES_DB: ${DB_DATABASE:?Falta DB_DATABASE en el .env}
+            POSTGRES_USER: ${DB_USERNAME:?Falta DB_USERNAME en el .env}
+            POSTGRES_PASSWORD: ${DB_PASSWORD:?Falta DB_PASSWORD en el .env}
+            TZ: America/Lima
+        volumes:
+            - postgres-datos:/var/lib/postgresql/data
+        restart: unless-stopped
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+volumes:
+    storage:
+    postgres-datos:

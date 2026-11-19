@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Oportunidades · tabla</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1E2B28;background:#F4F3EE}
+a{color:#0F6E56}a:hover{color:#0A5240}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #0F6E56;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100%;background:#F4F3EE;color:#1E2B28;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.45">
+<dc-import name="Barra" hint-size="100%,56px"></dc-import>
+<div style="display:flex;flex-wrap:wrap;align-items:stretch">
+<div style="flex:0 0 56px;background:#FFFFFF;border-right:1px solid #DAD8CF"><dc-import name="Riel" active="oportunidades" hint-size="56px,340px"></dc-import></div>
+<main style="flex:999 1 560px;min-width:0;padding:24px 28px 44px;display:flex;flex-direction:column;gap:16px">
+
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+<h1 style="margin:0;font-size:22px;font-weight:600">Oportunidades</h1>
+<span style="flex:1"></span>
+<div style="display:flex;gap:8px">
+<a href="OportunidadesTabla.dc.html" aria-current="page" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:600;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #0F6E56;background:#E1F5EE;color:#0B5A47;text-decoration:none">Tabla</a>
+<a href="Oportunidades.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #9AA39F;background:#FFFFFF;color:#1E2B28;text-decoration:none">Tablero</a>
+</div>
+<a href="OportunidadNueva.dc.html" style="display:inline-flex;align-items:center;font-size:13.5px;font-weight:600;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #0F6E56;background:#0F6E56;color:#FFFFFF;text-decoration:none">Nueva oportunidad</a>
+</div>
+
+<div style="overflow-x:auto;border:1px solid #E8E6DE;border-radius:10px;background:#FFFFFF">
+<table style="width:100%;border-collapse:collapse;min-width:900px;font-size:13.5px">
+<thead>
+<tr style="background:#F8F7F2;text-align:left">
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Oportunidad</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Cuenta</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66;text-align:right">Monto (S/)</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Etapa</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Cierre est.</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66;text-align:right">Días en etapa</th>
+<th style="padding:10px 14px;font-size:12px;font-weight:600;color:#5E6A66">Dueño</th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top:1px solid #E8E6DE"><td style="padding:12px 14px;font-weight:500">Cámaras I.E. 11024</td><td style="padding:12px 14px">UGEL Chiclayo</td><td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">85 000.00</td><td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Prospecto</span></td><td style="padding:12px 14px">15 dic</td><td style="padding:12px 14px;text-align:right">9</td><td style="padding:12px 14px">A. Ruiz</td></tr>
+<tr style="border-top:1px solid #E8E6DE;background:#FFFAF0"><td style="padding:12px 14px;font-weight:500">Red municipal <span style="font-size:12px;color:#7A4A00;font-weight:600">● sin próxima acción</span></td><td style="padding:12px 14px">Muni. de Monsefú</td><td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">120 000.00</td><td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Prospecto</span></td><td style="padding:12px 14px;color:#5E6A66">—</td><td style="padding:12px 14px;text-align:right">14</td><td style="padding:12px 14px">M. Torres</td></tr>
+<tr style="border-top:1px solid #E8E6DE"><td style="padding:12px 14px;font-weight:500"><a href="Oportunidad.dc.html">Videovigilancia</a></td><td style="padding:12px 14px">Muni. de Pimentel</td><td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">240 000.00</td><td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Calificada</span></td><td style="padding:12px 14px">28 oct</td><td style="padding:12px 14px;text-align:right">4</td><td style="padding:12px 14px">A. Ruiz</td></tr>
+<tr style="border-top:1px solid #E8E6DE;background:#FFFAF0"><td style="padding:12px 14px;font-weight:500">Data center GORE</td><td style="padding:12px 14px">GORE Lambayeque</td><td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">410 000.00</td><td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Propuesta enviada</span></td><td style="padding:12px 14px">30 set</td><td style="padding:12px 14px;text-align:right;color:#7A4A00;font-weight:600">18</td><td style="padding:12px 14px">A. Ruiz</td></tr>
+<tr style="border-top:1px solid #E8E6DE"><td style="padding:12px 14px;font-weight:500">Switches hospital</td><td style="padding:12px 14px">Hosp. Regional</td><td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">175 000.00</td><td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Propuesta enviada</span></td><td style="padding:12px 14px">10 oct</td><td style="padding:12px 14px;text-align:right">6</td><td style="padding:12px 14px">M. Torres</td></tr>
+<tr style="border-top:1px solid #E8E6DE"><td style="padding:12px 14px;font-weight:500">Ampliación CCTV</td><td style="padding:12px 14px">EPSEL S.A.</td><td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">290 000.00</td><td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#E4EEF9;color:#1D5FA5">Negociación</span></td><td style="padding:12px 14px">15 oct</td><td style="padding:12px 14px;text-align:right">6</td><td style="padding:12px 14px">M. Torres</td></tr>
+<tr style="border-top:1px solid #E8E6DE"><td style="padding:12px 14px;font-weight:500">Videovigilancia Plaza de Armas</td><td style="padding:12px 14px">Muni. Prov. de Chiclayo</td><td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">24 715.10</td><td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#DDF3E6;color:#0B5A32">Ganada</span></td><td style="padding:12px 14px">25 ago</td><td style="padding:12px 14px;text-align:right">0</td><td style="padding:12px 14px">A. Ruiz</td></tr>
+<tr style="border-top:1px solid #E8E6DE"><td style="padding:12px 14px;font-weight:500">Mant. red municipal</td><td style="padding:12px 14px">Muni. de Monsefú</td><td style="padding:12px 14px;text-align:right;font-variant-numeric:tabular-nums">96 000.00</td><td style="padding:12px 14px"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:600;background:#FCEBE8;color:#A4261E">Perdida · precio · Seg. Norte</span></td><td style="padding:12px 14px">2 set</td><td style="padding:12px 14px;text-align:right">0</td><td style="padding:12px 14px">M. Torres</td></tr>
+</tbody>
+</table>
+</div>
+<p style="margin:0;font-size:13px;color:#5E6A66">La tabla y el tablero muestran lo mismo. En ámbar: oportunidades que pasan el máximo de días en su etapa o que no tienen próxima acción.</p>
+
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
