@@ -35,6 +35,9 @@ final class DatabaseSeeder extends Seeder
         $dev->syncPermissions([]);
         $dev->syncRoles([SeguridadService::ROL_ADMINISTRADOR, $desarrollo->name]);
         $this->gerenteDeDesarrollo();
+
+        // MVP rápido (ficha t0-datos-demo): la cartera de demostración, solo en local.
+        $this->call(Demo\DemoSeeder::class);
     }
 
     /**

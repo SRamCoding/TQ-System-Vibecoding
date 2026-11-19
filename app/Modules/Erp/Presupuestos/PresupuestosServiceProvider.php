@@ -74,6 +74,7 @@ use App\Modules\Erp\Proyectos\Pestanas\RegistroPestanasProyecto;
 use App\Modules\Erp\Proyectos\Resumen\RegistroFiltrosSalud;
 use App\Modules\Erp\Proyectos\Resumen\RegistroTarjetasResumen;
 use App\Modules\Erp\Proyectos\Resumen\SemaforoDeCosto;
+use App\Modules\Erp\Proyectos\Services\VentaDelProyecto;
 use App\Modules\Nucleo\Alertas\DefinicionAlerta;
 use App\Modules\Nucleo\Alertas\RegistroAlertas;
 use App\Modules\Nucleo\Enums\TipoParametro;
@@ -114,6 +115,8 @@ final class PresupuestosServiceProvider extends ServiceProvider
         // Plan 2.61: el semáforo de costo de la portada de Proyectos.
         $this->app->bind(SemaforoDeCosto::class, SaludDesdeElArbol::class);
         $this->app->bind(PresupuestosService::class, PresupuestosEnBase::class);
+        // MVP rápido (t0-datos-demo): lo vendido sale de la cotización aceptada hasta que exista Contratos.
+        $this->app->bind(VentaDelProyecto::class, Services\VentaDesdeLaCotizacion::class);
         // Plan 2.9, D1: el precio sugerido de la mano de obra; C5 lo reemplaza cuando exista.
         $this->app->bind(PrecioSugeridoManoObra::class, SinPrecioSugerido::class);
         $this->app->scoped(PedidoTraerAlProyecto::class);
@@ -135,6 +138,7 @@ final class PresupuestosServiceProvider extends ServiceProvider
             'presupuesto_partida' => PartidaDePresupuesto::class,
             'insumo' => Insumo::class,
             'linea_apu' => LineaApu::class,
+            'gasto_demo' => Models\GastoDemo::class,
         ]);
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'presupuestos');

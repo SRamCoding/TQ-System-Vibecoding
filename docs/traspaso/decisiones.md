@@ -36,3 +36,45 @@ Lo que el agente eligió solo **no va aquí**: va a «Supuestos sin confirmar» 
 confirma, recién entonces se vuelve una decisión con su número.
 
 ## Decisiones
+
+### MV-001 · 2026-11-19 · La cartera de demostración son los nueve proyectos del plan viejo
+
+- **Ficha:** `fichas/t0-datos-demo.md`
+- **Dijo Sebastián:** eligió «Los 9 del plan» entre reutilizarlos, reutilizarlos con fechas recientes o una cartera
+  más chica.
+- **Decisión:** la demo usa la cartera P1–P9 del plan `2026-11-16-datos-desarrollo-cartera.md` tal cual: sus montos,
+  partidas, márgenes, fechas históricas 2024–2026 y estados (cinco cerrados, tres en ejecución, uno en preparación).
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «T0: datos de demostración»
+
+### MV-002 · 2026-11-19 · El hospital de la demo es inventado
+
+- **Ficha:** `fichas/t0-datos-demo.md`
+- **Dijo Sebastián:** «Inventarlo», en vez de mantener el nombre real que permitía la excepción D2 del plan viejo.
+- **Decisión:** P6 y P9 son del «Hospital Regional de Valle Norte», inventado. En los datos de demo no queda ningún
+  nombre real; la excepción D2 del plan viejo no se trae.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «T0: datos de demostración»
+
+### MV-003 · 2026-11-19 · Gastos de demostración como origen provisional del costo
+
+- **Ficha:** `fichas/t0-datos-demo.md`
+- **Dijo Sebastián:** eligió «Gasto de demostración» entre eso, usar solo la PC-99 o no tener gastos hasta el tramo 3.
+- **Decisión:** mientras no existan órdenes, tareo ni rendiciones, el costo de los proyectos de demo entra por un
+  documento mínimo «gasto de demostración», imputado a una partida de control (o a la PC-99) con sus montos
+  comprometido, ejecutado y pagado. Desaparece cuando lleguen las órdenes de compra (tramo 3).
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «T0: datos de demostración»
+
+### MV-004 · 2026-11-19 · Embudo abierto de la demo
+
+- **Ficha:** `fichas/t0-datos-demo.md`
+- **Dijo Sebastián:** eligió «~15 abiertas + 3 perdidas».
+- **Decisión:** además de las nueve ganadas, la demo trae unas quince oportunidades abiertas repartidas en todas las
+  etapas y tres perdidas, con cotizaciones en distintos estados, sobre unas quince cuentas públicas y privadas.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «T0: datos de demostración»

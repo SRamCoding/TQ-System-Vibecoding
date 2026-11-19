@@ -5,6 +5,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 
 | Ficha | Tramo | Estado | Versión | Etiqueta |
 |---|---|---|---|---|
+| [t0-datos-demo](fichas/t0-datos-demo.md) | T0 | en curso | v1 | — |
 
 ## Registro del repositorio
 
