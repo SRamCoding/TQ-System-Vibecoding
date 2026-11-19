@@ -37,6 +37,7 @@ use App\Modules\Erp\Presupuestos\Services\ArbolPartidasService;
 use App\Modules\Erp\Presupuestos\Services\ArmadoPresupuestoService;
 use App\Modules\Erp\Presupuestos\Services\ConsultaArbol;
 use App\Modules\Erp\Presupuestos\Services\DatosPresupuesto;
+use App\Modules\Erp\Presupuestos\Services\FormulaPolinomicaService;
 use App\Modules\Erp\Presupuestos\Services\GastosDemoService;
 use App\Modules\Erp\Proyectos\Models\Proyecto;
 use App\Modules\Erp\Proyectos\Services\ProyectosService;
@@ -95,6 +96,7 @@ final class DemoSeeder extends Seeder
         auth()->setUser($this->dev);
 
         try {
+            $this->indicesUnificados();
             $this->en('2024-01-02', function (): void {
                 $this->aprobacionPorMargen();
                 $this->jefesDeProyecto();
@@ -153,6 +155,10 @@ final class DemoSeeder extends Seeder
                 $codTitulo = substr($codigo, 0, 2);
                 $titulos[$codTitulo] ??= $armado->agregarTitulo($pre->id, null, $codTitulo, $titulo)->id;
                 $armado->agregarPartida($pre->id, $titulos[$codTitulo], $codigo, $descripcion, $this->unidad($unidad), $metrado, $precio);
+            }
+
+            if (in_array($p['clave'], ['P6', 'P8', 'P9'], true)) {
+                $this->formulaDe($pre->id, $p['linea']);
             }
 
             return $pre->refresh();
@@ -715,6 +721,35 @@ final class DemoSeeder extends Seeder
 
         if ($p['clave'] === 'P1') {
             $this->en('2024-11-15', fn () => $servicio->aplicarPenalidad($c->id, 70, CarbonImmutable::parse('2024-11-15'), 'Atraso de 70 días en la conformidad por la reubicación de postes.'));
+        }
+    }
+
+    /** Índices unificados inventados, de enero de 2025 a noviembre de 2026 (ficha t2-formula-polinomica). */
+    private function indicesUnificados(): void
+    {
+        $indices = ['47' => ['Mano de obra (incluye leyes sociales)', '598.20', '0.0042'], '06' => ['Cable de cobre y fibra óptica', '380.40', '0.0051'],
+            '49' => ['Maquinaria y equipo electrónico importado', '515.30', '-0.0006'], '39' => ['Índice general de precios al consumidor', '180.10', '0.0019'],
+            '30' => ['Dólar más inflación del mercado de EE. UU.', '402.60', '0.0013']];
+        $mes = CarbonImmutable::parse('2025-01-01');
+
+        for ($n = 0; $n < 23; $n++) {
+            foreach ($indices as $codigo => [$nombre, $base, $tasa]) {
+                $valor = bcmul($base, bcpow(bcadd('1', $tasa, 6), (string) $n, 8), 2);
+                DB::table('indices_unificados')->insert(['codigo' => $codigo, 'nombre' => $nombre, 'periodo' => $mes->addMonths($n)->format('Y-m'), 'valor' => $valor, 'created_at' => now(), 'updated_at' => now()]);
+            }
+        }
+    }
+
+    /** La fórmula del costeo (viaja a la copia del proyecto y a sus versiones). */
+    private function formulaDe(int $presupuestoId, string $linea): void
+    {
+        $servicio = app(FormulaPolinomicaService::class);
+        $monomios = $linea === 'REDES'
+            ? [['Mano de obra', '47', '0.320'], ['Cable de fibra óptica', '06', '0.285'], ['Equipos electrónicos', '49', '0.190'], ['Índice general de precios', '39', '0.205']]
+            : [['Mano de obra', '47', '0.280'], ['Equipos electrónicos', '49', '0.420'], ['Dólar más inflación', '30', '0.180'], ['Índice general de precios', '39', '0.120']];
+
+        foreach ($monomios as [$descripcion, $indice, $coef]) {
+            $servicio->agregar($presupuestoId, $descripcion, $indice, $coef);
         }
     }
 }

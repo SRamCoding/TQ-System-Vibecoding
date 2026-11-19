@@ -399,6 +399,12 @@ final readonly class ArmadoPresupuestoService
 
     private function copiarContenido(Presupuesto $origen, Presupuesto $nueva): void
     {
+        // MVP rápido (t2-formula-polinomica): la fórmula de reajuste viaja con el presupuesto.
+        foreach (DB::table('presupuesto_monomios')->where('presupuesto_id', $origen->id)->get() as $m) {
+            DB::table('presupuesto_monomios')->insert(['presupuesto_id' => $nueva->id, 'descripcion' => $m->descripcion, 'indice_codigo' => $m->indice_codigo,
+                'coeficiente' => $m->coeficiente, 'orden' => $m->orden, 'created_at' => now(), 'updated_at' => now()]);
+        }
+
         $titulos = [];
 
         foreach (TituloDePresupuesto::query()->where('presupuesto_id', $origen->id)->orderBy('codigo')->get() as $titulo) {

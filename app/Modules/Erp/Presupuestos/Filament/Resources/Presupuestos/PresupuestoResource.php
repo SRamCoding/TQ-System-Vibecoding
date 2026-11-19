@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Erp\Presupuestos\Filament\Resources\Presupuestos;
 
+use App\Modules\Erp\Presupuestos\Filament\FormulaDePresupuesto;
 use App\Modules\Erp\Presupuestos\Filament\ListaDeInsumosDePresupuesto;
 use App\Modules\Erp\Presupuestos\Filament\Montos;
 use App\Modules\Erp\Presupuestos\Filament\PartidasDePresupuesto;
@@ -166,6 +167,10 @@ final class PresupuestoResource extends Resource
                     ->schema([
                         Livewire::make(ListaDeInsumosDePresupuesto::class, fn (Presupuesto $record): array => ['presupuestoId' => $record->id])->key('lista-de-insumos'),
                     ]),
+                // MVP rápido (t2-formula-polinomica): la fórmula de reajuste, que se aplica en cada valorización.
+                Tab::make('Fórmula polinómica')->icon('heroicon-o-variable')->schema([
+                    Livewire::make(FormulaDePresupuesto::class, fn (Presupuesto $record): array => ['presupuestoId' => $record->id])->key('formula-polinomica'),
+                ]),
                 PestanaHistorial::make(HistorialDePresupuesto::class, fn (Presupuesto $record): int => $record->id),
             ]),
         ]);
