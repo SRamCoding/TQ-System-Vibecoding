@@ -21,6 +21,9 @@ Lo que no es de ninguna ficha: el arranque y los cambios generales.
 
 - 2026-11-19 · Arranque: copia del repo original en el commit `a5e5972`, sin pruebas, CI ni sitio de documentación;
   app en el puerto 8001 y base en el 5433.
+- 2026-11-19 · Checkpoint: tramos 0, 1 y 2 terminados y aprobados (MV-009). Sigue el tramo 3 (requerimientos,
+  cuadro comparativo, órdenes de compra y servicio, almacén, recepción y despacho, reclasificación), que reemplaza el
+  gasto de demostración (MV-003) por órdenes reales. La base de demo se rehace con `php artisan migrate:fresh --seed`.
 
 ## Cierre
 
