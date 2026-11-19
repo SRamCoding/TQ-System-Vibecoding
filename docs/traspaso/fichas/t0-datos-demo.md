@@ -1,9 +1,9 @@
 # Ficha · Datos de demostración
 
-- **Estado:** en curso
+- **Estado:** aprobada
 - **Versión:** v1
 - **Tramo de la ruta:** T0
-- **Aprobada:** —
+- **Aprobada:** 2026-11-19 · commit `ae8839a` (código; la etiqueta va en el commit de la aprobación, sin cambios de código) · etiqueta `aprobado/t0-datos-demo-v1`
 - **Fuentes del diseño:** `docs/vibe/ruta-mvp.md` (tramo 0); plan viejo
   `docs/planes/activos/2026-11-16-datos-desarrollo-cartera.md` (la cartera de nueve proyectos y su recorrido).
 
