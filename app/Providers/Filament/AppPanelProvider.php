@@ -103,6 +103,8 @@ final class AppPanelProvider extends PanelProvider
             // Plan 1.4g, D4 y D5: tema, letra, densidad y animaciones de la persona, antes de dibujar; el tema elegido con
             // el selector de Filament se guarda en la base.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.apariencia')->render())
+            // MVP rápido (MV-012): en el tema «Sistema», la pantalla sigue el cielo (en curso).
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => view('nucleo::filament.cielo')->render())
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? Livewire::mount(GuardarTema::class) : '')
             // El panel de aplicaciones, en todas las pantallas (plan 1.4p, D1). Si falla, la pantalla sale igual, sin él.
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? rescue(fn (): string => Livewire::mount(PanelAplicaciones::class), '') : '')
