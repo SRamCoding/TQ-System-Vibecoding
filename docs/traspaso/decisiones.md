@@ -141,7 +141,7 @@ confirma, recién entonces se vuelve una decisión con su número.
   gradual al amanecer y al atardecer, y el clima la matiza (nublado o lluvia más apagado y atardecer más temprano).
   «Claro» y «Oscuro» siguen fijos.
 - **Alcance:** cruza módulos (interfaz del núcleo)
-- **Estado:** vigente
+- **Estado:** reemplazada por MV-012
 - **Commit:** se anota al construirla
 
 ### MV-011 · 2026-11-19 · La transición del cielo va después del tramo 3
@@ -152,3 +152,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** —
+
+### MV-012 · 2026-11-19 · La ubicación del navegador manda si ya está permitida
+
+- **Ficha:** `fichas/transicion-cielo.md` (se abre al construirla)
+- **Dijo Sebastián:** «ahora si ya tiene la ubicación permitida pues esa manda».
+- **Decisión:** igual que MV-010 (en «Sistema», la pantalla sigue el cielo: sol, transición gradual y clima), pero la
+  ubicación es la del navegador si la persona ya dio el permiso; si no lo dio, la de la sede de la empresa. El sistema
+  no pide el permiso solo para esto.
+- **Alcance:** cruza módulos (interfaz del núcleo)
+- **Estado:** vigente
+- **Commit:** se anota al construirla
