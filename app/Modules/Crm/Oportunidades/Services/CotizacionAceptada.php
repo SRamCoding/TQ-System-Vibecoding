@@ -23,5 +23,14 @@ final readonly class CotizacionAceptada
         /** «24 meses», o nulo */
         public ?string $garantia,
         public ?int $presupuestoId,
+        /** MVP rápido (t1-puente-erp): el total sin IGV (después de descuentos), que es lo vendido. */
+        public string $subtotal = '0.00',
+        /**
+         * MVP rápido (t1-puente-erp, MV-006): las líneas que no salen del costeo enlazado, para copiarlas al presupuesto
+         * del proyecto como partidas.
+         *
+         * @var list<array{descripcion: string, unidad_medida_id: ?int, cantidad: string, costo_unitario: string}>
+         */
+        public array $lineasLibres = [],
     ) {}
 }

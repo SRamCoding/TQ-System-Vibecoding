@@ -73,15 +73,15 @@ final readonly class TransicionesService
 
         return DB::transaction(fn (): Model => $this->auditoria->comoUsuario($usuario, function () use ($documento, $definicion, $inicial, $usuario, $originadoPor): Model {
             $documento->setAttribute('estado_id', $inicial->id);
-            $formato = $definicion->numeracion();
+            $formato = $definicion->numeracionDe($documento);
 
             if ($formato !== null && ! $this->heredaNumero($definicion, $documento)) {
-                $documento->setAttribute('numero', $this->numeracion->siguiente(
+                $documento->setAttribute('numero', $definicion->numeroVisible($this->numeracion->siguiente(
                     $definicion->tipo(),
                     $formato,
                     $definicion->fechaDeNumeracion($documento),
                     $definicion->ambitoDeNumeracion($documento),
-                ));
+                ), $documento));
             }
 
             $this->transicion->durante(fn (): bool => $documento->save());

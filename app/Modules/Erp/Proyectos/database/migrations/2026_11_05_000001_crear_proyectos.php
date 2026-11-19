@@ -28,6 +28,8 @@ return new class extends Migration
             $table->foreignId('party_id')->index()->constrained('parties');
             $table->boolean('es_interno')->default(false);
             $table->unsignedBigInteger('contrato_id')->nullable()->index();
+            // MVP rápido (t1-puente-erp, MV-006): la oportunidad ganada de la que nació; sin llave foránea (otro módulo).
+            $table->unsignedBigInteger('oportunidad_id')->nullable()->unique();
             $table->foreignId('jefe_proyecto_user_id')->index()->constrained('users');
             $table->date('fecha_inicio');
             $table->date('fecha_fin_prevista');
@@ -39,7 +41,7 @@ return new class extends Migration
 
         DB::statement("ALTER TABLE proyectos ADD CONSTRAINT proyectos_textos_check CHECK (btrim(nombre) <> '' AND btrim(codigo) <> '')");
         DB::statement('ALTER TABLE proyectos ADD CONSTRAINT proyectos_fechas_check CHECK (fecha_fin_prevista >= fecha_inicio)');
-        DB::statement('ALTER TABLE proyectos ADD CONSTRAINT proyectos_contrato_check CHECK (es_interno OR contrato_id IS NOT NULL)');
+        DB::statement('ALTER TABLE proyectos ADD CONSTRAINT proyectos_contrato_check CHECK (es_interno OR contrato_id IS NOT NULL OR oportunidad_id IS NOT NULL)');
         DB::statement('ALTER TABLE proyectos ADD CONSTRAINT proyectos_version_check CHECK (version >= 1)');
     }
 

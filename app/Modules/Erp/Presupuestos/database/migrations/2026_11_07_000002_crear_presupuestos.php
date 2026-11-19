@@ -37,6 +37,8 @@ return new class extends Migration
             $table->smallInteger('numero_version')->default(1);
             $table->foreignId('oportunidad_id')->nullable()->index()->constrained('oportunidades');
             $table->foreignId('proyecto_id')->nullable()->index()->constrained('proyectos');
+            // MVP rápido (t1-puente-erp, MV-006): la cotización aceptada de la que se copió al ganar (sin llave: otro módulo).
+            $table->unsignedBigInteger('origen_cotizacion_id')->nullable()->index();
             $table->string('nombre', 200);
             $table->foreignId('moneda_id')->index()->constrained('monedas');
             $table->boolean('usa_apu')->default(true);
@@ -57,7 +59,7 @@ return new class extends Migration
             $table->unique(['numero', 'numero_version']);
         });
 
-        DB::statement("ALTER TABLE presupuestos ADD CONSTRAINT presupuestos_textos_check CHECK (numero ~ '^PRE-[0-9]{4}-[0-9]{4,}$' AND btrim(nombre) <> '')");
+        DB::statement("ALTER TABLE presupuestos ADD CONSTRAINT presupuestos_textos_check CHECK (numero ~ '^(PRE-[0-9]{4}-[0-9]{4,}|(OP|PRY)-[0-9]{4}-[0-9]{4,} · PRE-[0-9]{2,})$' AND btrim(nombre) <> '')");
         DB::statement('ALTER TABLE presupuestos ADD CONSTRAINT presupuestos_porcentajes_check CHECK (gastos_generales_pct BETWEEN 0 AND 100 AND utilidad_pct BETWEEN 0 AND 100 AND igv_pct BETWEEN 0 AND 100 AND decimales_precio_unitario BETWEEN 0 AND 4)');
         DB::statement('ALTER TABLE presupuestos ADD CONSTRAINT presupuestos_montos_check CHECK (costo_directo >= 0 AND gastos_generales >= 0 AND utilidad >= 0 AND igv >= 0 AND total >= 0)');
         DB::statement('ALTER TABLE presupuestos ADD CONSTRAINT presupuestos_version_check CHECK (numero_version >= 1 AND version >= 1)');

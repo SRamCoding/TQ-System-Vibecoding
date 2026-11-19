@@ -104,6 +104,23 @@ final class ProyectosEnMemoria implements ProyectosService
         return $this->agregar(trim($datos->nombre), DefinicionProyecto::EN_PREPARACION, false, $contratoId, $cliente, $datos->jefeProyectoUserId);
     }
 
+    public function crearDesdeOportunidad(int $oportunidadId, DatosProyecto $datos, ?User $originadoPor = null): ResumenProyecto
+    {
+        return $this->crearDesdeContrato(800000 + $oportunidadId, $datos, $originadoPor);
+    }
+
+    public function deOportunidad(int $oportunidadId): ?int
+    {
+        return null;
+    }
+
+    public function oportunidadDe(int $proyectoId): ?int
+    {
+        return null;
+    }
+
+    public function anularDesdeOportunidad(int $oportunidadId, string $motivo): void {}
+
     public function iniciarEjecucion(int $proyectoId): void
     {
         $actual = $this->resumen($proyectoId);

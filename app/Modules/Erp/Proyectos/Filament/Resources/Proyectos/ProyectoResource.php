@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Erp\Proyectos\Filament\Resources\Proyectos;
 
+use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
 use App\Modules\Erp\Proyectos\Filament\Portada\DibujoProyecto;
 use App\Modules\Erp\Proyectos\Filament\Resources\Proyectos\Pages\ListarProyectos;
 use App\Modules\Erp\Proyectos\Filament\Resources\Proyectos\Pages\VerProyecto;
@@ -139,7 +140,8 @@ final class ProyectoResource extends Resource
         return $schema->components([
             // Plan 2.61, D5: la cabecera con la foto de fondo.
             View::make('proyectos::ficha.cabecera')->columnSpanFull()->viewData(fn (Proyecto $record): array => ['cabecera' => self::cabecera($record)]),
-            Tabs::make('ficha')->columnSpanFull()->tabs([
+            // MV-008: la pestaña va en la dirección (?pestana=…), para que el tablero lleve a una.
+            Tabs::make('ficha')->columnSpanFull()->persistTabInQueryString('pestana')->tabs([
                 // Plan 2.61, D5: el Resumen va primero.
                 Tab::make('Resumen')->icon('heroicon-o-presentation-chart-bar')->schema([
                     Livewire::make(ResumenDeProyecto::class, fn (Proyecto $record): array => ['proyectoId' => $record->id])->key('proyecto-resumen'),
@@ -151,7 +153,11 @@ final class ProyectoResource extends Resource
                         TextEntry::make('cliente')->label('Cliente')->state(fn (Proyecto $record): string => self::cliente($record)),
                         TextEntry::make('jefe.name')->label('Jefe de proyecto'),
                         TextEntry::make('origen')->label('Origen')
-                            ->state(fn (Proyecto $record): string => $record->contrato_id === null ? 'Proyecto interno' : "Contrato #{$record->contrato_id}"),
+                            ->state(fn (Proyecto $record): string => match (true) {
+                                $record->oportunidad_id !== null => 'Oportunidad ganada '.app(OportunidadesService::class)->resumen($record->oportunidad_id)->numero,
+                                $record->contrato_id !== null => "Contrato #{$record->contrato_id}",
+                                default => 'Proyecto interno',
+                            }),
                         TextEntry::make('fecha_inicio')->label('Inicio')->date('d/m/Y'),
                         TextEntry::make('fecha_fin_prevista')->label('Fin previsto')->date('d/m/Y'),
                         TextEntry::make('estado.nombre')->label('Estado')->badge()

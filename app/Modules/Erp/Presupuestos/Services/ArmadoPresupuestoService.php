@@ -12,6 +12,7 @@ use App\Modules\Erp\Presupuestos\Models\LineaApu;
 use App\Modules\Erp\Presupuestos\Models\PartidaDePresupuesto;
 use App\Modules\Erp\Presupuestos\Models\Presupuesto;
 use App\Modules\Erp\Presupuestos\Models\TituloDePresupuesto;
+use App\Modules\Erp\Proyectos\Services\ProyectosService;
 use App\Modules\Nucleo\Excepciones\VersionDesactualizada;
 use App\Modules\Nucleo\Models\Moneda;
 use App\Modules\Nucleo\Models\UnidadMedida;
@@ -301,6 +302,11 @@ final readonly class ArmadoPresupuestoService
             $origen = Presupuesto::query()->with('estado')->lockForUpdate()->find($presupuestoId)
                 ?? throw PresupuestoRechazado::conMotivo('Ese presupuesto no existe.');
 
+            // ADR 0023, D3: el costeo de una oportunidad ganada queda congelado; las versiones siguen en el proyecto.
+            if ($origen->oportunidad_id !== null && app(ProyectosService::class)->deOportunidad($origen->oportunidad_id) !== null) {
+                throw PresupuestoRechazado::conMotivo("{$origen->numero} es el costeo de una oportunidad ganada: queda congelado. Las versiones nuevas se hacen en el presupuesto del proyecto.");
+            }
+
             if (! in_array($origen->estado->codigo, [DefinicionPresupuesto::APROBADO, DefinicionPresupuesto::OFERTADO], true)) {
                 throw PresupuestoRechazado::conMotivo("La versión nueva sale del presupuesto aprobado u ofertado; {$origen->numero} v{$origen->numero_version} está ".mb_strtolower($origen->estado->nombre).'.');
             }
@@ -346,6 +352,49 @@ final readonly class ArmadoPresupuestoService
         }
 
         return $presupuesto->refresh();
+    }
+
+    /**
+     * MVP rápido (t1-puente-erp, MV-006; ADR 0023, D2): al ganar, lo cotizado se copia como el presupuesto del proyecto
+     * («PRY-2026-0013 · PRE-01 v1»), aprobado y vigente, con su origen. Con costeo enlazado, se copia el costeo con su
+     * APU; las demás líneas de la cotización van como partidas con su costo en un título aparte; sin costeo, solo ellas.
+     *
+     * @param  list<array{descripcion: string, unidad_medida_id: ?int, cantidad: string, costo_unitario: string}>  $lineas
+     */
+    public function copiarAlProyecto(?int $costeoId, array $lineas, int $proyectoId, int $cotizacionId, string $nombre, User $usuario): Presupuesto
+    {
+        return DB::transaction(function () use ($costeoId, $lineas, $proyectoId, $cotizacionId, $nombre, $usuario): Presupuesto {
+            $origen = $costeoId === null ? null : Presupuesto::query()->findOrFail($costeoId);
+            $encabezado = $origen?->only(['nombre', 'moneda_id', 'usa_apu', 'decimales_precio_unitario', 'gastos_generales_pct', 'utilidad_pct', 'igv_pct', 'costo_directo', 'gastos_generales', 'utilidad', 'igv', 'total'])
+                ?? [
+                    ...$this->encabezado(new DatosPresupuesto($nombre, (int) Moneda::query()->where('codigo', 'PEN')->value('id'), '0', '0', usaApu: false)),
+                    'usa_apu' => false,
+                    'decimales_precio_unitario' => ConsultaPresupuestos::decimalesPrecioUnitario(),
+                ];
+
+            $copia = app(TransicionesService::class)->crear(new Presupuesto([
+                ...$encabezado,
+                'numero_version' => 1,
+                'proyecto_id' => $proyectoId,
+                'origen_cotizacion_id' => $cotizacionId,
+            ]), $usuario)->refresh();
+
+            if ($origen !== null) {
+                $this->copiarContenido($origen, $copia);
+            }
+
+            if ($lineas !== []) {
+                $codigo = str_pad((string) ((int) TituloDePresupuesto::query()->where('presupuesto_id', $copia->id)->whereNull('padre_id')->max('codigo') + 1), 2, '0', STR_PAD_LEFT);
+                $titulo = $this->agregarTitulo($copia->id, null, $codigo, $origen === null ? 'LO COTIZADO' : 'OTRAS LÍNEAS DE LA COTIZACIÓN');
+                $niu = (int) DB::table('unidades_medida')->where('codigo', 'NIU')->value('id');
+
+                foreach (array_values($lineas) as $i => $linea) {
+                    $this->agregarPartida($copia->id, $titulo->id, sprintf('%s.%02d', $codigo, $i + 1), mb_substr($linea['descripcion'], 0, 250), $linea['unidad_medida_id'] ?? $niu, $linea['cantidad'], $linea['costo_unitario']);
+                }
+            }
+
+            return $this->traerAlProyecto($copia->id, $proyectoId, $copia->refresh()->version, $usuario);
+        });
     }
 
     private function copiarContenido(Presupuesto $origen, Presupuesto $nueva): void

@@ -62,6 +62,7 @@ final class CarteraDemo
                 'clave' => 'P1', 'nombre' => 'Videovigilancia y centro de monitoreo de Valle Norte', 'cuenta' => 'mpvn', 'linea' => 'VIDEOVIGILANCIA',
                 'gg' => '10', 'ut' => '8', 'ganada' => '2024-02-12', 'inicio' => '2024-03-04', 'fin' => '2024-10-31', 'estado' => 'cerrado', 'jefe' => 'rosa',
                 'pc99' => [['imprevisto_obra', 'Reubicación de seis postes por interferencia con la red eléctrica', '38500.00']],
+                'v2' => ['04.01' => ['1', '92500.00']],
                 'partidas' => [
                     ['01.01', 'Suministro e instalación de cámara PTZ 4K', 'NIU', '36', '14850.00', 'CÁMARAS Y POSTES'],
                     ['01.02', 'Suministro e instalación de cámara bullet 4 MP', 'NIU', '80', '2480.00', 'CÁMARAS Y POSTES'],
@@ -116,7 +117,8 @@ final class CarteraDemo
             [
                 'clave' => 'P6', 'nombre' => 'Sistema de información hospitalaria, software y servidor del Hospital Regional de Valle Norte', 'cuenta' => 'hospital', 'linea' => 'SOFTWARE',
                 'gg' => '10', 'ut' => '8', 'ganada' => '2025-08-18', 'inicio' => '2025-09-15', 'fin' => '2026-12-15', 'estado' => 'en_ejecucion', 'jefe' => 'andrea', 'avance' => '0.78',
-                'pc99' => [['precio_mayor', 'Alza del precio del almacenamiento SAN entre la oferta y la compra', '18450.00'], ['cambio_cliente', 'El hospital pidió 12 estaciones más para emergencia', '35400.00']],
+                'pc99' => [['imprevisto_obra', 'Reforzamiento eléctrico del cuarto de servidores', '18450.00'], ['cambio_cliente', 'El hospital pidió dos puntos de red más por consultorio en emergencia', '35400.00']],
+                'v2' => ['02.02' => ['1', '263450.00'], '03.01' => ['192', '2950.00']],
                 'partidas' => [
                     ['01.01', 'Licencias del sistema de información hospitalaria', 'GLB', '1', '612000.00', 'SISTEMA DE INFORMACIÓN'],
                     ['01.02', 'Implementación, parametrización y migración de datos', 'HUR', '4200', '95.00', 'SISTEMA DE INFORMACIÓN'],
@@ -142,6 +144,7 @@ final class CarteraDemo
             [
                 'clave' => 'P8', 'nombre' => 'Red de datos y enlaces de la sede del Gobierno Regional de Valle Norte', 'cuenta' => 'gore', 'linea' => 'REDES',
                 'gg' => '10', 'ut' => '8', 'ganada' => '2026-05-11', 'inicio' => '2026-06-01', 'fin' => '2027-01-27', 'estado' => 'en_ejecucion', 'jefe' => 'rosa', 'avance' => '0.55',
+                'v2' => ['01.01' => ['610', '265.00'], '02.01' => ['9', '23800.00']],
                 'partidas' => [
                     ['01.01', 'Punto de red Cat 6A certificado', 'NIU', '640', '265.00', 'RED DE DATOS'],
                     ['01.02', 'Switch de distribución de 48 puertos', 'NIU', '12', '12800.00', 'RED DE DATOS'],
@@ -195,35 +198,35 @@ final class CarteraDemo
                 ['Ampliación del almacenamiento de grabación', '1', '62000.00', '57300.00'],
             ]],
 
-            ['nombre' => 'CCTV perimetral de la planta concentradora', 'cuenta' => 'minera', 'linea' => 'VIDEOVIGILANCIA', 'monto' => '512000.00', 'creada' => '2026-08-18', 'cierre' => '2026-12-15', 'etapa' => 'propuesta_enviada', 'cotizacion' => 'emitida', 'lineas' => [
+            ['nombre' => 'CCTV perimetral de la planta concentradora', 'cuenta' => 'minera', 'linea' => 'VIDEOVIGILANCIA', 'monto' => '512000.00', 'creada' => '2026-09-28', 'cierre' => '2026-12-15', 'etapa' => 'propuesta_enviada', 'cotizacion' => 'emitida', 'lineas' => [
                 ['Cámara térmica de largo alcance', '8', '38500.00', '26900.00'],
                 ['Cámara bullet 8 MP antivandálica', '40', '2650.00', '1830.00'],
                 ['Torre de 15 m con pararrayos', '8', '9800.00', '6900.00'],
                 ['Enlaces, energía e instalación', '1', '63000.00', '44000.00'],
             ]],
-            ['nombre' => 'Mantenimiento de la red de datos 2027', 'cuenta' => 'clinica', 'linea' => 'REDES', 'monto' => '48000.00', 'creada' => '2026-10-02', 'cierre' => '2026-12-31', 'etapa' => 'propuesta_enviada', 'cotizacion' => 'emitida', 'lineas' => [
+            ['nombre' => 'Mantenimiento de la red de datos 2027', 'cuenta' => 'clinica', 'linea' => 'REDES', 'monto' => '48000.00', 'creada' => '2026-10-12', 'cierre' => '2026-12-31', 'etapa' => 'propuesta_enviada', 'cotizacion' => 'emitida', 'lineas' => [
                 ['Mantenimiento preventivo semestral', '2', '9800.00', '6600.00'],
                 ['Bolsa de horas de soporte', '200', '120.00', '78.00'],
             ]],
-            ['nombre' => 'Sistema de citas en línea', 'cuenta' => 'hospital', 'linea' => 'SOFTWARE', 'monto' => '168000.00', 'creada' => '2026-09-08', 'cierre' => '2026-12-31', 'etapa' => 'propuesta_enviada', 'cotizacion' => 'emitida', 'lineas' => [
+            ['nombre' => 'Sistema de citas en línea', 'cuenta' => 'hospital', 'linea' => 'SOFTWARE', 'monto' => '168000.00', 'creada' => '2026-10-01', 'cierre' => '2026-12-31', 'etapa' => 'propuesta_enviada', 'cotizacion' => 'emitida', 'lineas' => [
                 ['Desarrollo e implementación del sistema de citas', '1', '128000.00', '92000.00'],
                 ['Quioscos de autoatención', '4', '9800.00', '7100.00'],
             ]],
-            ['nombre' => 'Videovigilancia de tiendas, segunda fase', 'cuenta' => 'canasta', 'linea' => 'VIDEOVIGILANCIA', 'monto' => '142000.00', 'creada' => '2026-09-15', 'cierre' => '2026-12-10', 'etapa' => 'propuesta_enviada', 'cotizacion' => 'emitida', 'lineas' => [
+            ['nombre' => 'Videovigilancia de tiendas, segunda fase', 'cuenta' => 'canasta', 'linea' => 'VIDEOVIGILANCIA', 'monto' => '142000.00', 'creada' => '2026-10-08', 'cierre' => '2026-12-10', 'etapa' => 'propuesta_enviada', 'cotizacion' => 'emitida', 'lineas' => [
                 ['Kit de cámaras por tienda (16 cámaras y NVR)', '6', '19800.00', '13700.00'],
                 ['Monitoreo centralizado', '1', '23000.00', '15800.00'],
             ]],
 
-            ['nombre' => 'Data center modular de la unidad minera', 'cuenta' => 'minera', 'linea' => 'DATACENTER', 'monto' => '890000.00', 'creada' => '2026-07-06', 'cierre' => '2026-11-30', 'etapa' => 'negociacion', 'cotizacion' => 'emitida', 'lineas' => [
+            ['nombre' => 'Data center modular de la unidad minera', 'cuenta' => 'minera', 'linea' => 'DATACENTER', 'monto' => '890000.00', 'creada' => '2026-09-14', 'cierre' => '2026-11-30', 'etapa' => 'negociacion', 'cotizacion' => 'emitida', 'lineas' => [
                 ['Data center modular de 8 racks', '1', '640000.00', '448000.00'],
                 ['Sistema contra incendios con agente limpio', '1', '128000.00', '89000.00'],
                 ['Instalación, pruebas y capacitación', '1', '122000.00', '84000.00'],
             ]],
-            ['nombre' => 'Red de fibra óptica entre sedes regionales', 'cuenta' => 'gore', 'linea' => 'REDES', 'monto' => '1260000.00', 'creada' => '2026-08-03', 'cierre' => '2026-12-20', 'etapa' => 'negociacion', 'cotizacion' => 'aprobada_emitida', 'lineas' => [
+            ['nombre' => 'Red de fibra óptica entre sedes regionales', 'cuenta' => 'gore', 'linea' => 'REDES', 'monto' => '1260000.00', 'creada' => '2026-09-21', 'cierre' => '2026-12-20', 'etapa' => 'negociacion', 'cotizacion' => 'aprobada_emitida', 'lineas' => [
                 ['Tendido de fibra óptica monomodo de 48 hilos', '62000', '14.80', '13.60'],
                 ['Nodo de distribución con equipos activos', '6', '58000.00', '53200.00'],
             ]],
-            ['nombre' => 'Plataforma de trazabilidad de lotes', 'cuenta' => 'agronorte', 'linea' => 'SOFTWARE', 'monto' => '215000.00', 'creada' => '2026-08-25', 'cierre' => '2026-12-05', 'etapa' => 'negociacion', 'cotizacion' => 'emitida', 'lineas' => [
+            ['nombre' => 'Plataforma de trazabilidad de lotes', 'cuenta' => 'agronorte', 'linea' => 'SOFTWARE', 'monto' => '215000.00', 'creada' => '2026-10-05', 'cierre' => '2026-12-05', 'etapa' => 'negociacion', 'cotizacion' => 'emitida', 'lineas' => [
                 ['Desarrollo de la plataforma de trazabilidad', '1', '154000.00', '106000.00'],
                 ['Lectores y etiquetas para la línea de empaque', '1', '61000.00', '43500.00'],
             ]],

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Modules\Erp\Presupuestos\Resumen;
 
 use App\Modules\Erp\Presupuestos\PresupuestosServiceProvider;
+use App\Modules\Erp\Presupuestos\Services\ComparacionOfertado;
 use App\Modules\Erp\Presupuestos\Services\DineroDelProyecto;
 use App\Modules\Erp\Presupuestos\Services\SaldoPartida;
+use App\Modules\Erp\Proyectos\Filament\Resources\Proyectos\Pages\VerProyecto;
 use App\Modules\Erp\Proyectos\Resumen\ContenidoTarjeta;
 use App\Modules\Erp\Proyectos\Resumen\FilaDesglose;
 use App\Modules\Erp\Proyectos\Resumen\LineaResumen;
@@ -21,6 +23,9 @@ use App\Modules\Nucleo\Models\User;
  */
 final class TarjetaDinero implements TarjetaResumen
 {
+    /** El identificador de Filament de la pestaña «Ofertado vs. presupuesto» en la dirección. */
+    public const string PESTANA_COMPARACION = 'ofertado-vs-presupuesto::tab';
+
     public function clave(): string
     {
         return 'dinero';
@@ -58,6 +63,19 @@ final class TarjetaDinero implements TarjetaResumen
             $lineas[] = new LineaResumen('Vendido', Soles::texto($d['venta']));
             $lineas[] = new LineaResumen('Margen previsto', Soles::texto((string) $d['margen_previsto']));
             $lineas[] = new LineaResumen('Margen proyectado', Soles::texto((string) $d['margen_proyectado']), $d['tono']);
+        }
+
+        // MV-008: cuánto se movió el presupuesto respecto de lo ofertado; cada fila lleva a la pestaña de la comparación.
+        if (($c = app(ComparacionOfertado::class)->de($proyectoId)) !== null) {
+            $url = VerProyecto::getUrl(['record' => $proyectoId]).'?pestana='.self::PESTANA_COMPARACION;
+            $cambios = array_values(array_filter($c['filas'], fn (array $f): bool => bccomp($f['diferencia'], '0', 2) !== 0));
+            $lineas[] = new LineaResumen(
+                'Presupuesto vs. ofertado',
+                (bccomp($c['diferencia'], '0', 2) > 0 ? '+' : '').Soles::texto($c['diferencia']),
+                bccomp($c['diferencia'], '0', 2) > 0 ? 'warning' : null,
+                $cambios === [] ? [new FilaDesglose('Sin cambios: ver la comparación', '', $url)] : array_map(fn (array $f): FilaDesglose => new FilaDesglose("{$f['codigo']} · {$f['descripcion']}", (bccomp($f['diferencia'], '0', 2) > 0 ? '+' : '').Soles::texto($f['diferencia']), $url), $cambios),
+                "{$c['vigente']} contra lo ofertado {$c['ofertado']}",
+            );
         }
 
         array_push(

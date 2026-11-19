@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Cotizaciones\Services;
 
+use App\Modules\Crm\Cotizaciones\Enums\OrigenLinea;
 use App\Modules\Crm\Cotizaciones\Estados\DefinicionCotizacion;
 use App\Modules\Crm\Cotizaciones\Filament\Resources\Cotizaciones\Pages\VerCotizacion;
 use App\Modules\Crm\Cotizaciones\Models\Cotizacion;
+use App\Modules\Crm\Cotizaciones\Models\LineaDeCotizacion;
 use App\Modules\Crm\Oportunidades\Services\CotizacionAceptada;
 use App\Modules\Crm\Oportunidades\Services\CotizacionDeOportunidad;
 use App\Modules\Crm\Oportunidades\Services\VersionDeCotizacion;
@@ -25,7 +27,15 @@ final readonly class CotizacionDeOportunidadEnBase implements CotizacionDeOportu
 
         $resumen = app(CotizacionesService::class)->resumen($c->id);
 
-        return new CotizacionAceptada($c->id, $resumen->identificador, $resumen->total, $resumen->moneda, $resumen->plazo, $resumen->formaPago, $resumen->garantia, $c->presupuesto_id);
+        $libres = $c->lineas()->where('origen', '!=', OrigenLinea::Presupuesto->value)->orderBy('orden')->get()
+            ->map(fn (LineaDeCotizacion $l): array => [
+                'descripcion' => (string) ($l->descripcion ?? 'Línea de la cotización'),
+                'unidad_medida_id' => $l->unidad_medida_id,
+                'cantidad' => (string) $l->cantidad,
+                'costo_unitario' => (string) $l->costo_unitario,
+            ])->values()->all();
+
+        return new CotizacionAceptada($c->id, $resumen->identificador, $resumen->total, $resumen->moneda, $resumen->plazo, $resumen->formaPago, $resumen->garantia, $c->presupuesto_id, bcsub((string) $c->total, (string) $c->igv, 2), $libres);
     }
 
     public function versiones(int $oportunidadId): array

@@ -46,7 +46,7 @@ class Proyecto extends Model implements DescribibleEnBitacora, DocumentoConEstad
     protected $table = 'proyectos';
 
     protected $fillable = [
-        'codigo', 'nombre', 'party_id', 'es_interno', 'contrato_id', 'jefe_proyecto_user_id',
+        'codigo', 'nombre', 'party_id', 'es_interno', 'contrato_id', 'oportunidad_id', 'jefe_proyecto_user_id',
         'fecha_inicio', 'fecha_fin_prevista', 'moneda_id',
     ];
 

@@ -14,6 +14,7 @@ use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
 use App\Modules\Nucleo\Filament\AccionFilament;
 use App\Modules\Nucleo\Filament\Resources\Parties\SelectoresParty;
 use App\Modules\Nucleo\Models\Moneda;
+use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Services\ParametrosService;
 use App\Modules\Nucleo\Services\RevisionDeFoto;
 use App\Modules\Nucleo\Tiempo\Calendario;
@@ -158,6 +159,12 @@ final class PanelesOportunidad
             controles: [
                 'fecha_cierre_real' => fn (): Field => DatePicker::make('fecha_cierre_real')->format('Y-m-d')->live()
                     ->maxDate(fn (): string => Calendario::hoy()),
+                // MV-006: el proyecto nace al ganar, con su jefe y sus fechas.
+                'jefe_proyecto_user_id' => fn (): Field => Select::make('jefe_proyecto_user_id')->searchable()
+                    ->options(fn (): array => User::query()->where('es_activo', true)->where('es_sistema', false)->orderBy('name')->pluck('name', 'id')->all())
+                    ->helperText('Nace el proyecto «en preparación» con lo cotizado como su presupuesto.'),
+                'fecha_inicio' => fn (): Field => DatePicker::make('fecha_inicio')->format('Y-m-d'),
+                'fecha_fin_prevista' => fn (): Field => DatePicker::make('fecha_fin_prevista')->format('Y-m-d'),
             ],
             deApoyo: [fn (): Field => Toggle::make('confirmo_fecha_antigua')
                 ->label('La fecha de cierre tiene más de '.self::DIAS_CONFIRMAR_CIERRE.' días: confirmo que es correcta')
@@ -171,7 +178,12 @@ final class PanelesOportunidad
             ->fillForm(function (Action $action) use ($oportunidadId): array {
                 $oportunidad = Oportunidad::query()->findOrFail($oportunidadId($action));
 
-                return ['version' => $oportunidad->version, 'fecha_cierre_real' => Calendario::hoy(), 'monto_final' => $oportunidad->monto_estimado];
+                $inicio = CarbonImmutable::parse(Calendario::hoy())->addDays(7);
+
+                return [
+                    'version' => $oportunidad->version, 'fecha_cierre_real' => Calendario::hoy(), 'monto_final' => $oportunidad->monto_estimado,
+                    'fecha_inicio' => $inicio->toDateString(), 'fecha_fin_prevista' => $inicio->addDays(90)->toDateString(),
+                ];
             });
     }
 

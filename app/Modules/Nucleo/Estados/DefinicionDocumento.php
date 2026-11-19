@@ -110,6 +110,24 @@ abstract class DefinicionDocumento
     }
 
     /**
+     * MVP rápido (t1-puente-erp, MV-007): el formato de este documento en particular. Por omisión, el de la definición;
+     * un documento numerado por su dueño (ADR 0023) lo cambia según tenga dueño o no.
+     */
+    public function numeracionDe(Model $documento): ?FormatoNumeracion
+    {
+        return $this->numeracion();
+    }
+
+    /**
+     * MVP rápido (t1-puente-erp, MV-007): el número como se guarda y se muestra («OP-2026-0007 · COT-01»), a partir del
+     * que dio el contador («COT-OP2026.0007-01»). Por omisión, el mismo.
+     */
+    public function numeroVisible(string $numero, Model $documento): string
+    {
+        return $numero;
+    }
+
+    /**
      * El ámbito del contador (D4): vacío = toda la empresa; si no, el código del proyecto o contrato (`CT0003`), que va
      * dentro del número: `VAL-CT0003-2026-0001`.
      */

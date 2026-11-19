@@ -1,9 +1,9 @@
 # Ficha · Datos de demostración
 
-- **Estado:** aprobada
-- **Versión:** v1
+- **Estado:** en curso (v2, por cambios del puente al ERP)
+- **Versión:** v2
 - **Tramo de la ruta:** T0
-- **Aprobada:** 2026-11-19 · commit `ae8839a` (código; la etiqueta va en el commit de la aprobación, sin cambios de código) · etiqueta `aprobado/t0-datos-demo-v1`
+- **Aprobada (v1):** 2026-11-19 · commit `ae8839a` (código; la etiqueta va en el commit de la aprobación, sin cambios de código) · etiqueta `aprobado/t0-datos-demo-v1`
 - **Fuentes del diseño:** `docs/vibe/ruta-mvp.md` (tramo 0); plan viejo
   `docs/planes/activos/2026-11-16-datos-desarrollo-cartera.md` (la cartera de nueve proyectos y su recorrido).
 
@@ -75,22 +75,22 @@ No agrega estados. Recorre los existentes:
 
 ## Reglas y números
 
-**Lo vendido** de un proyecto (mientras no exista Contratos) es el subtotal sin IGV de su presupuesto vigente (costo
-directo + gastos generales + utilidad), si ese presupuesto es de una oportunidad con cotización aceptada. **Margen
+**Lo vendido** de un proyecto (mientras no exista Contratos) es el total sin IGV de la cotización aceptada de la
+oportunidad de la que nació (ficha `t1-puente-erp`). **Margen
 previsto** = vendido − presupuestado; **margen proyectado** = vendido − proyección al cierre (cálculo que ya existía).
 
 La cartera (soles; «presupuestado» es el del árbol: costo directo + gastos generales):
 
 | Proyecto | Estado | Total cotizado con IGV | Vendido | Presupuestado | Comprometido | PC-99 | Margen previsto | Margen proyectado | Semáforo |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| P1 PRY-2024-0001 | cerrado | 2,504,985.40 | 2,122,868.98 | 1,978,945.66 | 1,959,103.65 | 38,500.00 | 143,923.32 | 105,423.32 | verde |
+| P1 PRY-2024-0001 | cerrado | 2,504,985.40 | 2,122,868.98 | 1,992,364.00 | 1,971,753.48 | 38,500.00 | 130,504.98 | 92,004.98 | verde |
 | P2 PRY-2024-0002 | cerrado | 212,132.14 | 179,773.00 | 167,585.00 | 163,089.00 | 0.00 | 12,188.00 | 12,188.00 | verde |
 | P3 PRY-2024-0003 | cerrado | 139,585.39 | 118,292.70 | 111,898.50 | 109,048.72 | 0.00 | 6,394.20 | 6,394.20 | verde |
 | P4 PRY-2025-0001 | cerrado | 107,793.00 | 91,350.00 | 69,300.00 | 67,406.00 | 0.00 | 22,050.00 | 22,050.00 | verde |
 | P5 PRY-2025-0002 | en ejecución | 65,018.00 | 55,100.00 | 41,800.00 | 38,619.40 | 0.00 | 13,300.00 | 13,300.00 | verde |
-| P6 PRY-2025-0003 | en ejecución | 3,181,593.74 | 2,696,265.88 | 2,513,468.19 | 2,137,031.61 | 53,850.00 | 182,797.69 | 128,947.69 | ámbar |
+| P6 PRY-2025-0003 | en ejecución | 3,181,593.74 | 2,696,265.88 | 2,572,703.19 | 2,182,308.85 | 53,850.00 | 123,562.69 | 69,712.69 | ámbar |
 | P7 PRY-2025-0004 | cerrado | 227,665.66 | 192,937.00 | 146,366.00 | 151,902.20 | 9,800.00 | 46,571.00 | 36,771.00 | rojo |
-| P8 PRY-2026-0001 | en ejecución | 1,180,755.20 | 1,000,640.00 | 932,800.00 | 503,893.50 | 0.00 | 67,840.00 | 67,840.00 | verde |
+| P8 PRY-2026-0001 | en ejecución | 1,180,755.20 | 1,000,640.00 | 916,135.00 | 494,749.21 | 0.00 | 84,505.00 | 84,505.00 | verde |
 | P9 PRY-2026-0002 | en preparación | 1,799,418.08 | — (árbol en borrador) | | | | | | |
 
 - Las nueve oportunidades ganadas suman **S/ 9,418,946.61**, el total del plan viejo.
@@ -103,8 +103,6 @@ La cartera (soles; «presupuestado» es el del árbol: costo directo + gastos ge
 
 ## Supuestos sin confirmar
 
-- **La venta sale del presupuesto vigente** cuando su oportunidad tiene cotización aceptada (subtotal sin IGV). Con
-  Contratos, sale del contrato.
 - **Nombres sin santos:** «Santa Rosa del Valle» del plan viejo se cambió por «Los Laureles» (P3) por la regla de no
   usar santos; el proyecto P3 se llama «… Municipalidad de Los Laureles».
 - **La aprobación por margen** se arma como en el plan viejo (D5): unidad «Gerencia General», puesto ocupado por el
@@ -121,10 +119,6 @@ La cartera (soles; «presupuestado» es el del árbol: costo directo + gastos ge
 - **Gasto de demostración** (`gastos_demo`): documento sin estados, sin permisos, sin pantalla y sin numeración del
   núcleo (el número sale del id). Solo lo usa el seeder. En el repo original no existe: el costo entra por órdenes,
   tareo y rendiciones.
-- **Venta del proyecto desde el presupuesto** (`VentaDesdeLaCotizacion`): sustituye la de Contratos con una regla
-  provisional; vive en Presupuestos y consulta la cotización aceptada por la interfaz del CRM.
-- **Contrato provisional:** cada proyecto nace por `crearDesdeContrato` con un id de contrato inventado (900001…900009)
-  sin fila, como ya permitía la columna sin llave foránea.
 - **El seeder** busca catálogos y motivos con consultas directas a la base y crea a los jefes con las fábricas de
   modelos; todo lo demás va por los servicios de cada módulo, con su numeración, historial y auditoría.
 
@@ -134,4 +128,19 @@ La cartera (soles; «presupuestado» es el del árbol: costo directo + gastos ge
   llamado desde `database/seeders/DatabaseSeeder.php` solo en local.
 - `app/Modules/Erp/Presupuestos/Models/GastoDemo.php`, `Services/GastosDemoService.php` y la migración
   `database/migrations/2026_11_19_000001_crear_gastos_demo.php` del módulo.
-- `app/Modules/Erp/Presupuestos/Services/VentaDesdeLaCotizacion.php`, enlazada en `PresupuestosServiceProvider`.
+
+## Cambios desde la versión anterior
+
+v2 (2026-11-19), por la ficha `t1-puente-erp` (MV-006 a MV-008):
+
+- Los proyectos ya no nacen con un contrato inventado: nacen al ganar su oportunidad, con el jefe y las fechas de la
+  tabla, y lo cotizado se copia como su presupuesto «PRY-… · PRE-01 v1». El costeo queda en la oportunidad.
+- Los números salen por dueño: «OP-2024-0001 · COT-01», «OP-2024-0001 · PRE-01», «PRY-2024-0001 · PRE-01».
+- P1, P6 y P8 tienen una versión 2 del presupuesto, hecha cinco días después de ganar, para que la comparación
+  «Ofertado vs. presupuesto» muestre cambios: P1 obra civil 80,301.51 → 92,500.00; P6 almacenamiento SAN 245,000.00 →
+  263,450.00 y 180 → 192 computadoras; P8 640 → 610 puntos de red y enlace inalámbrico 24,600.00 → 23,800.00. El árbol
+  sale de la v2. Por eso cambian el presupuestado y los márgenes de esos tres en la tabla.
+- Los gastos de la PC-99 de P6 ahora son «imprevisto de obra: reforzamiento eléctrico» (18,450.00) y «cambio del
+  cliente: dos puntos de red más por consultorio» (35,400.00), para no repetir lo que ya entró en la v2.
+- Las oportunidades abiertas con cotización emitida se crearon entre setiembre y octubre de 2026 y sus cotizaciones
+  valen 60 días, para que sigan vigentes y se puedan aceptar y ganar desde la pantalla.

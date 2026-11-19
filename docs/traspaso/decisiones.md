@@ -78,3 +78,43 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «T0: datos de demostración»
+
+### MV-005 · 2026-11-19 · El tramo 1 empieza por el puente al ERP
+
+- **Ficha:** `fichas/t1-puente-erp.md`
+- **Dijo Sebastián:** eligió «Puente al ERP» entre empezar por él, por licitaciones o por la agenda.
+- **Decisión:** el orden del tramo 1 es: puente al ERP (ganar → proyecto con presupuesto copiado y comparación),
+  después licitaciones, agenda, catálogo y leads.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «T1: puente al ERP»
+
+### MV-006 · 2026-11-19 · El proyecto nace solo al ganar
+
+- **Ficha:** `fichas/t1-puente-erp.md`
+- **Dijo Sebastián:** «Solo, al ganar», en vez de un botón «Crear proyecto» aparte.
+- **Decisión:** ganar la oportunidad, crear su proyecto y copiar lo cotizado como su presupuesto ocurren en un solo
+  paso; si la copia falla, no se gana (confirma el ADR 0023 del repo original).
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «T1: puente al ERP»
+
+### MV-007 · 2026-11-19 · Numeración por dueño desde ahora
+
+- **Ficha:** `fichas/t1-puente-erp.md`
+- **Dijo Sebastián:** «Sí, ahora», aunque haya que reconstruir la base.
+- **Decisión:** costeos, cotizaciones y presupuestos se numeran por su dueño como dice el ADR 0023:
+  «OP-2026-0007 · COT-01 v1», «OP-2026-0007 · PRE-01 v1», «PRY-2026-0013 · PRE-01 v1»; sin dueño, «PRE-2026-0031 v1».
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «T1: puente al ERP»
+
+### MV-008 · 2026-11-19 · La comparación ofertado contra presupuesto va en su propia pestaña
+
+- **Ficha:** `fichas/t1-puente-erp.md`
+- **Dijo Sebastián:** eligió «Pestaña propia» entre eso, columnas dentro del presupuesto o un panel deslizante.
+- **Decisión:** la ficha del proyecto tiene una pestaña «Ofertado vs. presupuesto», partida por partida, junto a la del
+  presupuesto; el tablero muestra la diferencia total y lleva a esa pestaña.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «T1: puente al ERP»

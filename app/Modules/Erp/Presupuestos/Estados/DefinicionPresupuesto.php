@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Modules\Erp\Presupuestos\Estados;
 
+use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
 use App\Modules\Erp\Presupuestos\Condiciones\PresupuestoCompleto;
 use App\Modules\Erp\Presupuestos\Models\Presupuesto;
+use App\Modules\Erp\Proyectos\Services\ProyectosService;
 use App\Modules\Nucleo\Enums\TonoEstado;
 use App\Modules\Nucleo\Estados\DefinicionDocumento;
 use App\Modules\Nucleo\Estados\EstadoDefinido;
 use App\Modules\Nucleo\Estados\TransicionDefinida;
 use App\Modules\Nucleo\Numeracion\FormatoNumeracion;
+use App\Modules\Nucleo\Numeracion\NumeroPorDueno;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -63,6 +66,39 @@ final class DefinicionPresupuesto extends DefinicionDocumento
     public function numeracion(): FormatoNumeracion
     {
         return new FormatoNumeracion('PRE');
+    }
+
+    /**
+     * MV-007 (ADR 0023): con dueño, el costeo de una oportunidad es «OP-2026-0007 · PRE-01» y el presupuesto de un
+     * proyecto «PRY-2026-0013 · PRE-01»; sin dueño, «PRE-2026-0031».
+     */
+    public function numeracionDe(Model $documento): FormatoNumeracion
+    {
+        return self::codigoDelDueno($documento) === null ? $this->numeracion() : NumeroPorDueno::formato('PRE');
+    }
+
+    public function ambitoDeNumeracion(Model $documento): string
+    {
+        $dueno = self::codigoDelDueno($documento);
+
+        return $dueno === null ? '' : NumeroPorDueno::ambito($dueno);
+    }
+
+    public function numeroVisible(string $numero, Model $documento): string
+    {
+        $dueno = self::codigoDelDueno($documento);
+
+        return $dueno === null ? $numero : NumeroPorDueno::visible($numero, $dueno, 'PRE');
+    }
+
+    private static function codigoDelDueno(Model $documento): ?string
+    {
+        /** @var Presupuesto $documento */
+        return match (true) {
+            $documento->proyecto_id !== null => app(ProyectosService::class)->resumen((int) $documento->proyecto_id)->codigo,
+            $documento->oportunidad_id !== null => app(OportunidadesService::class)->resumen((int) $documento->oportunidad_id)->numero,
+            default => null,
+        };
     }
 
     public function versionesCompartenNumero(): bool

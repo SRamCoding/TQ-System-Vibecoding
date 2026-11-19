@@ -260,13 +260,13 @@ final readonly class OportunidadesService
     }
 
     /** Gana (D3): la fecha de cierre real nunca es futura (sí puede ser anterior a la creación) y se confirma el monto. */
-    public function ganar(int $oportunidadId, int $versionLeida, CarbonImmutable $fechaCierreReal, ?string $montoFinal, ?string $comentario, User $quien): HistorialEstado
+    public function ganar(int $oportunidadId, int $versionLeida, CarbonImmutable $fechaCierreReal, ?string $montoFinal, ?string $comentario, User $quien, ?DatosDelProyectoAlGanar $proyecto = null): HistorialEstado
     {
         if ($fechaCierreReal->toDateString() > Calendario::hoy()) {
             throw OportunidadRechazada::fechaCierreFutura();
         }
 
-        return DB::transaction(function () use ($oportunidadId, $versionLeida, $fechaCierreReal, $montoFinal, $comentario, $quien): HistorialEstado {
+        return DB::transaction(function () use ($oportunidadId, $versionLeida, $fechaCierreReal, $montoFinal, $comentario, $quien, $proyecto): HistorialEstado {
             $oportunidad = $this->bloquearAbiertaPropia($oportunidadId, $versionLeida, $quien);
             // Plan 2.22, D12 y P5: con cotización aceptada, el monto final es su total con IGV, en su moneda, y no se
             // escribe otro («nadie vuelve a escribir lo que ya se escribió», v4 parte 3).
@@ -288,7 +288,8 @@ final readonly class OportunidadesService
             $oportunidad->monto_estimado = $montoFinal;
             $this->guardarConNuevaVersion($oportunidad);
 
-            return app(TransicionesService::class)->transicionar($oportunidad, 'ganar', $oportunidad->version, $quien, null, $comentario);
+            // MV-006: el efecto de ganar hace nacer el proyecto con estos datos, en esta misma transacción.
+            return app(PedidoGanar::class)->durante($proyecto, fn (): HistorialEstado => app(TransicionesService::class)->transicionar($oportunidad, 'ganar', $oportunidad->version, $quien, null, $comentario));
         });
     }
 

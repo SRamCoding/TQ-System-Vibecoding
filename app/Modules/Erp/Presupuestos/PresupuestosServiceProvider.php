@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Erp\Presupuestos;
 
+use App\Modules\Crm\Oportunidades\Services\ProyectoAlGanar;
 use App\Modules\Erp\Presupuestos\Acciones\AgregarInsumoApu;
 use App\Modules\Erp\Presupuestos\Acciones\AgregarPartida;
 use App\Modules\Erp\Presupuestos\Acciones\AgregarPartidaPresupuesto;
@@ -117,6 +118,8 @@ final class PresupuestosServiceProvider extends ServiceProvider
         $this->app->bind(PresupuestosService::class, PresupuestosEnBase::class);
         // MVP rápido (t0-datos-demo): lo vendido sale de la cotización aceptada hasta que exista Contratos.
         $this->app->bind(VentaDelProyecto::class, Services\VentaDesdeLaCotizacion::class);
+        // MVP rápido (t1-puente-erp, MV-006): al ganar nace el proyecto con lo cotizado como presupuesto.
+        $this->app->bind(ProyectoAlGanar::class, Services\ProyectoDesdeLaGanada::class);
         // Plan 2.9, D1: el precio sugerido de la mano de obra; C5 lo reemplaza cuando exista.
         $this->app->bind(PrecioSugeridoManoObra::class, SinPrecioSugerido::class);
         $this->app->scoped(PedidoTraerAlProyecto::class);
@@ -181,6 +184,10 @@ final class PresupuestosServiceProvider extends ServiceProvider
         // Plan 2.10, D3: lo del área 1 en la ficha del proyecto, sin que Proyectos conozca sus modelos.
         $this->app->make(RegistroPestanasProyecto::class)->registrar(new PestanaProyecto(
             'presupuesto', 'Presupuesto', self::PERMISO_VER, PresupuestoDeProyecto::class, 'heroicon-o-document-currency-dollar', orden: 10,
+        ));
+        // MVP rápido (t1-puente-erp, MV-008): lo ofertado contra el presupuesto vigente, junto al presupuesto.
+        $this->app->make(RegistroPestanasProyecto::class)->registrar(new PestanaProyecto(
+            'ofertado-vs-presupuesto', 'Ofertado vs. presupuesto', self::PERMISO_VER, Filament\OfertadoVsPresupuesto::class, 'heroicon-o-scale', orden: 15,
         ));
         $this->app->make(RegistroPestanasProyecto::class)->registrar(new PestanaProyecto(
             'partidas-de-control', 'Partidas de control', self::PERMISO_VER, PartidasDeControlDeProyecto::class, 'heroicon-o-chart-bar', orden: 20,

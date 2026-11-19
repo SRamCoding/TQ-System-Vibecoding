@@ -73,7 +73,7 @@ return new class extends Migration
             $table->unique(['numero', 'numero_version']);
         });
 
-        DB::statement("ALTER TABLE cotizaciones ADD CONSTRAINT cotizaciones_numero_check CHECK (numero ~ '^COT-[0-9]{4}-[0-9]{4,}$' AND numero_version >= 1 AND version >= 1)");
+        DB::statement("ALTER TABLE cotizaciones ADD CONSTRAINT cotizaciones_numero_check CHECK (numero ~ '^OP-[0-9]{4}-[0-9]{4,} · COT-[0-9]{2,}$' AND numero_version >= 1 AND version >= 1)");
         DB::statement('ALTER TABLE cotizaciones ADD CONSTRAINT cotizaciones_condiciones_check CHECK (dias_validez BETWEEN 1 AND 365 AND (plazo_entrega_dias IS NULL OR plazo_entrega_dias >= 0) AND (garantia_meses IS NULL OR garantia_meses >= 0))');
         DB::statement('ALTER TABLE cotizaciones ADD CONSTRAINT cotizaciones_montos_check CHECK (subtotal >= 0 AND descuento_total >= 0 AND igv >= 0 AND total >= 0 AND costo_total >= 0 AND (tipo_cambio IS NULL OR tipo_cambio > 0) AND (igv_porcentaje IS NULL OR igv_porcentaje BETWEEN 0 AND 100) AND (margen_minimo IS NULL OR margen_minimo BETWEEN 0 AND 100) AND (margen_objetivo IS NULL OR margen_objetivo BETWEEN 0 AND 100))');
         // D9, D10: lo que se congela al emitir llega junto.

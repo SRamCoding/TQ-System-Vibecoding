@@ -51,7 +51,7 @@ class Presupuesto extends Model implements DeclaraCamposSensibles, DescribibleEn
     protected $table = 'presupuestos';
 
     protected $fillable = [
-        'numero', 'numero_version', 'oportunidad_id', 'proyecto_id', 'nombre', 'moneda_id', 'usa_apu', 'decimales_precio_unitario',
+        'numero', 'numero_version', 'oportunidad_id', 'proyecto_id', 'origen_cotizacion_id', 'nombre', 'moneda_id', 'usa_apu', 'decimales_precio_unitario',
         'gastos_generales_pct', 'utilidad_pct', 'igv_pct', 'costo_directo', 'gastos_generales', 'utilidad', 'igv', 'total',
     ];
 

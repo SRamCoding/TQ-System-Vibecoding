@@ -14,9 +14,11 @@ use App\Modules\Crm\Cuentas\Services\CuentasService;
 use App\Modules\Crm\Cuentas\Services\DatosCuenta;
 use App\Modules\Crm\Oportunidades\Enums\GanadorConocido;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
+use App\Modules\Crm\Oportunidades\Services\DatosDelProyectoAlGanar;
 use App\Modules\Crm\Oportunidades\Services\DatosOportunidad;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
 use App\Modules\Erp\Presupuestos\Models\PartidaControl;
+use App\Modules\Erp\Presupuestos\Models\PartidaDePresupuesto;
 use App\Modules\Erp\Presupuestos\Models\Presupuesto;
 use App\Modules\Erp\Presupuestos\Services\AjustesPropuesta;
 use App\Modules\Erp\Presupuestos\Services\ArbolPartidasService;
@@ -25,7 +27,6 @@ use App\Modules\Erp\Presupuestos\Services\ConsultaArbol;
 use App\Modules\Erp\Presupuestos\Services\DatosPresupuesto;
 use App\Modules\Erp\Presupuestos\Services\GastosDemoService;
 use App\Modules\Erp\Proyectos\Models\Proyecto;
-use App\Modules\Erp\Proyectos\Services\DatosProyecto;
 use App\Modules\Erp\Proyectos\Services\ProyectosService;
 use App\Modules\Nucleo\Aprobaciones\DatosRegla;
 use App\Modules\Nucleo\Enums\CondicionRegla;
@@ -146,18 +147,34 @@ final class DemoSeeder extends Seeder
             $cot->refresh();
             app(CotizacionesService::class)->aceptar($cot->id, $cot->version, CarbonImmutable::parse($p['ganada']), $publica ? TipoRespaldo::BuenaPro : TipoRespaldo::OrdenServicio, $publica ? 'Buena pro del procedimiento '.$p['clave'] : 'OS-'.substr($p['ganada'], 0, 4).'-0'.substr($p['clave'], 1), null, null, $this->dev);
             $o->refresh();
-            app(OportunidadesService::class)->ganar($o->id, $o->version, CarbonImmutable::parse($p['ganada']), null, null, $this->dev);
+            // MV-006: al ganar nace el proyecto con lo cotizado como su presupuesto «PRY-… · PRE-01 v1».
+            app(OportunidadesService::class)->ganar($o->id, $o->version, CarbonImmutable::parse($p['ganada']), null, null, $this->dev, new DatosDelProyectoAlGanar(
+                $this->jefes[$p['jefe']]->id, CarbonImmutable::parse($p['inicio']), CarbonImmutable::parse($p['fin']),
+            ));
         });
+        $proyectoId = (int) app(ProyectosService::class)->deOportunidad($o->id);
 
-        // Una semana después: el proyecto, su presupuesto aprobado y el árbol desde el presupuesto.
-        $proyectoId = $this->en($ganada->addDays(7), function () use ($p, $presupuesto): int {
+        // Unos días después, en algunos: la versión 2 del presupuesto con lo que cambió desde la oferta (MV-008).
+        if (isset($p['v2'])) {
+            $this->en($ganada->addDays(5), function () use ($p, $proyectoId): void {
+                $armado = app(ArmadoPresupuestoService::class);
+                $v1 = Presupuesto::query()->where('proyecto_id', $proyectoId)->where('es_vigente', true)->firstOrFail();
+                $v2 = $armado->nuevaVersion($v1->id, $this->dev);
+
+                foreach ($p['v2'] as $codigo => [$metrado, $precio]) {
+                    $partida = PartidaDePresupuesto::query()->where('presupuesto_id', $v2->id)->where('codigo', $codigo)->firstOrFail();
+                    $armado->editarPartida($partida->id, $partida->descripcion, $partida->unidad_medida_id, $metrado, $precio, $partida->version);
+                }
+
+                $armado->traerAlProyecto($v2->id, $proyectoId, $v2->refresh()->version, $this->dev);
+            });
+        }
+
+        // Una semana después: el árbol desde el presupuesto vigente, y su aprobación.
+        $this->en($ganada->addDays(7), function () use ($p, $proyectoId): void {
             $jefe = $this->jefes[$p['jefe']];
-            $proyecto = app(ProyectosService::class)->crearDesdeContrato(900000 + (int) substr($p['clave'], 1), new DatosProyecto(
-                $p['nombre'], $jefe->id, CarbonImmutable::parse($p['inicio']), CarbonImmutable::parse($p['fin']), $this->cuentas[$p['cuenta']]['party'],
-            ), $this->dev);
-            app(ArmadoPresupuestoService::class)->traerAlProyecto($presupuesto->id, $proyecto->id, $presupuesto->refresh()->version, $this->dev);
             $arbol = app(ArbolPartidasService::class)->crearDesdePropuesta(
-                app(ConsultaArbol::class)->propuestaDesdePresupuesto($proyecto->id),
+                app(ConsultaArbol::class)->propuestaDesdePresupuesto($proyectoId),
                 AjustesPropuesta::desdeCampos([], [], [], $jefe->id),
                 $this->dev,
             );
@@ -166,8 +183,6 @@ final class DemoSeeder extends Seeder
                 $arbol->refresh();
                 app(TransicionesService::class)->transicionar($arbol, 'aprobar', $arbol->version, $this->dev);
             }
-
-            return $proyecto->id;
         });
 
         if ($p['estado'] === 'en_preparacion') {
@@ -243,7 +258,7 @@ final class DemoSeeder extends Seeder
 
         if (isset($d['cotizacion'])) {
             $cot = $this->en($creada->addDays(12), function () use ($o, $d): Cotizacion {
-                $c = app(CotizacionesService::class)->crear($o->id, new DatosCotizacion(contactoId: $this->cuentas[$d['cuenta']]['decisor'], diasValidez: 45), $this->dev);
+                $c = app(CotizacionesService::class)->crear($o->id, new DatosCotizacion(contactoId: $this->cuentas[$d['cuenta']]['decisor'], diasValidez: 60), $this->dev);
 
                 foreach ($d['lineas'] as [$descripcion, $cantidad, $precio, $costo]) {
                     app(CotizacionesService::class)->agregarLinea($c->id, $c->refresh()->version, new DatosLinea($cantidad, $precio, $costo, descripcion: $descripcion, unidadMedidaId: $this->unidad('NIU')), $this->dev);

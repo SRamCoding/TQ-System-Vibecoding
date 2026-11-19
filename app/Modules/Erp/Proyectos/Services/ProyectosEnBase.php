@@ -8,6 +8,7 @@ use App\Modules\Erp\Proyectos\Estados\DefinicionProyecto;
 use App\Modules\Erp\Proyectos\Events\ProyectoCreado;
 use App\Modules\Erp\Proyectos\Models\Proyecto;
 use App\Modules\Nucleo\Enums\Catalogo;
+use App\Modules\Nucleo\Estados\MotivoElegido;
 use App\Modules\Nucleo\Models\Concerns\BusquedaSinAcentos;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Numeracion\FormatoNumeracion;
@@ -87,6 +88,53 @@ final readonly class ProyectosEnBase implements ProyectosService
         return $this->guardar($datos, $cliente, false, $contratoId, User::query()->findOrFail(app(UsuarioSistema::class)->id()), $originadoPor);
     }
 
+    public function crearDesdeOportunidad(int $oportunidadId, DatosProyecto $datos, ?User $originadoPor = null): ResumenProyecto
+    {
+        if ($this->deOportunidad($oportunidadId) !== null) {
+            throw ProyectoRechazado::conMotivo('Esa oportunidad ya tiene su proyecto.');
+        }
+
+        $cliente = $datos->clientePartyId ?? throw ProyectoRechazado::conMotivo('Falta el cliente del proyecto.');
+
+        return $this->guardar($datos, $cliente, false, null, User::query()->findOrFail(app(UsuarioSistema::class)->id()), $originadoPor, $oportunidadId);
+    }
+
+    public function deOportunidad(int $oportunidadId): ?int
+    {
+        $id = Proyecto::query()->where('oportunidad_id', $oportunidadId)
+            ->whereHas('estado', fn ($query) => $query->where('codigo', '!=', DefinicionProyecto::ANULADO))->value('id');
+
+        return $id === null ? null : (int) $id;
+    }
+
+    public function oportunidadDe(int $proyectoId): ?int
+    {
+        $id = Proyecto::query()->whereKey($proyectoId)->value('oportunidad_id');
+
+        return $id === null ? null : (int) $id;
+    }
+
+    public function anularDesdeOportunidad(int $oportunidadId, string $motivo): void
+    {
+        $id = $this->deOportunidad($oportunidadId);
+
+        if ($id === null) {
+            return;
+        }
+
+        $proyecto = Proyecto::query()->with('estado')->lockForUpdate()->findOrFail($id);
+
+        if ($proyecto->estado->codigo !== DefinicionProyecto::EN_PREPARACION) {
+            throw ProyectoRechazado::conMotivo("Su proyecto {$proyecto->codigo} ya está ".mb_strtolower($proyecto->estado->nombre).': no se puede anular la ganada.');
+        }
+
+        $motivoId = (int) DB::table('motivos as m')->join('tipos_motivo as t', 't.id', '=', 'm.tipo_motivo_id')
+            ->where('t.codigo', 'erp.proyectos.proyecto.anular')->where('m.codigo', 'otro')->value('m.id');
+        // MVP rápido: la anula quien anula la ganada (la transición no es del sistema); su permiso no se revisa aparte.
+        $quien = auth()->user() instanceof User ? auth()->user() : User::query()->findOrFail(app(UsuarioSistema::class)->id());
+        $this->transiciones->transicionar($proyecto, 'anular', $proyecto->version, $quien, new MotivoElegido($motivoId, "Se anuló la oportunidad ganada: {$motivo}"));
+    }
+
     public function iniciarEjecucion(int $proyectoId): void
     {
         DB::transaction(function () use ($proyectoId): void {
@@ -101,18 +149,19 @@ final readonly class ProyectosEnBase implements ProyectosService
         });
     }
 
-    private function guardar(DatosProyecto $datos, int $clientePartyId, bool $esInterno, ?int $contratoId, User $usuario, ?User $originadoPor): ResumenProyecto
+    private function guardar(DatosProyecto $datos, int $clientePartyId, bool $esInterno, ?int $contratoId, User $usuario, ?User $originadoPor, ?int $oportunidadId = null): ResumenProyecto
     {
         $this->validar($datos, $clientePartyId);
         $monedaId = $this->catalogos->idPorCodigo(Catalogo::Monedas, $datos->moneda);
 
-        $proyecto = DB::transaction(function () use ($datos, $clientePartyId, $esInterno, $contratoId, $usuario, $originadoPor, $monedaId): Proyecto {
+        $proyecto = DB::transaction(function () use ($datos, $clientePartyId, $esInterno, $contratoId, $usuario, $originadoPor, $monedaId, $oportunidadId): Proyecto {
             $proyecto = new Proyecto([
                 'codigo' => $this->numeracion->siguiente('proyecto', new FormatoNumeracion('PRY'), CarbonImmutable::now('America/Lima')),
                 'nombre' => trim($datos->nombre),
                 'party_id' => $clientePartyId,
                 'es_interno' => $esInterno,
                 'contrato_id' => $contratoId,
+                'oportunidad_id' => $oportunidadId,
                 'jefe_proyecto_user_id' => $datos->jefeProyectoUserId,
                 'fecha_inicio' => $datos->fechaInicio->toDateString(),
                 'fecha_fin_prevista' => $datos->fechaFinPrevista->toDateString(),

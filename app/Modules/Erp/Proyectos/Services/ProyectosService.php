@@ -40,6 +40,24 @@ interface ProyectosService
     public function crearDesdeContrato(int $contratoId, DatosProyecto $datos, ?User $originadoPor = null): ResumenProyecto;
 
     /**
+     * MVP rápido (t1-puente-erp, MV-006): el proyecto «en preparación» que nace al ganar una oportunidad, en la misma
+     * transacción. Lo crea el sistema; `$originadoPor` es quien la ganó. Una oportunidad, un proyecto.
+     */
+    public function crearDesdeOportunidad(int $oportunidadId, DatosProyecto $datos, ?User $originadoPor = null): ResumenProyecto;
+
+    /** El proyecto que nació de esa oportunidad, si lo hay y no está anulado. */
+    public function deOportunidad(int $oportunidadId): ?int;
+
+    /** La oportunidad de la que nació el proyecto, si nació de una. */
+    public function oportunidadDe(int $proyectoId): ?int;
+
+    /**
+     * Anula el proyecto de esa oportunidad (al anular la ganada). Solo si sigue en preparación y sin costos: si no,
+     * lo rechaza y la ganada no se anula.
+     */
+    public function anularDesdeOportunidad(int $oportunidadId, string $motivo): void;
+
+    /**
      * Pasa el proyecto a «en ejecución» (lo llama Presupuestos al aprobar el árbol; no es acción de usuario). Si ya
      * está en ejecución, no hace nada.
      *

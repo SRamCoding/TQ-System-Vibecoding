@@ -10,8 +10,12 @@ use App\Modules\Crm\Oportunidades\Events\OportunidadGanadaAnulada;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
 use App\Modules\Crm\Oportunidades\Services\ContratosDeOportunidad;
 use App\Modules\Crm\Oportunidades\Services\CotizacionDeOportunidad;
+use App\Modules\Crm\Oportunidades\Services\DatosDelProyectoAlGanar;
+use App\Modules\Crm\Oportunidades\Services\PedidoGanar;
+use App\Modules\Crm\Oportunidades\Services\ProyectoAlGanar;
 use App\Modules\Nucleo\Estados\Efecto;
 use App\Modules\Nucleo\Models\HistorialEstado;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -27,6 +31,13 @@ final readonly class GanadaAvisaAlErp implements Efecto
         $cuenta = app(CuentasService::class)->resumen($documento->cuenta_id);
         // Plan 2.22, D12: con cotización aceptada, el monto, la moneda y las condiciones salen de ella.
         $aceptada = app(CotizacionDeOportunidad::class)->aceptada($documento->id);
+
+        // MV-006: el proyecto nace aquí, en la transacción de ganar. Sin datos de «Ganada» (otro camino), el ejecutivo
+        // queda de jefe y las fechas salen del cierre y del plazo de la cotización.
+        $cierre = CarbonImmutable::parse((string) $documento->fecha_cierre_real?->toDateString());
+        $inicio = $cierre->addDays(7);
+        $datos = app(PedidoGanar::class)->datos() ?? new DatosDelProyectoAlGanar($documento->ejecutivo_user_id, $inicio, $inicio->addDays(90));
+        app(ProyectoAlGanar::class)->nacer($documento->id, $documento->nombre, $cuenta->partyId, $aceptada, $datos);
 
         OportunidadGanada::dispatch(
             $documento->id,
@@ -49,6 +60,7 @@ final readonly class GanadaAvisaAlErp implements Efecto
     public function revertir(Model $documento, array $datos): void
     {
         $motivo = $this->motivoDeLaAnulacion($documento);
+        app(ProyectoAlGanar::class)->anular((int) $documento->getKey(), $motivo);
         app(ContratosDeOportunidad::class)->anularBorrador((int) $documento->getKey(), $motivo);
 
         OportunidadGanadaAnulada::dispatch((int) $documento->getKey(), (int) $datos['cuenta_id'], $motivo);

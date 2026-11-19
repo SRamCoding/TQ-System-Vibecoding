@@ -12,6 +12,7 @@ use App\Modules\Crm\Cotizaciones\Condiciones\SobreLaOportunidadPropia;
 use App\Modules\Crm\Cotizaciones\Condiciones\TieneLineas;
 use App\Modules\Crm\Cotizaciones\Models\Cotizacion;
 use App\Modules\Crm\Cotizaciones\Services\CalculoCotizacion;
+use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
 use App\Modules\Nucleo\Aprobaciones\MontoAprobable;
 use App\Modules\Nucleo\Enums\CondicionRegla;
 use App\Modules\Nucleo\Enums\TonoEstado;
@@ -20,6 +21,7 @@ use App\Modules\Nucleo\Estados\EstadoDefinido;
 use App\Modules\Nucleo\Estados\TransicionDefinida;
 use App\Modules\Nucleo\Models\Moneda;
 use App\Modules\Nucleo\Numeracion\FormatoNumeracion;
+use App\Modules\Nucleo\Numeracion\NumeroPorDueno;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -111,7 +113,24 @@ final class DefinicionCotizacion extends DefinicionDocumento
 
     public function numeracion(): FormatoNumeracion
     {
-        return new FormatoNumeracion('COT');
+        return NumeroPorDueno::formato('COT');
+    }
+
+    /** MV-007: la cotización se numera dentro de su oportunidad: «OP-2026-0007 · COT-01». */
+    public function ambitoDeNumeracion(Model $documento): string
+    {
+        return NumeroPorDueno::ambito(self::codigoDeLaOportunidad($documento));
+    }
+
+    public function numeroVisible(string $numero, Model $documento): string
+    {
+        return NumeroPorDueno::visible($numero, self::codigoDeLaOportunidad($documento), 'COT');
+    }
+
+    private static function codigoDeLaOportunidad(Model $documento): string
+    {
+        /** @var Cotizacion $documento */
+        return app(OportunidadesService::class)->resumen((int) $documento->oportunidad_id)->numero;
     }
 
     public function versionesCompartenNumero(): bool
