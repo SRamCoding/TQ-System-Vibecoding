@@ -39,6 +39,7 @@ use App\Modules\Erp\Presupuestos\Services\ConsultaArbol;
 use App\Modules\Erp\Presupuestos\Services\DatosPresupuesto;
 use App\Modules\Erp\Presupuestos\Services\FormulaPolinomicaService;
 use App\Modules\Erp\Presupuestos\Services\GastosDemoService;
+use App\Modules\Erp\Presupuestos\Services\PresupuestoEmpresaService;
 use App\Modules\Erp\Proyectos\Models\Proyecto;
 use App\Modules\Erp\Proyectos\Services\ProyectosService;
 use App\Modules\Nucleo\Aprobaciones\DatosRegla;
@@ -52,11 +53,15 @@ use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Organigrama\DatosUnidad;
 use App\Modules\Nucleo\Parties\DatosContacto;
 use App\Modules\Nucleo\Parties\DatosParty;
+use App\Modules\Nucleo\Parties\DatosSede;
 use App\Modules\Nucleo\Parties\DocumentoIdentidad;
 use App\Modules\Nucleo\Services\AprobacionesService;
 use App\Modules\Nucleo\Services\ContactosPartyService;
+use App\Modules\Nucleo\Services\EmpresaService;
 use App\Modules\Nucleo\Services\OrganigramaService;
+use App\Modules\Nucleo\Services\ParametrosService;
 use App\Modules\Nucleo\Services\PartiesService;
+use App\Modules\Nucleo\Services\SedesPartyService;
 use App\Modules\Nucleo\Services\SeguridadService;
 use App\Modules\Nucleo\Services\TipoCambioService;
 use App\Modules\Nucleo\Services\TransicionesService;
@@ -98,6 +103,7 @@ final class DemoSeeder extends Seeder
         try {
             $this->indicesUnificados();
             $this->en('2024-01-02', function (): void {
+                $this->empresaYSedes();
                 $this->aprobacionPorMargen();
                 $this->jefesDeProyecto();
             });
@@ -120,6 +126,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: campañas y leads');
             $this->en('2026-11-19', fn () => $this->campanias());
+
+            $this->command?->info('Demo: presupuesto de la empresa');
+            $this->presupuestoEmpresa();
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -751,5 +760,79 @@ final class DemoSeeder extends Seeder
         foreach ($monomios as [$descripcion, $indice, $coef]) {
             $servicio->agregar($presupuestoId, $descripcion, $indice, $coef);
         }
+    }
+
+    /** La ficha de Techquk como empresa del sistema, con tres sedes inventadas (ficha t2-presupuesto-empresa). */
+    private function empresaYSedes(): void
+    {
+        if (app(EmpresaService::class)->ficha() !== null) {
+            return;
+        }
+
+        $base = '2069900001';
+        $techquk = app(PartiesService::class)->registrar(new DatosParty(Catalogo::RUC, $base.DocumentoIdentidad::digitoVerificadorRuc($base), razonSocial: 'Techquk S.A.C.'));
+        $parametros = app(ParametrosService::class);
+        $parametros->cambiarDesdeTexto(EmpresaService::PARAMETRO, $base.DocumentoIdentidad::digitoVerificadorRuc($base), $parametros->ficha(EmpresaService::PARAMETRO)['version']);
+
+        foreach (['Sede principal Valle Norte' => 'Av. Los Próceres 1250, Valle Norte', 'Oficina Lima' => 'Calle Las Begonias 415, Lima', 'Almacén La Pampa' => 'Carretera a La Pampa km 4, Valle Norte'] as $nombre => $direccion) {
+            app(SedesPartyService::class)->agregar($techquk->id, new DatosSede($nombre, $direccion));
+        }
+    }
+
+    /** El presupuesto 2026 de la empresa, aprobado en enero, con su gasto directo de enero a noviembre y un traspaso. */
+    private function presupuestoEmpresa(): void
+    {
+        $s = app(PresupuestoEmpresaService::class);
+        $sedes = array_keys($s->sedes());
+        $p = $this->en('2025-12-15', fn (): int => $s->crear(2026));
+        // [sede (índice), rubro, monto mensual, meses con monto distinto]
+        $lineas = [
+            [0, 'Alquiler y mantenimiento de local', '6500.00', []], [0, 'Servicios (luz, agua, internet, telefonía)', '1850.00', [1 => '2100.00', 2 => '2100.00', 12 => '2000.00']],
+            [0, 'Movilidad y viáticos', '2400.00', []], [0, 'Útiles y suministros de oficina', '650.00', []],
+            [1, 'Alquiler y mantenimiento de local', '4800.00', []], [1, 'Servicios (luz, agua, internet, telefonía)', '980.00', []], [1, 'Movilidad y viáticos', '1600.00', []],
+            [2, 'Alquiler y mantenimiento de local', '3200.00', []], [2, 'Servicios (luz, agua, internet, telefonía)', '540.00', []],
+            [3, 'Seguros', '0.00', [3 => '18600.00']], [3, 'Software y licencias', '2350.00', []], [3, 'Capacitación', '0.00', [5 => '6000.00', 10 => '6000.00']], [3, 'Publicidad y ferias', '0.00', [9 => '8500.00']],
+        ];
+
+        foreach ($lineas as [$sede, $rubro, $mensual, $distintos]) {
+            $s->guardarLinea($p, $sedes[$sede] === 'empresa' ? null : (int) $sedes[$sede], $rubro, array_replace(array_fill(1, 12, $mensual), $distintos), null);
+        }
+
+        $this->en('2026-01-05', fn () => $s->aprobar($p));
+        $proveedores = ['Inmobiliaria Los Próceres S.A.C.', 'Electro Norte S.A.', 'Transportes Ejecutivos del Valle E.I.R.L.', 'Librería y Útiles El Estudiante S.A.C.', 'Seguros Andinos S.A.', 'Nube Andina S.A.C.'];
+        $cc = fn (string $codigo): int => (int) DB::table('centros_costo')->where('codigo', $codigo)->value('id');
+        $variaciones = ['0.96', '1.00', '0.92', '1.04', '0.98', '0.95', '1.02', '0.97', '0.99', '1.08', '0.88'];
+
+        for ($mes = 1; $mes <= 11; $mes++) {
+            foreach ($lineas as $n => [$sede, $rubro, $mensual, $distintos]) {
+                $monto = (string) ($distintos[$mes] ?? $mensual);
+
+                if (bccomp($monto, '0', 2) === 0) {
+                    continue;
+                }
+
+                $factor = str_starts_with($rubro, 'Alquiler') || $rubro === 'Seguros' ? '1' : $variaciones[($mes + $n) % count($variaciones)];
+
+                // Oficina Lima se pasa en octubre con la movilidad (una visita larga al GORE), con su motivo.
+                if ($sede === 1 && $rubro === 'Movilidad y viáticos' && $mes === 10) {
+                    $factor = '1.85';
+                }
+
+                $gasto = bcadd(bcmul($monto, $factor, 4), '0.005', 2);
+                $fecha = CarbonImmutable::parse(sprintf('2026-%02d-%02d', $mes, 8 + $n));
+                $codigoCc = match (true) {
+                    str_contains($rubro, 'Publicidad') => 'COM', str_contains($rubro, 'Capacitación') => 'RRHH', $sede === 2 => 'SUM', default => 'ADM'
+                };
+                $saldo = $s->saldo(2026, $sedes[$sede] === 'empresa' ? null : (int) $sedes[$sede], $mes)['saldo'];
+                $motivo = bccomp($gasto, $saldo, 2) > 0 ? 'Viaje de una semana al GORE para la entrega de la red de datos.' : null;
+                $this->en($fecha, fn () => $s->gastoDirecto($sedes[$sede] === 'empresa' ? null : (int) $sedes[$sede], $rubro, $cc($codigoCc), $fecha, $gasto, $mes < 11 ? $gasto : '0',
+                    "{$rubro} · ".$fecha->translatedFormat('F'), $proveedores[$n % count($proveedores)], $motivo ?? (bccomp($gasto, $saldo, 2) > 0 ? 'Ajuste de tarifa del proveedor.' : null)));
+            }
+        }
+
+        // Un traspaso: en noviembre, la sede principal cede movilidad a la Oficina Lima.
+        $desde = (int) DB::table('presupuesto_empresa_lineas')->where('presupuesto_empresa_id', $p)->where('sede_id', $sedes[0])->where('rubro', 'Movilidad y viáticos')->value('id');
+        $hacia = (int) DB::table('presupuesto_empresa_lineas')->where('presupuesto_empresa_id', $p)->where('sede_id', $sedes[1])->where('rubro', 'Movilidad y viáticos')->value('id');
+        $this->en('2026-11-12', fn () => $s->traspasar($desde, 12, $hacia, 11, '600.00', 'La Oficina Lima tiene más visitas por la cartera del GORE.'));
     }
 }

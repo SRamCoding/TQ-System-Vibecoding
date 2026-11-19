@@ -13,6 +13,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t1-campanias](fichas/t1-campanias.md) | T1 | aprobada | v1 | `aprobado/t1-campanias-v1` |
 | [t2-contratos](fichas/t2-contratos.md) | T2 | aprobada | v1 | `aprobado/t2-contratos-v1` |
 | [t2-formula-polinomica](fichas/t2-formula-polinomica.md) | T2 | aprobada | v1 | `aprobado/t2-formula-polinomica-v1` |
+| [t2-presupuesto-empresa](fichas/t2-presupuesto-empresa.md) | T2 | aprobada | v1 | `aprobado/t2-presupuesto-empresa-v1` |
 
 ## Registro del repositorio
 

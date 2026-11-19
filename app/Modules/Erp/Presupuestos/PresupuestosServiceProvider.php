@@ -127,7 +127,7 @@ final class PresupuestosServiceProvider extends ServiceProvider
         $this->app->bind(FuenteDeDestinos::class, DestinosDePresupuestos::class);
         // Plan 2.2, D8: solo existe con el modo desarrollo activo (responde 404 sin él). En `register`: el panel se arma
         // antes del `boot` de los módulos, como hace el núcleo con sus pantallas.
-        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [ProbarSelectorImputacion::class], recursos: [PresupuestoResource::class]);
+        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [ProbarSelectorImputacion::class, Filament\PresupuestoDeLaEmpresa::class], recursos: [PresupuestoResource::class]);
     }
 
     public function boot(): void
@@ -194,6 +194,17 @@ final class PresupuestosServiceProvider extends ServiceProvider
         ));
 
         // Plan 2.61, D6: lo del área 1 en el Resumen de la ficha del proyecto.
+        // MVP rápido (t2-presupuesto-empresa): el presupuesto de lo que gasta la empresa fuera de los proyectos.
+        $permisos = $this->app->make(RegistroPermisos::class);
+        $permisos->declarar(Services\PresupuestoEmpresaService::PERMISO_VER, 'Ver el presupuesto de la empresa');
+        $permisos->declarar(Services\PresupuestoEmpresaService::PERMISO_GESTIONAR, 'Formular el presupuesto de la empresa y registrar gasto directo');
+        $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
+            'presupuesto-empresa', 'Presupuesto de la empresa', '/presupuesto-empresa', permiso: Services\PresupuestoEmpresaService::PERMISO_VER, area: AreaModulo::Erp,
+            icono: 'heroicon-o-building-office-2',
+            descripcion: 'Lo que la empresa gasta fuera de los proyectos, por sede y mes, contra lo presupuestado',
+            preguntas: ['¿Cuánto le queda a esta sede este mes?', '¿Qué sede pasó su presupuesto?', '¿Cuánto gastamos en movilidad?'],
+        ));
+
         $tarjetas = $this->app->make(RegistroTarjetasResumen::class);
         $tarjetas->registrar(new TarjetaDinero);
         $tarjetas->registrar(new TarjetaPartidasExcedidas);

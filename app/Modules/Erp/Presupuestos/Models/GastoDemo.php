@@ -22,7 +22,7 @@ class GastoDemo extends Model
 {
     protected $table = 'gastos_demo';
 
-    protected $fillable = ['numero', 'proyecto_id', 'partida_control_id', 'descripcion', 'proveedor', 'fecha', 'monto', 'created_by'];
+    protected $fillable = ['numero', 'proyecto_id', 'partida_control_id', 'descripcion', 'proveedor', 'fecha', 'monto', 'created_by', 'sede_id', 'rubro', 'centro_costo_id', 'es_gasto_directo', 'motivo_exceso'];
 
     protected function casts(): array
     {

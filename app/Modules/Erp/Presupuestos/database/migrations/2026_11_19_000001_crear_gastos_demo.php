@@ -18,8 +18,14 @@ return new class extends Migration
         Schema::create('gastos_demo', function (Blueprint $table): void {
             $table->id();
             $table->string('numero', 20)->unique();
-            $table->foreignId('proyecto_id')->index()->constrained('proyectos');
-            $table->foreignId('partida_control_id')->index()->constrained('partidas_control');
+            $table->foreignId('proyecto_id')->nullable()->index()->constrained('proyectos');
+            $table->foreignId('partida_control_id')->nullable()->index()->constrained('partidas_control');
+            // MVP rápido (t2-presupuesto-empresa): el gasto directo (sin proyecto) lleva su sede (nula = «Empresa»), su rubro y su centro de costo.
+            $table->foreignId('sede_id')->nullable()->index()->constrained('party_sedes');
+            $table->string('rubro', 60)->nullable();
+            $table->foreignId('centro_costo_id')->nullable()->constrained('centros_costo');
+            $table->boolean('es_gasto_directo')->default(false)->index();
+            $table->string('motivo_exceso', 300)->nullable();
             $table->string('descripcion', 200);
             $table->string('proveedor', 150);
             $table->date('fecha');
