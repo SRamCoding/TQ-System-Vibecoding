@@ -33,6 +33,7 @@ return [
     ValorizacionesServiceProvider::class,
     FinanzasServiceProvider::class,
     PostventaServiceProvider::class,
+    App\Modules\Erp\Tableros\TablerosServiceProvider::class,
     CuentasServiceProvider::class,
     ActividadesServiceProvider::class,
     OportunidadesServiceProvider::class,
