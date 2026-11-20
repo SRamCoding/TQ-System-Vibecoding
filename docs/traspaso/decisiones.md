@@ -523,3 +523,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 4: filtros de Tickets de ayuda»
+
+### MV-041 · 2026-11-20 · Las filas se mueven al filtrar u ordenar
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones, punto 5) «Cada vez que se presiona un filtro (una pestaña, un filtro en botón, el
+  buscador, el orden), la animación es la propia de una tabla: las filas se mueven. Las que siguen se deslizan, las que
+  salen se desvanecen y se recogen hacia arriba, las que entran aparecen desde un poco más abajo, una tras otra (unos
+  40 ms). Unos 300 ms. Vale para todas las tablas y listas».
+- **Decisión:** lo dicho, en toda tabla y lista que se filtra u ordena, y en los tableros de tarjetas; sin animación con
+  «reducir movimiento» o «reducir animaciones».
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 5: las filas se mueven al filtrar»

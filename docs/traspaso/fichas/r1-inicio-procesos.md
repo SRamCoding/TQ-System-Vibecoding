@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v8
+- **Versión:** v9
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-041** (cruza módulos) · Al filtrar u ordenar, las filas se deslizan, salen recogiéndose y entran escalonadas.
 - **MV-039** (cruza módulos) · Ninguna pantalla lleva texto que explique cómo funciona; quedan datos, etiquetas y
   mensajes.
 - **MV-038** (ficha) · Tickets de ayuda lleva su ícono propio: el ticket con audífonos de soporte.
@@ -138,6 +139,12 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   del XML…», «Pega desde Excel…», «Busca a la persona…») y 8 de secciones (Mis datos, Roles, Vista previa de fechas,
   Líneas del requerimiento, «La empresa» de la cuenta, Falta el gerente general).
 
+- **Filas que se mueven (MV-041):** en cada actualización de una pantalla con filas (las de toda tabla de Filament y
+  las marcadas `data-tq-fila`, como las tarjetas del Tablero de pagos), se recuerda dónde estaba cada fila por su clave;
+  después, las que siguen se deslizan de su lugar viejo al nuevo (300 ms, suave al final), las nuevas suben 8 px
+  apareciendo con 40 ms entre una y otra (hasta 8 escalones) y las que salieron dejan una copia que se desvanece y se
+  recoge hacia arriba (220 ms). Quietas con «reducir movimiento» o «reducir animaciones».
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -186,6 +193,10 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Atajos tomados
 
+- **La animación de filas** es un solo script global que mira cada actualización de Livewire; no distingue un filtro de
+  otra acción (una fila que cambia de lugar por cualquier motivo también se desliza). Los tableros de tarjetas fuera del
+  Tablero de pagos (p. ej. el de oportunidades) no se marcaron todavía.
+
 - **«El contenido aparece debajo, sin ir a otra página»** se logra con la navegación sin recarga de Livewire (MV-037):
   técnicamente cada caja sigue siendo su propia página, que reemplaza solo el contenido. El repo original (Vue) lo hace como rutas hijas dentro de la vista del proceso.
 - **El orden se guarda** por una ruta propia (`POST /procesos/{proceso}/orden`), no por una acción registrada, y no
@@ -207,6 +218,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v9** (MV-041): las filas se mueven al filtrar u ordenar.
 
 - **v8** (MV-039): se quitan los textos explicativos de cabeceras, ventanas y secciones.
 

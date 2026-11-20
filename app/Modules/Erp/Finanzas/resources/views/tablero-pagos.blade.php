@@ -10,7 +10,7 @@
                 <div class="max-h-[70vh] space-y-2 overflow-y-auto">
                     @foreach ($col['tarjetas'] as $c)
                         @php $vencida = $c->estado !== 'pagado' && $c->vencimiento->toDateString() < \App\Modules\Nucleo\Tiempo\Calendario::hoy(); @endphp
-                        <div class="rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
+                        <div data-tq-fila="pago-{{ $c->id }}" class="rounded-lg bg-white p-3 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
                             <div class="flex justify-between gap-2 text-sm">
                                 <span class="font-medium">{{ $c->razon_social }}</span>
                                 <span class="font-mono">{{ number_format((float) $c->total, 2) }}</span>

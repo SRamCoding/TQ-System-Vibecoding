@@ -124,6 +124,8 @@ final class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => ModoDesarrollo::activo() ? Livewire::mount(BarraDesarrollo::class) : '')
             // Plan 1.3d: fondo propio de la barra superior y estado guardado de la barra lateral.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.navegacion')->render())
+            // MV-041: al filtrar u ordenar, las filas de toda tabla o lista se mueven en vez de cambiar de golpe.
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.animacion-tablas')->render())
             // MV-035: arriba de cada pantalla de un proceso, su barra de cajas y su frase.
             ->renderHook(PanelsRenderHook::PAGE_START, fn (): string => rescue(fn (): string => ($u = $this->usuario()) !== null && ($datos = app(NavegacionService::class)->procesoDeRuta($u, BarraModulos::rutaActual())) !== null ? view('nucleo::filament.procesos.pestanas', ['datos' => $datos])->render() : '', ''))
             // Plan 1.4ab: la escala de letra del prototipo de Proyectos y la línea fina bajo la barra superior.
