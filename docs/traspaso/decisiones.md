@@ -578,3 +578,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 2.1: la barra de cajas quieta, la marca se desliza»
+
+### MV-045 · 2026-11-20 · En las barras laterales internas, la marca de la opción elegida se desliza en vertical
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-2, punto 2) «El mismo comportamiento en las barras laterales internas de cada
+  módulo (Listas, Configuración…): la barra se queda quieta, conserva su desplazamiento; la marca de la opción elegida se
+  desliza en vertical de la anterior a la nueva, en el azul de resaltado, en unos 250 ms; solo cambia el contenido de la
+  derecha, sin recargar».
+- **Decisión:** lo dicho, en todas las barras laterales internas; con «reducir movimiento», la marca salta.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 2.2: la marca de las barras laterales internas se desliza»

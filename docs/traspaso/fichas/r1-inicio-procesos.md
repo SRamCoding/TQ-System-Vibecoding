@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v12
+- **Versión:** v13
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-045** (cruza módulos) · En las barras laterales internas, la marca de la opción elegida se desliza en vertical.
 - **MV-044** (cruza módulos) · La barra de cajas queda quieta entre pantallas; solo se desliza la marca de la elegida,
   en el color de su franja y bien distinta de sus vecinas.
 - **MV-043** (ficha) · La carga al cambiar de pantalla es energía que recorre la franja bajo la barra de arriba.
@@ -171,6 +172,12 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   nuevo aparece desvaneciéndose y subiendo 6 px (200 ms). Con «reducir movimiento» o «reducir animaciones», la marca
   salta y el contenido aparece de golpe.
 
+- **Barras laterales internas (MV-045):** en Configuración, Listas, Reglas del negocio y Usuarios, la opción elegida
+  ya no lleva el fondo de Filament: una marca propia (fondo azul de resaltado al 9 %, 14 % en oscuro, y una barrita de
+  3 px a la izquierda) se desliza en vertical desde la opción anterior hasta la nueva en 250 ms; la barra conserva su
+  desplazamiento. Solo cambia el contenido de la derecha (sin recargar), que aparece suave. Con «reducir movimiento» o
+  «reducir animaciones», la marca salta.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -219,6 +226,9 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Atajos tomados
 
+- **La barra lateral interna** la dibuja Filament en cada pantalla: no se conserva entre pantallas, se vuelve a dibujar
+  igual y el script le devuelve su desplazamiento y desliza la marca desde donde estaba (se ve quieta).
+
 - **La animación de filas** es un solo script global que mira cada actualización de Livewire; no distingue un filtro de
   otra acción (una fila que cambia de lugar por cualquier motivo también se desliza). Los tableros de tarjetas fuera del
   Tablero de pagos (p. ej. el de oportunidades) no se marcaron todavía.
@@ -244,6 +254,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v13** (MV-045): la marca de las barras laterales internas se desliza en vertical.
 
 - **v12** (MV-044): la barra de cajas se conserva entre pantallas y la marca de la elegida se desliza.
 
