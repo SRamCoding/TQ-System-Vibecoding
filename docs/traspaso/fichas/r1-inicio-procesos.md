@@ -22,6 +22,8 @@ menos una pantalla.
 - **MV-018** (ficha) · Las franjas se reparten solas en dos columnas de alto parecido; una vacía desaparece; en el
   celular, una columna.
 - **MV-019** (ficha) · Los colores siguen como estaban; los nuevos, se le consultan.
+- **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
+  titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
 - **MV-020** (cruza módulos) · Portada con cajas; dentro, pestañas con las hermanas y miga a la portada; la barra lateral
   muestra procesos.
 
@@ -62,6 +64,12 @@ menos una pantalla.
   **Organigrama** sale a `/organigrama`, en Directorio y catálogos.
 - **Fichas laborales** `/fichas-laborales` (antes «Personas» del flujo 9, que chocaba con `/personas` de Personas y
   empresas y no se podía abrir).
+
+- **Nombres (MV-029):** cada pantalla se titula como su caja: «Lo aprendido», «Convocatorias del SEACE», «Personal
+  asignado», «Tareo», «Órdenes», «Tickets y series», «Suscripciones», «Flujo de caja y conciliación», «Rendiciones»,
+  «Para el contador» y «Catálogo de productos» (antes decían otra cosa). «Ejecutar la obra» no aparecía en ninguna
+  pantalla ni dato de este repositorio: la regla queda para el repo original, donde ese paso del flujo se llama
+  «Ejecutar proyecto».
 
 ## Operaciones
 

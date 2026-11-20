@@ -359,3 +359,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** negocio
 - **Estado:** vigente
 - **Commit:** el de «Ronda 1 · paso 6: ofertas de proveedor y herramientas»
+
+### MV-029 · 2026-11-20 · «Ejecutar proyecto» y los nombres exactos de cajas y franjas
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** «"Ejecutar la obra" pasa a ser "Ejecutar proyecto" donde aparezca. Revisa que los nombres de las
+  cajas y los títulos de las franjas digan exactamente lo de arriba». Y después: «la franja se llama "Plataforma" y su
+  única caja se llama "Sistema" (igual que la franja Estratégicos tiene una sola caja, "Techquk"). Las cuatro franjas
+  llevan título».
+- **Decisión:** el nombre del paso es «Ejecutar proyecto», nunca «Ejecutar la obra». Las cajas, sus cajas internas y
+  los títulos de las franjas dicen exactamente lo de MV-016; cada pantalla se titula como su caja.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 7: nombres»

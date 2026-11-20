@@ -27,7 +27,7 @@ final class FlujoCaja extends Base implements HasTable
 
     protected static ?string $slug = 'flujo-caja';
 
-    protected static ?string $title = 'Flujo de caja y bancos';
+    protected static ?string $title = 'Flujo de caja y conciliación';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrows-up-down';
 

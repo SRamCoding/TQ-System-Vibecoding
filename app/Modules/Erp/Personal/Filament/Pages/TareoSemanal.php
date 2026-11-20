@@ -38,7 +38,7 @@ final class TareoSemanal extends Page implements HasTable
 
     protected static ?string $slug = 'tareo';
 
-    protected static ?string $title = 'Tareo semanal';
+    protected static ?string $title = 'Tareo';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 

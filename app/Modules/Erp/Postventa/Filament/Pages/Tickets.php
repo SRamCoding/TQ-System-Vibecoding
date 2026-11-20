@@ -35,7 +35,7 @@ final class Tickets extends Page implements HasTable
 
     protected static ?string $slug = 'postventa';
 
-    protected static ?string $title = 'Postventa · tickets';
+    protected static ?string $title = 'Tickets y series';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-wrench';
 

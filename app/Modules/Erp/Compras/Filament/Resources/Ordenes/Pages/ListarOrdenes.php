@@ -14,6 +14,6 @@ final class ListarOrdenes extends ListRecords
 
     public function getTitle(): string
     {
-        return 'Órdenes de compra y de servicio';
+        return 'Órdenes';
     }
 }

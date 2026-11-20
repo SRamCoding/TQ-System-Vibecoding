@@ -33,7 +33,7 @@ final class BandejaConvocatorias extends Page implements HasTable
 
     protected static ?string $slug = 'convocatorias';
 
-    protected static ?string $title = 'Bandeja de convocatorias';
+    protected static ?string $title = 'Convocatorias del SEACE';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-inbox-stack';
 

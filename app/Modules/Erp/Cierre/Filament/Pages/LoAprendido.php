@@ -23,7 +23,7 @@ final class LoAprendido extends Page implements HasTable
 
     protected static ?string $slug = 'lo-aprendido';
 
-    protected static ?string $title = 'Lo aprendido de los proyectos cerrados';
+    protected static ?string $title = 'Lo aprendido';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-light-bulb';
 

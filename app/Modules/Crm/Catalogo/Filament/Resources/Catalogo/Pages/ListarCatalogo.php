@@ -21,6 +21,9 @@ final class ListarCatalogo extends ListRecords
 {
     protected static string $resource = CatalogoResource::class;
 
+    /** MV-029: el título dice lo mismo que su caja. */
+    protected static ?string $title = 'Catálogo de productos';
+
     public function getSubheading(): string
     {
         return 'Es el mismo catálogo que usan compras y almacén en el ERP: un solo maestro. Los precios no se sobrescriben: cada cambio crea un registro con su vigencia.';

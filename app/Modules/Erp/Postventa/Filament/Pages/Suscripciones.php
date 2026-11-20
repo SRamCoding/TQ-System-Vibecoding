@@ -26,7 +26,7 @@ final class Suscripciones extends Page implements HasTable
 
     protected static ?string $slug = 'suscripciones';
 
-    protected static ?string $title = 'Cartera de suscripciones';
+    protected static ?string $title = 'Suscripciones';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrow-path-rounded-square';
 

@@ -20,7 +20,7 @@ final class ExportarContador extends Base
 {
     protected static ?string $slug = 'exportar-contador';
 
-    protected static ?string $title = 'Exportar para el contador';
+    protected static ?string $title = 'Para el contador';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 

@@ -33,7 +33,7 @@ final class Asignacion extends Page implements HasTable
 
     protected static ?string $slug = 'asignacion';
 
-    protected static ?string $title = 'Personal y asignación';
+    protected static ?string $title = 'Personal asignado';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 

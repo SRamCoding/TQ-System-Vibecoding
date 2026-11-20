@@ -35,7 +35,7 @@ final class Rendiciones extends Base implements HasTable
 
     protected static ?string $slug = 'rendiciones';
 
-    protected static ?string $title = 'Fondos y rendiciones';
+    protected static ?string $title = 'Rendiciones';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-receipt-percent';
 
