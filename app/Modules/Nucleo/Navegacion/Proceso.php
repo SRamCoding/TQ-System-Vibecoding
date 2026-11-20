@@ -62,7 +62,7 @@ enum Proceso: string
         return match ($this) {
             self::Mien => 'heroicon-o-star',
             self::Techquk => 'heroicon-o-flag',
-            self::ConseguirNegocio => 'heroicon-o-rocket-launch',
+            self::ConseguirNegocio => 'tq-montana-bandera', // MV-030: la montaña con la bandera en la cima
             self::GerenciaProyectos => 'heroicon-o-briefcase',
             self::Abastecer => 'heroicon-o-truck',
             self::FacturacionCobranza => 'heroicon-o-currency-dollar',

@@ -22,6 +22,7 @@ menos una pantalla.
 - **MV-018** (ficha) · Las franjas se reparten solas en dos columnas de alto parecido; una vacía desaparece; en el
   celular, una columna.
 - **MV-019** (ficha) · Los colores siguen como estaban; los nuevos, se le consultan.
+- **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
 - **MV-020** (cruza módulos) · Portada con cajas; dentro, pestañas con las hermanas y miga a la portada; la barra lateral
@@ -70,6 +71,9 @@ menos una pantalla.
   «Para el contador» y «Catálogo de productos» (antes decían otra cosa). «Ejecutar la obra» no aparecía en ninguna
   pantalla ni dato de este repositorio: la regla queda para el repo original, donde ese paso del flujo se llama
   «Ejecutar proyecto».
+
+- **Íconos propios de procesos:** Conseguir el negocio usa `tq-montana-bandera` (MV-030): de línea, 24 × 24, trazo
+  1,9, `currentColor`, sin texto; referencia en `docs/vibe/referencias/`.
 
 ## Operaciones
 

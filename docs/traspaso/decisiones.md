@@ -372,3 +372,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Ronda 1 · paso 7: nombres»
+
+### MV-030 · 2026-11-20 · Ícono propio de «Conseguir el negocio»: la montaña con la bandera
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/icono-conseguir-el-negocio.md`) «una montaña de dos picos con una bandera
+  clavada en la cima del pico principal: ganar el negocio es llegar a la cima. Solo el dibujo, sin ningún texto».
+- **Decisión:** la caja usa un ícono propio de línea, de 24 × 24, trazo 1,9 y un solo color (el de su franja): el pico
+  principal a la izquierda, el más bajo detrás a la derecha, una línea de nieve en zigzag en cada uno, el mástil en la
+  cima y un banderín con muesca en «V». Va en el inicio, la barra lateral y la portada. Referencia en
+  `docs/vibe/referencias/icono-conseguir-el-negocio.png`.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Pedido 1: ícono de Conseguir el negocio»
