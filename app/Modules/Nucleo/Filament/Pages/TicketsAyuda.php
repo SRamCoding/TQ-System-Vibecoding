@@ -28,7 +28,7 @@ final class TicketsAyuda extends Page implements HasTable
 
     protected static ?string $title = 'Tickets de ayuda';
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-lifebuoy';
+    protected static string|BackedEnum|null $navigationIcon = 'tq-ticket-soporte';
 
     protected static bool $shouldRegisterNavigation = false;
 

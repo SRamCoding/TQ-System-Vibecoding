@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v6
+- **Versión:** v7
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-038** (ficha) · Tickets de ayuda lleva su ícono propio: el ticket con audífonos de soporte.
 - **MV-037** (cruza módulos) · Cambiar de pantalla sin recargar: solo cambia el contenido; el marco queda quieto.
 - **MV-036** (ficha) · La frase debajo de las cajas, chica y apagada; reordenar con una copia que sigue al puntero
   y las demás corriéndose en vivo, como en el muelle.
@@ -96,7 +97,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 
 - **Íconos propios de procesos:** Conseguir el negocio usa `tq-montana-bandera` (MV-030): de línea, 24 × 24, trazo
   1,9, `currentColor`, sin texto; Postventa usa `tq-rompecabezas-flecha` (MV-031), con una lengüeta por borde interior
-  para que no se empaste. Referencias en `docs/vibe/referencias/`.
+  para que no se empaste. Tickets de ayuda usa `tq-ticket-soporte` (MV-038). Referencias en
+  `docs/vibe/referencias/`.
 
 - **La ventana (MV-032):** 168 × 180, arco de medio punto, alféizar, travesaños donde empieza el arco y a media altura
   de la parte recta, parante al centro; marco `#6B4A2E` (5 px; travesaños 3 px), `#A07850` en oscuro. Adentro, recortada
@@ -190,6 +192,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v7** (MV-038): ícono propio de Tickets de ayuda.
 
 - **v6** (MV-037): navegación sin recarga en todo el panel; lo vivo se conserva entre pantallas.
 

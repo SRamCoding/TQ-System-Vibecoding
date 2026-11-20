@@ -484,3 +484,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 1: cambiar de pantalla sin recargar»
+
+### MV-038 · 2026-11-20 · Ícono propio de «Tickets de ayuda»: el ticket con audífonos de soporte
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones, punto 2) «La caja Tickets de ayuda lleva un ícono propio: un ticket con unos
+  audífonos de soporte».
+- **Decisión:** ícono de línea, 24 × 24, trazo 1,9, un solo color: el boleto ancho (casi todo el lienzo) con una muesca
+  en cada lado, los audífonos con micrófono a la izquierda y dos líneas de texto a la derecha. En su caja, la barra y su
+  pantalla. Referencia en `docs/vibe/referencias/icono-tickets-de-ayuda.png`.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 2: ícono de Tickets de ayuda»
