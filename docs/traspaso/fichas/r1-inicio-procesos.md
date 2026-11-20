@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v10
+- **Versión:** v11
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-043** (ficha) · La carga al cambiar de pantalla es energía que recorre la franja bajo la barra de arriba.
 - **MV-042** (cruza módulos) · Un solo azul de resaltado (azul noche; `#6F9BFF` en oscuro) para lo elegido; la franja
   solo en la barra lateral principal, las cajas, la frase y los íconos.
 - **MV-041** (cruza módulos) · Al filtrar u ordenar, las filas se deslizan, salen recogiéndose y entran escalonadas.
@@ -130,7 +131,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **Sin recargar (MV-037):** el panel navega sin recargar la página (modo SPA de Filament y `wire:navigate` en los
   enlaces propios: barra de cajas del proceso, estrella de Mien, tarjetas y tablero de Mien). La barra lateral, el
   encabezado y el marco se quedan; el muelle, la agenda, el asistente, el cielo, la ambientación y el guardado del tema
-  se conservan vivos entre pantallas (`x-persist`). Mientras carga, la barra fina de progreso de Livewire. Las cajas del
+  se conservan vivos entre pantallas (`x-persist`). Mientras carga, la **franja de energía** (MV-043). Las cajas del
   inicio, en escritorio, siguen abriendo su proceso en otra pestaña (plan 1.4f, D10); en el celular, sin recargar.
 
 - **Sin textos explicativos (MV-039):** las cabeceras de las pantallas solo muestran datos: se quitó la explicación y se
@@ -152,6 +153,13 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   que usaba el morado o el turquesa para resaltar algo elegido pasa al azul: la tarjeta de proyecto y la de oportunidad
   al pasar el mouse, la columna sobre la que se suelta en el tablero de oportunidades y la fila puesta de su botonera.
   Los filtros activos de Tickets de ayuda, también en azul.
+
+- **La franja de energía (MV-043):** 3 px, fija justo bajo la barra superior, invisible en reposo. Al empezar un cambio
+  de pantalla se enciende y se llena de izquierda a derecha (rápido al principio y cada vez más lento, hasta el 88 % en
+  2,4 s) con un degradado del azul de resaltado a celeste y un resplandor; dos chispas blancas con estela la recorren
+  por lo cargado, desfasadas (1,1 s cada una, en bucle). Al llegar la pantalla, se completa (180 ms), una última chispa
+  cruza todo el ancho y se apaga (450 ms). Con «reducir movimiento» o «reducir animaciones», se llena sin chispas. La
+  barra de progreso propia de Livewire se apagó (`config/livewire.php`, `navigate.show_progress_bar`).
 
 ## Operaciones
 
@@ -226,6 +234,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v11** (MV-043): la señal de carga pasa a ser la franja de energía bajo la barra de arriba.
 
 - **v10** (MV-042): un solo azul de resaltado en todo el sistema.
 

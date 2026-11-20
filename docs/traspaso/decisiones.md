@@ -551,3 +551,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 6: un solo azul de resaltado»
+
+### MV-043 · 2026-11-20 · La carga se ve como energía que recorre la franja bajo la barra de arriba
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** «para dar la sensación de carga utiliza la franja de abajo del ícono de Techquk» (eligió la
+  franja fina bajo la barra superior, entre las opciones que le dio el agente) y «haz una sensación de que comienza a
+  pasar una carga de energía por esa franja».
+- **Decisión:** al cambiar de pantalla, la franja bajo la barra de arriba se carga de izquierda a derecha con un brillo
+  azul y chispas que la recorren; al llegar la pantalla, se completa, destella y se apaga. Reemplaza la barra de
+  progreso de Livewire. Precisa MV-037.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «La carga como energía en la franja de arriba»

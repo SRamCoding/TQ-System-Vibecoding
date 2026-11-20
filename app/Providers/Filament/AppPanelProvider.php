@@ -108,6 +108,8 @@ final class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.apariencia')->render())
             // MVP rápido (MV-012): en el tema «Sistema», la pantalla sigue el cielo (en curso).
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => self::persistir('tq-cielo', view('nucleo::filament.cielo')->render()))
+            // MV-043: al cambiar de pantalla, una carga de energía recorre la franja bajo la barra de arriba.
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? self::persistir('tq-energia', view('nucleo::filament.carga-energia')->render()) : '')
             // MVP rápido (op-asistente): el asistente de ayuda «n_n».
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => self::persistir('tq-asistente', view('nucleo::filament.asistente')->render()))
             // MVP rápido (op-gran-momento): la ambientación de pantalla completa de Navidad y Año Nuevo.

@@ -21,4 +21,13 @@ return [
         'max_upload_time' => 5,
         'cleanup' => true,
     ],
+
+    /*
+    | MV-043: la señal de carga al cambiar de pantalla es la franja de energía bajo la barra de arriba
+    | (nucleo::filament.carga-energia), no la barra de progreso de Livewire.
+    */
+    'navigate' => [
+        'show_progress_bar' => false,
+        'progress_bar_color' => '#2299dd',
+    ],
 ];
