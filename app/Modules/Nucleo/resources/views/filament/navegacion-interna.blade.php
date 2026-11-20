@@ -125,12 +125,27 @@
 
         // MV-052: la estrella de Mien de la barra lateral principal abre su globo; Ctrl, Cmd, Shift o la rueda abren Mien
         // en otra pestaña, como cualquier enlace.
+        // Livewire empieza a navegar al presionar el botón (mousedown) y suelta al levantarlo, y con Enter: por eso se
+        // detienen esos eventos además del clic, antes de que lleguen al enlace.
+        const estrellaMien = (e) => e.target.closest?.('.fi-main-sidebar [data-modulo="mien"] a, .fi-main-sidebar a[data-modulo="mien"]')
+        const conModificador = (e) => e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || (e.button !== undefined && e.button !== 0)
+        const abrirGlobo = (enlace) => window.dispatchEvent(new CustomEvent('tq-globo-mien', { detail: { rect: (enlace.querySelector('.fi-sidebar-item-icon') ?? enlace).getBoundingClientRect() } }))
+        for (const tipo of ['mousedown', 'mouseup', 'pointerdown', 'pointerup']) {
+            document.addEventListener(tipo, (e) => { if (estrellaMien(e) && ! conModificador(e)) e.stopImmediatePropagation() }, true)
+        }
         document.addEventListener('click', (e) => {
-            const enlace = e.target.closest?.('.fi-main-sidebar [data-modulo="mien"] a, .fi-main-sidebar a[data-modulo="mien"]')
-            if (! enlace || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return
+            const enlace = estrellaMien(e)
+            if (! enlace || conModificador(e)) return
             e.preventDefault()
             e.stopImmediatePropagation()
-            window.dispatchEvent(new CustomEvent('tq-globo-mien', { detail: { rect: (enlace.querySelector('.fi-sidebar-item-icon') ?? enlace).getBoundingClientRect() } }))
+            abrirGlobo(enlace)
+        }, true)
+        document.addEventListener('keydown', (e) => {
+            const enlace = estrellaMien(e)
+            if (! enlace || e.key !== 'Enter' || conModificador(e)) return
+            e.preventDefault()
+            e.stopImmediatePropagation()
+            abrirGlobo(enlace)
         }, true)
 
         // MV-051: el degradado que avisa que hay más, y el elemento enfocado con teclado siempre a la vista.
