@@ -1,9 +1,10 @@
 # Ficha · Licitaciones (CRM-04)
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Versión:** v2
 - **Tramo de la ruta:** T1
-- **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
+- **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
+- **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-2-crm.md` (pasos 4 y 5 del recorrido comercial);
   `docs/analisis/bloques/crm-pantallas.md` (CRM-04, 15 pantallas); DBML `convocatorias`, `convocatoria_cronograma`,
   `participaciones`, `participacion_documentos`, `participacion_resultado`.
@@ -42,7 +43,7 @@ perdida con el ganador y su precio.
 - **Botones de la ficha** según el estado: Participar · No participar (por decidir); Aceptar lista sugerida ·
   Registrar propuesta (en preparación); Registrar resultado (presentada); Ir a la oportunidad (siempre que haya).
 
-Quedan fuera de esta versión, del inventario de 15 pantallas: bandeja de convocatorias del SEACE, calendario de
+Quedan fuera de esta versión, del inventario de 15 pantallas: calendario de
 cronogramas, «Lo que me tocó», y las pestañas Análisis, Preparación y Propuesta como pantallas aparte (la propuesta se
 registra con un botón).
 
@@ -110,3 +111,26 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 `app/Modules/Crm/Licitaciones/` (provider, `Services/LicitacionesService.php`, modelos, enums,
 `Filament/Resources/Licitaciones/` con la lista, la ficha y sus cuatro pestañas); datos en
 `database/seeders/Demo/CarteraDemo.php` (`licitaciones()`, `competidores()`) y `DemoSeeder::licitaciones()`.
+
+## Cambios desde la versión anterior
+
+v2 (2026-11-20, pedido de Sebastián: «sí, hazlo»): **Bandeja de convocatorias del SEACE** (`/convocatorias`, caja
+«Convocatorias del SEACE»). Las convocatorias llegan de los datos abiertos de contrataciones del OECE en el estándar
+OCDS (paquetes de releases o records): solo entran las que mencionan alguna de las palabras clave de Techquk (parámetro
+`crm.seace_palabras_clave`: videovigilancia, cámaras, CCTV, red de datos, cableado estructurado, fibra óptica, switch,
+servidor, centro de datos, software, sistema de información, telemetría, wifi, inalámbrico) y pasan el valor mínimo
+(parámetro `crm.seace_valor_minimo`, 20,000). La tabla muestra convocatoria y tipo, objeto con entidad y región, si la
+entidad ya es cuenta, valor referencial, presentación (rojo a menos de 5 días) y con qué palabras coincide; filtro
+nuevas, registradas, descartadas o todas. **Registrar** crea la licitación «por decidir» con nomenclatura, tipo,
+objeto, valor y cronograma (convocatoria, consultas, absolución, integración, presentación y buena pro del release; las
+que no trae, a +6, +11, +14 días) y la cuenta de la entidad si no existe (pública, nivel por el nombre: municipalidad →
+local; regional, UGEL, proyecto especial → regional; si no, nacional). **Descartar** con motivo de una lista. «Ver en
+el SEACE» abre el enlace del documento. Arriba: **Leer ahora del OECE** y **Importar archivo OCDS**. La lectura corre
+sola cada día a las 7:00 (`php artisan seace:leer`).
+
+Demo: 9 releases inventados importados con el mismo lector; entran 6 (los de pistas, uniformes y un mantenimiento de
+12,500 quedan fuera); el del GORE se registró como licitación y el de farmacia del hospital se descartó.
+
+Supuesto: **la dirección del servicio del OECE no se confirmó** (el dominio cambió del OSCE al OECE); se configura en
+`OECE_OCDS_URL` y se le pasa `since`. Hasta tenerla, «Leer ahora» lo avisa y la bandeja se llena importando el archivo
+del portal de datos abiertos. Atajos: sin acción registrada; la cuenta de la entidad no consulta el padrón de SUNAT.

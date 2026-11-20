@@ -21,6 +21,7 @@ use App\Modules\Crm\Cuentas\Services\DatosCuenta;
 use App\Modules\Crm\Licitaciones\Enums\EstadoLicitacion;
 use App\Modules\Crm\Licitaciones\Enums\TipoProcedimiento;
 use App\Modules\Crm\Licitaciones\Models\Licitacion;
+use App\Modules\Crm\Licitaciones\Services\ConvocatoriasSeaceService;
 use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
 use App\Modules\Crm\Oportunidades\Enums\GanadorConocido;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
@@ -161,6 +162,9 @@ final class DemoSeeder extends Seeder
                 $a->abrirTicket($this->jefes['diego'], 'No me deja cerrar la semana de tareo: dice que la semana no tiene horas.', '/tareo', "Persona: no me deja cerrar la semana\nAsistente: Lo siento. Si quieres, abro un ticket.");
                 $a->abrirTicket($this->dev, 'El PDF de la cotización sale sin el logo.', '/cotizaciones/12', "Persona: el pdf sale sin logo, es un error\nAsistente: Lo siento. Si quieres, abro un ticket.");
             });
+
+            $this->command?->info('Demo: bandeja de convocatorias del SEACE');
+            $this->en('2026-11-19', fn () => $this->convocatoriasSeace());
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -1271,5 +1275,33 @@ final class DemoSeeder extends Seeder
         $ids = DB::table('solicitudes_permiso')->where('user_id', $vendedora->id)->orderBy('id')->pluck('id')->all();
         $s->conceder($ids[2], $rol->id, $this->dev);
         $s->rechazar($ids[3], 'Los precios del catálogo los cambia solo Compras.', $this->dev);
+    }
+
+    /** Una muestra OCDS inventada (ficha t1-licitaciones v2), importada por el mismo lector que usa la sincronización. */
+    private function convocatoriasSeace(): void
+    {
+        $ruc = fn (string $base): string => $base.DocumentoIdentidad::digitoVerificadorRuc($base);
+        $release = fn (string $ocid, string $nom, string $entidad, string $rucE, string $region, string $titulo, string $metodo, ?string $valor, string $pub, string $pres, string $bp) => [
+            'ocid' => "ocds-dgv273-{$ocid}", 'date' => "{$pub}T09:00:00-05:00", 'buyer' => ['id' => "PE-RUC-{$rucE}", 'name' => $entidad],
+            'parties' => [['id' => "PE-RUC-{$rucE}", 'name' => $entidad, 'identifier' => ['scheme' => 'PE-RUC', 'id' => $rucE], 'address' => ['region' => $region], 'roles' => ['buyer']]],
+            'tender' => ['id' => $nom, 'title' => $titulo, 'procurementMethodDetails' => $metodo, 'value' => $valor === null ? null : ['amount' => (float) $valor, 'currency' => 'PEN'],
+                'tenderPeriod' => ['endDate' => "{$pres}T23:59:00-05:00"], 'awardPeriod' => ['startDate' => "{$bp}T10:00:00-05:00"],
+                'documents' => [['url' => 'https://prod2.seace.gob.pe/seacebus-uiwd-pub/buscadorPublico/buscadorPublico.xhtml', 'documentType' => 'biddingDocuments']]],
+        ];
+        $paquete = ['uri' => 'demo', 'version' => '1.1', 'releases' => [
+            $release('1001', 'AS-SM-31-2026-MPVN-1', 'Municipalidad Provincial de Valle Norte', $ruc('2069910001'), 'Valle Norte', 'Adquisición e instalación de cámaras de videovigilancia para el malecón', 'Adjudicación Simplificada', '286000', '2026-11-16', '2026-12-02', '2026-12-09'),
+            $release('1002', 'LP-SM-12-2026-GRVN-1', 'Gobierno Regional de Valle Norte', $ruc('2069910005'), 'Valle Norte', 'Ampliación de la red de datos y fibra óptica de las sedes provinciales', 'Licitación Pública', '1450000', '2026-11-12', '2026-12-10', '2026-12-18'),
+            $release('1003', 'CP-SM-9-2026-HRVN-1', 'Hospital Regional de Valle Norte', $ruc('2069910004'), 'Valle Norte', 'Implementación de software de gestión de farmacia y almacén', 'Concurso Público', '520000', '2026-11-18', '2026-12-15', '2026-12-22'),
+            $release('1004', 'AS-SM-7-2026-MDLP-1', 'Municipalidad Distrital de Las Palmeras', $ruc('2069960001'), 'Valle Norte', 'Servicio de instalación de wifi gratuito en plazas y parques', 'Adjudicación Simplificada', '98000', '2026-11-17', '2026-11-28', '2026-12-04'),
+            $release('1005', 'SIE-21-2026-DIRESA-VN-1', 'Dirección Regional de Salud Valle Norte', $ruc('2069960002'), 'Valle Norte', 'Adquisición de servidores y switch para el centro de datos regional', 'Subasta Inversa Electrónica', '640000', '2026-11-19', '2026-12-03', '2026-12-05'),
+            $release('1006', 'AS-SM-15-2026-UNVN-1', 'Universidad Nacional del Valle Norte', $ruc('2069910007'), 'Valle Norte', 'Cableado estructurado del nuevo pabellón de ingeniería', 'Adjudicación Simplificada', '240000', '2026-11-14', '2026-11-27', '2026-12-03'),
+            $release('1007', 'LP-SM-3-2026-MDLP-1', 'Municipalidad Distrital de Las Palmeras', $ruc('2069960001'), 'Valle Norte', 'Mejoramiento de pistas y veredas del jirón Libertad', 'Licitación Pública', '2300000', '2026-11-15', '2026-12-12', '2026-12-20'),
+            $release('1008', 'AS-SM-40-2026-UGEL-1', 'Unidad de Gestión Educativa Local Valle Norte', $ruc('2069910002'), 'Valle Norte', 'Adquisición de uniformes para el personal administrativo', 'Adjudicación Simplificada', '64000', '2026-11-18', '2026-11-30', '2026-12-05'),
+            $release('1009', 'COMPRE-88-2026-MPVN-1', 'Municipalidad Provincial de Valle Norte', $ruc('2069910001'), 'Valle Norte', 'Mantenimiento de cámaras de videovigilancia del centro histórico', 'Comparación de Precios', '12500', '2026-11-19', '2026-11-26', '2026-11-27'),
+        ]];
+        $s = app(ConvocatoriasSeaceService::class);
+        $s->importar((string) json_encode($paquete));
+        $s->registrar((int) DB::table('convocatorias_seace')->where('ocid', 'ocds-dgv273-1002')->value('id'), $this->dev);
+        $s->descartar((int) DB::table('convocatorias_seace')->where('ocid', 'ocds-dgv273-1003')->value('id'), 'No es nuestro rubro');
     }
 }

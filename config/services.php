@@ -44,4 +44,9 @@ return [
         'ruc' => env('SUNAT_RUC'),
     ],
 
+    // MVP rápido (t1-licitaciones v2): los datos abiertos de contrataciones del OECE (estándar OCDS).
+    'oece' => [
+        'ocds_url' => env('OECE_OCDS_URL'),
+    ],
+
 ];
