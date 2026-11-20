@@ -66,6 +66,7 @@ use App\Modules\Nucleo\Parties\DatosParty;
 use App\Modules\Nucleo\Parties\DatosSede;
 use App\Modules\Nucleo\Parties\DocumentoIdentidad;
 use App\Modules\Nucleo\Services\AprobacionesService;
+use App\Modules\Nucleo\Services\AsistenteService;
 use App\Modules\Nucleo\Services\ContactosPartyService;
 use App\Modules\Nucleo\Services\EmpresaService;
 use App\Modules\Nucleo\Services\OrganigramaService;
@@ -154,6 +155,12 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: solicitudes de permiso');
             $this->solicitudesPermiso();
+
+            $this->en('2026-11-18', function (): void {
+                $a = app(AsistenteService::class);
+                $a->abrirTicket($this->jefes['diego'], 'No me deja cerrar la semana de tareo: dice que la semana no tiene horas.', '/tareo', "Persona: no me deja cerrar la semana\nAsistente: Lo siento. Si quieres, abro un ticket.");
+                $a->abrirTicket($this->dev, 'El PDF de la cotización sale sin el logo.', '/cotizaciones/12', "Persona: el pdf sale sin logo, es un error\nAsistente: Lo siento. Si quieres, abro un ticket.");
+            });
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());

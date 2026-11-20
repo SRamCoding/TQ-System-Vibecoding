@@ -651,6 +651,7 @@ final class NucleoServiceProvider extends ServiceProvider
         // Plan 1.4l: «Mien», de todas las personas (sin permiso a propósito), en su área «Personal».
         // MVP rápido (op-solicitudes-permiso): los pedidos de permiso; quien administra roles los resuelve.
         $this->app->make(RegistroModulos::class)->registrar(new CajaModulo('solicitudes-permiso', 'Solicitudes de permiso', '/solicitudes-permiso', permiso: null, area: AreaModulo::Nucleo, icono: 'heroicon-o-key', descripcion: 'Los permisos que alguien pidió desde un botón bloqueado', preguntas: ['¿Quién pidió qué permiso?', '¿Me dieron el permiso que pedí?']));
+        $this->app->make(RegistroModulos::class)->registrar(new CajaModulo('tickets-ayuda', 'Tickets de ayuda', '/tickets-ayuda', permiso: null, area: AreaModulo::Nucleo, icono: 'heroicon-o-lifebuoy', descripcion: 'Los problemas que se reportaron al asistente', preguntas: ['¿Qué problemas reportaron?', '¿En qué quedó mi ticket?']));
         $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
             'mien', 'Mien', '/mien', permiso: null, area: AreaModulo::Personal, icono: 'heroicon-o-star',
             descripcion: 'Cómo va tu trabajo de un vistazo: tus pendientes, tus aprobaciones y los números de tu área.',
@@ -697,7 +698,7 @@ final class NucleoServiceProvider extends ServiceProvider
     {
         $this->app->make(RegistroPantallas::class)->registrar(
             'app',
-            paginas: [Configuracion::class, Catalogos::class, Alertas::class, InteligenciaArtificial::class, Seguridad::class, MisPreferencias::class, VistaPreviaFechas::class, RenovarClave::class, FaltaGerenteGeneral::class, MisDatos::class, Mien::class, MisAvisos::class, MisAprobaciones::class, SaludDelSistema::class, ConfiguracionInicial::class, RolesPermisos::class, Filament\Pages\SolicitudesPermiso::class],
+            paginas: [Configuracion::class, Catalogos::class, Alertas::class, InteligenciaArtificial::class, Seguridad::class, MisPreferencias::class, VistaPreviaFechas::class, RenovarClave::class, FaltaGerenteGeneral::class, MisDatos::class, Mien::class, MisAvisos::class, MisAprobaciones::class, SaludDelSistema::class, ConfiguracionInicial::class, RolesPermisos::class, Filament\Pages\SolicitudesPermiso::class, Filament\Pages\TicketsAyuda::class],
             recursos: [ParametroResource::class, TipoCambioResource::class, EstadoResource::class, MotivoResource::class, SerieDocumentoResource::class, ReglaAprobacionResource::class, PartyResource::class, UsuarioResource::class, UnidadOrganizativaResource::class, ConflictoResource::class, IncompatibilidadResource::class],
         );
     }
