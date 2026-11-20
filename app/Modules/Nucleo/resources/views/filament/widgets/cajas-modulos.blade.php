@@ -280,6 +280,12 @@
 
         {{-- MV-016 a MV-018: Mien arriba, a lo ancho; debajo, las franjas en dos columnas de alto parecido (en el celular, una). --}}
         <style>
+            /* MV-053: el logo de Techquk en su caja, en el color de su franja (Estratégicos), del peso de sus vecinas. */
+            .tq-caja-logo { display: flex; color: var(--tq-area-color); }
+            .tq-inicio-cajas[data-tq-estacion] .tq-caja-logo { color: var(--tq-e-texto); }
+            .tq-logo-mono { display: inline-flex; flex-direction: column; align-items: center; gap: 0.45rem; }
+            .tq-logo-mono-simbolo { width: 2.6rem; height: calc(2.6rem * 0.85 * 119 / 122); }
+            .tq-logo-mono-nombre { font-family: 'Audiowide', ui-sans-serif, sans-serif; font-weight: 400; font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
             .tq-celda-ancha { width: 100%; height: 6.5rem; }
             .tq-celda-ancha:has(> .tq-activa) { width: 100%; height: 6.5rem; }
             .tq-celda-ancha .tq-caja-modulo { flex-direction: row; justify-content: flex-start; gap: 1rem; padding-inline: 1.5rem; text-align: left; }

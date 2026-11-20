@@ -41,7 +41,12 @@
         {{-- Plan 1.4r: el degradado del trazo del ícono (otoño, invierno), con un id por caja: hay varias en la página. Su
              sistema de coordenadas es el del ícono (24 × 24), así un trazo recto también lo toma. --}}
         <svg class="tq-caja-degradados" aria-hidden="true" focusable="false"><defs><linearGradient id="tq-trazo-{{ $caja->clave }}" gradientUnits="userSpaceOnUse" x1="2" y1="2" x2="22" y2="22"><stop offset="0" style="stop-color: var(--tq-e-icono1, currentColor)" /><stop offset="1" style="stop-color: var(--tq-e-icono2, currentColor)" /></linearGradient></defs></svg>
+        @if ($caja->clave === 'techquk')
+            {{-- MV-053: la caja Techquk lleva el logo con su nombre, que reemplaza al ícono y al texto «Techquk». --}}
+            <span class="tq-caja-logo" @if ($caja->preguntas !== []) x-show="! activa || final" @endif>@include('nucleo::filament.logo-monocromo', ['nombre' => true])</span>
+        @else
         <span class="tq-caja-modulo-marco"><x-filament::icon :icon="$caja->icono" class="tq-caja-modulo-icono" /></span>
+        @endif
         <x-filament::icon :icon="$caja->icono" class="tq-caja-marca-agua" aria-hidden="true" />
         {{-- Plan 1.4t: las hojas de otoño y la escarcha de invierno, distintas en cada caja; el CSS las muestra solo en su estación. --}}
         <span class="tq-caja-adornos" aria-hidden="true">{!! \App\Modules\Nucleo\Navegacion\AdornosDeEstacion::hojas($caja->clave) !!}{!! \App\Modules\Nucleo\Navegacion\AdornosDeEstacion::hielo($caja->clave) !!}</span>
@@ -51,7 +56,7 @@
                 <span class="tq-caja-modulo-nombre">{{ $caja->nombre }}</span>
                 <span class="tq-caja-modulo-descripcion">{{ $caja->descripcion }}</span>
             </span>
-        @else
+        @elseif ($caja->clave !== 'techquk')
             <span class="tq-caja-modulo-nombre">{{ $caja->nombre }}</span>
         @endif
         @if ($caja->preguntas !== [])

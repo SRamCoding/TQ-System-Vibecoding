@@ -679,3 +679,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 4.4: el globo de Mien en la barra lateral»
+
+### MV-053 · 2026-11-20 · La caja Techquk lleva el logo de Techquk con su nombre
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-4, punto 5) «La caja Techquk usa como ícono el logo completo de Techquk: el símbolo
+  y su nombre TECHQUK. En el color de la franja Estratégicos, en un solo color. El nombre en Audiowide, el símbolo
+  achatado al 85 %. Sale del mismo lugar que el logo del encabezado. Dentro de la caja, el logo con su nombre reemplaza
+  al texto "Techquk". En la barra lateral: expandida, el símbolo y TECHQUK; comprimida, solo el símbolo».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 4.5: el logo de Techquk en su caja»

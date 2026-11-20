@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v20
+- **Versión:** v21
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-053** (ficha) · La caja Techquk lleva el logo de Techquk con su nombre, en el color de Estratégicos.
 - **MV-052** (ficha) · La estrella de Mien en la barra lateral abre un globo con todos los pendientes; Ctrl + clic, Mien.
 - **MV-051** (cruza módulos) · Las barras laterales se ajustan al alto; en el extremo se desplazan sin barra, con degradado.
 - **MV-050** (cruza módulos) · La barra lateral solo se expande (ancho fijo) o se comprime (íconos), con un botón.
@@ -114,7 +115,11 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 
 - **Íconos propios de procesos:** Conseguir el negocio usa `tq-montana-bandera` (MV-030): de línea, 24 × 24, trazo
   1,9, `currentColor`, sin texto; Postventa usa `tq-rompecabezas-flecha` (MV-031), con una lengüeta por borde interior
-  para que no se empaste. Tickets de ayuda usa `tq-ticket-soporte` (MV-038). Referencias en
+  para que no se empaste. Tickets de ayuda usa `tq-ticket-soporte` (MV-038). **Techquk (MV-053):** en su caja, el logo en un solo color (el de
+  Estratégicos; el texto de la estación cuando la apariencia sigue la estación): el símbolo de tres piezas de
+  `LogoTechquk::PIEZAS` (de línea, con un relleno suave, achatado al 85 %) y debajo TECHQUK en Audiowide, en lugar del
+  ícono y del nombre; en la barra lateral, el símbolo (`tq-logo-techquk`) y el nombre en Audiowide y mayúsculas, solo el
+  símbolo con la barra comprimida. Referencias en
   `docs/vibe/referencias/`.
 
 - **La ventana (MV-032):** 168 × 180, arco de medio punto, alféizar, travesaños donde empieza el arco y a media altura
@@ -277,6 +282,9 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Atajos tomados
 
+- **El símbolo de Techquk de la barra lateral** es un SVG copiado de `LogoTechquk::PIEZAS` (`tq-logo-techquk`): si
+  cambia la forma del logo, hay que regenerarlo; el de la caja sí sale de las mismas piezas.
+
 - **Tabla y acción sin uso:** `modulos_ocultos` y la acción `nucleo.elegir-modulos` quedan en el código, vacías y sin
   pantalla; el repo original no las construye.
 
@@ -308,6 +316,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v21** (MV-053): el logo de Techquk en su caja y en la barra lateral.
 
 - **v20** (MV-052): el globo de Mien en la barra lateral.
 
