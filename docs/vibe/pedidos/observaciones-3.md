@@ -22,3 +22,15 @@ la derecha cambia, nada más (observación 2 de la segunda tanda).
 Requerimientos a Órdenes en Abastecer), ¿tampoco aparece el haz de luz?
 
 **Alcance:** cruza módulos.
+
+## 2. Falta quitar el título en las pantallas con barra lateral interna
+
+**Qué pasa hoy.** La observación 2.3 (segunda tanda) quitó el título grande en las pantallas normales, pero en las que
+tienen barra lateral interna sigue apareciendo: por ejemplo, en Directorio y catálogos › Listas, «Catálogos» arriba de
+la barra lateral.
+
+**Qué quiero.** Quitarlo ahí y en **todas** las pantallas con barra lateral interna (Configuración, Listas y las
+demás): debajo del nombre del módulo van directo la barra lateral y el contenido. Revisa todas las pantallas internas
+de los 11 procesos para que no quede ningún título grande, y dime si encontraste otros casos.
+
+**Alcance:** cruza módulos (completa la observación 2.3).
