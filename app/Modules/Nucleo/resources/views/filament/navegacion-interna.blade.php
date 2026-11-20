@@ -9,6 +9,11 @@
     vez (en el encabezado).
 --}}
 <style>
+    /* MV-046: sin ruta (miga de pan) en ninguna pantalla; sin título grande en la pantalla de una caja de proceso (lo dicen
+       la caja elegida y el nombre del módulo). */
+    .fi-breadcrumbs { display: none !important; }
+    html[data-tq-en-caja] .fi-header-heading { display: none; }
+    @font-face { font-family: 'Audiowide'; src: url('{{ asset('fonts/audiowide/audiowide-latin.woff2') }}') format('woff2'); font-display: swap; }
     /* La marca propia de las barras laterales internas reemplaza el fondo de la opción activa de Filament. */
     .fi-page-sub-navigation-sidebar { position: relative; }
     .fi-page-sub-navigation-sidebar .fi-sidebar-item { position: relative; z-index: 1; }

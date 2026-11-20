@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v13
+- **Versión:** v14
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-046** (cruza módulos) · Sin ruta ni título grande; bajo la frase, el nombre del módulo en Audiowide.
 - **MV-045** (cruza módulos) · En las barras laterales internas, la marca de la opción elegida se desliza en vertical.
 - **MV-044** (cruza módulos) · La barra de cajas queda quieta entre pantallas; solo se desliza la marca de la elegida,
   en el color de su franja y bien distinta de sus vecinas.
@@ -178,6 +179,14 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   desplazamiento. Solo cambia el contenido de la derecha (sin recargar), que aparece suave. Con «reducir movimiento» o
   «reducir animaciones», la marca salta.
 
+- **El nombre del módulo (MV-046):** debajo de la frase, centrado, el nombre de la caja de proceso en mayúsculas
+  («DIRECTORIO Y CATÁLOGOS») en Audiowide (la letra del logo), 22 px (18 px en celular, 16 px bajo 380 px de ancho),
+  interlineado 1,2, espaciado 0,06 em, una sola línea, en el color de texto de su franja; 6 px bajo la frase y 28 px
+  antes del contenido. Orden: barra de cajas, frase, nombre del módulo, contenido.
+- **Sin ruta ni título grande (MV-046):** la miga de pan no aparece en ninguna pantalla. En la pantalla de una caja de
+  proceso no aparece el título grande (la caja elegida y el nombre del módulo dicen dónde se está); en una ficha (por
+  ejemplo, una oportunidad) se queda el título, que dice qué registro es.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -204,6 +213,9 @@ contar solas, porque no coinciden con ningún proceso).
   motivos, empresa, general) siguen en Configuración.
 
 ## Supuestos sin confirmar
+
+- **Fichas con título (MV-046):** en una ficha (la oportunidad OP-…, el requerimiento) se dejó su título, porque dice qué
+  registro es; el título grande se quita solo en la pantalla de cada caja.
 
 - **Qué es «explicativo» (MV-039):** se dejaron los textos de las ventanas que avisan una consecuencia antes de
   confirmar («No se borra: queda en la lista como anulada», «Se pierden los cambios…», «Solo se borra lo que nunca se
@@ -254,6 +266,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v14** (MV-046): sin ruta ni título grande; el nombre del módulo bajo la frase.
 
 - **v13** (MV-045): la marca de las barras laterales internas se desliza en vertical.
 

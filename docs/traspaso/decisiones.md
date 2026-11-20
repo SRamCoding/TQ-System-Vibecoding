@@ -590,3 +590,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 2.2: la marca de las barras laterales internas se desliza»
+
+### MV-046 · 2026-11-20 · Sin ruta ni título grande; el nombre del módulo bajo la frase, con la letra del logo
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-2, punto 3) «Quitar la ruta en todas las pantallas. Debajo de la frase del
+  proceso, el nombre del módulo (por ejemplo, DIRECTORIO Y CATÁLOGOS), centrado, con la letra del logo de TECHQUK:
+  Audiowide, en mayúsculas. Quitar también el título grande de la pantalla interna. Escritorio 22 px, interlineado 1,2,
+  espaciado 0,06 em; celular 18 px; una sola línea; unos 6 px debajo de la frase y unos 28 px antes del contenido».
+- **Decisión:** lo dicho; el orden queda barra de cajas, frase, nombre del módulo y contenido. En el color de texto de
+  su franja (4,5:1 o más).
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 2.3: sin ruta; el nombre del módulo con la letra del logo»

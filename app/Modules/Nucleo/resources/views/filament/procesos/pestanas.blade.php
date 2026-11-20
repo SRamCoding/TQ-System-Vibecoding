@@ -143,6 +143,9 @@
         .dark .tq-proceso[data-area="erp"] { --tq-f: {{ $C::TURQUESA }}; --tq-f-texto: {{ $C::TURQUESA }}; }
         .dark .tq-proceso[data-area="plataforma"] { --tq-f: {{ $C::GRIS_PLATAFORMA_OSCURO }}; --tq-f-texto: {{ $C::GRIS_PLATAFORMA_OSCURO }}; }
         .tq-proceso-frase { margin: -0.25rem 0 0; font-size: 0.95rem; line-height: 1.3; font-weight: 500; font-style: italic; text-align: center; color: color-mix(in oklab, var(--tq-f-texto) 55%, var(--gray-500)); }
+        .tq-proceso-modulo { margin: calc(6px - 1rem) 0 calc(28px - 1.25rem); font-family: 'Audiowide', ui-sans-serif, sans-serif; font-weight: 400; font-size: 1.375rem; line-height: 1.2; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; color: var(--tq-f-texto); text-align: center; }
+        @media (max-width: 640px) { .tq-proceso-modulo { font-size: 1.125rem; } }
+        @media (max-width: 380px) { .tq-proceso-modulo { font-size: 1rem; } }
         .dark .tq-proceso-frase { color: color-mix(in oklab, var(--tq-f-texto) 55%, var(--gray-400)); }
         /* Las cajas juntas, como un solo cuerpo: un borde, un fondo y separadores finos. */
         .tq-proceso { --tq-proceso-fondo: white; }
@@ -196,6 +199,8 @@
     </div>
     {{-- La frase, debajo de las cajas y sutil (pedido de Sebastián, 2026-11-20). --}}
     <p class="tq-proceso-frase">{{ $frase }}</p>
+    {{-- MV-046: el nombre del módulo, con la letra del logo. --}}
+    <p class="tq-proceso-modulo">{{ mb_strtoupper($proceso->nombre()) }}</p>
     <button type="button" class="tq-proceso-original" x-ref="original" @unless ($personalizado) hidden @endunless x-on:click="original()">Volver al orden original</button>
 </nav>
 </div>
