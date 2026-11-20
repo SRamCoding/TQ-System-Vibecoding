@@ -564,3 +564,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «La carga como energía en la franja de arriba»
+
+### MV-044 · 2026-11-20 · La barra de cajas del proceso queda quieta; solo se desliza la marca de la elegida
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/observaciones-2.md`, punto 1) «Que la barra de cajas se quede quieta y lo
+  único que cambie sea: la marca de la elegida se desliza de la caja anterior a la nueva, en unos 250 ms; el contenido
+  de abajo se reemplaza sin recargar, con un cambio suave y corto. Al usar "atrás", la marca se desliza igual». Y la
+  aclaración: «la caja elegida de la barra de cada proceso se marca con el color de su franja (no con el azul), y tiene
+  que distinguirse bien de las demás aunque sean del mismo color».
+- **Decisión:** lo dicho, en las barras de los once procesos; la marca va en el color de la franja, más marcada (fondo,
+  borde fino y línea de abajo) y la caja elegida con su nombre en negrita.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 2.1: la barra de cajas quieta, la marca se desliza»

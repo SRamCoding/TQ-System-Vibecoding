@@ -14,6 +14,8 @@
     $C = \App\Modules\Nucleo\Navegacion\ColoresMarca::class;
 @endphp
 @if ($proceso !== \App\Modules\Nucleo\Navegacion\Proceso::Mien)
+{{-- MV-044: la barra se conserva entre pantallas del mismo proceso; solo se desliza la marca (navegacion-interna). --}}
+<div x-persist="tq-proceso-{{ $proceso->value }}">
 <nav class="tq-proceso" data-area="{{ $datos['caja']->area->value }}" aria-label="{{ $proceso->nombre() }}"
     x-data="{
         claves: @js(array_map(fn ($c) => $c->clave, $datos['internas'])),
@@ -121,6 +123,7 @@
         ordenarDom() {
             const cuerpo = this.$refs.cuerpo
             this.claves.forEach((c) => cuerpo.appendChild(cuerpo.querySelector(`[data-caja='${c}']`)))
+            window.tqMarcarProceso?.(false)
         },
         original() {
             fetch(@js('/procesos/'.$proceso->value.'/orden'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': @js(csrf_token()), 'Accept': 'application/json' }, body: JSON.stringify({ claves: [] }) })
@@ -155,15 +158,29 @@
         .tq-proceso-caja .tq-proceso-icono { width: 2rem; height: 2rem; color: var(--tq-f); }
         .tq-proceso-nombre { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; font-size: 0.875rem; font-weight: 600; line-height: 1.25rem; }
         /* La caja elegida, marcada con el color de su franja. */
-        .tq-proceso-caja[aria-current="page"] { background: color-mix(in oklab, var(--tq-f) 14%, transparent); color: var(--tq-f-texto); }
-        .tq-proceso-caja[aria-current="page"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--tq-f); }
+        /* MV-044: la marca de la elegida es un solo elemento que se desliza; la caja elegida toma el color de su franja en el
+           texto y el ícono, en negrita, para distinguirse de sus vecinas aunque sean del mismo color. */
+        .tq-proceso-cuerpo { position: relative; }
+        .tq-proceso-caja { z-index: 1; background: transparent; }
+        .tq-proceso-marca { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; opacity: 0;
+            background: color-mix(in oklab, var(--tq-f) 20%, transparent); box-shadow: inset 0 -4px 0 var(--tq-f), inset 0 0 0 1px color-mix(in oklab, var(--tq-f) 45%, transparent);
+            transition: transform 250ms cubic-bezier(.2, .7, .2, 1), width 250ms cubic-bezier(.2, .7, .2, 1), height 250ms cubic-bezier(.2, .7, .2, 1); }
+        .dark .tq-proceso-marca { background: color-mix(in oklab, var(--tq-f) 26%, transparent); }
+        .tq-proceso-marca.tq-lista { opacity: 1; }
+        .tq-proceso-caja { transition: color 250ms ease; }
+        .tq-proceso-caja[aria-current="page"] { color: var(--tq-f-texto); }
+        .tq-proceso-caja[aria-current="page"] .tq-proceso-nombre { font-weight: 800; }
+        @media (prefers-reduced-motion: reduce) { .tq-proceso-marca { transition: none; } }
+        html.tq-sin-animaciones .tq-proceso-marca { transition: none; }
         .tq-proceso-caja.tq-arrastrando { opacity: 0.4; }
         .tq-proceso-original { font-size: 0.8rem; color: var(--gray-500); text-decoration: underline; }
         @media (prefers-reduced-motion: reduce) { .tq-proceso-caja { transition: none; } }
     </style>
     <div class="tq-proceso-cuerpo" x-ref="cuerpo" role="list">
+        <span class="tq-proceso-marca" aria-hidden="true"></span>
         @foreach ($datos['internas'] as $interna)
             <a href="{{ $interna->url }}" wire:navigate class="tq-proceso-caja" role="listitem" data-caja="{{ $interna->clave }}"
+                data-rutas="{{ json_encode([parse_url($interna->url, PHP_URL_PATH), ...array_keys(array_filter(\App\Modules\Nucleo\Navegacion\Proceso::rutasDentroDe(), fn ($c) => $c === $interna->clave))]) }}"
                 @if ($interna->clave === $datos['actual']->clave) aria-current="page" @endif
                 draggable="false"
                 x-on:dragstart.prevent
@@ -181,4 +198,5 @@
     <p class="tq-proceso-frase">{{ $frase }}</p>
     <button type="button" class="tq-proceso-original" x-ref="original" @unless ($personalizado) hidden @endunless x-on:click="original()">Volver al orden original</button>
 </nav>
+</div>
 @endif

@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v11
+- **Versión:** v12
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-044** (cruza módulos) · La barra de cajas queda quieta entre pantallas; solo se desliza la marca de la elegida,
+  en el color de su franja y bien distinta de sus vecinas.
 - **MV-043** (ficha) · La carga al cambiar de pantalla es energía que recorre la franja bajo la barra de arriba.
 - **MV-042** (cruza módulos) · Un solo azul de resaltado (azul noche; `#6F9BFF` en oscuro) para lo elegido; la franja
   solo en la barra lateral principal, las cajas, la frase y los íconos.
@@ -161,6 +163,14 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   cruza todo el ancho y se apaga (450 ms). Con «reducir movimiento» o «reducir animaciones», se llena sin chispas. La
   barra de progreso propia de Livewire se apagó (`config/livewire.php`, `navigate.show_progress_bar`).
 
+- **Barra quieta, marca que se desliza (MV-044):** la barra de cajas (con su frase) se conserva al pasar entre
+  pantallas del mismo proceso (`x-persist` por proceso); al llegar, la marca —un solo elemento con el fondo de la franja
+  al 20 % (26 % en oscuro), un borde fino y una línea de 4 px abajo— se desliza en horizontal hasta la caja de la
+  pantalla actual en 250 ms, suave al final; la caja elegida toma el color de texto de la franja y su nombre en negrita.
+  También con «atrás». La caja se elige por la dirección más larga que coincide (las fichas marcan su caja). El contenido
+  nuevo aparece desvaneciéndose y subiendo 6 px (200 ms). Con «reducir movimiento» o «reducir animaciones», la marca
+  salta y el contenido aparece de golpe.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -234,6 +244,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v12** (MV-044): la barra de cajas se conserva entre pantallas y la marca de la elegida se desliza.
 
 - **v11** (MV-043): la señal de carga pasa a ser la franja de energía bajo la barra de arriba.
 
