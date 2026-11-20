@@ -7,7 +7,7 @@
         .tq-catalogos-grupo + .tq-catalogos-grupo { margin-top: 1.5rem; }
         .tq-catalogos-grupo-titulo { margin-bottom: 0.75rem; font-size: 0.95rem; font-weight: 700; color: var(--primary-600); }
         .dark .tq-catalogos-grupo-titulo { color: var(--primary-400); }
-        .tq-catalogos-cajas { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, 9rem); grid-auto-rows: 6.5rem; }
+        .tq-catalogos-cajas { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, 9rem); grid-auto-rows: 7.5rem; } /* MV-034: el alto de dos líneas de nombre */
         .tq-caja-catalogo { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; height: 100%; min-width: 0; overflow: hidden; padding: 0.75rem; text-align: center; border-top: 3px solid var(--primary-600); }
         .dark .tq-caja-catalogo { border-top-color: var(--primary-400); }
         .tq-caja-catalogo:hover { --tw-ring-color: var(--primary-600); }

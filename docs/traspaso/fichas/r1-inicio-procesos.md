@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v2
+- **Versión:** v3
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-020); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -21,6 +21,7 @@ menos una pantalla.
 - **MV-017** (cruza módulos) · Mien arriba, a lo ancho, y absorbe «Mi tablero».
 - **MV-018** (ficha) · Las franjas se reparten solas en dos columnas de alto parecido; una vacía desaparece; en el
   celular, una columna.
+- **MV-034** (ficha) · Todas las cajas de 9 × 7,5 rem, con el nombre en dos líneas como máximo.
 - **MV-033** (cruza módulos) · Colores por franja: Misionales turquesa, Estratégicos azul noche, De Apoyo morado,
   Plataforma gris, el oro solo para Mien; en oscuro, cada una en su versión clara (reemplaza MV-019).
 - **MV-032** (ficha) · Inicio centrado: ventana del saludo, saludo grande, frase, Mien como estrella sin caja.
@@ -98,6 +99,10 @@ menos una pantalla.
   turquesa `#00788A` y morado `morado-700` en claro. En verano, Estratégicos toma el azul mar (245) y Misionales el agua
   de piscina (195), al revés que antes, para seguir el color de cada franja; Plataforma no tiene color de verano (gris).
 
+- **Altura de las cajas (MV-034):** inicio, portadas y cajas internas (también Catálogos y las demás pantallas de cajas)
+  miden 9 × 7,5 rem; con preguntas, la caja activa crece a 11,5 × 8,75. El nombre más largo, «Flujo de caja y
+  conciliación», entra en dos líneas («Flujo de caja y» / «conciliación»); ninguno necesita una tercera.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -150,6 +155,8 @@ contar solas, porque no coinciden con ningún proceso).
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v3** (MV-034): las cajas suben de 6,5 a 7,5 rem de alto, iguales en toda pantalla.
 
 - **v2** (MV-030 a MV-033): íconos propios de Conseguir el negocio y Postventa; el inicio centrado con la ventana del
   saludo, el saludo grande, la frase y la estrella de Mien (ya no hay caja ancha de Mien); los colores por franja en

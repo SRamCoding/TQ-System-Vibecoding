@@ -47,9 +47,9 @@
                 .tq-cajas-modulos { max-width: calc(100% - 2.5rem); transition: max-width 0s linear 300ms; }
                 .tq-cajas-modulos:has(.tq-activa) { max-width: 100%; transition: none; }
             }
-            .tq-celda-modulo { position: relative; flex: none; width: 9rem; height: 6.5rem; }
+            .tq-celda-modulo { position: relative; flex: none; width: 9rem; height: 7.5rem; } /* MV-034: alto para dos líneas de nombre, igual en todas */
             .tq-celda-modulo:has(> [data-tq-preguntas]) { transition: width 260ms ease-out, height 260ms ease-out; }
-            .tq-celda-modulo:has(> .tq-activa) { width: 11.5rem; height: 7.75rem; }
+            .tq-celda-modulo:has(> .tq-activa) { width: 11.5rem; height: 8.75rem; }
             .tq-caja-modulo { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; height: 100%; min-width: 0; overflow: hidden; padding: 0.75rem; text-align: center; border-top: 3px solid var(--tq-area-color); --tw-ring-color: color-mix(in oklab, var(--tq-area-color) 45%, transparent); background-image: linear-gradient(color-mix(in oklab, var(--tq-area-color) 8%, transparent), color-mix(in oklab, var(--tq-area-color) 8%, transparent)); }
             .tq-caja-modulo:hover { --tw-ring-color: var(--tq-area-color); }
             .tq-caja-modulo .tq-caja-modulo-icono { flex: none; width: 2rem; height: 2rem; color: var(--tq-area-color); }

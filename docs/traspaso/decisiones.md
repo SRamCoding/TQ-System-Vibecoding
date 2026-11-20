@@ -429,3 +429,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Pedido 3: inicio centrado, ventana, estrella de Mien y colores por franja»
+
+### MV-034 · 2026-11-20 · Todas las cajas con la altura de un nombre de dos líneas
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/altura-de-cajas.md`) «Un poco más de altura en las cajas, para que entre un
+  nombre de dos líneas con aire. Todas las cajas de una misma pantalla con la misma altura. El nombre, como máximo en
+  dos líneas. Lo mismo en las cajas internas».
+- **Decisión:** las cajas del inicio y las internas miden 9 × 7,5 rem (antes 6,5 de alto), todas iguales; el nombre
+  ocupa como máximo dos líneas, sin achicar la letra.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Pedido 4: altura pareja de las cajas»
