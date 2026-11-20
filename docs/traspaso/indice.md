@@ -23,6 +23,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [op-asistente](fichas/op-asistente.md) | Opcional | aprobada | v1 | `aprobado/op-asistente-v1` |
 | [op-gran-momento](fichas/op-gran-momento.md) | Opcional | aprobada | v1 | `aprobado/op-gran-momento-v1` |
 | [t6-postventa](fichas/t6-postventa.md) | Flujo 8 | aprobada | v1 | `aprobado/t6-postventa-v1` |
+| [t7-personas](fichas/t7-personas.md) | Flujo 9 | aprobada | v1 | `aprobado/t7-personas-v1` |
 
 ## Registro del repositorio
 

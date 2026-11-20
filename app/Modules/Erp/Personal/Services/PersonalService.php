@@ -59,7 +59,7 @@ final readonly class PersonalService
     }
 
     /** @param  array<string, string>  $horas  día => horas */
-    public function tarear(int $tareoId, int $colaboradorId, int $partidaId, array $horas): TareoLinea
+    public function tarear(int $tareoId, int $colaboradorId, int $partidaId, array $horas, ?string $autorizacion = null): TareoLinea
     {
         $t = Tareo::query()->findOrFail($tareoId);
         $c = Colaborador::query()->findOrFail($colaboradorId);
@@ -68,8 +68,9 @@ final readonly class PersonalService
             throw new RuntimeException('La semana está cerrada: se corrige con un ajuste.');
         }
 
-        if ($c->habilitado_hasta === null || $c->habilitado_hasta->lt($t->semana)) {
-            throw new RuntimeException("{$c->nombres} no tiene su habilitación de campo (SCTR) vigente: no se le puede tarear en obra.");
+        // Flujo 9 (F9): con la habilitación vencida, el tareo se bloquea salvo que lo autorice, con motivo, quien tiene ese permiso.
+        if (($c->habilitado_hasta === null || $c->habilitado_hasta->lt($t->semana)) && ($autorizacion === null || trim($autorizacion) === '' || ! (auth()->user()?->can(PersonasService::PERMISO_AUTORIZAR) ?? false))) {
+            throw new RuntimeException("{$c->nombres} no tiene su habilitación de campo (SCTR) vigente: no se le puede tarear en obra. Quien tiene el permiso puede autorizarlo con motivo.");
         }
 
         if (DB::table('partidas_control')->where('id', $partidaId)->value('proyecto_id') !== $t->proyecto_id) {
@@ -77,7 +78,7 @@ final readonly class PersonalService
         }
 
         $costo = (string) DB::table('categorias_personal')->where('id', $c->categoria_id)->value('costo_hora');
-        $fila = ['costo_hora' => $costo];
+        $fila = ['costo_hora' => $costo, 'autorizacion' => $autorizacion];
 
         foreach (array_keys(self::DIAS) as $d) {
             $fila[$d] = (string) ($horas[$d] ?? '0');

@@ -131,11 +131,12 @@ final class TareoSemanal extends Page implements HasTable
                     Select::make('colaborador')->label('Persona')->required()->options(fn (): array => Colaborador::query()->where('es_activo', true)->orderBy('nombres')->pluck('nombres', 'id')->all()),
                     Select::make('partida')->label('Partida')->required()->options(fn (): array => Compras::partidasDe($this->proyecto)),
                     Grid::make(6)->schema(collect(PersonalService::DIAS)->map(fn (string $e, string $d) => TextInput::make($d)->label($e)->numeric()->minValue(0)->maxValue(16))->values()->all()),
+                    TextInput::make('autorizacion')->label('Autorización con motivo (solo si su habilitación venció)')->maxLength(300),
                 ])
                 ->action(function (array $data): void {
                     try {
                         $s = app(PersonalService::class);
-                        $s->tarear($s->semana((int) $this->proyecto, CarbonImmutable::parse($this->semana))->id, (int) $data['colaborador'], (int) $data['partida'], collect(PersonalService::DIAS)->keys()->mapWithKeys(fn ($d): array => [$d => (string) ($data[$d] ?? '0')])->all());
+                        $s->tarear($s->semana((int) $this->proyecto, CarbonImmutable::parse($this->semana))->id, (int) $data['colaborador'], (int) $data['partida'], collect(PersonalService::DIAS)->keys()->mapWithKeys(fn ($d): array => [$d => (string) ($data[$d] ?? '0')])->all(), filled($data['autorizacion'] ?? null) ? $data['autorizacion'] : null);
                     } catch (RuntimeException $e) {
                         Notification::make()->danger()->title($e->getMessage())->send();
 

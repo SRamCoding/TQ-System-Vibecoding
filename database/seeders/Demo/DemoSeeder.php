@@ -35,6 +35,7 @@ use App\Modules\Erp\Contratos\Services\ContratosService;
 use App\Modules\Erp\Finanzas\Services\FinanzasService;
 use App\Modules\Erp\Personal\Models\Colaborador;
 use App\Modules\Erp\Personal\Services\PersonalService;
+use App\Modules\Erp\Personal\Services\PersonasService;
 use App\Modules\Erp\Postventa\Services\PostventaService;
 use App\Modules\Erp\Presupuestos\Models\Insumo;
 use App\Modules\Erp\Presupuestos\Models\PartidaControl;
@@ -151,6 +152,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: personal, tareo, valorizaciones y subcontratos');
             $this->tramo4();
+
+            $this->command?->info('Demo: personas, selección y planilla');
+            $this->personas();
 
             $this->command?->info('Demo: facturación, cobranza y rendiciones');
             $this->tramo5();
@@ -1131,6 +1135,65 @@ final class DemoSeeder extends Seeder
             $val->update(['estado' => 'pagada']);
         });
         $this->en('2026-09-30', fn () => $v->valorizarSubcontrato($sc->id, '2026-09', '40'));
+    }
+
+    /** Flujo 9 (ficha t7-personas): contratos, habilitación, certificaciones, selección, planilla y una salida. */
+    private function personas(): void
+    {
+        $ps = app(PersonasService::class);
+        $id = fn (string $dni): int => (int) DB::table('colaboradores')->where('dni', $dni)->value('id');
+        $cat = fn (string $c): int => (int) DB::table('categorias_personal')->where('codigo', $c)->value('id');
+        $p8 = (int) DB::table('proyectos')->where('nombre', 'like', 'Red de datos y enlaces%')->value('id');
+        $plaza = (int) DB::table('proyectos')->where('nombre', 'like', '%Plaza de Armas%')->value('id');
+
+        // Contratos: el ejemplo del v4 (Julio Chávez, 2,400.00 en ONP: aporte 312.00, neto 2,088.00, EsSalud 216.00, costo 2,616.00).
+        foreach ([['40112233', '2400.00', 'onp', '2025-03-01'], ['40223344', '1500.00', 'onp', '2025-08-01'], ['40334455', '3500.00', 'afp', '2023-02-01'],
+            ['40445566', '3800.00', 'afp', '2022-06-15'], ['40556677', '4500.00', 'afp', '2021-09-01'], ['40667788', '2300.00', 'onp', '2024-05-01']] as [$dni, $rem, $reg, $ing]) {
+            DB::table('colaboradores')->where('dni', $dni)->update(['remuneracion' => $rem, 'regimen' => $reg, 'ingreso' => $ing]);
+        }
+
+        // Habilitación: SCTR y examen médico (el de Tomás León venció); certificaciones, algunas por vencer.
+        foreach ([['40112233', '2027-03-31', '2027-05-20'], ['40223344', '2027-03-31', '2026-12-10'], ['40334455', '2027-06-30', '2027-08-15'],
+            ['40445566', '2027-06-30', '2027-04-30'], ['40667788', '2026-10-31', '2027-01-15']] as [$dni, $sctr, $emo]) {
+            $ps->documento($id($dni), 'sctr', 'SCTR salud y pensión', 'Aseguradora Andina', $sctr);
+            $ps->documento($id($dni), 'emo', 'Examen médico ocupacional anual', 'Clínica Ocupacional del Norte', $emo);
+            $ps->documento($id($dni), 'induccion', 'Inducción de seguridad en obra', 'Techquk', null);
+        }
+
+        foreach ([['40112233', 'Trabajos en altura', 'Centro de Capacitación Técnica', '2026-12-05'], ['40334455', 'Certificación en cableado estructurado', 'Fabricante de cableado', '2028-02-28'],
+            ['40334455', 'Fusión de fibra óptica', 'Instituto de Telecomunicaciones', '2027-09-30'], ['40445566', 'Administración de redes', 'Fabricante de equipos de red', '2027-11-30'],
+            ['40445566', 'Videovigilancia IP', 'Fabricante de cámaras', '2026-12-15'], ['40556677', 'Desarrollo seguro de software', 'Instituto de Software', null]] as [$dni, $n, $e, $v]) {
+            $ps->documento($id($dni), 'certificacion', $n, $e, $v);
+        }
+
+        // Tomás León con la habilitación vencida: solo se le tarea con autorización y motivo.
+        $s = app(PersonalService::class);
+        $s->asignar($id('40667788'), $plaza, 100, CarbonImmutable::parse('2026-11-16'), CarbonImmutable::parse('2026-11-22'));
+        $pc = (int) DB::table('partidas_control')->where('proyecto_id', $plaza)->where('codigo', 'PC-02.03')->value('id');
+        $this->en('2026-11-19', function () use ($s, $plaza, $pc, $id): void {
+            $t = $s->semana($plaza, CarbonImmutable::parse('2026-11-16'));
+            $s->tarear($t->id, $id('40667788'), $pc, ['lu' => '8', 'ma' => '8'], 'SCTR renovado el 15/11, la constancia llega el lunes; autorizado por jefatura de proyectos.');
+        });
+
+        // Selección: dos técnicos para P8 desde diciembre; uno ya contratado.
+        $v = $ps->vacante($cat('TEC'), $p8, 2, '2026-12-01', 'Técnico en redes con SCTR vigente y trabajos en altura');
+        $ps->vacante($cat('AYU'), null, 1, '2027-01-15', 'Ayudante de instalaciones');
+        $c1 = $ps->candidato($v, 'Raúl Mendoza Alayo', '41778899', 'Cinco años en cableado; buena entrevista.');
+        $ps->candidato($v, 'Diego Paz Valderrama', '41889900', 'Por entrevistar.');
+        $c3 = $ps->candidato($v, 'Óscar Linares Bazán', '41990011', 'No tiene experiencia en altura.');
+        DB::table('candidatos')->where('id', $c1)->update(['estado' => 'entrevistado']);
+        DB::table('candidatos')->where('id', $c3)->update(['estado' => 'descartado']);
+        $nuevo = $this->en('2026-11-18', fn () => $ps->contratar($c1, '2200.00', 'onp', CarbonImmutable::parse('2026-12-01')));
+        $ps->documento($nuevo, 'sctr', 'SCTR salud y pensión', 'Aseguradora Andina', '2027-11-30');
+        $ps->documento($nuevo, 'emo', 'Examen médico de ingreso', 'Clínica Ocupacional del Norte', '2027-11-18');
+
+        // Una salida: un ayudante que se fue en septiembre.
+        $sale = Colaborador::query()->create(['nombres' => 'Kevin Ramos Tello', 'dni' => '41001122', 'categoria_id' => $cat('AYU'), 'vinculo' => 'eventual', 'remuneracion' => '1500.00', 'regimen' => 'onp', 'ingreso' => '2026-01-05'])->id;
+        $this->en('2026-09-30', fn () => $ps->salida($sale, CarbonImmutable::parse('2026-09-30'), 'Renuncia voluntaria; entregó herramientas y EPP.'));
+
+        // Planillas: octubre cerrada, noviembre en cálculo.
+        $this->en('2026-10-31', fn () => $ps->cerrarPlanilla($ps->calcularPlanilla('2026-10')));
+        $this->en('2026-11-19', fn () => $ps->calcularPlanilla('2026-11'));
     }
 
     /** Tramo 5 (ficha t5-finanzas): lo que cada proyecto facturó y cobró, la factura del cable, y fondos con su rendición. */
