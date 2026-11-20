@@ -164,7 +164,7 @@ final readonly class TablerosService
             'listas' => [
                 ['titulo' => 'Qué pago', 'items' => $semana->merge($vencidas)->map(fn ($c): array => ['texto' => "{$c->serie_numero} · {$c->razon_social}", 'nota' => self::s($c->saldo).' · '.($c->estado === 'programado' ? 'programado '.CarbonImmutable::parse($c->pago_programado)->format('d/m') : 'venció '.CarbonImmutable::parse($c->vencimiento)->format('d/m')),
                     'url' => '/tablero-pagos', 'tono' => $c->estado === 'programado' ? null : 'danger'])->values()->all()],
-                ['titulo' => 'Qué cobro', 'items' => $cobrar->map(fn ($c): array => ['texto' => "{$c->serie_numero} · {$c->razon_social}", 'nota' => self::s($c->saldo).' · vence '.CarbonImmutable::parse($c->vencimiento)->format('d/m/Y'), 'url' => '/comprobantes',
+                ['titulo' => 'Qué cobro', 'items' => $cobrar->map(fn ($c): array => ['texto' => "{$c->serie_numero} · {$c->razon_social}", 'nota' => self::s($c->saldo).' · vence '.CarbonImmutable::parse($c->vencimiento)->format('d/m/Y'), 'url' => '/cobranzas',
                     'tono' => $c->vencimiento < $hoy->toDateString() ? 'danger' : null])->values()->all()],
                 ['titulo' => 'La caja de los próximos meses', 'items' => array_map(fn (array $f): array => ['texto' => $f['mes'].($f['proyectado'] ? ' (proyectado)' : ''), 'nota' => 'entra '.self::s($f['ingresos']).' · sale '.self::s($f['egresos']).' · neto '.self::s($f['neto']),
                     'url' => '/flujo-caja', 'tono' => $minimo !== null && $f['mes'] === $minimo['mes'] && (float) $f['neto'] < 0 ? 'danger' : null], $flujo)],

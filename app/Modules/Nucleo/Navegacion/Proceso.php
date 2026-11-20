@@ -118,11 +118,10 @@ enum Proceso: string
             self::ConseguirNegocio => ['oportunidades' => 'Oportunidades', 'convocatorias' => 'Convocatorias del SEACE', 'leads' => 'Campañas', 'licitaciones' => 'Licitaciones', 'agenda' => 'Agenda'],
             self::GerenciaProyectos => ['proyectos' => 'Proyectos', 'contratos' => 'Contratos', 'asignacion' => 'Personal asignado', 'tareo' => 'Tareo', 'subcontratos' => 'Subcontratos'],
             self::Abastecer => ['requerimientos' => 'Requerimientos', 'ordenes' => 'Órdenes', 'almacen' => 'Almacén'],
-            // Comprobantes, mientras llega el paso 2 (se parte en emitidas y de proveedor).
-            self::FacturacionCobranza => ['valorizaciones' => 'Valorizaciones', 'comprobantes' => 'Comprobantes'],
+            self::FacturacionCobranza => ['valorizaciones' => 'Valorizaciones', 'facturas-emitidas' => 'Facturas emitidas', 'cobranzas' => 'Cobranzas'],
             self::Postventa => ['postventa' => 'Tickets y series', 'suscripciones' => 'Suscripciones'],
             self::PresupuestarCotizar => ['presupuestos' => 'Presupuestos', 'cotizaciones' => 'Cotizaciones'],
-            self::Finanzas => ['tablero-pagos' => 'Tablero de pagos', 'flujo-caja' => 'Flujo de caja y conciliación', 'rendiciones' => 'Rendiciones', 'servicios-vigencia' => 'Servicios con vigencia', 'exportar-contador' => 'Para el contador'],
+            self::Finanzas => ['facturas-proveedor' => 'Facturas de proveedor', 'tablero-pagos' => 'Tablero de pagos', 'flujo-caja' => 'Flujo de caja y conciliación', 'rendiciones' => 'Rendiciones', 'servicios-vigencia' => 'Servicios con vigencia', 'exportar-contador' => 'Para el contador'],
             self::Personas => ['fichas-laborales' => 'Fichas laborales', 'vacantes' => 'Demanda y selección', 'planilla' => 'Planilla'],
             // Cuentas, mientras llega el paso 3 (pasa a la ficha de la persona o empresa).
             self::Directorio => ['personas' => 'Personas y empresas', 'catalogo' => 'Catálogo de productos', 'listas' => 'Listas', 'organigrama' => 'Organigrama', 'cuentas' => 'Cuentas'],

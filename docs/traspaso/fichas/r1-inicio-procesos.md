@@ -95,7 +95,7 @@ contar solas, porque no coinciden con ningún proceso).
 - **Organigrama** se abre solo, sin las pestañas de Usuarios; **Usuarios** conserva roles, conflictos e incompatibles.
 - **Las preguntas de una caja de proceso** son la primera de cada pantalla, hasta tres.
 - **Mientras llegan los pasos siguientes de la ronda:** Licitaciones y Agenda quedan en Conseguir el negocio (pasos 4
-  y 5), Comprobantes en Facturación y cobranza (paso 2) y Cuentas en Directorio y catálogos (paso 3).
+  y 5) y Cuentas en Directorio y catálogos (paso 3).
 
 ## Pendientes que decide Sebastián
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Modules\Erp\Finanzas;
 
-use App\Modules\Erp\Finanzas\Filament\Pages\Comprobantes;
 use App\Modules\Erp\Finanzas\Filament\Pages\FlujoCaja;
 use App\Modules\Erp\Finanzas\Filament\Pages\Rendiciones;
 use App\Modules\Erp\Finanzas\Filament\Pages\Resultados;
@@ -25,7 +24,7 @@ final class FinanzasServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [Comprobantes::class, TableroPagos::class, FlujoCaja::class, Rendiciones::class, Resultados::class, Filament\Pages\ExportarContador::class, Filament\Pages\ServiciosVigencia::class]);
+        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [Filament\Pages\FacturasEmitidas::class, Filament\Pages\Cobranzas::class, Filament\Pages\FacturasProveedor::class, TableroPagos::class, FlujoCaja::class, Rendiciones::class, Resultados::class, Filament\Pages\ExportarContador::class, Filament\Pages\ServiciosVigencia::class]);
     }
 
     public function boot(): void
@@ -41,7 +40,10 @@ final class FinanzasServiceProvider extends ServiceProvider
         $m = $this->app->make(RegistroModulos::class);
         foreach ([
             ['resultados', '¿Cuánto se ganó?', '/resultados', 'heroicon-o-trophy', 'Por proyecto: vendido, facturado, costo real y margen real', ['¿Cuánto se ganó realmente en cada proyecto?', '¿Qué proyecto pierde dinero?']],
-            ['comprobantes', 'Comprobantes', '/comprobantes', 'heroicon-o-document-text', 'Facturas emitidas y de proveedores, con su cruce de tres vías', ['¿Qué falta facturar?', '¿Qué facturas tienen diferencia con lo recibido?']],
+            // MV-021: Comprobantes se parte en emitidas y cobranzas (Facturación y cobranza) y de proveedor (Finanzas).
+            ['facturas-emitidas', 'Facturas emitidas', '/facturas-emitidas', 'heroicon-o-document-text', 'Las facturas que emite Techquk, desde sus valorizaciones aprobadas', ['¿Qué falta facturar?']],
+            ['cobranzas', 'Cobranzas', '/cobranzas', 'heroicon-o-hand-raised', 'Lo que deben los clientes, lo vencido primero, y lo cobrado', ['¿Quién nos debe y desde cuándo?']],
+            ['facturas-proveedor', 'Facturas de proveedor', '/facturas-proveedor', 'heroicon-o-document-arrow-down', 'Las facturas de proveedor con su cruce de tres vías: orden, recepción y factura', ['¿Qué facturas tienen diferencia con lo recibido?']],
             ['tablero-pagos', 'Tablero de pagos', '/tablero-pagos', 'heroicon-o-view-columns', 'Tesorería ordena y paga las facturas de proveedores', ['¿Qué pagamos este viernes?', '¿Qué está vencido?']],
             ['flujo-caja', 'Flujo de caja', '/flujo-caja', 'heroicon-o-arrows-up-down', 'Lo que entra y sale por mes, real y proyectado, y la conciliación', ['¿Nos alcanza la caja el próximo mes?', '¿Qué falta conciliar?']],
             ['exportar-contador', 'Para el contador', '/exportar-contador', 'heroicon-o-arrow-down-tray', 'Registros de ventas y compras y caja y bancos del mes, para Excel', ['¿Qué le mando al contador este mes?']],

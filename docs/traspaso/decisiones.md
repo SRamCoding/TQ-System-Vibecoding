@@ -262,3 +262,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Ronda 1 · paso 1: el inicio por procesos»
+
+### MV-021 · 2026-11-20 · Comprobantes se parte entre Facturación y cobranza y Finanzas
+
+- **Ficha:** `fichas/t5-finanzas.md`
+- **Dijo Sebastián:** «Las facturas que emite Techquk van a Facturación y cobranza ("Facturas emitidas", junto a
+  "Cobranzas"). Las facturas de proveedor, con su cruce de tres vías, van a Finanzas ("Facturas de proveedor")».
+- **Decisión:** ya no hay una pantalla de comprobantes: las ventas se ven en Facturas emitidas y Cobranzas; las compras,
+  con el cruce de tres vías, en Facturas de proveedor.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 2: partir Comprobantes»

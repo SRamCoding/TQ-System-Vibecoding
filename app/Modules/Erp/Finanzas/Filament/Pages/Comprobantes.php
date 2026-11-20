@@ -7,7 +7,6 @@ namespace App\Modules\Erp\Finanzas\Filament\Pages;
 use App\Modules\Erp\Finanzas\Models\Comprobante;
 use App\Modules\Erp\Finanzas\Services\FinanzasService;
 use App\Modules\Nucleo\Tiempo\Calendario;
-use BackedEnum;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -24,25 +23,21 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
-/** MVP rápido (t5-finanzas): comprobantes de venta y de compra; la bandeja por facturar y las facturas de proveedor. */
-final class Comprobantes extends Base implements HasTable
+/**
+ * MVP rápido (t5-finanzas): lo común de las pantallas de comprobantes. MV-021 las parte: «Facturas emitidas» y
+ * «Cobranzas» (ventas, en Facturación y cobranza) y «Facturas de proveedor» (compras, con su cruce de tres vías, en
+ * Finanzas). Cada una dice su clase.
+ */
+abstract class Comprobantes extends Base implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $slug = 'comprobantes';
+    /** venta | compra */
+    protected const string CLASE = 'venta';
 
-    protected static ?string $title = 'Comprobantes';
-
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    protected static bool $shouldRegisterNavigation = false;
 
     public const array ESTADOS = ['por_cobrar' => 'Por cobrar', 'cobrado' => 'Cobrado', 'por_programar' => 'Por programar', 'programado' => 'Programado', 'pagado' => 'Pagado', 'anulado' => 'Anulado'];
-
-    public function getSubheading(): string
-    {
-        $porFacturar = DB::table('valorizaciones')->where('estado', 'aprobada')->count();
-
-        return ($porFacturar > 0 ? "Por facturar: {$porFacturar} valorizaciones aprobadas · " : '').'Las facturas de proveedor entran por su XML (validado con SUNAT) y se cruzan con la orden y su recepción.';
-    }
 
     public function content(Schema $schema): Schema
     {
@@ -52,18 +47,18 @@ final class Comprobantes extends Base implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(fn (): Builder => Comprobante::query())
+            ->query(fn (): Builder => Comprobante::query()->where('clase', static::CLASE))
             ->defaultSort('emision', 'desc')
             ->columns([
                 TextColumn::make('serie_numero')->label('Comprobante')->fontFamily('mono')->searchable()
-                    ->description(fn (Comprobante $record): string => ($record->clase === 'venta' ? 'Venta' : 'Compra').' · '.['xml' => 'XML', 'manual' => 'a mano', 'emitido' => 'emitido'][$record->origen]),
-                TextColumn::make('razon_social')->label('Cliente o proveedor')->wrap()->searchable()->description(fn (Comprobante $record): ?string => $record->ruc),
+                    ->description(fn (Comprobante $record): string => ['xml' => 'XML', 'manual' => 'a mano', 'emitido' => 'emitido'][$record->origen]),
+                TextColumn::make('razon_social')->label(static::CLASE === 'venta' ? 'Cliente' : 'Proveedor')->wrap()->searchable()->description(fn (Comprobante $record): ?string => $record->ruc),
                 TextColumn::make('proyecto')->label('Proyecto')->state(fn (Comprobante $record): string => $record->proyecto_id === null ? '—' : (string) DB::table('proyectos')->where('id', $record->proyecto_id)->value('codigo')),
                 TextColumn::make('emision')->label('Emisión')->date('d/m/Y')->description(fn (Comprobante $record): string => 'vence '.$record->vencimiento->format('d/m/Y')),
                 TextColumn::make('total')->label('Total')->alignEnd()->fontFamily('mono')->formatStateUsing(fn ($state, Comprobante $record): string => ($record->moneda === 'PEN' ? '' : $record->moneda.' ').self::s($state))
                     ->description(fn (Comprobante $record): ?string => (float) $record->detraccion > 0 ? 'detracción '.self::s($record->detraccion)
                         : ($record->moneda === 'PEN' ? null : 'TC '.$record->tipo_cambio.((float) $record->diferencia_cambio !== 0.0 ? ' · dif. de cambio '.self::s($record->diferencia_cambio) : ''))),
-                TextColumn::make('cruce')->label('Cruce / SUNAT')->badge()->placeholder('—')
+                TextColumn::make('cruce')->label('Cruce / SUNAT')->badge()->placeholder('—')->visible(static::CLASE === 'compra')
                     ->formatStateUsing(fn (?string $state): string => $state === 'diferencia' ? 'Diferencia con la recepción' : 'Orden ✓ recepción ✓ factura ✓')
                     ->color(fn (?string $state): string => $state === 'diferencia' ? 'danger' : 'success')
                     ->description(fn (Comprobante $record): ?string => $record->sunat_detalle),
@@ -73,29 +68,36 @@ final class Comprobantes extends Base implements HasTable
                     }),
             ])
             ->filters([
-                SelectFilter::make('clase')->label('Clase')->options(['venta' => 'Ventas', 'compra' => 'Compras']),
-                SelectFilter::make('estado')->label('Estado')->options(self::ESTADOS),
+                SelectFilter::make('estado')->label('Estado')->options(array_intersect_key(self::ESTADOS, array_flip(static::CLASE === 'venta' ? ['por_cobrar', 'cobrado', 'anulado'] : ['por_programar', 'programado', 'pagado', 'anulado']))),
             ])
-            ->recordActions([
-                Action::make('cobrar')->label('Cobrar')->button()->color('success')->hidden(fn (Comprobante $record): bool => $record->estado !== 'por_cobrar' || ! self::puede(FinanzasService::PERMISO_FACTURAR))
-                    ->fillForm(fn (): array => ['fecha' => Calendario::hoy(), 'cuenta' => FinanzasService::CUENTAS[0]])
-                    ->schema([DatePicker::make('fecha')->label('Fecha')->required()->format('Y-m-d'), Select::make('cuenta')->label('Cuenta')->options(array_combine(FinanzasService::CUENTAS, FinanzasService::CUENTAS))->required()])
-                    ->action(fn (Comprobante $record, array $data) => $this->hacer(fn () => app(FinanzasService::class)->cobrar($record->id, CarbonImmutable::parse($data['fecha']), $data['cuenta']), 'Cobrado.')),
-            ]);
+            ->recordActions(static::CLASE === 'venta' ? [$this->accionCobrar()] : []);
     }
 
-    protected function getHeaderActions(): array
+    protected function accionCobrar(): Action
+    {
+        return Action::make('cobrar')->label('Cobrar')->button()->color('success')->hidden(fn (Comprobante $record): bool => $record->estado !== 'por_cobrar' || ! self::puede(FinanzasService::PERMISO_FACTURAR))
+            ->fillForm(fn (): array => ['fecha' => Calendario::hoy(), 'cuenta' => FinanzasService::CUENTAS[0]])
+            ->schema([DatePicker::make('fecha')->label('Fecha')->required()->format('Y-m-d'), Select::make('cuenta')->label('Cuenta')->options(array_combine(FinanzasService::CUENTAS, FinanzasService::CUENTAS))->required()])
+            ->action(fn (Comprobante $record, array $data) => $this->hacer(fn () => app(FinanzasService::class)->cobrar($record->id, CarbonImmutable::parse($data['fecha']), $data['cuenta']), 'Cobrado.'));
+    }
+
+    protected function accionFacturar(): Action
+    {
+        return Action::make('facturar')->label('Facturar valorización')->icon('heroicon-o-document-plus')->visible(fn (): bool => self::puede(FinanzasService::PERMISO_FACTURAR))
+            ->fillForm(fn (): array => ['emision' => Calendario::hoy()])
+            ->schema([
+                Select::make('valorizacion')->label('Valorización aprobada')->required()
+                    ->options(fn (): array => DB::table('valorizaciones as v')->join('contratos as c', 'c.id', '=', 'v.contrato_id')->where('v.estado', 'aprobada')
+                        ->selectRaw("v.id, c.codigo || ' · val. ' || v.numero || ' · ' || v.periodo || ' · neto ' || to_char(v.neto, 'FM999G999G990D00') AS t")->pluck('t', 'v.id')->all()),
+                DatePicker::make('emision')->label('Emisión')->required()->format('Y-m-d'),
+            ])
+            ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->facturarValorizacion((int) $data['valorizacion'], CarbonImmutable::parse($data['emision'])), 'Factura emitida por el neto.'));
+    }
+
+    /** @return list<Action> */
+    protected function accionesDeProveedor(): array
     {
         return [
-            Action::make('facturar')->label('Facturar valorización')->icon('heroicon-o-document-plus')->visible(fn (): bool => self::puede(FinanzasService::PERMISO_FACTURAR))
-                ->fillForm(fn (): array => ['emision' => Calendario::hoy()])
-                ->schema([
-                    Select::make('valorizacion')->label('Valorización aprobada')->required()
-                        ->options(fn (): array => DB::table('valorizaciones as v')->join('contratos as c', 'c.id', '=', 'v.contrato_id')->where('v.estado', 'aprobada')
-                            ->selectRaw("v.id, c.codigo || ' · val. ' || v.numero || ' · ' || v.periodo || ' · neto ' || to_char(v.neto, 'FM999G999G990D00') AS t")->pluck('t', 'v.id')->all()),
-                    DatePicker::make('emision')->label('Emisión')->required()->format('Y-m-d'),
-                ])
-                ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->facturarValorizacion((int) $data['valorizacion'], CarbonImmutable::parse($data['emision'])), 'Factura emitida por el neto.')),
             Action::make('xml')->label('Subir XML de factura')->icon('heroicon-o-code-bracket')->visible(fn (): bool => self::puede(FinanzasService::PERMISO_PAGAR))
                 ->modalDescription('Se lee del XML: número, emisión, RUC, moneda, base, IGV y total; se valida con SUNAT y se cruza con la orden y lo recibido.')
                 ->fillForm(fn (): array => ['dias' => 30])

@@ -18,7 +18,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t3b-transicion-cielo](fichas/t3b-transicion-cielo.md) | T3b | aprobada | v1 | `aprobado/t3b-transicion-cielo-v1` |
 | [t4-personal-tareo](fichas/t4-personal-tareo.md) | T4 | aprobada | v1 | `aprobado/t4-personal-tareo-v1` |
 | [t4-valorizaciones](fichas/t4-valorizaciones.md) | T4 | aprobada | v1 | `aprobado/t4-valorizaciones-v1` |
-| [t5-finanzas](fichas/t5-finanzas.md) | T5 | aprobada | v3 | `aprobado/t5-finanzas-v3` |
+| [t5-finanzas](fichas/t5-finanzas.md) | T5 | en curso (v3 aprobada) | v4 | `aprobado/t5-finanzas-v3` |
 | [op-solicitudes-permiso](fichas/op-solicitudes-permiso.md) | Opcional | aprobada | v1 | `aprobado/op-solicitudes-permiso-v1` |
 | [op-asistente](fichas/op-asistente.md) | Opcional | aprobada | v1 | `aprobado/op-asistente-v1` |
 | [op-gran-momento](fichas/op-gran-momento.md) | Opcional | aprobada | v1 | `aprobado/op-gran-momento-v1` |

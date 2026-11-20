@@ -20,3 +20,6 @@ Route::middleware(['web', 'auth'])->prefix('asistente')->group(function (): void
         return response()->json(['codigo' => app(AsistenteService::class)->abrirTicket($r->user(), $datos['resumen'], $datos['pantalla'], (string) ($datos['conversacion'] ?? ''))]);
     })->name('asistente.ticket');
 });
+
+// MV-021: Comprobantes se partió; los enlaces viejos van a las facturas emitidas.
+Route::middleware(['web'])->get('comprobantes', fn () => redirect('/facturas-emitidas'));

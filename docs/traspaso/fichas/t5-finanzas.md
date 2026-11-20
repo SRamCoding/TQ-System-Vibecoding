@@ -1,7 +1,7 @@
 # Ficha · El ciclo del dinero: facturación, pagos, caja, rendiciones y resultado real (flujos 4 a 7)
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v3
+- **Estado:** en curso (v4, ronda de cambios; la v3 quedó aprobada)
+- **Versión:** v4
 - **Tramo de la ruta:** T5
 - **Aprobada (v3):** 2026-11-20 · etiqueta `aprobado/t5-finanzas-v3`
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t5-finanzas-v2`
@@ -20,20 +20,31 @@ real y lo proyectado por mes. «¿Cuánto se ganó?» y la tarjeta «Resultado r
 
 ## Decisiones de Sebastián
 
+- **MV-021** (cruza módulos) · Comprobantes se parte: Facturas emitidas y Cobranzas (Facturación y cobranza) y
+  Facturas de proveedor (Finanzas).
+- **MV-016** (cruza módulos) · Sus pantallas se reparten entre Techquk, Facturación y cobranza y Finanzas.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
 
-- **Inicio:** cajas «¿Cuánto se ganó?», «Comprobantes», «Tablero de pagos», «Flujo de caja» y «Rendiciones» (ERP).
+- **Inicio (MV-016, MV-021):** «¿Cuánto se ganó?» en Techquk; «Facturas emitidas» y «Cobranzas» en Facturación y
+  cobranza; «Facturas de proveedor», «Tablero de pagos», «Flujo de caja y conciliación», «Rendiciones», «Servicios con
+  vigencia» y «Para el contador» en Finanzas.
 - **¿Cuánto se ganó?** `/resultados`: por proyecto, vendido, facturado, por cobrar, costo real, por pagar, **margen
   real** (con su %; rojo si pierde) y caja neta. Cada fila abre el proyecto.
 - **Proyecto → Resumen:** tarjeta **«Resultado real»** (facturado, por cobrar, costo real, por pagar a proveedores,
   margen real con su % y caja neta).
-- **Comprobantes** `/comprobantes`: comprobante (venta o compra; XML, a mano o emitido), cliente o proveedor y RUC,
-  proyecto, emisión y vencimiento, total (detracción debajo), cruce y SUNAT («Orden ✓ recepción ✓ factura ✓» o
-  «Diferencia con la recepción»), estado. Botones: **Facturar valorización** (las aprobadas), **Registrar factura de
-  proveedor** (orden recibida, serie y número, RUC, emisión, días de crédito, subtotal si difiere); en cada venta por
-  cobrar, **Cobrar** (fecha y cuenta).
+- **Facturas emitidas** `/facturas-emitidas` (MV-021): las ventas. Comprobante (XML, a mano o emitido), cliente y RUC,
+  proyecto, emisión y vencimiento, total (detracción o tipo de cambio debajo), estado (por cobrar, cobrado, anulado).
+  Subtítulo: cuántas valorizaciones aprobadas faltan facturar. Botón **Facturar valorización** (las aprobadas); en cada
+  venta por cobrar, **Cobrar** (fecha y cuenta).
+- **Cobranzas** `/cobranzas` (MV-021): las ventas por cobrar, lo vencido primero, y las cobradas en los últimos 60
+  días. Columna **Plazo**: «Vencida hace N d» (rojo), «Vence hoy» o «Vence en N d» (ámbar si faltan 7 días o menos),
+  «Cobrada» (verde). Subtítulo: «Por cobrar S/ … · vencido S/ … (N facturas)». En cada una, **Cobrar**.
+- **Facturas de proveedor** `/facturas-proveedor` (MV-021): las compras con su columna de cruce y SUNAT («Orden ✓
+  recepción ✓ factura ✓» o «Diferencia con la recepción») y su estado (por programar, programado, pagado, anulado).
+  Botones **Subir XML de factura** y **Registrar factura de proveedor** (orden recibida, serie y número, RUC, emisión,
+  días de crédito, subtotal si difiere). `/comprobantes` lleva a Facturas emitidas.
 - **Tablero de pagos** `/tablero-pagos`: tres columnas (Por programar, Programado, Pagado de los últimos 15 días) con
   tarjetas: proveedor, total, comprobante, proyecto, vencimiento (rojo si venció) o fecha programada, aviso de
   diferencia en el cruce; botones Programar (al viernes siguiente) y Pagar.
@@ -100,11 +111,16 @@ concepto, comprobante, fondo, proyecto, conciliado), `fondos` y `fondo_gastos` (
 
 ## Dónde está en el código
 
-`app/Modules/Erp/Finanzas/` (provider, migración, `Services/FinanzasService.php`, `Filament/Pages/` con Comprobantes,
+`app/Modules/Erp/Finanzas/` (provider, migración, `Services/FinanzasService.php`, `Filament/Pages/` con Comprobantes (la base común) y sus tres pantallas FacturasEmitidas, Cobranzas y
+FacturasProveedor,
 TableroPagos, FlujoCaja, Rendiciones y Resultados, `Resumen/TarjetaResultado.php`, vistas `tablero-pagos` y `flujo`);
 datos en `DemoSeeder::compraDemo()` (facturas y pagos) y `tramo5()`.
 
 ## Cambios desde la versión anterior
+
+- **v4** (ronda 1, MV-021): Comprobantes se parte en tres pantallas: Facturas emitidas y Cobranzas (nueva: lo que
+  deben los clientes con su plazo) en Facturación y cobranza; Facturas de proveedor en Finanzas. El tablero de
+  Tesorería lleva «Qué cobro» a Cobranzas.
 
 v2 (2026-11-20): **Exportar para el contador** (`/exportar-contador`, caja «Para el contador»): por mes, en CSV para
 Excel (punto y coma, UTF-8 con BOM), el registro de ventas, el de compras y caja y bancos, cada fila con las cuentas
