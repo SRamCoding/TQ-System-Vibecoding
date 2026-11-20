@@ -458,3 +458,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Pedido 5: la portada de cada proceso»
+
+### MV-036 · 2026-11-20 · La frase debajo de las cajas, sutil; reordenar como en el muelle
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** «que la frase esté abajo de las cajas y que sea más sutil, esto implica más pequeño y menos
+  intensidad de color, y quiero que cuando intento cambiar el orden las cajas, pues sea más natural como lo fue en el
+  muelle por ejemplo».
+- **Decisión:** la frase va debajo de la barra de cajas, chica (15 px), en cursiva y con el color de su franja apagado
+  hacia gris. Reordenar se siente como el muelle: una copia de la caja sigue al puntero (mouse o dedo) y las demás se
+  corren en vivo a su nuevo lugar; al soltar, la copia se desliza a su sitio. Precisa MV-035.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «La frase debajo y sutil; reordenar como en el muelle»

@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v4
+- **Versión:** v5
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-036** (ficha) · La frase debajo de las cajas, chica y apagada; reordenar con una copia que sigue al puntero
+  y las demás corriéndose en vivo, como en el muelle.
 - **MV-035** (cruza módulos) · Cada proceso: frase en el color de su franja y sus cajas centradas como un solo cuerpo
   que es su navegación; el contenido debajo; al entrar, la caja del medio; orden por persona (reemplaza MV-020).
 
@@ -52,8 +54,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   series»; Abastecer, de 4, «Órdenes»; Conseguir el negocio, «Oportunidades»). Un enlace (Mien, la barra lateral, un
   aviso) abre directo la caja de ese enlace.
 - **Arriba de cada pantalla del proceso** (también en sus fichas, como `/oportunidades/1`), centrados:
-  - **La frase** del proceso, una línea de 28 px en negrita, en el color de texto de su franja (en claro, turquesa
-    `#00788A`, morado `morado-700`, azul noche, gris; en oscuro, sus versiones claras). Sale del parámetro
+  - **La frase** del proceso (MV-036: **debajo de las cajas**), una línea de 15 px en cursiva, con el color de texto de
+    su franja mezclado a la mitad con gris (más apagado; en oscuro, con el gris claro). Sale del parámetro
     `procesos.frase_<clave>` (Configuración → Parámetros); las de la propuesta: Techquk «Así va Techquk.»,
     Conseguir el negocio «¡Vamos por esas oportunidades!», Gerencia de proyectos «Cada proyecto, bajo control.»,
     Abastecer «Lo que la obra necesita, a tiempo.», Facturación y cobranza «Lo trabajado, cobrado.», Postventa «El
@@ -64,7 +66,9 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
     en pantallas chicas pasan a otra fila centradas). La de la pantalla actual va marcada con un fondo suave y una
     barra de 4 px del color de su franja (`aria-current`). Presionar otra muestra su contenido debajo; la barra se
     queda quieta en su lugar.
-  - **Reordenar:** arrastrar una caja sobre otra, o con el foco en una, **Alt + ← / →**. Se guarda al instante para esa
+  - **Reordenar (MV-036):** se presiona una caja y se mueve (más de 6 px; con mouse o con el dedo): una copia con sombra
+    sigue al puntero y las demás se deslizan en vivo (200 ms) al lugar que tendrían; al soltar, la copia se desliza a su
+    sitio y el clic no abre la caja. Con el foco en una, **Alt + ← / →** la corre un lugar con el mismo deslizamiento. Se guarda al instante para esa
     persona y cambia la caja del medio. **«Volver al orden original»** aparece debajo cuando hay un orden propio.
   - Ya no hay título de portada, descripción, etiqueta de franja, pestañas ni miga.
 - **Barra lateral:** un grupo por franja con las cajas de proceso (Mien en «Personal»). Un proceso queda marcado en cualquiera
@@ -180,6 +184,9 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v5** (MV-036): la frase pasa debajo de las cajas, chica y apagada; el reordenamiento deja el arrastre del navegador
+  y usa el del muelle (copia que sigue al puntero y cajas que se corren en vivo).
 
 - **v4** (MV-035): la portada con cajas que llevaban a otra pantalla y las pestañas con miga se reemplazan por la frase
   y la barra de cajas del proceso arriba de cada pantalla; al entrar, la caja del medio; orden por persona.
