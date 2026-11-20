@@ -11,6 +11,8 @@ use App\Modules\Crm\Licitaciones\LicitacionesServiceProvider;
 use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
 use App\Modules\Erp\Compras\ComprasServiceProvider;
 use App\Modules\Erp\Contratos\ContratosServiceProvider;
+use App\Modules\Erp\Personal\PersonalServiceProvider;
+use App\Modules\Erp\Valorizaciones\ValorizacionesServiceProvider;
 use App\Modules\Erp\Presupuestos\PresupuestosServiceProvider;
 use App\Modules\Erp\Proyectos\ProyectosServiceProvider;
 use App\Modules\Nucleo\NucleoServiceProvider;
@@ -25,6 +27,8 @@ return [
     PresupuestosServiceProvider::class,
     ContratosServiceProvider::class,
     ComprasServiceProvider::class,
+    PersonalServiceProvider::class,
+    ValorizacionesServiceProvider::class,
     CuentasServiceProvider::class,
     ActividadesServiceProvider::class,
     OportunidadesServiceProvider::class,

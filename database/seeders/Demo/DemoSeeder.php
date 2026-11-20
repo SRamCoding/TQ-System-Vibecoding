@@ -31,6 +31,8 @@ use App\Modules\Erp\Compras\Models\Orden;
 use App\Modules\Erp\Compras\Services\ComprasService;
 use App\Modules\Erp\Contratos\Models\Contrato;
 use App\Modules\Erp\Contratos\Services\ContratosService;
+use App\Modules\Erp\Personal\Models\Colaborador;
+use App\Modules\Erp\Personal\Services\PersonalService;
 use App\Modules\Erp\Presupuestos\Models\Insumo;
 use App\Modules\Erp\Presupuestos\Models\PartidaControl;
 use App\Modules\Erp\Presupuestos\Models\PartidaDePresupuesto;
@@ -48,6 +50,7 @@ use App\Modules\Erp\Presupuestos\Services\InsumosService;
 use App\Modules\Erp\Presupuestos\Services\PresupuestoEmpresaService;
 use App\Modules\Erp\Proyectos\Models\Proyecto;
 use App\Modules\Erp\Proyectos\Services\ProyectosService;
+use App\Modules\Erp\Valorizaciones\Services\ValorizacionesService;
 use App\Modules\Nucleo\Aprobaciones\DatosRegla;
 use App\Modules\Nucleo\Enums\Catalogo;
 use App\Modules\Nucleo\Enums\CondicionRegla;
@@ -138,6 +141,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: presupuesto de la empresa');
             $this->presupuestoEmpresa();
+
+            $this->command?->info('Demo: personal, tareo, valorizaciones y subcontratos');
+            $this->tramo4();
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -1024,5 +1030,73 @@ final class DemoSeeder extends Seeder
             $compras->recibir($orden->id, [(int) $orden->lineas()->value('id') => '520'], CarbonImmutable::parse('2026-11-18'), 'GR-001-004512', 'obra', 'Recibido en obra por el especialista.');
             $orden->update(['seguimiento' => 'Faltan 130 m · el proveedor confirmó para el 20/11']);
         });
+    }
+
+    /** Tramo 4 (fichas t4-personal-tareo y t4-valorizaciones): la gente, el tareo del v4, valorizaciones y un subcontrato. */
+    private function tramo4(): void
+    {
+        $plaza = (int) DB::table('proyectos')->where('nombre', 'like', '%Plaza de Armas%')->value('id');
+        $p8 = (int) DB::table('proyectos')->where('nombre', 'like', 'Red de datos y enlaces%')->value('id');
+        $p6 = (int) DB::table('proyectos')->where('nombre', 'like', 'Sistema de información hospitalaria%')->value('id');
+        $p9 = (int) DB::table('proyectos')->where('nombre', 'like', 'Historia clínica%')->value('id');
+        $cat = fn (string $c): int => (int) DB::table('categorias_personal')->where('codigo', $c)->value('id');
+        $col = [];
+
+        foreach ([['julio', 'Julio Chávez Sandoval', '40112233', 'TEC', 'eventual', '2027-03-31'], ['luis', 'Luis Vela Paredes', '40223344', 'AYU', 'eventual', '2027-03-31'],
+            ['marco', 'Marco Ruiz Ugaz', '40334455', 'ESP', 'planilla', '2027-06-30'], ['carla', 'Carla Ríos Seminario', '40445566', 'ESP', 'planilla', '2027-06-30'],
+            ['pedro', 'Pedro Salas Cieza', '40556677', 'DES', 'planilla', null], ['tomas', 'Tomás León Fiestas', '40667788', 'TEC', 'eventual', '2026-10-31']] as [$k, $n, $dni, $c, $v, $sctr]) {
+            $col[$k] = Colaborador::query()->create(['nombres' => $n, 'dni' => $dni, 'categoria_id' => $cat($c), 'vinculo' => $v, 'habilitado_hasta' => $sctr])->id;
+        }
+
+        $s = app(PersonalService::class);
+        $d = fn (string $f): CarbonImmutable => CarbonImmutable::parse($f);
+        $s->asignar($col['julio'], $plaza, 100, $d('2026-11-06'), $d('2026-12-06'));
+        $s->asignar($col['luis'], $plaza, 100, $d('2026-11-06'), $d('2026-12-06'));
+        $s->asignar($col['marco'], $plaza, 60, $d('2026-11-09'), $d('2026-12-06'));
+        $s->asignar($col['marco'], $p8, 60, $d('2026-11-23'), null);
+        $s->asignar($col['carla'], $p8, 100, $d('2026-06-01'), null);
+        $s->asignar($col['pedro'], $p6, 50, $d('2025-09-15'), null);
+        $s->asignar($col['pedro'], $p9, 50, $d('2026-11-23'), null);
+
+        // La semana del v4: 68 h por S/ 1,080.00; PC-02.03 = 648.00; PC-01.02 = 432.00 (72 %).
+        $pc = fn (string $codigo): int => (int) DB::table('partidas_control')->where('proyecto_id', $plaza)->where('codigo', $codigo)->value('id');
+        $this->en('2026-11-14', function () use ($s, $plaza, $col, $pc, $d): void {
+            $t = $s->semana($plaza, $d('2026-11-09'));
+            $s->tarear($t->id, $col['julio'], $pc('PC-02.03'), ['lu' => '8', 'ma' => '8', 'mi' => '4']);
+            $s->tarear($t->id, $col['julio'], $pc('PC-01.02'), ['mi' => '4', 'ju' => '8', 'vi' => '8', 'sa' => '4']);
+            $s->tarear($t->id, $col['luis'], $pc('PC-02.03'), ['lu' => '8', 'ma' => '8', 'mi' => '8']);
+            $s->cerrar($t->id, $this->dev);
+        });
+        $this->en('2026-11-19', function () use ($s, $plaza, $col, $pc, $d): void {
+            $t = $s->semana($plaza, $d('2026-11-16'));
+            $s->tarear($t->id, $col['julio'], $pc('PC-02.03'), ['lu' => '8', 'ma' => '8', 'mi' => '8']);
+            $s->tarear($t->id, $col['luis'], $pc('PC-02.03'), ['lu' => '8', 'ma' => '6', 'mi' => '8']);
+        });
+
+        // Valorizaciones de P8 con adelanto directo del 10 % y la fórmula polinómica del presupuesto.
+        $v = app(ValorizacionesService::class);
+        $ct = Contrato::query()->where('proyecto_id', $p8)->firstOrFail();
+        $v->registrarAdelanto($ct->id, 'directo', '100064.00', '10', '2026-06-05');
+
+        foreach ([['2026-07', ['01.01' => '20', '01.02' => '30']], ['2026-08', ['01.01' => '25', '01.02' => '40', '02.01' => '30']],
+            ['2026-09', ['01.01' => '25', '02.01' => '40', '03.01' => '30']], ['2026-10', ['01.01' => '15', '01.02' => '20', '03.01' => '30', '03.02' => '50']]] as $n => [$periodo, $avances]) {
+            $this->en(CarbonImmutable::parse($periodo.'-28'), function () use ($v, $ct, $periodo, $avances, $n): void {
+                $val = $v->armar($ct->id, $periodo, $avances);
+
+                if ($n < 3) {
+                    $v->aprobar($val->id);
+                }
+            });
+        }
+
+        // El subcontrato del v4: 70,000.00 con adelanto 20 % y retención 5 %; la valorización 2 queda por aprobar.
+        $hojas = DB::table('partidas_control')->where('proyecto_id', $p8)->where('es_hoja', true)->where('es_no_presupuestado', false)->where('es_gastos_generales', false)->orderBy('codigo')->pluck('id')->all();
+        $sc = $this->en('2026-07-20', fn () => $v->crearSubcontrato($p8, 'Obras Civiles Norte E.I.R.L.', 'Obra civil del centro de datos y canalizaciones', '20', '5', [$hojas[3] => '50000.00', $hojas[0] => '20000.00']));
+        $this->en('2026-08-30', function () use ($v, $sc): void {
+            $val = $v->valorizarSubcontrato($sc->id, '2026-08', '35');
+            $v->aprobarSubcontrato($val->id);
+            $val->update(['estado' => 'pagada']);
+        });
+        $this->en('2026-09-30', fn () => $v->valorizarSubcontrato($sc->id, '2026-09', '40'));
     }
 }
