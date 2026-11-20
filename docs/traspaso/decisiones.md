@@ -385,3 +385,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Pedido 1: ícono de Conseguir el negocio»
+
+### MV-031 · 2026-11-20 · Ícono propio de «Postventa»: el rompecabezas armado y la flecha que sigue
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/icono-postventa.md`) «un rompecabezas de cuatro piezas encajadas, con una
+  flecha que sale de la pieza de abajo a la derecha y sigue ondulando hacia la derecha. La idea: el proyecto ya está
+  armado y completo, pero la relación con el cliente continúa. Solo el dibujo, sin ningún texto».
+- **Decisión:** ícono propio de línea, 24 × 24, trazo 1,9, un solo color: el cuadrado de 2 × 2 piezas (unos 14 × 14 a
+  la izquierda) con una lengüeta por borde interior, y la flecha ondulada con punta abierta saliendo de la pieza de abajo
+  a la derecha. Va en el inicio, la barra lateral y la portada. Referencia en
+  `docs/vibe/referencias/icono-postventa.png`.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Pedido 2: ícono de Postventa»

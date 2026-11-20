@@ -66,7 +66,7 @@ enum Proceso: string
             self::GerenciaProyectos => 'heroicon-o-briefcase',
             self::Abastecer => 'heroicon-o-truck',
             self::FacturacionCobranza => 'heroicon-o-currency-dollar',
-            self::Postventa => 'heroicon-o-hand-thumb-up',
+            self::Postventa => 'tq-rompecabezas-flecha', // MV-031: el rompecabezas armado y la flecha que sigue
             self::PresupuestarCotizar => 'heroicon-o-clipboard-document-check',
             self::Finanzas => 'heroicon-o-wallet',
             self::Personas => 'heroicon-o-face-smile',

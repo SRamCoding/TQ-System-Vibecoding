@@ -22,6 +22,7 @@ menos una pantalla.
 - **MV-018** (ficha) · Las franjas se reparten solas en dos columnas de alto parecido; una vacía desaparece; en el
   celular, una columna.
 - **MV-019** (ficha) · Los colores siguen como estaban; los nuevos, se le consultan.
+- **MV-031** (ficha) · Postventa lleva su ícono propio: el rompecabezas armado con la flecha que sigue.
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
@@ -73,7 +74,8 @@ menos una pantalla.
   «Ejecutar proyecto».
 
 - **Íconos propios de procesos:** Conseguir el negocio usa `tq-montana-bandera` (MV-030): de línea, 24 × 24, trazo
-  1,9, `currentColor`, sin texto; referencia en `docs/vibe/referencias/`.
+  1,9, `currentColor`, sin texto; Postventa usa `tq-rompecabezas-flecha` (MV-031), con una lengüeta por borde interior
+  para que no se empaste. Referencias en `docs/vibe/referencias/`.
 
 ## Operaciones
 
