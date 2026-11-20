@@ -33,7 +33,7 @@
         .tq-op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr)); gap: 1rem; }
         .tq-op-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 0.75rem; background: white; box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); outline: 1px solid rgb(3 7 18 / 0.06); text-align: start; cursor: pointer; transition: box-shadow 160ms ease, transform 160ms ease; }
         .dark .tq-op-card { background: var(--gray-900); outline-color: rgb(255 255 255 / 0.08); }
-        .tq-op-card:hover, .tq-op-card:focus-visible { box-shadow: 0 8px 20px -6px color-mix(in oklab, var(--morado-600) 35%, transparent); transform: translateY(-2px); }
+        .tq-op-card:hover, .tq-op-card:focus-visible { box-shadow: 0 8px 20px -6px color-mix(in oklab, var(--primary-600) 35%, transparent); transform: translateY(-2px); }
         @media (prefers-reduced-motion: reduce) { .tq-op-card { transition: none; transform: none !important; } }
         html.tq-sin-animaciones .tq-op-card { transition: none; transform: none !important; }
         .tq-op-foto { position: relative; height: 7.5rem; overflow: hidden; background: var(--gray-100); }

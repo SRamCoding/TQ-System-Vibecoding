@@ -77,7 +77,9 @@ final class ColoresMarca
             950 => [0.12, 0.07],
         ];
 
-        return array_map(fn (array $tono): string => "oklch({$tono[0]} {$tono[1]} {$matiz})", $escala);
+        // MV-042: el azul de resaltado en modo oscuro (enlaces, pestañas, foco, filtros activos) es #6F9BFF, el mismo de la
+        // franja Estratégicos en oscuro: Filament lo toma del tono 400.
+        return array_replace(array_map(fn (array $tono): string => "oklch({$tono[0]} {$tono[1]} {$matiz})", $escala), [400 => self::AZUL_NOCHE_OSCURO]);
     }
 
     /**

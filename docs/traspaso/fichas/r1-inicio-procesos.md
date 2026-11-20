@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v9
+- **Versión:** v10
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-042** (cruza módulos) · Un solo azul de resaltado (azul noche; `#6F9BFF` en oscuro) para lo elegido; la franja
+  solo en la barra lateral principal, las cajas, la frase y los íconos.
 - **MV-041** (cruza módulos) · Al filtrar u ordenar, las filas se deslizan, salen recogiéndose y entran escalonadas.
 - **MV-039** (cruza módulos) · Ninguna pantalla lleva texto que explique cómo funciona; quedan datos, etiquetas y
   mensajes.
@@ -145,6 +147,12 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   apareciendo con 40 ms entre una y otra (hasta 8 escalones) y las que salieron dejan una copia que se desvanece y se
   recoge hacia arriba (220 ms). Quietas con «reducir movimiento» o «reducir animaciones».
 
+- **Azul de resaltado (MV-042):** el tono 400 del color principal pasa a `#6F9BFF` (el azul que Filament usa en oscuro para
+  enlaces, pestañas activas, foco y la opción elegida de las barras laterales internas como la de Configuración). Lo
+  que usaba el morado o el turquesa para resaltar algo elegido pasa al azul: la tarjeta de proyecto y la de oportunidad
+  al pasar el mouse, la columna sobre la que se suelta en el tablero de oportunidades y la fila puesta de su botonera.
+  Los filtros activos de Tickets de ayuda, también en azul.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -218,6 +226,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v10** (MV-042): un solo azul de resaltado en todo el sistema.
 
 - **v9** (MV-041): las filas se mueven al filtrar u ordenar.
 

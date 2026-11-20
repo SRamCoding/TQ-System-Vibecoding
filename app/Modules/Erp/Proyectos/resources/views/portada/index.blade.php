@@ -21,7 +21,7 @@
         .tq-pp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; }
         .tq-pp-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 0.75rem; background: white; box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); outline: 1px solid rgb(3 7 18 / 0.06); transition: box-shadow 160ms ease, transform 160ms ease; }
         .dark .tq-pp-card { background: var(--gray-900); outline-color: rgb(255 255 255 / 0.08); }
-        .tq-pp-card:hover, .tq-pp-card:focus-visible { box-shadow: 0 8px 20px -6px color-mix(in oklab, var(--info-600) 35%, transparent); transform: translateY(-2px); }
+        .tq-pp-card:hover, .tq-pp-card:focus-visible { box-shadow: 0 8px 20px -6px color-mix(in oklab, var(--primary-600) 35%, transparent); transform: translateY(-2px); }
         @media (prefers-reduced-motion: reduce) { .tq-pp-card { transition: none; transform: none !important; } }
         .tq-pp-foto { position: relative; aspect-ratio: 16 / 9; overflow: hidden; background: var(--gray-100); }
         .tq-pp-foto > img, .tq-pp-foto > svg { width: 100%; height: 100%; object-fit: cover; display: block; }

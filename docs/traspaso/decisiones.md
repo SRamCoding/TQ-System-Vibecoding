@@ -536,3 +536,18 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 5: las filas se mueven al filtrar»
+
+### MV-042 · 2026-11-20 · Un solo azul de resaltado; la franja dice dónde estás
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones, punto 6) «El azul con el que hoy se resalta lo elegido me gusta y se queda, y es el
+  mismo para todo el sistema. Lo usan: la opción elegida en las barras laterales internas, los enlaces de acción, el
+  foco de los campos y del buscador, las pestañas y los filtros activos. La excepción es la barra lateral principal: esa
+  sigue con el color de cada franja. El color de la franja dice dónde estás; el azul dice qué elegiste». Y, entre las
+  opciones que le dio el agente: la caja elegida de la barra de un proceso sigue con el color de su franja.
+- **Decisión:** el resaltado de lo elegido es siempre el color principal (azul noche en claro, `#6F9BFF` en oscuro).
+  Con el color de su franja quedan la barra lateral principal, las cajas (también la elegida de cada proceso), la frase
+  de cada proceso y los íconos de las cajas.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 6: un solo azul de resaltado»

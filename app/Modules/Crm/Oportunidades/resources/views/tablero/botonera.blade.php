@@ -121,7 +121,7 @@
         .dark .tq-botonera-col { background: rgb(255 255 255 / 0.03); outline-color: rgb(255 255 255 / 0.06); }
         .tq-botonera-col[data-lugar="ganadas"] { background: color-mix(in oklab, var(--success-500) 7%, var(--gray-50)); }
         .tq-botonera-col[data-lugar="perdidas"] { background: color-mix(in oklab, var(--danger-500) 6%, var(--gray-50)); }
-        .tq-botonera-col.tq-sobre { outline: 2px dashed var(--morado-600); }
+        .tq-botonera-col.tq-sobre { outline: 2px dashed var(--primary-600); }
         .tq-botonera-titulo { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.875rem; }
         .tq-botonera-titulo .tq-gema-titulo { display: inline-flex; transition: transform 300ms ease; }
         .tq-botonera-titulo .tq-gema-titulo.tq-salta { animation: tq-titulo-salta 500ms ease; }
@@ -150,7 +150,7 @@
         .dark .tq-botonera-tabla th { border-bottom-color: var(--gray-700); }
         .dark .tq-botonera-tabla td { border-bottom-color: var(--gray-800); }
         .tq-botonera-tabla .tq-num { text-align: end; font-variant-numeric: tabular-nums; }
-        .tq-botonera-tabla tr.tq-puesta { background: color-mix(in oklab, var(--morado-600) 6%, transparent); }
+        .tq-botonera-tabla tr.tq-puesta { background: color-mix(in oklab, var(--primary-600) 6%, transparent); }
         .tq-botonera-cab { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
         .tq-botonera-ayuda { margin-top: 0.75rem; font-size: 0.8125rem; color: var(--gray-500); }
     </style>
