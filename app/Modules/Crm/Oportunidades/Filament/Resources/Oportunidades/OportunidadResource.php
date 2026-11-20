@@ -289,7 +289,8 @@ final class OportunidadResource extends Resource
                 ]),
                 // D12: las que suman otros módulos (Cotizaciones, Presupuesto, Actividades…), cada una con su permiso.
                 ...array_map(fn (PestanaOportunidad $pestana): Tab => Tab::make($pestana->titulo)->icon($pestana->icono)
-                    ->visible(fn (): bool => app(RegistroPestanasOportunidad::class)->puedeVer(self::usuario(), $pestana->permiso))
+                    ->visible(fn (Oportunidad $record): bool => app(RegistroPestanasOportunidad::class)->puedeVer(self::usuario(), $pestana->permiso)
+                        && ($pestana->aplicaA === null || ($pestana->aplicaA)($record->id)))
                     ->schema([
                         Livewire::make($pestana->nombreLivewire(), fn (Oportunidad $record): array => ['oportunidadId' => $record->id])->key('oportunidad-'.$pestana->clave),
                     ]), app(RegistroPestanasOportunidad::class)->pestanasPara(self::usuario())),

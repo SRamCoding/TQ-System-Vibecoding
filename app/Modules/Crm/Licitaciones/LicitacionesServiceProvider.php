@@ -7,6 +7,8 @@ namespace App\Modules\Crm\Licitaciones;
 use App\Modules\Crm\Licitaciones\Filament\Resources\Licitaciones\LicitacionResource;
 use App\Modules\Crm\Licitaciones\Models\Licitacion;
 use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
+use App\Modules\Crm\Oportunidades\Pestanas\PestanaOportunidad;
+use App\Modules\Crm\Oportunidades\Pestanas\RegistroPestanasOportunidad;
 use App\Modules\Nucleo\Enums\TipoParametro;
 use App\Modules\Nucleo\Navegacion\AreaModulo;
 use App\Modules\Nucleo\Navegacion\CajaModulo;
@@ -51,11 +53,11 @@ final class LicitacionesServiceProvider extends ServiceProvider
             descripcion: 'Lo que publica el SEACE cada día y coincide con lo que vende Techquk, listo para registrar',
             preguntas: ['¿Qué salió hoy en el SEACE para nosotros?', '¿Qué convocatoria vence primero?'],
         ));
-        $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
-            'licitaciones', 'Licitaciones', '/licitaciones', permiso: LicitacionesService::PERMISO_VER, area: AreaModulo::Crm,
-            icono: 'heroicon-o-building-library',
-            descripcion: 'Las convocatorias públicas y privadas: cronograma, expediente, propuesta y resultado',
-            preguntas: ['¿Qué convocatorias vencen esta semana?', '¿Qué falta para presentar?', '¿A qué precio adjudica esta entidad?', '¿Por qué no participamos?'],
+        // MV-023: Licitaciones ya no es caja: es una pestaña de la oportunidad y de la portada de Oportunidades.
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'licitaciones');
+        $this->app->make(RegistroPestanasOportunidad::class)->registrar(new PestanaOportunidad(
+            'licitacion', 'Licitación', LicitacionesService::PERMISO_VER, Filament\LicitacionDeOportunidad::class, 'heroicon-o-building-library', orden: 5,
+            aplicaA: fn (int $id): bool => Filament\LicitacionDeOportunidad::tieneLicitacion($id),
         ));
     }
 }

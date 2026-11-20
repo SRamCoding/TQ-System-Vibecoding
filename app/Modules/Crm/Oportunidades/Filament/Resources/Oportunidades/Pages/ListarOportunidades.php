@@ -128,6 +128,8 @@ final class ListarOportunidades extends ListRecords
     public function content(Schema $schema): Schema
     {
         return $schema->components([
+            // MV-023 y MV-024: Por calificar (leads) · Oportunidades · Licitaciones.
+            View::make('oportunidades::portada.embudo-pestanas')->viewData(['actual' => 'oportunidades']),
             $this->cabeceraDeVistas(),
             $this->getTabsContentComponent(),
             View::make('oportunidades::portada.avisos')->viewData(fn (): array => ['avisos' => $this->avisos, 'filtro' => $this->tableFilters['revisar']['value'] ?? null]),

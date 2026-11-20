@@ -73,6 +73,9 @@ final class CampaniaResource extends Resource
                 TextColumn::make('presupuesto')->label('Presupuesto')->alignEnd()->fontFamily('mono')->formatStateUsing(fn ($state): string => $state === null ? '—' : 'S/ '.number_format((float) $state, 2)),
                 TextColumn::make('leads')->label('Leads')->alignEnd()->state($cifra('leads')),
                 TextColumn::make('convertidos')->label('Convertidos')->alignEnd()->state(fn (Campania $record): string => ($c = app(LeadsService::class)->cifras($record->id))['convertidos']." · {$c['tasa']} %"),
+                // MV-024: los resultados de la campaña, de un vistazo.
+                TextColumn::make('monto')->label('Monto generado')->alignEnd()->fontFamily('mono')->state(fn (Campania $record): string => 'S/ '.number_format((float) app(LeadsService::class)->cifras($record->id)['monto'], 2)),
+                TextColumn::make('costo_por_lead')->label('Costo por lead')->alignEnd()->fontFamily('mono')->state(fn (Campania $record): string => ($c = app(LeadsService::class)->cifras($record->id)['costo_por_lead']) === null ? '—' : 'S/ '.number_format((float) $c, 2)),
                 TextColumn::make('es_activa')->label('')->badge()->formatStateUsing(fn (bool $state): string => $state ? 'activa' : 'cerrada')->color(fn (bool $state): string => $state ? 'success' : 'gray'),
             ])
             ->recordUrl(fn (Campania $record): string => VerCampania::getUrl(['record' => $record]));

@@ -1,7 +1,7 @@
 # Ficha · Campañas y leads (CRM-07)
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v2
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-campanias-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-2-crm.md` (paso 6, «Leads y conversión»); `crm-pantallas.md` (CRM-07:
@@ -18,6 +18,7 @@ módulo es el último del CRM.
 
 ## Decisiones de Sebastián
 
+- **MV-024** (cruza módulos) · Los leads son la primera etapa del embudo («Por calificar»); Campañas muestra resultados.
 - **MV-005** (ficha) · Va al final del tramo 1.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
@@ -84,3 +85,10 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 `app/Modules/Crm/Campanias/` (provider, `Services/LeadsService.php`, modelos `Campania` y `Lead`,
 `Filament/Resources/Leads` y `Filament/Resources/Campanias`); datos en `DemoSeeder::campanias()`.
+
+## Cambios desde la versión anterior
+
+- **v2** (ronda 1, MV-024): la caja «Campañas y leads» pasa a ser **Campañas** (`/campanias`), con columnas nuevas
+  Monto generado y Costo por lead junto a Leads y Convertidos (con su tasa). Los leads (`/leads`) son la pestaña
+  **Por calificar**, la primera de la portada de Oportunidades (con su cantidad de nuevos y contactados).
+- **Supuesto:** el tablero y la faja de oportunidades no suman una columna de leads; «Por calificar» vive como pestaña.

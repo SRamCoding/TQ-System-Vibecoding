@@ -114,8 +114,8 @@ enum Proceso: string
         return match ($this) {
             self::Mien => ['mien' => null],
             self::Techquk => ['resultados' => '¿Cuánto se ganó?', 'presupuesto-empresa' => 'Presupuesto de la empresa', 'lo-aprendido' => 'Lo aprendido', 'reglas-negocio' => 'Reglas del negocio'],
-            // Licitaciones y Agenda, mientras llegan los pasos 4 y 5 de la ronda (MV-016).
-            self::ConseguirNegocio => ['oportunidades' => 'Oportunidades', 'convocatorias' => 'Convocatorias del SEACE', 'leads' => 'Campañas', 'licitaciones' => 'Licitaciones', 'agenda' => 'Agenda'],
+            // La Agenda, mientras llega el paso 5 de la ronda (MV-016).
+            self::ConseguirNegocio => ['oportunidades' => 'Oportunidades', 'convocatorias' => 'Convocatorias del SEACE', 'campanias' => 'Campañas', 'agenda' => 'Agenda'],
             self::GerenciaProyectos => ['proyectos' => 'Proyectos', 'contratos' => 'Contratos', 'asignacion' => 'Personal asignado', 'tareo' => 'Tareo', 'subcontratos' => 'Subcontratos'],
             self::Abastecer => ['requerimientos' => 'Requerimientos', 'ordenes' => 'Órdenes', 'almacen' => 'Almacén'],
             self::FacturacionCobranza => ['valorizaciones' => 'Valorizaciones', 'facturas-emitidas' => 'Facturas emitidas', 'cobranzas' => 'Cobranzas'],
@@ -126,6 +126,17 @@ enum Proceso: string
             self::Directorio => ['personas' => 'Personas y empresas', 'catalogo' => 'Catálogo de productos', 'listas' => 'Listas', 'organigrama' => 'Organigrama'],
             self::Sistema => ['usuarios' => 'Usuarios', 'configuracion' => 'Configuración', 'solicitudes-permiso' => 'Solicitudes de permiso', 'tickets-ayuda' => 'Tickets de ayuda'],
         };
+    }
+
+    /**
+     * Pantallas sin caja propia que viven dentro de otra (MV-023): su ruta cuenta como la de esa caja para las pestañas y
+     * la miga. «Por calificar» (los leads) y «Licitaciones» son pestañas de la portada de Oportunidades.
+     *
+     * @return array<string, string> prefijo de ruta => clave de la caja
+     */
+    public static function rutasDentroDe(): array
+    {
+        return ['/leads' => 'oportunidades', '/licitaciones' => 'oportunidades'];
     }
 
     public function url(): string

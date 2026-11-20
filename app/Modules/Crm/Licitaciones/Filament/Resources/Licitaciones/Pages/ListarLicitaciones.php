@@ -19,6 +19,9 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\EmbeddedTable;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
@@ -26,6 +29,16 @@ use RuntimeException;
 final class ListarLicitaciones extends ListRecords
 {
     protected static string $resource = LicitacionResource::class;
+
+    /** MV-023: la pestaña «Licitaciones» de la portada de Oportunidades. */
+    public function content(Schema $schema): Schema
+    {
+        return $schema->components([
+            View::make('oportunidades::portada.embudo-pestanas')->viewData(['actual' => 'licitaciones']),
+            $this->getTabsContentComponent(),
+            EmbeddedTable::make(),
+        ]);
+    }
 
     protected function getHeaderActions(): array
     {

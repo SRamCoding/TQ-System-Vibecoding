@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v2
+- **Estado:** en curso (v3, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v3
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -21,6 +21,7 @@ perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
 
+- **MV-023** (cruza módulos) · La licitación es una sección de la oportunidad; su lista, una pestaña de Oportunidades.
 - **MV-005** (ficha) · Licitaciones va después del puente al ERP.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
@@ -113,6 +114,18 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 `database/seeders/Demo/CarteraDemo.php` (`licitaciones()`, `competidores()`) y `DemoSeeder::licitaciones()`.
 
 ## Cambios desde la versión anterior
+
+- **v3** (ronda 1, MV-023): ya no hay caja Licitaciones. La oportunidad que nació de una licitación tiene la pestaña
+  **Licitación** (primera de las que suman otros módulos): estado y plazo próximo, las acciones del estado (participar,
+  no participar, aceptar lista sugerida, registrar propuesta, registrar resultado), y Bases, Cronograma, Expediente,
+  Consultas, Propuesta (con el rango histórico de la entidad) y Resultado. Cronograma, expediente y consultas se editan
+  en la ficha completa (`/licitaciones/{id}`, botón en la pestaña). **La buena pro ahora gana la oportunidad** por lo
+  ofertado (antes solo se cerraba al perder); si el embudo exige una cotización aceptada, queda abierta. La lista
+  `/licitaciones` es la pestaña «Licitaciones» de la portada de Oportunidades, con su miga «Conseguir el negocio ›
+  Oportunidades».
+- **Supuesto:** la pestaña aparece cuando la oportunidad tiene licitación (no por ser entidad pública sin licitación
+  registrada); una convocatoria registrada sin participar todavía no tiene oportunidad y se ve en la lista.
+- **Atajo:** cronograma, expediente y consultas se ven de solo lectura en la pestaña y se editan en la ficha vieja.
 
 v2 (2026-11-20, pedido de Sebastián: «sí, hazlo»): **Bandeja de convocatorias del SEACE** (`/convocatorias`, caja
 «Convocatorias del SEACE»). Las convocatorias llegan de los datos abiertos de contrataciones del OECE en el estándar

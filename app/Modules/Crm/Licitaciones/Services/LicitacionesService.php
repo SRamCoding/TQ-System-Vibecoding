@@ -192,6 +192,7 @@ final readonly class LicitacionesService
             $l->update(['estado' => $resultado, 'fecha_resultado' => $fecha->toDateString()]);
             $l->hitos()->update(['es_cumplido' => true]);
             $this->cerrarOportunidadPerdida($l, $resultado, $quien);
+            $this->cerrarOportunidadGanada($l, $resultado, $fecha, $quien);
 
             return $l->refresh();
         });
@@ -224,6 +225,29 @@ final readonly class LicitacionesService
         usort($porcentajes, fn (string $a, string $b): int => bccomp($a, $b, 1));
 
         return ['filas' => $filas, 'minimo' => $porcentajes[0] ?? null, 'maximo' => $porcentajes === [] ? null : $porcentajes[count($porcentajes) - 1]];
+    }
+
+    /**
+     * MV-023: el resultado cierra la oportunidad también cuando hay buena pro: queda ganada por lo ofertado. Si el embudo
+     * pide algo más para ganar (una cotización aceptada), la oportunidad queda abierta y se gana a mano.
+     */
+    private function cerrarOportunidadGanada(Licitacion $l, EstadoLicitacion $resultado, CarbonImmutable $fecha, User $quien): void
+    {
+        if ($l->oportunidad_id === null || $resultado !== EstadoLicitacion::BuenaPro) {
+            return;
+        }
+
+        $o = Oportunidad::query()->with('estado')->find($l->oportunidad_id);
+
+        if ($o === null || in_array($o->estado->codigo, ['ganada', 'perdida', 'anulada'], true)) {
+            return;
+        }
+
+        try {
+            app(OportunidadesService::class)->ganar($o->id, $o->version, $fecha, $l->monto_ofertado === null ? null : (string) $l->monto_ofertado, "Buena pro de la licitación {$l->codigo}", $quien);
+        } catch (RuntimeException) {
+            // Se gana a mano desde la oportunidad.
+        }
     }
 
     private function cerrarOportunidadPerdida(Licitacion $l, EstadoLicitacion $resultado, User $quien): void

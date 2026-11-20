@@ -285,3 +285,28 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Ronda 1 · paso 3: Cuentas dentro de Personas y empresas»
+
+### MV-023 · 2026-11-20 · La licitación es una sección de la oportunidad
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** «Licitaciones deja de ser caja. La licitación es una sección de la ficha de la oportunidad cuando
+  el cliente es una entidad pública: bases, cronograma, expediente, consultas, propuesta y resultado. El resultado
+  cierra la oportunidad. La lista de licitaciones con sus plazos es una pestaña o filtro en la portada de
+  Oportunidades. La bandeja del SEACE sigue como caja interna ("Convocatorias del SEACE")».
+- **Decisión:** pestaña «Licitación» en la oportunidad con las seis partes y sus acciones; el resultado la cierra
+  (ganada con la buena pro, perdida si la ganó otro o quedó desierta). «Licitaciones» es una pestaña de la portada de
+  Oportunidades.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 4: licitaciones y leads dentro de la oportunidad»
+
+### MV-024 · 2026-11-20 · Los leads son la primera etapa del embudo; Campañas muestra resultados
+
+- **Ficha:** `fichas/t1-campanias.md`
+- **Dijo Sebastián:** «Los leads son la primera etapa del embudo ("por calificar"). Campañas se queda como caja interna
+  pequeña: la lista de campañas con sus resultados (leads, conversión, monto, costo por lead)».
+- **Decisión:** «Por calificar» es la primera pestaña de la portada de Oportunidades; la caja Campañas abre la lista de
+  campañas con leads, convertidos y tasa, monto generado y costo por lead.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 4: licitaciones y leads dentro de la oportunidad»

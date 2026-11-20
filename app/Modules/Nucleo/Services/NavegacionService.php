@@ -144,13 +144,23 @@ final class NavegacionService
         $mejor = null;
         $largo = 0;
 
+        $alias = Proceso::rutasDentroDe();
+
         foreach ($this->procesos($usuario) as $proceso) {
             foreach ($proceso['internas'] as $interna) {
-                $url = '/'.trim((string) parse_url($interna->url, PHP_URL_PATH), '/').'/';
+                $urls = ['/'.trim((string) parse_url($interna->url, PHP_URL_PATH), '/').'/'];
 
-                if (str_starts_with($ruta, $url) && strlen($url) > $largo) {
-                    $mejor = [...$proceso, 'actual' => $interna];
-                    $largo = strlen($url);
+                foreach ($alias as $prefijo => $clave) {
+                    if ($clave === $interna->clave) {
+                        $urls[] = $prefijo.'/';
+                    }
+                }
+
+                foreach ($urls as $url) {
+                    if (str_starts_with($ruta, $url) && strlen($url) > $largo) {
+                        $mejor = [...$proceso, 'actual' => $interna];
+                        $largo = strlen($url);
+                    }
                 }
             }
         }

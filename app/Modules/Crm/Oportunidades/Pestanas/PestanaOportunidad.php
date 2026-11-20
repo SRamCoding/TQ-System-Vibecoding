@@ -25,6 +25,8 @@ final readonly class PestanaOportunidad
         public string $icono,
         /** Menor, más a la izquierda; van después de Historial de etapas y antes del Historial. */
         public int $orden = 100,
+        /** MV-023: si solo aparece en algunas oportunidades, quién decide (recibe el id); null, en todas. */
+        public ?\Closure $aplicaA = null,
     ) {
         if (preg_match('/^[a-z][a-z0-9-]{0,39}$/', $clave) !== 1) {
             throw new InvalidArgumentException("La clave de la pestaña [{$clave}] debe llevar solo minúsculas, cifras y guiones, hasta 40.");

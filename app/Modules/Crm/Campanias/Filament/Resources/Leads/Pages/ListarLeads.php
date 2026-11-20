@@ -15,12 +15,27 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\EmbeddedTable;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 
 /** MVP rápido (t1-campanias): «Campañas y leads»: la lista de leads, con «Nuevo lead» y el enlace a las campañas. */
 final class ListarLeads extends ListRecords
 {
     protected static string $resource = LeadResource::class;
+
+    protected static ?string $title = 'Por calificar';
+
+    /** MV-023: la pestaña «Por calificar» de la portada de Oportunidades. */
+    public function content(Schema $schema): Schema
+    {
+        return $schema->components([
+            View::make('oportunidades::portada.embudo-pestanas')->viewData(['actual' => 'leads']),
+            $this->getTabsContentComponent(),
+            EmbeddedTable::make(),
+        ]);
+    }
 
     public function getTitle(): string
     {

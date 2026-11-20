@@ -94,8 +94,7 @@ contar solas, porque no coinciden con ningún proceso).
   marcados como sensibles de dinero.
 - **Organigrama** se abre solo, sin las pestañas de Usuarios; **Usuarios** conserva roles, conflictos e incompatibles.
 - **Las preguntas de una caja de proceso** son la primera de cada pantalla, hasta tres.
-- **Mientras llegan los pasos siguientes de la ronda:** Licitaciones y Agenda quedan en Conseguir el negocio (pasos 4
-  y 5) y Cuentas en Directorio y catálogos (paso 3).
+- **Mientras llega el paso 5:** la Agenda queda en Conseguir el negocio.
 
 ## Pendientes que decide Sebastián
 
