@@ -72,17 +72,9 @@
         html.dark .fi-global-search-field .fi-input-wrp { background-color: rgb(255 255 255 / 0.07); border-color: rgb(255 255 255 / 0.1); }
         html.dark .fi-global-search-field .fi-input { color: #A1A1AA; }
     @endif
-    /* La barra se pliega solo arrastrando su borde: sin la flecha de plegar de Filament junto al logo. */
-    html .fi-topbar-collapse-sidebar-btn-ctn { display: none; }
+    /* MV-050: la barra solo se expande o se comprime, con el botón de Filament junto al logo; ya no se arrastra su borde. */
 
     .tq-borde-barra { display: none; }
-    @media {{ \App\Modules\Nucleo\Navegacion\BarraLateral::consultaEscritorio() }} {
-        .tq-borde-barra { display: block; position: absolute; inset-block: 0; inset-inline-end: -4px; z-index: 31; width: 8px; cursor: col-resize; touch-action: none; }
-        .tq-borde-barra::after { content: ''; position: absolute; inset-block: 0; inset-inline-start: 3px; width: 2px; background: var(--gray-200); transition: background-color 0.15s; }
-        .dark .tq-borde-barra::after { background: var(--gray-800); }
-        .tq-borde-barra:hover::after, .tq-borde-barra.tq-arrastrando::after { background: var(--primary-500); }
-        html.tq-arrastrando-barra, html.tq-arrastrando-barra * { cursor: col-resize !important; user-select: none !important; }
-    }
 
     html.tq-barra-apagada .fi-sidebar,
     html.tq-barra-apagada .fi-topbar-open-sidebar-btn,

@@ -290,10 +290,8 @@ final class AppPanelProvider extends PanelProvider
     /** El ancho abierto de la barra lateral; si la persona la plegó, el inicial (al abrirla con el botón vuelve a él). */
     private function anchoBarraLateral(): int
     {
-        $usuario = $this->usuario();
-        $ancho = $usuario === null ? BarraLateral::ANCHO_INICIAL : app(NavegacionService::class)->anchoBarra($usuario);
-
-        return $ancho === BarraLateral::PLEGADA ? BarraLateral::ANCHO_INICIAL : $ancho;
+        // MV-050: expandida, siempre el mismo ancho; comprimida, solo íconos (lo decide el estado guardado).
+        return BarraLateral::ANCHO_INICIAL;
     }
 
     private function usuario(): ?User

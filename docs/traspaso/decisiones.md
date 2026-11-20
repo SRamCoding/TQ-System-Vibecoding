@@ -642,3 +642,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 4.1: sin elegir qué módulos ver»
+
+### MV-050 · 2026-11-20 · La barra lateral solo se expande o se comprime
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-4, punto 2) «Que no exista la opción de cambiar el ancho de la barra lateral. Solo
+  dos estados: expandida, con los nombres, a un ancho fijo; comprimida, solo los íconos. Se cambia con un botón, con
+  una transición corta, y el sistema recuerda el último estado de cada persona».
+- **Decisión:** lo dicho; reemplaza el borde arrastrable del repo original (plan 1.3d, D6).
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 4.2: la barra lateral solo se expande o se comprime»

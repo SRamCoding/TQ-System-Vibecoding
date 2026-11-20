@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v17
+- **Versión:** v18
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-050** (cruza módulos) · La barra lateral solo se expande (ancho fijo) o se comprime (íconos), con un botón.
 - **MV-049** (cruza módulos) · Nadie elige qué módulos ver; se quedan solo los permisos del rol (y el orden de las cajas).
 - **MV-048** (cruza módulos) · Tampoco hay título grande en las opciones de una barra lateral interna.
 - **MV-047** (cruza módulos) · Dentro de un módulo (cajas del proceso, barra lateral interna) no se enciende el haz; si
@@ -200,6 +201,11 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   interno tarda más de 1 s, el contenido se atenúa (55 %) y una línea fina del azul de resaltado recorre su borde de
   arriba hasta que llega lo nuevo (con «reducir animaciones», la línea quieta).
 
+- **Barra lateral de dos estados (MV-050):** expandida a 320 px fijos o comprimida a solo íconos, con el botón de Filament
+  junto al logo (con su transición). Ya no se arrastra su borde. El estado se guarda por persona en la preferencia
+  `navegacion.ancho_barra` (0 comprimida, 320 expandida; los anchos guardados antes pasaron a 320). Las barras laterales
+  internas no tenían ajuste de ancho.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -281,6 +287,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v18** (MV-050): sin borde arrastrable; la barra lateral se expande o se comprime con un botón.
 
 - **v17** (MV-049): se quita «Elegir módulos» y lo que guardaba (`modulos_ocultos` y la preferencia
   `navegacion.modulos_barra` se borran).
