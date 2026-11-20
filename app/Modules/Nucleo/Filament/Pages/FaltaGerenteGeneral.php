@@ -31,7 +31,6 @@ final class FaltaGerenteGeneral extends Page
     {
         return $schema->components([
             Section::make('El sistema todavía no puede arrancar')
-                ->description('Las alertas de control (cruces de funciones, autoaprobaciones) le llegan al gerente general. Sin una cuenta activa con ese rol, nadie las recibiría.')
                 ->schema([
                     Text::make('Lo registra quien instaló el servidor, con el comando «php artisan seguridad:gerente-general». Después, esta pantalla desaparece sola.'),
                 ]),

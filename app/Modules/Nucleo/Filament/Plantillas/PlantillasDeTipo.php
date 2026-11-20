@@ -89,7 +89,6 @@ final class PlantillasDeTipo extends Component implements HasActions, HasSchemas
                 ActionGroup::make([
                     AccionFilament::desde('nucleo.plantillas.actualizar', fn (array $record): array => ['plantilla_id' => (int) $record['id'], 'documento_id' => (int) $this->documentoId], $this->avisar('Plantilla actualizada: desde ahora se usa la versión nueva.'))
                         ->name('actualizarPlantilla')->label('Actualizar desde este documento')->icon('heroicon-o-arrow-path')
-                        ->modalDescription('Crea su versión siguiente con lo que tiene este documento. Lo ya creado con la anterior no cambia.')
                         ->fillForm(fn (array $record): array => ['version' => (int) $record['version']])
                         ->hidden(fn (array $record): bool => ! $conDocumento || ! $cambia($record)),
                     AccionFilament::desde('nucleo.plantillas.editar', fn (array $record): array => ['plantilla_id' => (int) $record['id']], $this->avisar('Guardado.'))

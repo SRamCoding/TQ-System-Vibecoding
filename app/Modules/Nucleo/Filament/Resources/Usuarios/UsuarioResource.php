@@ -171,7 +171,6 @@ final class UsuarioResource extends Resource
                 ->fillForm(fn (User $record): array => ['puesto_id' => $record->puesto_id, 'version' => $record->version]),
             AccionFilament::desde('nucleo.seguridad.registrar-cumpleanos-usuario', fn (User $record): array => ['usuario_id' => $record->id], $aviso)
                 ->label('Cumpleaños')->icon('heroicon-o-cake')->color('gray')
-                ->modalDescription('Solo día y mes, para el saludo. Deja los dos vacíos para borrarlo.')
                 ->fillForm(fn (User $record): array => ['cumpleanos_dia' => $record->cumpleanos_dia, 'cumpleanos_mes' => $record->cumpleanos_mes, 'version' => $record->version]),
             AccionFilament::desde('nucleo.seguridad.desactivar-usuario', fn (User $record): array => ['usuario_id' => $record->id], $aviso)
                 ->label('Desactivar')->icon('heroicon-o-no-symbol')->color('danger')

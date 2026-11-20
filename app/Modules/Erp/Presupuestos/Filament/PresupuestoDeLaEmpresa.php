@@ -64,8 +64,7 @@ final class PresupuestoDeLaEmpresa extends Page implements HasTable
     {
         $p = $this->presupuesto();
 
-        return $p === null ? "Sin presupuesto para {$this->anio}." : ($p->estado === 'aprobado' ? 'Aprobado (base) el '.CarbonImmutable::parse($p->aprobado_at)->format('d/m/Y').' · los cambios van por traspasos' : 'En borrador')
-            .' · Controla el gasto directo por sede y mes; los gastos generales de cada proyecto se quedan en su árbol.';
+        return $p === null ? "Sin presupuesto para {$this->anio}." : ($p->estado === 'aprobado' ? 'Aprobado (base) el '.CarbonImmutable::parse($p->aprobado_at)->format('d/m/Y').'' : 'En borrador');
     }
 
     public function content(Schema $schema): Schema
@@ -143,7 +142,6 @@ final class PresupuestoDeLaEmpresa extends Page implements HasTable
                     Notification::make()->success()->title('Gasto registrado.')->send();
                 }),
             Action::make('traspasar')->label('Traspasar')->icon('heroicon-o-arrows-right-left')->color('gray')->visible($gestiona)
-                ->modalDescription('Mueve saldo presupuestado de una sede o un mes a otro, con su motivo. Distinto de reclasificar un gasto ya hecho.')
                 ->schema([
                     Select::make('desde')->label('Desde')->options($lineas)->required(),
                     Select::make('desde_mes')->label('Mes de origen')->options($meses)->required(),

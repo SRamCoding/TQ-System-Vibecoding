@@ -78,7 +78,6 @@ final class ListarPresupuestos extends ListRecords
                 }
             }, ocultos: fn (): array => ['oportunidad_id'], controles: ['moneda_id' => fn () => PresupuestoResource::selectorMoneda()])
                 ->name('nuevo')->label('Nuevo presupuesto')->icon('heroicon-o-plus')->slideOver()
-                ->modalDescription('Empieza en borrador. Con análisis de precios, el P.U. de cada partida sale de su APU.')
                 ->fillForm(fn (): array => PresupuestoResource::valoresIniciales()),
             Action::make('insumos')->label('Insumos')->icon('heroicon-o-cube')->color('gray')
                 ->action(fn () => $this->abrirPanel('insumos')),

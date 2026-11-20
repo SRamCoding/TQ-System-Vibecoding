@@ -93,7 +93,7 @@ final class RequerimientoResource extends Resource
         $estado = fn (string $e): string => ['pendiente' => 'por comprar', 'en_cuadro' => 'en cuadro comparativo', 'ordenada' => 'con orden', 'reservada' => 'reservada en almacén', 'despachada' => 'despachada'][$e] ?? $e;
 
         return $schema->components([
-            Section::make('Líneas')->description('Cada línea declara qué tipo de compra es y a qué partida va. Lo que hay en almacén se atenderá con un despacho, no con una compra.')
+            Section::make('Líneas')
                 ->schema([
                     RepeatableEntry::make('lineas')->hiddenLabel()->columns(7)->schema([
                         TextEntry::make('descripcion')->label('Ítem')->columnSpan(2),

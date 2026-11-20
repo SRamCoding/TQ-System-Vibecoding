@@ -136,7 +136,6 @@ final class BarraModulos
                 ->formatStateUsing(fn (mixed $state): array => array_values(array_diff(self::clavesPermitidas(), self::lista($state))))
                 ->dehydrateStateUsing(fn (mixed $state, Get $get): array => array_values(array_diff(self::lista($get('mostrados')), self::lista($state)))),
         ], deApoyo: [fn (): Hidden => Hidden::make('mostrados')])
-            ->modalDescription('Marca los módulos que quieres ver en tu barra.')
             ->fillForm(fn (): array => [
                 'ocultos' => ($usuario = self::usuario()) === null ? [] : app(NavegacionService::class)->ocultos($usuario),
                 'mostrados' => self::clavesPermitidas(),

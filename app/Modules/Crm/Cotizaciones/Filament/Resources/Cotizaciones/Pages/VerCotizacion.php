@@ -69,7 +69,6 @@ final class VerCotizacion extends ViewRecord
             // Plan 2.22b: el archivo del respaldo se sube aquí y queda adjunto a la cotización.
             AccionFilament::desde(DefinicionCotizacion::CLAVE.'.'.DefinicionCotizacion::ACEPTAR, fn (Cotizacion $record): array => ['cotizacion_id' => $record->id], $this->avisarGuardado(...),
                 ocultos: fn (): array => ['respaldo_adjunto_id'])->name('aceptar')->label('Aceptar')->icon('heroicon-o-check-circle')->color('success')->slideOver()
-                ->modalDescription('El cliente la aceptó: registra el documento que lo respalda (orden de compra, buena pro, contrato o correo).')
                 ->fillForm(fn (Cotizacion $record): array => ['version' => $record->version, 'fecha_aceptacion' => Calendario::hoy()])
                 ->hidden($en(DefinicionCotizacion::EMITIDA)),
             $this->transicion(DefinicionCotizacion::RECHAZAR)->name('rechazar')->label('Rechazada por el cliente')->icon('heroicon-o-x-circle')->color('gray')
@@ -111,7 +110,6 @@ final class VerCotizacion extends ViewRecord
                     ->hidden($en(DefinicionCotizacion::APROBADA)),
                 AccionFilament::desde('crm.cotizaciones.nueva-version-cotizacion', fn (Cotizacion $record): array => ['cotizacion_id' => $record->id], $this->abrirVersionNueva(...))
                     ->name('nuevaVersion')->label('Nueva versión')->icon('heroicon-o-document-duplicate')->slideOver()
-                    ->modalDescription('Copia esta versión en una nueva, en borrador. Al emitir la nueva, esta queda reemplazada.')
                     ->hidden($en(...DefinicionCotizacion::SALE_VERSION_NUEVA)),
                 $this->transicion(DefinicionCotizacion::ANULAR)->name('anular')->label('Anular')->icon('heroicon-o-no-symbol')->color('danger')
                     ->modalDescription('No se borra: queda en la lista como anulada.')

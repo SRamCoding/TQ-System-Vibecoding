@@ -41,7 +41,7 @@ final class Suscripciones extends Page implements HasTable
     {
         $n = DB::table('suscripciones')->where('renovacion', '<=', CarbonImmutable::parse(Calendario::hoy())->addDays(60)->toDateString())->count();
 
-        return "{$n} por renovar en 60 días · El margen se mide por periodo, porque el costo también corre cada mes.";
+        return "{$n} por renovar en 60 días";
     }
 
     public function content(Schema $schema): Schema

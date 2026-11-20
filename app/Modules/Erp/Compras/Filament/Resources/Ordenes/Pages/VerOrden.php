@@ -58,7 +58,6 @@ final class VerOrden extends ViewRecord
                 ->action(fn (array $data) => $this->hacer(fn () => $s()->aprobarOrden($this->orden()->id, $data['motivo'] ?? null, auth()->user()), 'Aprobada: el monto quedó comprometido.')),
             Action::make('recibir')->label(fn (): string => $conformidad() ? 'Dar conformidad' : 'Registrar recepción')->icon('heroicon-o-inbox-arrow-down')->color('warning')
                 ->visible($en(ComprasService::PERMISO_COMPRAR, 'aprobada', 'recibida_parcial'))->slideOver()
-                ->modalDescription('Lo recibido pasa a ejecutado en su partida. Entregado directo en obra, lo registra el especialista en campo.')
                 ->fillForm(fn (): array => ['fecha' => Calendario::hoy(), 'lugar' => 'obra'] + $this->orden()->lineas->mapWithKeys(fn (OrdenLinea $l): array => ["linea_{$l->id}" => bcsub((string) $l->cantidad, (string) $l->cantidad_recibida, 3)])->all())
                 ->schema(fn (): array => [
                     DatePicker::make('fecha')->label('Fecha')->required()->format('Y-m-d'),
@@ -83,7 +82,7 @@ final class VerOrden extends ViewRecord
                 ->schema([Textarea::make('seguimiento')->label('Seguimiento')->rows(2)->placeholder('Faltan 130 m · el proveedor confirmó para el 19/09')])
                 ->action(fn (array $data) => $this->hacer(fn () => $this->orden()->update(['seguimiento' => $data['seguimiento']]), 'Anotado.')),
             Action::make('pagar')->label('Marcar pagada')->icon('heroicon-o-banknotes')->color('gray')->visible($en(ComprasService::PERMISO_COMPRAR, 'recibida', 'recibida_parcial'))
-                ->requiresConfirmation()->modalDescription('Provisional hasta Tesorería (tramo 5): lo ejecutado pasa a pagado.')
+                ->requiresConfirmation()
                 ->action(fn () => $this->hacer(fn () => $s()->pagar($this->orden()->id), 'Pagada.')),
         ];
     }

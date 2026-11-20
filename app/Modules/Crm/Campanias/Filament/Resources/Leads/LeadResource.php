@@ -124,7 +124,6 @@ final class LeadResource extends Resource
                     }),
                 Action::make('convertir')->label('Convertir')->icon('heroicon-o-arrow-right-circle')->color('success')->button()->visible($abierto)->slideOver()
                     ->modalHeading(fn (Lead $record): string => "Convertir lead · {$record->nombre_contacto}")
-                    ->modalDescription('Primero se revisan las coincidencias: «Crear una cuenta nueva de todas formas» existe, pero es la última opción.')
                     ->fillForm(function (Lead $record): array {
                         $c = app(LeadsService::class)->coincidencias($record);
 

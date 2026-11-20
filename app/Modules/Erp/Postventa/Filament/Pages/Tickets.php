@@ -52,7 +52,7 @@ final class Tickets extends Page implements HasTable
     {
         $vencer = DB::table('tickets_postventa')->whereNotIn('estado', ['resuelto', 'cerrado'])->where('vence_at', '<', Calendario::ahora()->addHours(4))->count();
 
-        return "{$vencer} por vencer su SLA en 4 horas o vencidos · Empieza siempre por identificar el equipo: su serie dice a quién se compró, cuándo se instaló y si sigue en garantía.";
+        return "{$vencer} por vencer su SLA en 4 horas o vencidos";
     }
 
     public function content(Schema $schema): Schema
@@ -107,7 +107,6 @@ final class Tickets extends Page implements HasTable
                     ->schema([Select::make('estado')->label('Estado')->options(self::ESTADOS)->required(), Textarea::make('solucion')->label('Solución')->rows(2)])
                     ->action(fn (array $record, array $data) => app(PostventaService::class)->cambiarEstado((int) $record['id'], $data['estado'], $data['solucion'] ?? null)),
                 Action::make('cotizar')->label('Cotizar')->button()->color('danger')->hidden(fn (array $record): bool => $record['garantia'] !== 'vencida' || $record['oportunidad_id'] !== null)
-                    ->modalDescription('Fuera de garantía no se atiende sin cotización aceptada: nace una oportunidad en el CRM.')
                     ->schema([TextInput::make('monto')->label('Monto estimado (S/)')->numeric()->required()])
                     ->action(function (array $record, array $data): void {
                         $id = app(PostventaService::class)->cotizar((int) $record['id'], (string) $data['monto'], auth()->user());

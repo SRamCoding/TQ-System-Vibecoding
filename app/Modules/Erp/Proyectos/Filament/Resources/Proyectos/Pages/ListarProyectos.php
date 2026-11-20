@@ -171,8 +171,7 @@ final class ListarProyectos extends Page
                     $this->redirect(VerProyecto::getUrl(['record' => $resumen->id]), navigate: true);
                 }
             }, controles: ['jefe_proyecto_user_id' => fn (): Field => SelectoresProyecto::jefe()])
-                ->name('nuevo')->label('Nuevo proyecto interno')->icon('heroicon-o-plus')->slideOver()
-                ->modalDescription('Sin contrato y con Techquk como cliente. Los proyectos de un contrato nacen del contrato.'),
+                ->name('nuevo')->label('Nuevo proyecto interno')->icon('heroicon-o-plus')->slideOver(),
         ];
     }
 }

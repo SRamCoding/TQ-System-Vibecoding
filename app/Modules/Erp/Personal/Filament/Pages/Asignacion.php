@@ -44,11 +44,6 @@ final class Asignacion extends Page implements HasTable
         return $u instanceof User && $u->can(PersonalService::PERMISO_VER);
     }
 
-    public function getSubheading(): string
-    {
-        return 'Cada persona con su dedicación por proyecto y semana. Más de 100 % es sobreasignación. Solo se tarea en obra a quien tiene su habilitación (SCTR) vigente.';
-    }
-
     public function content(Schema $schema): Schema
     {
         return $schema->components([EmbeddedTable::make()]);

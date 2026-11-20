@@ -92,7 +92,6 @@ final class Rendiciones extends Base implements HasTable
                 ])
                 ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->crearFondo((int) $data['proyecto'], $data['tipo'], $data['responsable'], (string) $data['monto'], CarbonImmutable::parse($data['fecha'])), 'Fondo entregado.')),
             Action::make('gasto')->label('Registrar gasto')->icon('heroicon-o-camera')->visible(fn (): bool => Fondo::query()->where('estado', 'abierto')->exists())
-                ->modalDescription('Con «leído de la foto por IA» la nota queda marcada para revisar: la IA sugiere y una persona confirma.')
                 ->fillForm(fn (): array => ['fecha' => Calendario::hoy()])
                 ->schema([
                     Select::make('fondo')->label('Fondo')->required()->live()->options(fn (): array => Fondo::query()->where('estado', 'abierto')->get()->mapWithKeys(fn (Fondo $f): array => [$f->id => "{$f->codigo} · {$f->responsable}"])->all()),
@@ -105,7 +104,6 @@ final class Rendiciones extends Base implements HasTable
                 ])
                 ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->registrarGasto((int) $data['fondo'], CarbonImmutable::parse($data['fecha']), $data['descripcion'], $data['comprobante'] ?? null, (string) $data['monto'], (int) $data['partida'], (bool) ($data['ia'] ?? false)), 'Gasto registrado.')),
             Action::make('foto')->label('Leer nota por foto')->icon('heroicon-o-sparkles')->color('gray')->visible(fn (): bool => Fondo::query()->where('estado', 'abierto')->exists())
-                ->modalDescription('La IA lee la foto y deja el gasto por aprobar, marcado para revisar: la IA sugiere y una persona confirma. Sin la IA configurada, se escribe a mano.')
                 ->schema([
                     Select::make('fondo')->label('Fondo')->required()->live()->options(fn (): array => Fondo::query()->where('estado', 'abierto')->get()->mapWithKeys(fn (Fondo $f): array => [$f->id => "{$f->codigo} · {$f->responsable}"])->all()),
                     Select::make('partida')->label('Partida')->required()->options(fn ($get): array => Compras::partidasDe(is_numeric($get('fondo')) ? (int) Fondo::query()->whereKey((int) $get('fondo'))->value('proyecto_id') : null)),

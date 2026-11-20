@@ -93,7 +93,6 @@ final class LineasDeCotizacion extends Component implements HasActions, HasSchem
                     ocultos: fn (): array => ['descripcion', 'unidad_medida_id'],
                     controles: ['producto_id' => fn (): Select => self::selectorProducto()])
                     ->name('delCatalogo')->label('Del catálogo')->icon('heroicon-o-squares-plus')->slideOver()
-                    ->modalDescription('El producto trae su descripción y su unidad. El precio y el costo van sin IGV.')
                     ->fillForm($version)->hidden(fn (): bool => ! $editable()),
                 AccionFilament::desde('crm.cotizaciones.agregar-linea', $fijo, $this->avisarGuardado(...),
                     ocultos: fn (): array => ['producto_id'])

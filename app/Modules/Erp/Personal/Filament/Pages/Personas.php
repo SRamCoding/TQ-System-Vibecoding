@@ -51,7 +51,7 @@ final class Personas extends Page implements HasTable
         $hoy = CarbonImmutable::parse(Calendario::hoy());
         $vencen = DB::table('colaborador_documentos as d')->join('colaboradores as c', 'c.id', '=', 'd.colaborador_id')->where('c.es_activo', true)->whereBetween('d.vence', [$hoy->toDateString(), $hoy->addDays(30)->toDateString()])->count();
 
-        return "{$vencen} documentos vencen en 30 días · Varias convocatorias exigen personal certificado vigente: esta información también es comercial.";
+        return "{$vencen} documentos vencen en 30 días";
     }
 
     public function content(Schema $schema): Schema

@@ -42,11 +42,6 @@ final class TicketsAyuda extends Page implements HasTable
         return auth()->user()?->can(RolesPermisos::PERMISO) ?? false;
     }
 
-    public function getSubheading(): string
-    {
-        return 'Los abre el asistente «n_n» cuando alguien le cuenta un problema y lo confirma. Llevan la pantalla y la conversación.';
-    }
-
     public function content(Schema $schema): Schema
     {
         return $schema->components([EmbeddedTable::make()]);

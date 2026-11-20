@@ -70,8 +70,7 @@ final class ValorizacionesDeContrato extends Page implements HasTable
         $s = app(ValorizacionesService::class);
         $dado = (string) (DB::table('contrato_adelantos')->where('contrato_id', $c->id)->where('tipo', 'directo')->sum('monto') ?: '0');
 
-        return "{$c->codigo} · ".mb_substr($c->objeto, 0, 60).' · Adelanto directo '.Compras::soles($dado).': por amortizar '.Compras::soles($s->porAmortizar($c->id, 'directo'))
-            .' · Neto = avance + reajuste − amortizaciones − retención − penalidad del periodo. Al aprobarse, habilita su comprobante por el neto.';
+        return "{$c->codigo} · ".mb_substr($c->objeto, 0, 60).' · Adelanto directo '.Compras::soles($dado).': por amortizar '.Compras::soles($s->porAmortizar($c->id, 'directo'));
     }
 
     public function content(Schema $schema): Schema
@@ -130,7 +129,6 @@ final class ValorizacionesDeContrato extends Page implements HasTable
                 ])
                 ->action(fn (array $data) => app(ValorizacionesService::class)->registrarAdelanto((int) $this->contrato, $data['tipo'], (string) $data['monto'], (string) $data['porcentaje'], $data['fecha'])),
             Action::make('nueva')->label('Nueva valorización')->icon('heroicon-o-plus')->slideOver()->visible(fn (): bool => $puede() && $this->contrato !== null)
-                ->modalDescription('Avance del periodo por partida (porcentaje sobre su precio contractual). El reajuste sale de la fórmula polinómica del presupuesto con los índices del mes.')
                 ->fillForm(fn (): array => ['periodo' => Calendario::ahora()->format('Y-m'), 'materiales' => '0', 'retencion' => '0'])
                 ->schema(fn (): array => [
                     TextInput::make('periodo')->label('Periodo (AAAA-MM)')->required()->regex('/^\d{4}-\d{2}$/'),

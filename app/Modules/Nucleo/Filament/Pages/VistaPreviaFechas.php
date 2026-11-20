@@ -99,7 +99,6 @@ final class VistaPreviaFechas extends Page
     {
         return $schema->statePath('data')->components([
             Section::make('Gran momento')
-                ->description('Lo que verá cada persona una vez al año, en el día de la fecha o el primer día hábil después. Aquí no se marca como visto ni se guarda nada.')
                 ->columns(3)
                 ->schema([
                     Select::make('ocasion')->label('Fecha')->required()->live()->selectablePlaceholder(false)

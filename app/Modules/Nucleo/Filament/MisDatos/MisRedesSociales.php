@@ -54,7 +54,6 @@ final class MisRedesSociales extends Component implements HasActions, HasSchemas
             ->headerActions([
                 AccionFilament::desde('nucleo.agregar-mi-red-social', alTerminar: $this->avisarGuardado(...))
                     ->label('Agregar red')->icon('heroicon-o-plus')
-                    ->modalDescription('Pega el enlace a tu perfil. Si marcas «Solo la veo yo», nadie más del equipo la ve.')
                     ->hidden($this->usuario()->party_id === null),
             ])
             ->recordActions([

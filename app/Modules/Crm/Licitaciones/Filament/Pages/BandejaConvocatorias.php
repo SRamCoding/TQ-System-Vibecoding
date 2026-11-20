@@ -49,7 +49,7 @@ final class BandejaConvocatorias extends Page implements HasTable
         $nuevas = DB::table('convocatorias_seace')->where('estado', 'nueva')->count();
         $ultima = DB::table('convocatorias_seace')->max('created_at');
 
-        return "{$nuevas} nuevas · Llegan del SEACE por los datos abiertos del OECE y solo entran las que mencionan: ".implode(', ', app(ConvocatoriasSeaceService::class)->palabras())
+        return "{$nuevas} nuevas"
             .($ultima === null ? '' : ' · última lectura '.CarbonImmutable::parse($ultima)->format('d/m/Y H:i'));
     }
 
@@ -77,7 +77,7 @@ final class BandejaConvocatorias extends Page implements HasTable
             ->filters([SelectFilter::make('estado')->label('Ver')->default('nueva')->options(['nueva' => 'Nuevas', 'registrada' => 'Registradas', 'descartada' => 'Descartadas', 'todas' => 'Todas'])->query(fn ($q) => $q)])
             ->recordActions([
                 Action::make('registrar')->label('Registrar')->button()->color('success')->hidden(fn (array $record): bool => $record['estado'] !== 'nueva')
-                    ->requiresConfirmation()->modalDescription('Nace la licitación «por decidir» con su entidad (se crea la cuenta si no existe), objeto, valor referencial y cronograma. Después decides si participas.')
+                    ->requiresConfirmation()
                     ->action(function (array $record): void {
                         try {
                             $id = app(ConvocatoriasSeaceService::class)->registrar((int) $record['id'], auth()->user());

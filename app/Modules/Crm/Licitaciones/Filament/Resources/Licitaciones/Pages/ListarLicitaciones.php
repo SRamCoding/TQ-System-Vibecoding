@@ -46,7 +46,6 @@ final class ListarLicitaciones extends ListRecords
             Action::make('registrar')->label('Registrar convocatoria')->icon('heroicon-o-plus')
                 ->visible(fn (): bool => LicitacionResource::puede(LicitacionesService::PERMISO_GESTIONAR))
                 ->slideOver()->modalHeading('Registrar convocatoria')
-                ->modalDescription('Carga manual, pública o privada. Al decidir participar nace su oportunidad.')
                 ->fillForm(fn (): array => [
                     'tipo' => TipoProcedimiento::AdjudicacionSimplificada->value,
                     'fecha_convocatoria' => Calendario::hoy(),

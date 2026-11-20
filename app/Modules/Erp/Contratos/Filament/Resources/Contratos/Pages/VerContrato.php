@@ -57,7 +57,6 @@ final class VerContrato extends ViewRecord
 
         return [
             Action::make('activar')->label('Completar y activar')->icon('heroicon-o-check-badge')->color('success')->visible($gestiona('borrador'))->slideOver()
-                ->modalDescription('Lo que la cotización no trae: número de contrato de la entidad, firma, forma de pago y la penalidad de las bases.')
                 ->fillForm(fn (): array => ['firma' => Calendario::hoy(), 'forma_pago' => $this->contrato()->forma_pago ?? '100 % a la conformidad', 'garantia' => $this->contrato()->garantia_meses ?? 24,
                     'tope' => '10', 'factor' => ContratosService::factor($this->contrato()->plazo_dias)])
                 ->schema([

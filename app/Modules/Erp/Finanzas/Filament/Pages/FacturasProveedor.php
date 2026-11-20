@@ -17,11 +17,6 @@ final class FacturasProveedor extends Comprobantes
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-arrow-down';
 
-    public function getSubheading(): string
-    {
-        return 'Entran por su XML (validado con SUNAT) y se cruzan con la orden y su recepción; después pasan al tablero de pagos.';
-    }
-
     protected function getHeaderActions(): array
     {
         return $this->accionesDeProveedor();

@@ -496,3 +496,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 2: ícono de Tickets de ayuda»
+
+### MV-039 · 2026-11-20 · Sin textos explicativos en las pantallas
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones, punto 3) «Quitar siempre esos textos, en todas las pantallas: el subtítulo o
+  descripción de la cabecera de cada pantalla. Si una explicación hace falta de verdad, va en la ayuda (el asistente
+  "n_n") o en un ícono de información que se abre al pasar el mouse, nunca como texto fijo. No quites las etiquetas de
+  los campos ni los mensajes de error o de confirmación».
+- **Decisión:** ninguna pantalla, ficha, panel ni formulario lleva texto que explique cómo funciona. Se quedan las
+  etiquetas, los mensajes de error y de confirmación y los datos (cantidades, montos, estados).
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 3: sin textos explicativos»

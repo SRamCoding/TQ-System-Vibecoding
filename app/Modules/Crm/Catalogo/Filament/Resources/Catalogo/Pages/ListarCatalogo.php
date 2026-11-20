@@ -24,18 +24,12 @@ final class ListarCatalogo extends ListRecords
     /** MV-029: el título dice lo mismo que su caja. */
     protected static ?string $title = 'Catálogo de productos';
 
-    public function getSubheading(): string
-    {
-        return 'Es el mismo catálogo que usan compras y almacén en el ERP: un solo maestro. Los precios no se sobrescriben: cada cambio crea un registro con su vigencia.';
-    }
-
     protected function getHeaderActions(): array
     {
         $gestiona = fn (): bool => CatalogoResource::puede(PreciosCatalogoService::PERMISO_GESTIONAR);
 
         return [
             Action::make('carga')->label('Carga masiva de precios')->icon('heroicon-o-arrow-up-tray')->color('gray')->visible($gestiona)->slideOver()
-                ->modalDescription('Pega desde Excel: código, precio, costo y margen objetivo, una fila por ítem. Cada fila crea su precio con la vigencia elegida; lo que no se entiende se informa y no se aplica.')
                 ->fillForm(fn (): array => ['desde' => Calendario::hoy()])
                 ->schema([
                     DatePicker::make('desde')->label('Vigentes desde')->required()->format('Y-m-d'),

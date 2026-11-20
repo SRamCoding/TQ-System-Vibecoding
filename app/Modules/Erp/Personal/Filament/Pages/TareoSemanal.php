@@ -75,7 +75,7 @@ final class TareoSemanal extends Page implements HasTable
         $costo = $t === null ? '0' : $t->lineas->reduce(fn (string $s, TareoLinea $l): string => bcadd($s, $l->costo(), 2), '0');
 
         return "Semana {$lunes->isoWeek()} ({$lunes->format('d/m')} al {$lunes->addDays(5)->format('d/m')}) · {$pry} · ".($t?->estado === 'cerrado' ? 'cerrada' : 'abierta')
-            ." · {$horas} h · ".Compras::soles($costo).' · Costo hora estándar por categoría: el mismo del análisis de precios unitarios.';
+            ." · {$horas} h · ".Compras::soles($costo);
     }
 
     public function content(Schema $schema): Schema
@@ -146,7 +146,6 @@ final class TareoSemanal extends Page implements HasTable
                     $this->resetTable();
                 }),
             Action::make('cerrar')->label('Cerrar semana')->icon('heroicon-o-lock-closed')->color('success')->requiresConfirmation()
-                ->modalDescription('Las horas pasan a comprometido y ejecutado de cada partida a la vez. Una semana cerrada no se edita.')
                 ->visible(fn (): bool => $abierta() && $this->tareo() !== null && (auth()->user()?->can(PersonalService::PERMISO_CERRAR) ?? false))
                 ->action(function (): void {
                     try {

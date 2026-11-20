@@ -87,7 +87,6 @@ final class MisDatos extends Page
         return $schema->statePath('data')->components([
             // Plan 1.4o, D4 a D7: a la derecha de los datos, la foto del círculo del menú; tocarla abre la ventana para subirla.
             Section::make('Mi cuenta')
-                ->description('Si algo está mal, pídelo a quien administra los usuarios. Tu foto la cambias tú: tócala.')
                 ->schema([
                     Grid::make(['default' => 1, 'md' => 3])->schema([
                         Group::make([
@@ -107,7 +106,6 @@ final class MisDatos extends Page
                     ]),
                 ]),
             Section::make('Mis datos de contacto')
-                ->description('Tu cumpleaños, para saludarte ese día (solo día y mes), y el teléfono en que el equipo te ubica.')
                 ->schema([
                     TextInput::make('cumpleanos_dia')->label('Día de tu cumpleaños')->integer()->minValue(1)->maxValue(31)->inlineLabel(),
                     Select::make('cumpleanos_mes')->label('Mes de tu cumpleaños')->options(self::MESES)->placeholder('Sin registrar')->inlineLabel(),
@@ -118,7 +116,6 @@ final class MisDatos extends Page
                 ]),
             // Plan 1.4o, D2 y D3: mis redes, y red por red quién las ve.
             Section::make('Mis redes')
-                ->description('Tu LinkedIn, tu Instagram o tu sitio web. Red por red eliges si la ve todo el equipo o solo tú.')
                 ->visible($ficha !== null)
                 ->schema([Livewire::make(MisRedesSociales::class)->key('mis-redes-sociales')]),
             Section::make('Seguridad')->schema([
@@ -175,7 +172,6 @@ final class MisDatos extends Page
             ->label(fn (): string => $this->usuario()->foto_ruta === null ? 'Subir mi foto' : 'Cambiar mi foto')
             ->icon('heroicon-o-camera')
             ->modalHeading('Mi foto')
-            ->modalDescription('Elige una foto y encuádrala en el círculo.')
             ->modalSubmitActionLabel('Guardar foto');
     }
 

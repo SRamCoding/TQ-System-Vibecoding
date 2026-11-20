@@ -80,7 +80,6 @@ final class ListarCotizaciones extends ListRecords
                 'contacto_id' => fn () => SelectoresCotizacion::contacto(),
             ])
                 ->name('nueva')->label('Nueva cotización')->icon('heroicon-o-plus')->slideOver()
-                ->modalDescription('Nace en borrador, de una oportunidad abierta. Las condiciones vacías toman los valores por defecto.')
                 ->fillForm(fn (): array => ['oportunidad_id' => $this->oportunidadDeLaCarpeta()]),
         ];
     }

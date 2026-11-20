@@ -42,7 +42,6 @@ final class AccionesLicitacion
             'participar' => Action::make('participar')->label('Participar')->icon('heroicon-o-check-circle')->color('success')
                 ->visible($en(EstadoLicitacion::Registrada))
                 ->modalHeading('Decidir participar')
-                ->modalDescription('Nace su oportunidad con el valor referencial y la IA propone la lista del expediente desde las bases.')
                 ->fillForm(fn (): array => ['responsable_user_id' => auth()->id()])
                 ->schema([Select::make('responsable_user_id')->label('Responsable')->required()->searchable()
                     ->options(fn (): array => User::query()->where('es_activo', true)->where('es_sistema', false)->orderBy('name')->pluck('name', 'id')->all())])
@@ -67,7 +66,6 @@ final class AccionesLicitacion
                 ->action(fn (array $data) => $hacer(fn () => app(LicitacionesService::class)->presentar($registro()->id, (string) $data['monto'], CarbonImmutable::parse($data['fecha'])), 'Propuesta registrada.')),
             'resultado' => Action::make('resultado')->label('Registrar resultado')->icon('heroicon-o-trophy')->color('warning')
                 ->visible($en(EstadoLicitacion::Presentada))->slideOver()
-                ->modalDescription('Se completa gane quien gane: el precio al que adjudicó la entidad es más útil cuando se perdió.')
                 ->fillForm(fn (): array => ['resultado' => EstadoLicitacion::BuenaPro->value, 'fecha' => Calendario::hoy(), 'participantes' => [
                     ['nombre' => 'Techquk S.A.C.', 'es_techquk' => true, 'oferta' => $registro()->monto_ofertado, 'puesto' => 1],
                 ]])

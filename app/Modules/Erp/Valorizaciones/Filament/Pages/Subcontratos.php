@@ -49,8 +49,7 @@ final class Subcontratos extends Page implements HasTable
     public function getSubheading(): string
     {
         return Subcontrato::query()->orderBy('codigo')->get()->map(fn (Subcontrato $s): string => "{$s->codigo} {$s->subcontratista}: ".Compras::soles($s->monto)
-            .', retención acumulada '.Compras::soles(app(ValorizacionesService::class)->retencionAcumulada($s->id)))->implode(' · ')
-            .' · Lo que la entidad le hace a Techquk, Techquk se lo hace a su subcontratista. Cada valorización aprobada pasa a ejecutado en las partidas del alcance.';
+            .', retención acumulada '.Compras::soles(app(ValorizacionesService::class)->retencionAcumulada($s->id)))->implode(' · ');
     }
 
     public function content(Schema $schema): Schema

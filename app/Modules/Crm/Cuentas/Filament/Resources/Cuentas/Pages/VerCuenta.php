@@ -83,7 +83,6 @@ final class VerCuenta extends ViewRecord
             ...array_map(fn (BotonCuenta $boton): Action => $boton->accion($this->record->id), app(RegistroPestanasCuenta::class)->botonesPara(CuentaResource::usuario())),
             ActionGroup::make([
                 $this->accion('marcar-cliente')->label('Marcar como cliente')->icon('heroicon-o-check-badge')
-                    ->modalDescription('Para los clientes de antes del sistema. Si después se gana una oportunidad más antigua, vale la fecha más antigua.')
                     ->fillForm(fn (Cuenta $record): array => ['version' => $record->version])
                     ->hidden(fn (Cuenta $record): bool => ! $record->es_activa || $record->marcasCliente()->vigentes()->where('origen', OrigenMarcaCliente::Manual)->exists()),
                 $this->accion('quitar-marca-cliente')->label('Quitar la marca de cliente')->icon('heroicon-o-x-circle')->color('danger')

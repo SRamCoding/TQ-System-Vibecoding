@@ -198,7 +198,6 @@ trait MuestraPasoAbierto
             ->icon('heroicon-m-arrows-right-left')
             ->size('sm')
             ->modalHeading('La ficha de Techquk')
-            ->modalDescription('La empresa de Personas y empresas que es Techquk: de ahí salen su razón social, RUC, dirección fiscal, sedes y cuentas bancarias.')
             ->modalSubmitActionLabel('Elegir')
             ->fillForm(fn (): array => [
                 'valor' => ($ficha = app(EmpresaService::class)->ficha()) === null ? null : 'RUC '.$ficha->numero_documento,

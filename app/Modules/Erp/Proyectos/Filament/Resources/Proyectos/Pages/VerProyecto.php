@@ -79,7 +79,7 @@ final class VerProyecto extends ViewRecord
             ->name('cambiarFoto')
             ->label(fn (Proyecto $record): string => $record->foto_ruta === null ? 'Subir foto' : 'Cambiar foto')
             ->icon('heroicon-o-camera')->color('gray')
-            ->modalHeading('Foto del proyecto')->modalDescription('Elige una foto de la obra y encuádrala en 16:9.')
+            ->modalHeading('Foto del proyecto')
             ->modalSubmitActionLabel('Guardar foto')
             ->hidden(fn (Proyecto $record): bool => ! $this->esJefe($record));
     }

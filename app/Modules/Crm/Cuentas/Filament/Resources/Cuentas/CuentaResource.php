@@ -182,7 +182,7 @@ final class CuentaResource extends Resource
                             ->visible(fn (Cuenta $record): bool => ! $record->es_activa)
                             ->state(fn (Cuenta $record): string => trim(($record->motivoInactiva->nombre ?? '').' '.($record->motivo_inactiva_detalle === null ? '' : "· {$record->motivo_inactiva_detalle}"))),
                     ]),
-                    Section::make('La empresa')->description('De su ficha en Personas y empresas: se corrige allá.')->columns(3)->schema([
+                    Section::make('La empresa')->columns(3)->schema([
                         TextEntry::make('party.razon_social')->label('Razón social')->columnSpan(2)
                             ->url(fn (Cuenta $record): ?string => self::usuarioPuede('parties.ver') ? VerParty::getUrl(['record' => $record->party_id]) : null),
                         TextEntry::make('party.numero_documento')->label('RUC')->fontFamily('mono')->copyable(),

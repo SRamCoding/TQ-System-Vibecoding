@@ -72,7 +72,6 @@ final class VerPresupuesto extends ViewRecord
             AccionFilament::desde('erp.presupuestos.nueva-version-presupuesto', fn (Presupuesto $record): array => ['presupuesto_id' => $record->id], $this->abrirVersionNueva(...))
                 ->name('nuevaVersion')->label('Nueva versión')->icon('heroicon-o-document-duplicate')->color('gray')
                 ->requiresConfirmation()
-                ->modalDescription('Copia este presupuesto en una versión nueva, en borrador. Esta sigue vigente hasta que la nueva se traiga al proyecto.')
                 ->hidden($en(DefinicionPresupuesto::APROBADO)),
             AccionFilament::desde('erp.presupuestos.editar-encabezado-presupuesto', fn (Presupuesto $record): array => ['presupuesto_id' => $record->id], $this->avisarGuardado(...),
                 controles: ['moneda_id' => fn () => PresupuestoResource::selectorMoneda()])

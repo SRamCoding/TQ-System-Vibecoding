@@ -26,8 +26,7 @@ final class ListarUnidades extends ListRecords
             AccionFilament::desde('nucleo.organigrama.crear-unidad', alTerminar: function (): void {
                 Notification::make()->success()->title('Unidad creada.')->send();
             }, controles: ['superior_id' => fn () => SelectoresSeguridad::unidad('superior_id')])
-                ->label('Crear unidad')->icon('heroicon-o-plus')
-                ->modalDescription('Sin «Depende de», queda en la raíz del organigrama. Sus puestos y su jefatura se definen después.'),
+                ->label('Crear unidad')->icon('heroicon-o-plus'),
         ];
     }
 }

@@ -11,9 +11,4 @@ use Filament\Resources\Pages\ListRecords;
 final class ListarContratos extends ListRecords
 {
     protected static string $resource = ContratoResource::class;
-
-    public function getSubheading(): string
-    {
-        return 'Nacen en borrador al ganar una oportunidad; Administración de Contratos los completa y los activa.';
-    }
 }

@@ -99,7 +99,6 @@ abstract class Comprobantes extends Base implements HasTable
     {
         return [
             Action::make('xml')->label('Subir XML de factura')->icon('heroicon-o-code-bracket')->visible(fn (): bool => self::puede(FinanzasService::PERMISO_PAGAR))
-                ->modalDescription('Se lee del XML: número, emisión, RUC, moneda, base, IGV y total; se valida con SUNAT y se cruza con la orden y lo recibido.')
                 ->fillForm(fn (): array => ['dias' => 30])
                 ->schema([
                     FileUpload::make('archivo')->label('XML de la factura')->required()->storeFiles(false)->acceptedFileTypes(['text/xml', 'application/xml']),
@@ -110,7 +109,6 @@ abstract class Comprobantes extends Base implements HasTable
                 ])
                 ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->registrarCompraXml((int) $data['orden'], $data['archivo']->get(), (int) $data['dias']), 'Factura leída del XML y registrada.')),
             Action::make('compra')->label('Registrar factura de proveedor')->icon('heroicon-o-arrow-up-tray')->color('gray')->visible(fn (): bool => self::puede(FinanzasService::PERMISO_PAGAR))
-                ->modalDescription('En el MVP se escriben los datos del XML; la validación con SUNAT y la lectura del archivo son simuladas. Se cruza con la orden y lo recibido.')
                 ->fillForm(fn (): array => ['emision' => Calendario::hoy(), 'dias' => 30])
                 ->schema([
                     Select::make('orden')->label('Orden')->required()->searchable()

@@ -26,11 +26,6 @@ final class Resultados extends Base implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-trophy';
 
-    public function getSubheading(): string
-    {
-        return 'Por proyecto: lo vendido (contrato con adendas, menos penalidades), lo facturado y cobrado, lo que costó de verdad (órdenes recibidas, horas, rendiciones) y lo que se pagó. Margen real = facturado − costo ejecutado.';
-    }
-
     public function content(Schema $schema): Schema
     {
         return $schema->components([EmbeddedTable::make()]);

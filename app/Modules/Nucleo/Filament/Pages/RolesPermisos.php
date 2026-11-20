@@ -184,7 +184,6 @@ final class RolesPermisos extends Page
         return $schema->statePath('data')->components([
             ...$listas,
             Section::make('Control compensatorio')
-                ->description('Con estos permisos, estas personas juntarían permisos incompatibles. Describe el control y elige a su responsable (otra persona), o quita el permiso.')
                 ->visible(fn (): bool => $this->cruces !== [])
                 ->schema([
                     View::make('nucleo::filament.roles.cruces-frenados')->viewData(fn (): array => ['cruces' => $this->cruces]),

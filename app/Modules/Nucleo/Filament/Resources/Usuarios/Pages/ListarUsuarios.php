@@ -30,8 +30,7 @@ final class ListarUsuarios extends ListRecords
                 'party_id' => fn () => SelectoresSeguridad::personaSinCuenta('party_id'),
                 'puesto_id' => fn () => SelectoresSeguridad::puesto('puesto_id'),
             ])
-                ->label('Registrar usuario')->icon('heroicon-o-user-plus')
-                ->modalDescription('Busca a la persona por nombre o documento (DNI, carné de extranjería o pasaporte). Los roles se dan en su ficha.'),
+                ->label('Registrar usuario')->icon('heroicon-o-user-plus'),
         ];
     }
 }

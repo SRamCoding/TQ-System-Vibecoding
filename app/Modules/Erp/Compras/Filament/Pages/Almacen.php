@@ -36,7 +36,7 @@ final class Almacen extends Page implements HasTable
     {
         $valor = DB::table('stock')->selectRaw('COALESCE(SUM(cantidad * costo_promedio), 0) AS v')->value('v');
 
-        return 'Almacén Central · valor del stock '.Compras::soles($valor).' a costo promedio. Lo reservado está apartado para requerimientos aprobados y sale con su despacho.';
+        return 'Almacén Central · valor del stock '.Compras::soles($valor).' a costo promedio';
     }
 
     public function content(Schema $schema): Schema

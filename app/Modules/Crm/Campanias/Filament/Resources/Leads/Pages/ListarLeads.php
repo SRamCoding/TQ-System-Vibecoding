@@ -46,7 +46,7 @@ final class ListarLeads extends ListRecords
     {
         $n = LeadResource::sinAtender();
 
-        return ($n > 0 ? "Sin atender +3 días · {$n} · " : '').'En Techquk el negocio entra por convocatorias: los leads se convierten solo después de revisar coincidencias.';
+        return $n > 0 ? "Sin atender +3 días · {$n}" : '';
     }
 
     protected function getHeaderActions(): array

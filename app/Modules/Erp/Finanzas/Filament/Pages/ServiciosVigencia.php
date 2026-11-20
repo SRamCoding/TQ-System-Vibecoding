@@ -37,7 +37,7 @@ final class ServiciosVigencia extends Base implements HasTable
     {
         $pronto = DB::table('servicios_vigencia')->where('hasta', '<=', CarbonImmutable::parse(Calendario::hoy())->addDays(30)->toDateString())->count();
 
-        return ($pronto > 0 ? "{$pronto} vencen en 30 días o menos · " : '').'Cada periodo genera su orden de servicio (en los gastos generales del proyecto o en su centro de costo). Avisa a 60, 30 y 15 días.';
+        return $pronto > 0 ? "{$pronto} vencen en 30 días o menos" : '';
     }
 
     public function content(Schema $schema): Schema

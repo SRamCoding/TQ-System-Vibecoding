@@ -64,8 +64,7 @@ final class Planilla extends Page implements HasTable
         $p = $this->planilla();
         $t = $p === null ? null : DB::table('planilla_lineas')->where('planilla_id', $p->id)->selectRaw('SUM(neto) AS neto, SUM(costo_empresa) AS costo')->first();
 
-        return "Periodo {$this->periodo} · ".($p === null ? 'sin calcular' : ($p->estado === 'cerrada' ? 'cerrada' : 'en cálculo').' · neto '.number_format((float) $t->neto, 2).' · costo empresa '.number_format((float) $t->costo, 2))
-            .' · Ilustrativo y simplificado: la planilla real incluye asignación familiar, quinta categoría, gratificaciones, CTS y vacaciones; las reglas las valida el contador.';
+        return "Periodo {$this->periodo} · ".($p === null ? 'sin calcular' : ($p->estado === 'cerrada' ? 'cerrada' : 'en cálculo').' · neto '.number_format((float) $t->neto, 2).' · costo empresa '.number_format((float) $t->costo, 2));
     }
 
     public function content(Schema $schema): Schema

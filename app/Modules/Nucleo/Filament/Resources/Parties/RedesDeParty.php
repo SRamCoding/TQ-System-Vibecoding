@@ -71,7 +71,6 @@ final class RedesDeParty extends Component implements HasActions, HasSchemas, Ha
             ->headerActions([
                 AccionFilament::desde('nucleo.parties.agregar-red-social', fn (): array => ['party_id' => $this->partyId], $this->avisarGuardado(...), controles: $contacto)
                     ->label('Agregar red')->icon('heroicon-o-plus')
-                    ->modalDescription('De la persona o empresa, o de uno de sus contactos. El enlace debe ser de la red elegida.')
                     ->hidden($delEquipo),
             ])
             ->recordActions([

@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v7
+- **Versión:** v8
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-039** (cruza módulos) · Ninguna pantalla lleva texto que explique cómo funciona; quedan datos, etiquetas y
+  mensajes.
 - **MV-038** (ficha) · Tickets de ayuda lleva su ícono propio: el ticket con audífonos de soporte.
 - **MV-037** (cruza módulos) · Cambiar de pantalla sin recargar: solo cambia el contenido; el marco queda quieto.
 - **MV-036** (ficha) · La frase debajo de las cajas, chica y apagada; reordenar con una copia que sigue al puntero
@@ -128,6 +130,14 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   se conservan vivos entre pantallas (`x-persist`). Mientras carga, la barra fina de progreso de Livewire. Las cajas del
   inicio, en escritorio, siguen abriendo su proceso en otra pestaña (plan 1.4f, D10); en el celular, sin recargar.
 
+- **Sin textos explicativos (MV-039):** las cabeceras de las pantallas solo muestran datos: se quitó la explicación y se
+  dejó lo que es un número o un estado (p. ej. Cobranzas «Por cobrar S/ … · vencido S/ …», Almacén «Almacén Central ·
+  valor del stock S/ … a costo promedio», Tareo «Semana 47 … · 62.0 h · S/ 984.00», Planilla «Periodo 2026-11 · en
+  cálculo · neto … · costo empresa …»). Sin subtítulo: ¿Cuánto se ganó?, Contratos, Personal asignado, Catálogo de
+  productos, Tickets de ayuda, Facturas de proveedor. También se quitaron 39 explicaciones de ventanas (p. ej. «Se lee
+  del XML…», «Pega desde Excel…», «Busca a la persona…») y 8 de secciones (Mis datos, Roles, Vista previa de fechas,
+  Líneas del requerimiento, «La empresa» de la cuenta, Falta el gerente general).
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -154,6 +164,11 @@ contar solas, porque no coinciden con ningún proceso).
   motivos, empresa, general) siguen en Configuración.
 
 ## Supuestos sin confirmar
+
+- **Qué es «explicativo» (MV-039):** se dejaron los textos de las ventanas que avisan una consecuencia antes de
+  confirmar («No se borra: queda en la lista como anulada», «Se pierden los cambios…», «Solo se borra lo que nunca se
+  usó…»), las reglas de contraseña al renovarla y las ayudas bajo cada campo (son de los campos, no de la pantalla).
+  Todavía no hay íconos de información: lo quitado no se movió a ningún lado.
 
 - **La dirección del navegador** cambia con la caja (cada pantalla conserva la suya, como `/flujo-caja`), así «atrás» y
   los enlaces funcionan; no se anidaron bajo el proceso (Sebastián: no le importa ver direcciones).
@@ -192,6 +207,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v8** (MV-039): se quitan los textos explicativos de cabeceras, ventanas y secciones.
 
 - **v7** (MV-038): ícono propio de Tickets de ayuda.
 

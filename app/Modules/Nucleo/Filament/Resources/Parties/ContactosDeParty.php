@@ -108,7 +108,6 @@ final class ContactosDeParty extends Component implements HasActions, HasSchemas
                         ],
                     )
                         ->label('Trasladar a otra institución')->icon('heroicon-o-arrow-right-circle')
-                        ->modalDescription('Cierra su vínculo aquí y abre uno nuevo en la otra institución, enlazado. Revisa el correo: el institucional suele cambiar.')
                         // Precarga lo que suele seguir igual; el cargo nuevo se pide (D1).
                         ->fillForm(fn (PartyContacto $record): array => [
                             ...$record->only(['nombres', 'apellidos', 'area', 'telefono', 'email', 'es_decisor']),

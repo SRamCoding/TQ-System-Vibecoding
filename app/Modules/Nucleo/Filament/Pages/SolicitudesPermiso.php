@@ -54,7 +54,7 @@ final class SolicitudesPermiso extends Page implements HasTable
     {
         $n = DB::table('solicitudes_permiso')->where('estado', 'pendiente')->count();
 
-        return self::administra() ? "{$n} pendientes · Se conceden por rol, nunca a una persona suelta." : 'Tus pedidos de permiso y cómo se resolvieron.';
+        return self::administra() ? "{$n} pendientes" : '';
     }
 
     public function content(Schema $schema): Schema

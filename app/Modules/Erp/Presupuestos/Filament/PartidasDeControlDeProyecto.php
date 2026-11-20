@@ -157,7 +157,6 @@ final class PartidasDeControlDeProyecto extends ComponentePestanaProyecto implem
                 ->hidden(! $enBorrador),
             AccionFilament::desde(DefinicionArbolPartidas::CLAVE.'.aprobar', fn (): array => ['documento_id' => $arbol->id], $this->avisarGuardado(...))
                 ->name('aprobarArbol')->label('Aprobar')->icon('heroicon-o-check-circle')->color('success')
-                ->modalDescription('La suma de las hojas debe ser igual al costo presupuestado y cada partida con responsable. Al aprobarse se crea la PC-99 y el proyecto pasa a «en ejecución».')
                 ->fillForm(fn (): array => ['version' => ArbolPartidas::query()->whereKey($arbol->id)->value('version')])
                 ->hidden(! $enBorrador),
         ];
@@ -175,7 +174,6 @@ final class PartidasDeControlDeProyecto extends ComponentePestanaProyecto implem
             AccionFilament::desde('erp.presupuestos.editar-partida', fn (array $record): array => ['partida_id' => (int) $record['id']], $this->avisarGuardado(...),
                 controles: ['responsable_user_id' => fn (): Field => self::responsable()])
                 ->name('editarPartida')->label('Editar')->icon('heroicon-o-pencil-square')->iconButton()
-                ->modalDescription('El nombre y quién responde por ella. El código, el monto y su origen en el presupuesto no cambian aquí.')
                 ->fillForm(fn (array $record): array => ['nombre' => $record['nombre'], 'responsable_user_id' => (int) $record['responsable_user_id'], 'version' => (int) $record['version']])
                 ->hidden(fn (array $record): bool => ! $enBorrador || ! $record['es_activa'] || $record['es_no_presupuestado']),
             AccionFilament::desde('erp.presupuestos.fijar-presupuestado', fn (array $record): array => ['partida_id' => (int) $record['id']], $this->avisarGuardado(...))
@@ -253,7 +251,6 @@ final class PartidasDeControlDeProyecto extends ComponentePestanaProyecto implem
         return Action::make('armarArbol')->label('Armar el árbol')->icon('heroicon-o-squares-plus')
             ->slideOver()
             ->modalHeading('Armar el árbol de partidas')
-            ->modalDescription('Revisa la propuesta: cambia nombres y responsables, o quita lo que no va. Lo quitado queda por repartir. Reagrupar, mover y fijar montos se hace después, en el borrador.')
             ->modalSubmitActionLabel('Armar el árbol')
             // D11: pide ver costos. Con el panel ya abierto sigue visible aunque el árbol o los orígenes cambien: si no,
             // Filament ignoraría el envío sin aviso; así el servicio lo rechaza diciendo por qué (D7).
