@@ -1,9 +1,10 @@
 # Ficha · El ciclo del dinero: facturación, pagos, caja, rendiciones y resultado real (flujos 4 a 7)
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Versión:** v2
 - **Tramo de la ruta:** T5
-- **Aprobada:** 2026-11-20 · etiqueta `aprobado/t5-finanzas-v1`
+- **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t5-finanzas-v2`
+- **Aprobada (v1):** 2026-11-20 · etiqueta `aprobado/t5-finanzas-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-4-flujo-04.md` a `flujo-07.md`; `docs/vibe/ruta-mvp.md` (tramo 5).
 
 ## Qué hace
@@ -84,7 +85,7 @@ concepto, comprobante, fondo, proyecto, conciliado), `fondos` y `fondo_gastos` (
   datos; la marca «leído por IA» queda para revisar).
 - Detracción fija del 4 % para contratos públicos; sin retenciones del IGV ni percepciones.
 - El tablero de pagos mueve tarjetas con botones (el v4 pide arrastrarlas).
-- No hay moneda extranjera, plantillas de asientos ni exportación para el contador, servicios con vigencia, notas de
+- No hay moneda extranjera, servicios con vigencia, notas de
   crédito, liquidación formal del contrato, consorcios ni conciliación contra un extracto importado.
 - La comisión de la carta fianza (OS) se paga sin factura ni movimiento de banco.
 
@@ -99,3 +100,10 @@ concepto, comprobante, fondo, proyecto, conciliado), `fondos` y `fondo_gastos` (
 `app/Modules/Erp/Finanzas/` (provider, migración, `Services/FinanzasService.php`, `Filament/Pages/` con Comprobantes,
 TableroPagos, FlujoCaja, Rendiciones y Resultados, `Resumen/TarjetaResultado.php`, vistas `tablero-pagos` y `flujo`);
 datos en `DemoSeeder::compraDemo()` (facturas y pagos) y `tramo5()`.
+
+## Cambios desde la versión anterior
+
+v2 (2026-11-20): **Exportar para el contador** (`/exportar-contador`, caja «Para el contador»): por mes, en CSV para
+Excel (punto y coma, UTF-8 con BOM), el registro de ventas, el de compras y caja y bancos, cada fila con las cuentas
+de su plantilla de asiento (ventas 12121 / 40111 / 70321; compras 60xx-63xx / 40111 / 42121; caja 10411 / 1013). La
+plantilla es fija en el código (atajo); el v4 la quiere configurable.
