@@ -73,12 +73,15 @@ use App\Modules\Nucleo\Services\ParametrosService;
 use App\Modules\Nucleo\Services\PartiesService;
 use App\Modules\Nucleo\Services\SedesPartyService;
 use App\Modules\Nucleo\Services\SeguridadService;
+use App\Modules\Nucleo\Services\SolicitudesPermisoService;
 use App\Modules\Nucleo\Services\TipoCambioService;
 use App\Modules\Nucleo\Services\TransicionesService;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 /**
  * Los datos de demostración (ficha t0-datos-demo): cuentas, embudo, cotizaciones y los nueve proyectos con presupuesto,
@@ -148,6 +151,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: facturación, cobranza y rendiciones');
             $this->tramo5();
+
+            $this->command?->info('Demo: solicitudes de permiso');
+            $this->solicitudesPermiso();
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -1235,5 +1241,28 @@ final class DemoSeeder extends Seeder
 
         // Conciliado todo lo que pasó hasta octubre.
         DB::table('movimientos_caja')->where('fecha', '<', '2026-11-01')->update(['conciliado' => true]);
+    }
+
+    /**
+     * Una vendedora con un rol corto (ficha op-solicitudes-permiso), para ver los botones bloqueados; y sus pedidos de
+     * permiso: dos pendientes, uno concedido y uno rechazado. Entra con ventas.demo@techquk.test y la clave de la fábrica.
+     */
+    private function solicitudesPermiso(): void
+    {
+        $rol = Role::findOrCreate('comercial-demo', 'web');
+        $rol->syncPermissions(Permission::query()->where(fn ($q) => $q->where('name', 'like', 'crm.%.ver')->orWhereIn('name', ['crm.actividades.registrar', 'crm.cotizaciones.crear', 'crm.oportunidades.crear']))->pluck('name')->all());
+        $persona = Party::factory()->create(['numero_documento' => '00000021', 'nombres' => 'Valeria', 'apellidos' => 'Montalván Ríos', 'razon_social' => 'Montalván Ríos Valeria']);
+        $vendedora = User::factory()->create(['party_id' => $persona->id, 'name' => 'Valeria Montalván Ríos', 'email' => 'ventas.demo@techquk.test', 'es_activo' => true]);
+        $vendedora->assignRole($rol);
+        $s = app(SolicitudesPermisoService::class);
+
+        foreach ([['crm.oportunidades.oportunidad.ganar', 'Ganar oportunidad', 'Cierro las privadas pequeñas yo misma.'], ['crm.licitaciones.gestionar', 'Registrar convocatoria', 'Me tocó llevar las convocatorias de la UGEL.'],
+            ['crm.cuentas.crear', 'Nueva cuenta', 'Para registrar los leads de la feria.'], ['crm.catalogo.gestionar', 'Nuevo precio', null]] as $i => [$permiso, $accion, $motivo]) {
+            $s->solicitar($vendedora, $permiso, $accion, $motivo);
+        }
+
+        $ids = DB::table('solicitudes_permiso')->where('user_id', $vendedora->id)->orderBy('id')->pluck('id')->all();
+        $s->conceder($ids[2], $rol->id, $this->dev);
+        $s->rechazar($ids[3], 'Los precios del catálogo los cambia solo Compras.', $this->dev);
     }
 }

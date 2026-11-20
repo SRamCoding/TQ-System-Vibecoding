@@ -14,6 +14,7 @@ use App\Modules\Nucleo\RegistroAcciones\TipoCampo;
 use App\Modules\Nucleo\Services\CatalogosService;
 use App\Modules\Nucleo\Services\MotivosService;
 use App\Modules\Nucleo\Services\ParametrosService;
+use App\Modules\Nucleo\Services\SolicitudesPermisoService;
 use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
@@ -24,9 +25,11 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Text;
 use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +61,12 @@ final class AccionFilament
      *                                           (`dehydrated(false)`), pero un control los lee con `$get`. Por ejemplo,
      *                                           lo que se mostró al abrir la ventana (plan 1.4f, «Elegir módulos»)
      */
+    /** Si la persona tiene el permiso de la acción (o la acción no pide ninguno). */
+    public static function tiene(Accion $accion): bool
+    {
+        return $accion->permiso() === null || (Filament::auth()->user()?->can($accion->permiso()) ?? false);
+    }
+
     public static function desde(Accion|string $accion, ?Closure $datosFijos = null, ?Closure $alTerminar = null, ?Closure $soloLectura = null, ?Closure $ocultos = null, array $controles = [], array $deApoyo = []): Action
     {
         $accion = is_string($accion) ? app(RegistroAcciones::class)->obtener($accion) : $accion;
@@ -67,9 +76,19 @@ final class AccionFilament
 
         return Action::make(Str::camel(str_replace('.', '-', $accion->clave())))
             ->label($accion->nombre())
-            // Ocultarla es comodidad; quien decide es EjecutorAcciones.
-            ->visible(fn (): bool => $accion->permiso() === null || (Filament::auth()->user()?->can($accion->permiso()) ?? false))
+            // MVP rápido (op-solicitudes-permiso, plan 2.0b): sin el permiso, el botón se ve bloqueado (gris, candado) y dice
+            // qué falta; al tocarlo se pide con un clic. Quien decide sigue siendo EjecutorAcciones.
+            ->color(fn (): ?string => self::tiene($accion) ? null : 'gray')
+            ->tooltip(fn (): ?string => self::tiene($accion) ? null : 'Te falta el permiso «'.app(SolicitudesPermisoService::class)->nombre((string) $accion->permiso()).'». Tócalo para pedirlo.')
+            ->extraAttributes(fn (): array => self::tiene($accion) ? [] : ['class' => 'opacity-60'])
             ->schema(function (Action $action) use ($accion, $fijos, $soloLectura, $ocultos, $controles, $deApoyo): array {
+                if (! self::tiene($accion)) {
+                    return [
+                        Text::make('Para «'.$accion->nombre().'» te falta el permiso «'.app(SolicitudesPermisoService::class)->nombre((string) $accion->permiso()).'». Quien administra Roles y permisos recibe tu pedido y te lo da por rol.'),
+                        Textarea::make('tq_motivo_solicitud')->label('¿Para qué lo necesitas? (opcional)')->rows(2)->maxLength(300),
+                    ];
+                }
+
                 $bloqueados = $soloLectura === null ? [] : (array) $action->evaluate($soloLectura);
                 $sinMostrar = $ocultos === null ? [] : (array) $action->evaluate($ocultos);
                 $apoyo = array_map(fn (Closure $campo): Field => $campo()->dehydrated(false), $deApoyo);
@@ -89,6 +108,17 @@ final class AccionFilament
 
                 if (! $usuario instanceof User) {
                     throw new AuthorizationException;
+                }
+
+                if (! self::tiene($accion)) {
+                    try {
+                        app(SolicitudesPermisoService::class)->solicitar($usuario, (string) $accion->permiso(), $accion->nombre(), $data['tq_motivo_solicitud'] ?? null);
+                        Notification::make()->success()->title('Permiso pedido: te avisarán cuando lo resuelvan.')->send();
+                    } catch (\RuntimeException $e) {
+                        Notification::make()->warning()->title($e->getMessage())->send();
+                    }
+
+                    return;
                 }
 
                 // Desde la pantalla, un campo de archivo solo vale si es el archivo que subió la persona: si el navegador lo
