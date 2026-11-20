@@ -11,13 +11,15 @@ use App\Modules\Crm\Actividades\Services\AporteActividadesACuentas;
 use App\Modules\Crm\Actividades\Services\ProximaAccionDesdeActividades;
 use App\Modules\Crm\Cuentas\Actividad\ActividadDeCuentas;
 use App\Modules\Crm\Oportunidades\Services\ProximaAccionDeOportunidades;
-use App\Modules\Nucleo\Navegacion\AreaModulo;
-use App\Modules\Nucleo\Navegacion\CajaModulo;
-use App\Modules\Nucleo\Navegacion\RegistroModulos;
+use App\Modules\Nucleo\Mien\RegistroTarjetasMien;
+use App\Modules\Nucleo\Mien\TarjetaMien;
 use App\Modules\Nucleo\Navegacion\RegistroPantallas;
 use App\Modules\Nucleo\Seguridad\RegistroPermisos;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 /** MVP rápido (ficha t1-agenda): Agenda y actividades (CRM-05). Va antes de Oportunidades en la lista de providers. */
 final class ActividadesServiceProvider extends ServiceProvider
@@ -39,11 +41,12 @@ final class ActividadesServiceProvider extends ServiceProvider
         $permisos->declarar(ActividadesService::PERMISO_VER, 'Ver la agenda');
         $permisos->declarar(ActividadesService::PERMISO_REGISTRAR, 'Registrar actividades');
 
-        $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
-            'agenda', 'Agenda', '/agenda', permiso: ActividadesService::PERMISO_VER, area: AreaModulo::Crm,
-            icono: 'heroicon-o-calendar-days',
-            descripcion: 'Las visitas, llamadas y reuniones con los clientes, y lo que sigue con cada uno',
-            preguntas: ['¿Qué tengo hoy?', '¿Qué se me venció?', '¿Qué oportunidades no tienen próxima acción?', '¿Cuándo hablamos por última vez con este cliente?'],
+        // MV-025: la agenda sale del inicio y es una herramienta del muelle; Mien muestra «Mi agenda».
+        Livewire::component('agenda-muelle', Filament\Muelle\AgendaMuelle::class);
+        FilamentView::registerRenderHook(PanelsRenderHook::BODY_END,
+            fn (): string => auth()->user()?->can(ActividadesService::PERMISO_VER) === true ? Livewire::mount('agenda-muelle') : '');
+        $this->app->make(RegistroTarjetasMien::class)->registrar(new TarjetaMien(
+            'mi-agenda', 'Mi agenda', ActividadesService::PERMISO_VER, Filament\Muelle\TarjetaMiAgenda::class, 5,
         ));
     }
 }

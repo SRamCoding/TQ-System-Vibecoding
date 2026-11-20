@@ -1,7 +1,7 @@
 # Ficha · Agenda y actividades (CRM-05)
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v2
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-agenda-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-2-crm.md` (paso 6: «Mi agenda», registro rápido, próxima acción);
@@ -17,6 +17,8 @@ Oportunidades su columna «Próxima acción» y el punto ámbar de las que no ti
 
 ## Decisiones de Sebastián
 
+- **MV-025** (cruza módulos) · La agenda es una herramienta del muelle; Mien muestra «Mi agenda».
+- **MV-026** (ficha) · Botón «Año»; desde las descripciones se marca hecha y se registra.
 - **MV-005** (ficha) · Va después de licitaciones, en el tramo 1.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
@@ -84,3 +86,23 @@ polimórfica (`actividable_type`) para cuentas, oportunidades, proyectos y ticke
 `ProximaAccionDesdeActividades.php`, `Filament/Pages/Agenda.php`); en Oportunidades,
 `Services/ProximaAccionDeOportunidades.php` (interfaz) y su uso en `OportunidadesService` y `FajaDeVidrio`; datos en
 `DemoSeeder::actividades()`.
+
+## Cambios desde la versión anterior
+
+- **v2** (ronda 1, MV-025 y MV-026): la caja Agenda deja el inicio. En el muelle, arriba de Recortes, un ícono de
+  calendario con reloj abre en el centro dos recuadros pegados:
+  - **Calendario** (grande): primero el año (12 meses chicos con cada día pintado) y a los 0,9 s se acerca solo al mes
+    actual, agrandando ese mes desde su lugar (0,55 s). En el mes: flechas ‹ › de mes, el botón **Año** (se aleja) y
+    los días con una barra del color de su estado más urgente: **vencida** (pendiente y ya pasó; rojo), **por vencer**
+    (pendiente en los próximos 3 días; ámbar), **programada** (pendiente más adelante; azul), **hecha** (verde). Hoy
+    lleva una flecha ▼ que salta suave encima. Leyenda abajo. En el año, un clic en un mes se acerca a él.
+  - **Descripciones** (angosto, 19 rem): el día elegido (al abrir, hoy), cada actividad con hora y tipo, su estado,
+    el asunto, «Con» cliente y oportunidad, responsable y resultado; **Marcar hecha** en las pendientes y **Registrar
+    actividad** (tipo, cliente, oportunidad de ese cliente opcional, asunto, hora) para ese día. Esc o ✕ cierran.
+  - Solo las actividades de la persona (responsable). En el celular, uno debajo del otro.
+- **Mien:** tarjeta **Mi agenda** (primera): Hoy, Vencidas y Por vencer con su cantidad y hasta tres de cada una, y
+  «Abrir la agenda».
+- **Supuestos:** «por vencer» son 3 días; la agenda muestra solo lo propio; la pantalla `/agenda` vieja sigue existiendo
+  sin caja.
+- **Atajos:** las listas de clientes y oportunidades del formulario se leen en el componente; el reparto del año se
+  calcula en PHP en cada apertura.

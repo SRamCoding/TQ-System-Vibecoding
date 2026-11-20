@@ -357,6 +357,11 @@
                 </a>
             @endforeach
             <hr>
+            {{-- MV-025: la agenda, arriba de Recortes. La pone el módulo de actividades (si la persona la ve, el ícono aparece). --}}
+            <button type="button" class="tq-apps-control" x-data x-init="Alpine.store('tqAgenda') ?? Alpine.store('tqAgenda', { lista: false })" x-show="$store.tqAgenda?.lista" x-cloak
+                x-on:click="window.dispatchEvent(new CustomEvent('tq-agenda-abrir'))" data-nombre="Agenda" aria-label="Agenda" title="Agenda" data-tq-apps="agenda">
+                <x-filament::icon icon="tq-calendario-reloj" class="h-4 w-4" />
+            </button>
             {{-- Plan 1.4z, D8: recortar pantalla, fijo; no es una aplicación (no se arrastra ni se oculta). Solo en Windows. --}}
             <a href="ms-screenclip:" class="tq-apps-control" x-show="windows" x-cloak data-nombre="Recortar pantalla (Windows + Mayús + S)" aria-label="Recortar pantalla (Windows + Mayús + S)" data-tq-apps="recortar">
                 <x-filament::icon icon="heroicon-m-scissors" class="h-4 w-4" />

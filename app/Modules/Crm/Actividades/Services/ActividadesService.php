@@ -90,6 +90,96 @@ final readonly class ActividadesService
             ])->all();
     }
 
+    /** Días hacia adelante en que una pendiente está «por vencer» (MV-025). */
+    public const int DIAS_POR_VENCER = 3;
+
+    /** vencida | por_vencer | programada | hecha (MV-025), de una actividad. */
+    public static function estadoDe(bool $hecha, CarbonImmutable $fecha): string
+    {
+        $ahora = Calendario::ahora();
+
+        return match (true) {
+            $hecha => 'hecha',
+            $fecha->lt($ahora) => 'vencida',
+            $fecha->lte($ahora->endOfDay()->addDays(self::DIAS_POR_VENCER)) => 'por_vencer',
+            default => 'programada',
+        };
+    }
+
+    /**
+     * MV-025: el color de cada día del año en la agenda del muelle: el estado más urgente de sus actividades (vencida,
+     * por vencer, programada, hecha), solo las de la persona.
+     *
+     * @return array<string, string> 'Y-m-d' => estado
+     */
+    public function diasDelAnio(int $userId, int $anio): array
+    {
+        $orden = ['vencida' => 0, 'por_vencer' => 1, 'programada' => 2, 'hecha' => 3];
+        $dias = [];
+
+        foreach (Actividad::query()->where('responsable_user_id', $userId)->whereYear('fecha', $anio)->get(['fecha', 'es_realizada']) as $a) {
+            $fecha = CarbonImmutable::parse($a->fecha)->setTimezone('America/Lima');
+            $dia = $fecha->toDateString();
+            $estado = self::estadoDe((bool) $a->es_realizada, $fecha);
+
+            if (! isset($dias[$dia]) || $orden[$estado] < $orden[$dias[$dia]]) {
+                $dias[$dia] = $estado;
+            }
+        }
+
+        return $dias;
+    }
+
+    /**
+     * MV-025: las actividades de un día de la persona, con quién, de qué cliente u oportunidad y su estado.
+     *
+     * @return list<array{id: int, tipo: string, asunto: string, hora: string, cuenta: ?string, oportunidad: ?string, estado: string, resultado: ?string, quien: string}>
+     */
+    public function delDia(int $userId, string $dia): array
+    {
+        $desde = CarbonImmutable::parse($dia, 'America/Lima')->startOfDay();
+
+        return Actividad::query()->where('actividades.responsable_user_id', $userId)
+            ->whereBetween('actividades.fecha', [$desde, $desde->endOfDay()])
+            ->leftJoin('cuentas', 'cuentas.id', '=', 'actividades.cuenta_id')
+            ->leftJoin('parties', 'parties.id', '=', 'cuentas.party_id')
+            ->leftJoin('oportunidades', 'oportunidades.id', '=', 'actividades.oportunidad_id')
+            ->leftJoin('users', 'users.id', '=', 'actividades.responsable_user_id')
+            ->orderBy('actividades.fecha')
+            ->get(['actividades.id', 'actividades.tipo', 'actividades.asunto', 'actividades.fecha', 'actividades.es_realizada', 'actividades.resultado', 'parties.razon_social as cuenta', 'oportunidades.numero as oportunidad', 'oportunidades.nombre as oportunidad_nombre', 'users.name as quien'])
+            ->map(function (Actividad $a): array {
+                $fecha = CarbonImmutable::parse($a->fecha)->setTimezone('America/Lima');
+
+                return [
+                    'id' => (int) $a->id, 'tipo' => Actividad::TIPOS[$a->tipo] ?? $a->tipo, 'asunto' => $a->asunto, 'hora' => $fecha->format('H:i'),
+                    'cuenta' => $a->getAttribute('cuenta'), 'oportunidad' => $a->getAttribute('oportunidad') === null ? null : $a->getAttribute('oportunidad').' · '.$a->getAttribute('oportunidad_nombre'),
+                    'estado' => self::estadoDe((bool) $a->es_realizada, $fecha), 'resultado' => $a->resultado, 'quien' => (string) $a->getAttribute('quien'),
+                ];
+            })->all();
+    }
+
+    /**
+     * MV-025: la tarjeta «Mi agenda» de Mien: lo de hoy, lo vencido y lo que vence en los próximos días.
+     *
+     * @return array{hoy: list<array{asunto: string, cuando: string, cuenta: ?string}>, vencidas: list<array{asunto: string, cuando: string, cuenta: ?string}>, por_vencer: list<array{asunto: string, cuando: string, cuenta: ?string}>}
+     */
+    public function miAgenda(int $userId): array
+    {
+        $ahora = Calendario::ahora();
+        $grupos = ['hoy' => [], 'vencidas' => [], 'por_vencer' => []];
+
+        foreach (Actividad::query()->where('actividades.responsable_user_id', $userId)->where('actividades.es_realizada', false)
+            ->where('actividades.fecha', '<=', $ahora->endOfDay()->addDays(self::DIAS_POR_VENCER))
+            ->leftJoin('cuentas', 'cuentas.id', '=', 'actividades.cuenta_id')->leftJoin('parties', 'parties.id', '=', 'cuentas.party_id')
+            ->orderBy('actividades.fecha')->get(['actividades.asunto', 'actividades.fecha', 'actividades.tipo', 'parties.razon_social as cuenta']) as $a) {
+            $fecha = CarbonImmutable::parse($a->fecha)->setTimezone('America/Lima');
+            $grupo = $fecha->lt($ahora) ? 'vencidas' : ($fecha->isSameDay($ahora) ? 'hoy' : 'por_vencer');
+            $grupos[$grupo][] = ['asunto' => (Actividad::TIPOS[$a->tipo] ?? $a->tipo).' · '.$a->asunto, 'cuando' => $fecha->format($grupo === 'hoy' ? 'H:i' : 'd/m H:i'), 'cuenta' => $a->getAttribute('cuenta')];
+        }
+
+        return $grupos;
+    }
+
     /** Marca hecha una pendiente, con lo que pasó. */
     public function cumplir(int $actividadId, ?string $resultado): Actividad
     {

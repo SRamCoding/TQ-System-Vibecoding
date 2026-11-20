@@ -310,3 +310,30 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Ronda 1 · paso 4: licitaciones y leads dentro de la oportunidad»
+
+### MV-025 · 2026-11-20 · La agenda es una herramienta del muelle
+
+- **Ficha:** `fichas/t1-agenda.md`
+- **Dijo Sebastián:** «La agenda sale del inicio y es una herramienta del muelle, con un ícono de calendario con reloj,
+  arriba del de Recortes. Al presionarlo aparecen en el centro dos recuadros pegados: el grande (calendario) muestra
+  primero el año completo y enseguida, solo, una animación de acercamiento hasta el mes actual. El día de hoy tiene una
+  flecha arriba que lo señala, y los días tienen colores según sus actividades (vencidas, por vencer, programadas,
+  hechas); el angosto, pegado al lado (descripciones): al presionar un día, muestra sus actividades con quién, de qué
+  cliente u oportunidad y su estado. Mien muestra además una tarjeta "Mi agenda" con lo de hoy, lo vencido y lo que
+  está por vencer».
+- **Decisión:** lo dicho; la caja Agenda deja el inicio.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 5: la agenda en el muelle»
+
+### MV-026 · 2026-11-20 · En la agenda: botón «Año» y se registra y marca desde las descripciones
+
+- **Ficha:** `fichas/t1-agenda.md`
+- **Dijo Sebastián:** eligió «Botón "Año"» (y no el clic en el nombre del mes ni la rueda) y «Registrar y marcar hecha»
+  (y no solo marcar ni solo ver), entre las opciones que le dio el agente.
+- **Decisión:** un botón «Año» junto al nombre del mes hace la animación al revés y, en el año, un clic en un mes se
+  acerca a él. En el recuadro de descripciones cada actividad pendiente tiene «Marcar hecha», y abajo «Registrar
+  actividad» para ese día (tipo, cliente, oportunidad opcional, asunto y hora).
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 5: la agenda en el muelle»

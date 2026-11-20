@@ -114,8 +114,7 @@ enum Proceso: string
         return match ($this) {
             self::Mien => ['mien' => null],
             self::Techquk => ['resultados' => '¿Cuánto se ganó?', 'presupuesto-empresa' => 'Presupuesto de la empresa', 'lo-aprendido' => 'Lo aprendido', 'reglas-negocio' => 'Reglas del negocio'],
-            // La Agenda, mientras llega el paso 5 de la ronda (MV-016).
-            self::ConseguirNegocio => ['oportunidades' => 'Oportunidades', 'convocatorias' => 'Convocatorias del SEACE', 'campanias' => 'Campañas', 'agenda' => 'Agenda'],
+            self::ConseguirNegocio => ['oportunidades' => 'Oportunidades', 'convocatorias' => 'Convocatorias del SEACE', 'campanias' => 'Campañas'],
             self::GerenciaProyectos => ['proyectos' => 'Proyectos', 'contratos' => 'Contratos', 'asignacion' => 'Personal asignado', 'tareo' => 'Tareo', 'subcontratos' => 'Subcontratos'],
             self::Abastecer => ['requerimientos' => 'Requerimientos', 'ordenes' => 'Órdenes', 'almacen' => 'Almacén'],
             self::FacturacionCobranza => ['valorizaciones' => 'Valorizaciones', 'facturas-emitidas' => 'Facturas emitidas', 'cobranzas' => 'Cobranzas'],
