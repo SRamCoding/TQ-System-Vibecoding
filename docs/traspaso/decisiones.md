@@ -691,3 +691,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 4.5: el logo de Techquk en su caja»
+
+### MV-054 · 2026-11-20 · Ícono propio de «Gerencia de proyectos»: reloj, moneda y barras
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-4, punto 6) «Un reloj, una moneda con el signo de dólar y unas barras que suben: el
+  plazo, el costo y el avance. Un solo color; la moneda puede ir rellena con el "$" calado».
+- **Decisión:** ícono de línea, 24 × 24, trazo 1,9, un solo color: el reloj abierto abajo con dos agujas, la moneda
+  rellena con el «$» calado abajo a la izquierda y tres barras que suben abajo a la derecha. Referencia en
+  `docs/vibe/referencias/icono-gerencia-de-proyectos.png`.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 4.6: ícono de Gerencia de proyectos»

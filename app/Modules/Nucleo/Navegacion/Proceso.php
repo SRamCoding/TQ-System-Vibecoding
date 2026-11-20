@@ -63,7 +63,7 @@ enum Proceso: string
             self::Mien => 'heroicon-o-star',
             self::Techquk => 'tq-logo-techquk', // MV-053: el símbolo de Techquk
             self::ConseguirNegocio => 'tq-montana-bandera', // MV-030: la montaña con la bandera en la cima
-            self::GerenciaProyectos => 'heroicon-o-briefcase',
+            self::GerenciaProyectos => 'tq-reloj-moneda-barras', // MV-054: plazo, costo y avance
             self::Abastecer => 'heroicon-o-truck',
             self::FacturacionCobranza => 'heroicon-o-currency-dollar',
             self::Postventa => 'tq-rompecabezas-flecha', // MV-031: el rompecabezas armado y la flecha que sigue
