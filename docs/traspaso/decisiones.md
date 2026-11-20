@@ -187,3 +187,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** los de «Cierre del tramo 5» y «Opcionales»
+
+### MV-015 · 2026-11-20 · Lo que el v4 tenía y la ruta dejó fuera también entra
+
+- **Ficha:** general
+- **Dijo Sebastián:** «sí, sigue con todo de una vez», sobre la bandeja del SEACE y lo planeado que faltaba: flujo 8
+  (postventa, con series de almacén), flujo 9 (las personas, con planilla), tableros de inicio por rol y el cierre del
+  proyecto (flujo 6).
+- **Decisión:** se construyen antes de cerrar el MVP, en ese orden.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** los de «Postventa», «Personas», «Tableros» y «Cierre»

@@ -12,6 +12,7 @@ use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
 use App\Modules\Erp\Compras\ComprasServiceProvider;
 use App\Modules\Erp\Contratos\ContratosServiceProvider;
 use App\Modules\Erp\Finanzas\FinanzasServiceProvider;
+use App\Modules\Erp\Postventa\PostventaServiceProvider;
 use App\Modules\Erp\Personal\PersonalServiceProvider;
 use App\Modules\Erp\Valorizaciones\ValorizacionesServiceProvider;
 use App\Modules\Erp\Presupuestos\PresupuestosServiceProvider;
@@ -31,6 +32,7 @@ return [
     PersonalServiceProvider::class,
     ValorizacionesServiceProvider::class,
     FinanzasServiceProvider::class,
+    PostventaServiceProvider::class,
     CuentasServiceProvider::class,
     ActividadesServiceProvider::class,
     OportunidadesServiceProvider::class,

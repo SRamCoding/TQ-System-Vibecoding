@@ -35,6 +35,7 @@ use App\Modules\Erp\Contratos\Services\ContratosService;
 use App\Modules\Erp\Finanzas\Services\FinanzasService;
 use App\Modules\Erp\Personal\Models\Colaborador;
 use App\Modules\Erp\Personal\Services\PersonalService;
+use App\Modules\Erp\Postventa\Services\PostventaService;
 use App\Modules\Erp\Presupuestos\Models\Insumo;
 use App\Modules\Erp\Presupuestos\Models\PartidaControl;
 use App\Modules\Erp\Presupuestos\Models\PartidaDePresupuesto;
@@ -165,6 +166,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: bandeja de convocatorias del SEACE');
             $this->en('2026-11-19', fn () => $this->convocatoriasSeace());
+
+            $this->command?->info('Demo: postventa');
+            $this->postventa();
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -1303,5 +1307,48 @@ final class DemoSeeder extends Seeder
         $s->importar((string) json_encode($paquete));
         $s->registrar((int) DB::table('convocatorias_seace')->where('ocid', 'ocds-dgv273-1002')->value('id'), $this->dev);
         $s->descartar((int) DB::table('convocatorias_seace')->where('ocid', 'ocds-dgv273-1003')->value('id'), 'No es nuestro rubro');
+    }
+
+    /** Series, tickets y suscripciones de la demo (ficha t6-postventa). */
+    private function postventa(): void
+    {
+        $pv = app(PostventaService::class);
+        $prod = fn (string $c): int => (int) DB::table('productos')->where('codigo', $c)->value('id');
+        $pry = fn (string $n): int => (int) DB::table('proyectos')->where('nombre', 'like', $n.'%')->value('id');
+        $cuenta = fn (string $c): int => $this->cuentas[$c]['cuenta'];
+        $plaza = (int) DB::table('proyectos')->where('nombre', 'like', '%Plaza de Armas%')->value('id');
+        $oc = (int) DB::table('ordenes')->where('proyecto_id', $plaza)->where('clase', 'compra')->orderBy('id')->value('id');
+
+        // Las 8 cámaras domo del inventario inicial: 4 instaladas en la Plaza de Armas (la del poste 3 es DS8K…4415).
+        $pv->ingresar($prod('CAM-D4M'), ['DS8K7731024412', 'DS8K7731024413', 'DS8K7731024414', 'DS8K7731024415', 'DS8K7731024416', 'DS8K7731024417', 'DS8K7731024418', 'DS8K7731024419'], $oc, CarbonImmutable::parse('2026-09-12'), 'Central A-03');
+        foreach (['DS8K7731024412' => 'Poste 1', 'DS8K7731024413' => 'Poste 2', 'DS8K7731024415' => 'Poste 3', 'DS8K7731024414' => 'Poste 4'] as $serie => $lugar) {
+            $pv->instalar($serie, $plaza, CarbonImmutable::parse('2026-09-30'), $lugar, 24, 36);
+        }
+
+        // Equipos de proyectos anteriores: PTZ de Valle Norte (2024, garantía vencida), switch del hospital (vigente), NVR de la clínica (del fabricante).
+        $pv->ingresar($prod('CAM-PTZ4K'), ['PT4K5521802231', 'PT4K5521802232'], null, CarbonImmutable::parse('2024-04-02'), 'Central B-01');
+        $pv->instalar('PT4K5521802231', $pry('Videovigilancia y centro de monitoreo'), CarbonImmutable::parse('2024-04-20'), 'Av. Grau con Bolognesi', 24, null);
+        $pv->instalar('PT4K5521802232', $pry('Videovigilancia y centro de monitoreo'), CarbonImmutable::parse('2024-04-20'), 'Plaza Mayor', 24, null);
+        $pv->ingresar($prod('SW-48P'), ['SW48K9930190917'], null, CarbonImmutable::parse('2025-10-15'), 'Central C-02');
+        $pv->instalar('SW48K9930190917', $pry('Sistema de información hospitalaria'), CarbonImmutable::parse('2025-11-03'), 'Gabinete de emergencia', 24, 60);
+        $pv->ingresar($prod('NVR-32'), ['NV32R4410221180'], null, CarbonImmutable::parse('2024-11-05'), 'Central B-04');
+        $pv->instalar('NV32R4410221180', $pry('Mantenimiento de CCTV'), CarbonImmutable::parse('2024-11-20'), 'Sala de control', 12, 36);
+
+        $ahora = CarbonImmutable::parse('2026-11-19 10:00', 'America/Lima');
+        $a = $pv->abrir($cuenta('hospital'), 'SW48K9930190917', '', 'El switch de emergencia se reinicia solo varias veces al día.', 'alta', $this->dev->id, $ahora->subHours(6));
+        $b = $pv->abrir($cuenta('mpvn'), 'PT4K5521802231', '', 'La cámara PTZ de Grau no gira; la imagen se ve fija.', 'media', $this->dev->id, $ahora->subHours(18));
+        $c = $pv->abrir($cuenta('clinica'), 'NV32R4410221180', '', 'El grabador no guarda más de 3 días de video.', 'baja', $this->dev->id, $ahora->subDays(2));
+        $pv->cambiarEstado($c, 'con_fabricante', 'Enviado al fabricante por garantía: falla de la controladora de discos.');
+        $d = $pv->abrir($cuenta('mpvn'), 'DS8K7731024415', '', 'La cámara del poste 3 pierde la conexión por las noches.', 'media', $this->jefes['rosa']->id, $ahora->subHours(20));
+        $pv->visita($d, $ahora->toImmutable(), 'Julio Chávez Sandoval', '2.5', '18.00', 'Se cambió el conector RJ45 exterior; queda en observación 48 h.');
+        $e = $pv->abrir($cuenta('ugel'), null, 'Punto de red del aula 3', 'Sin conexión en el aula 3 de la I.E. 10245.', 'baja', $this->dev->id, $ahora->subDays(9));
+        $pv->cambiarEstado($e, 'resuelto', 'Patch cord dañado; se reemplazó.');
+
+        foreach ([['clinica', 'Monitoreo CCTV 24/7', '4800.00', '3100.00', '99.50', '99.60', '2026-01-02', '2027-01-02'],
+            ['hospital', 'Respaldo en nube del sistema hospitalario', '1900.00', '1650.00', '99.90', '100.00', '2026-03-01', '2027-03-01'],
+            ['gore', 'Monitoreo de la red de datos', '2600.00', '1900.00', '99.50', '99.20', '2026-07-01', '2026-12-31']] as [$k, $servicio, $cobro, $costo, $meta, $real, $desde, $renov]) {
+            DB::table('suscripciones')->insert(['cuenta_id' => $cuenta($k), 'servicio' => $servicio, 'cobro_mensual' => $cobro, 'costo_mensual' => $costo, 'disponibilidad_meta' => $meta,
+                'disponibilidad_real' => $real, 'desde' => $desde, 'renovacion' => $renov, 'created_at' => now(), 'updated_at' => now()]);
+        }
     }
 }
