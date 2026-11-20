@@ -28,8 +28,8 @@ ficha de una empresa con RUC muestra lo que tenía la ficha de la cuenta.
 
 ## Supuestos sin confirmar
 
-- Papeles: clientes = `cliente` y `entidad`; proveedores = `proveedor` y `colaborador`. Aliado, banco y competidor solo
-  se ven en «Todos» de… ninguna de las dos (quedan fuera de ambas cajas).
+- Papeles: clientes = `cliente` y `entidad`; proveedores = `proveedor` y `colaborador`. Aliado, banco y competidor
+  quedan fuera de las dos cajas (se llega a su ficha por enlaces o el buscador).
 - La ficha vieja de la cuenta (`/cuentas/{id}`) y su lista siguen existiendo para sus acciones y los avisos que llevan
   allá; ya no tienen caja.
 
