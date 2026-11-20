@@ -1,18 +1,18 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v3
+- **Versión:** v4
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
-- **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-020); el inicio de cajas de
+- **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
 
 ## Qué hace
 
-El sistema se ve como el mapa de procesos de Techquk, no como sus módulos técnicos. El inicio tiene a Mien arriba, a
-lo ancho, y debajo cuatro franjas (Estratégicos, Misionales, De Apoyo y Plataforma) con 11 cajas de proceso. Cada caja
-abre la portada de su proceso, con sus cajas internas: las pantallas de siempre. Dentro de una pantalla, una miga y
-unas pestañas llevan a la portada y a las pantallas hermanas. Cada persona ve solo los procesos en que puede abrir al
-menos una pantalla.
+El sistema se ve como el mapa de procesos de Techquk, no como sus módulos técnicos. El inicio, centrado, tiene la
+ventana del saludo, el saludo, la frase y la estrella de Mien; debajo, cuatro franjas (Estratégicos, Misionales, De
+Apoyo y Plataforma) con 11 cajas de proceso. Cada caja abre su proceso en la caja del medio: arriba, la frase del
+proceso y sus cajas internas (las pantallas de siempre) como barra de navegación; debajo, el contenido de la caja
+elegida. Cada persona ve solo los procesos en que puede abrir al menos una pantalla y ordena sus cajas a su gusto.
 
 ## Decisiones de Sebastián
 
@@ -29,8 +29,8 @@ menos una pantalla.
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
-- **MV-020** (cruza módulos) · Portada con cajas; dentro, pestañas con las hermanas y miga a la portada; la barra lateral
-  muestra procesos.
+- **MV-035** (cruza módulos) · Cada proceso: frase en el color de su franja y sus cajas centradas como un solo cuerpo
+  que es su navegación; el contenido debajo; al entrar, la caja del medio; orden por persona (reemplaza MV-020).
 
 ## Pantallas y navegación
 
@@ -47,16 +47,28 @@ menos una pantalla.
     Plataforma (Sistema) a la derecha; no ve Estratégicos.
   - **Cada caja de proceso** responde, al dejar el mouse, la primera pregunta de cada una de sus cajas internas, hasta
     tres. Cada una abre su portada en otra pestaña en escritorio, como siempre.
-- **Portada de un proceso** `/procesos/<clave>` (`techquk`, `conseguir-negocio`, `gerencia-proyectos`, `abastecer`,
-  `facturacion-cobranza`, `postventa`, `presupuestar-cotizar`, `finanzas`, `personas`, `directorio`, `sistema`):
-  título y frase del proceso, el nombre de su franja y sus cajas internas (como las de Catálogos: mismo tamaño, color de
-  la franja, la descripción en el tooltip). El clic abre la pantalla en la misma pestaña. Un proceso sin cajas para esa
-  persona da 404.
-- **Dentro de una pantalla interna** (también en sus fichas, p. ej. `/ordenes/12`): arriba, la miga «Abastecer ›
-  Órdenes» (el proceso es un enlace a su portada) y, si el proceso tiene más de una pantalla, pestañas con todas sus
-  hermanas, la actual marcada.
-- **Barra lateral:** un grupo por franja con las cajas de proceso (Mien en «Personal»). Un proceso queda marcado en su
-  portada y en cualquiera de sus pantallas. «Elegir módulos» y «Pantalla al entrar» (preferencias) eligen entre
+- **Un proceso (MV-035)** `/procesos/<clave>` lleva a su **caja del medio** en el orden de la persona: de 3 cajas la
+  2.ª, de 4 la 2.ª, de 5 la 3.ª, de 6 la 3.ª (Finanzas abre «Flujo de caja y conciliación»; Postventa, de 2, «Tickets y
+  series»; Abastecer, de 4, «Órdenes»; Conseguir el negocio, «Oportunidades»). Un enlace (Mien, la barra lateral, un
+  aviso) abre directo la caja de ese enlace.
+- **Arriba de cada pantalla del proceso** (también en sus fichas, como `/oportunidades/1`), centrados:
+  - **La frase** del proceso, una línea de 28 px en negrita, en el color de texto de su franja (en claro, turquesa
+    `#00788A`, morado `morado-700`, azul noche, gris; en oscuro, sus versiones claras). Sale del parámetro
+    `procesos.frase_<clave>` (Configuración → Parámetros); las de la propuesta: Techquk «Así va Techquk.»,
+    Conseguir el negocio «¡Vamos por esas oportunidades!», Gerencia de proyectos «Cada proyecto, bajo control.»,
+    Abastecer «Lo que la obra necesita, a tiempo.», Facturación y cobranza «Lo trabajado, cobrado.», Postventa «El
+    cliente sigue siendo nuestro.», Presupuestar y cotizar «Números claros, ofertas que ganan.», Finanzas «La caja en
+    orden.», Personas «La gente correcta en cada obra.», Directorio y catálogos «Todo en su sitio.», Sistema «Lo que
+    hace funcionar todo.».
+  - **Las cajas internas juntas como un solo cuerpo** (un marco redondeado, separadores finos, 9 × 7,5 rem cada una;
+    en pantallas chicas pasan a otra fila centradas). La de la pantalla actual va marcada con un fondo suave y una
+    barra de 4 px del color de su franja (`aria-current`). Presionar otra muestra su contenido debajo; la barra se
+    queda quieta en su lugar.
+  - **Reordenar:** arrastrar una caja sobre otra, o con el foco en una, **Alt + ← / →**. Se guarda al instante para esa
+    persona y cambia la caja del medio. **«Volver al orden original»** aparece debajo cuando hay un orden propio.
+  - Ya no hay título de portada, descripción, etiqueta de franja, pestañas ni miga.
+- **Barra lateral:** un grupo por franja con las cajas de proceso (Mien en «Personal»). Un proceso queda marcado en cualquiera
+  de sus pantallas. «Elegir módulos» y «Pantalla al entrar» (preferencias) eligen entre
   procesos.
 - **Mien** `/mien`: sus tarjetas de siempre y, debajo, «El tablero de tu rol» con las pestañas de los roles que la
   persona puede ver (`/mien?rol=jefatura|almacen|tesoreria|comercial|gerencia`). `/mi-tablero` lleva a Mien.
@@ -110,11 +122,14 @@ Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas
 | Operación | Campos | Valida | Qué produce |
 |---|---|---|---|
 | Elegir procesos de la barra | procesos ocultos (lista de claves de proceso) | cada clave es un proceso que la persona ve; queda al menos uno | guarda los ocultos de la barra |
+| Ordenar las cajas de un proceso | proceso; claves en el nuevo orden (lista; vacía = original) | solo claves de ese proceso | guarda el orden de la persona |
 | Pantalla al entrar | «El inicio» o un proceso | el proceso es uno que la persona ve | al iniciar sesión llega a la portada de ese proceso |
 
 ## Datos
 
-Sin tablas nuevas. `modulos_ocultos.clave_modulo` ahora guarda claves de proceso (las de módulos viejas dejan de
+Tabla nueva `orden_cajas_proceso` (MV-035): `user_id` (FK users, borra en cascada), `proceso` (texto 40),
+`claves` (JSON con las claves de las cajas en orden), única por persona y proceso. Parámetros nuevos
+`procesos.frase_<clave>` (texto), uno por proceso. Además: `modulos_ocultos.clave_modulo` ahora guarda claves de proceso (las de módulos viejas dejan de
 contar solas, porque no coinciden con ningún proceso).
 
 ## Reglas y números
@@ -126,6 +141,9 @@ contar solas, porque no coinciden con ningún proceso).
   motivos, empresa, general) siguen en Configuración.
 
 ## Supuestos sin confirmar
+
+- **La dirección del navegador** cambia con la caja (cada pantalla conserva la suya, como `/flujo-caja`), así «atrás» y
+  los enlaces funcionan; no se anidaron bajo el proceso (Sebastián: no le importa ver direcciones).
 
 - **«Parámetros sensibles»** se tomó como los parámetros que deciden cómo trabaja Techquk (los grupos de arriba) más los
   marcados como sensibles de dinero.
@@ -140,6 +158,12 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Atajos tomados
 
+- **«El contenido aparece debajo, sin ir a otra página»** se logra con una navegación normal entre páginas y la
+  transición de vista del navegador (`@view-transition`), con la barra fija en su lugar: técnicamente cada caja sigue
+  siendo su propia página. El repo original (Vue) lo hace como rutas hijas dentro de la vista del proceso.
+- **El orden se guarda** por una ruta propia (`POST /procesos/{proceso}/orden`), no por una acción registrada, y no
+  aparece en Mis preferencias.
+
 - **Qué proceso agrupa qué pantalla** vive en un enum del núcleo (`Proceso`), no en una tabla configurable.
 - **Los procesos se recalculan** varias veces por página (inicio, barra, pestañas) sin guardarlos.
 - **El reparto en dos columnas** se estima con tres cajas por fila, no con el ancho real de la pantalla.
@@ -150,11 +174,15 @@ contar solas, porque no coinciden con ningún proceso).
 
 `app/Modules/Nucleo/Navegacion/Franja.php` y `Proceso.php` (el mapa), `Services/NavegacionService.php`
 (`procesos`, `procesoDeRuta`, `porFranja`, `enDosColumnas`), `Filament/Widgets/CajasModulos.php` y su vista
-`widgets/cajas-modulos.blade.php`, `Filament/Pages/PortadaProceso.php` con `views/filament/procesos/`, el gancho
+`widgets/cajas-modulos.blade.php`, `Filament/Pages/PortadaProceso.php` (entra a la caja del medio), `views/filament/procesos/pestanas.blade.php` (la
+frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `PAGE_START` en `app/Providers/Filament/AppPanelProvider.php`, `Filament/Clusters/Listas.php` y `ReglasNegocio.php`,
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v4** (MV-035): la portada con cajas que llevaban a otra pantalla y las pestañas con miga se reemplazan por la frase
+  y la barra de cajas del proceso arriba de cada pantalla; al entrar, la caja del medio; orden por persona.
 
 - **v3** (MV-034): las cajas suben de 6,5 a 7,5 rem de alto, iguales en toda pantalla.
 

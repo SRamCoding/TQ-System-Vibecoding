@@ -260,7 +260,7 @@ confirma, recién entonces se vuelve una decisión con su número.
   una pantalla interna, arriba, la miga «Proceso › Pantalla» para volver a la portada y una fila de pestañas con las
   pantallas hermanas del proceso. La barra lateral muestra las cajas de proceso.
 - **Alcance:** cruza módulos
-- **Estado:** vigente
+- **Estado:** reemplazada por MV-035
 - **Commit:** el de «Ronda 1 · paso 1: el inicio por procesos»
 
 ### MV-021 · 2026-11-20 · Comprobantes se parte entre Facturación y cobranza y Finanzas
@@ -441,3 +441,20 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Pedido 4: altura pareja de las cajas»
+
+### MV-035 · 2026-11-20 · La portada de cada proceso: frase, cajas centradas como navegación y contenido debajo
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/portada-de-procesos.md`) «Arriba, centrado, una frase representativa del
+  proceso, en el color de su franja. Debajo, solo las cajas internas, juntas como un solo cuerpo, centrado: el conjunto
+  de cajas es la barra de navegación del proceso. Al presionar una, no se va a otra página: su contenido aparece debajo
+  de las cajas. Al entrar se abre siempre la caja del medio. Las cajas se pueden cambiar de posición; el orden queda
+  guardado para cada persona. Una opción "Volver al orden original"». Y, entre las opciones que le dio el agente: que en
+  las fichas de detalle la barra «sí, sigue arriba».
+- **Decisión:** las 11 cajas de proceso siguen este patrón; reemplaza la portada con cajas y las pestañas con miga
+  (MV-020). Al entrar, la caja del medio en el orden de la persona (de 3 la 2.ª; de 4 la 2.ª; de 6 la 3.ª); desde un
+  enlace, la de ese enlace. En Conseguir el negocio el orden original es Convocatorias del SEACE, Oportunidades,
+  Campañas. Las frases se cambian en Configuración sin tocar el código.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Pedido 5: la portada de cada proceso»

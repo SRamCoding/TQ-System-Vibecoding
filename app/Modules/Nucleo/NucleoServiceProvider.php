@@ -1071,6 +1071,18 @@ final class NucleoServiceProvider extends ServiceProvider
     private function declararParametros(): void
     {
         $this->app->make(RegistroParametros::class)->declarar(
+            // MV-035: la frase de la portada de cada proceso.
+            new DefinicionParametro('procesos', 'frase_techquk', TipoParametro::Texto, 'Así va Techquk.', 'La frase de la portada de Techquk (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_conseguir_negocio', TipoParametro::Texto, '¡Vamos por esas oportunidades!', 'La frase de la portada de Conseguir el negocio (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_gerencia_proyectos', TipoParametro::Texto, 'Cada proyecto, bajo control.', 'La frase de la portada de Gerencia de proyectos (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_abastecer', TipoParametro::Texto, 'Lo que la obra necesita, a tiempo.', 'La frase de la portada de Abastecer (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_facturacion_cobranza', TipoParametro::Texto, 'Lo trabajado, cobrado.', 'La frase de la portada de Facturación y cobranza (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_postventa', TipoParametro::Texto, 'El cliente sigue siendo nuestro.', 'La frase de la portada de Postventa (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_presupuestar_cotizar', TipoParametro::Texto, 'Números claros, ofertas que ganan.', 'La frase de la portada de Presupuestar y cotizar (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_finanzas', TipoParametro::Texto, 'La caja en orden.', 'La frase de la portada de Finanzas (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_personas', TipoParametro::Texto, 'La gente correcta en cada obra.', 'La frase de la portada de Personas (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_directorio', TipoParametro::Texto, 'Todo en su sitio.', 'La frase de la portada de Directorio y catálogos (MV-035).'),
+            new DefinicionParametro('procesos', 'frase_sistema', TipoParametro::Texto, 'Lo que hace funcionar todo.', 'La frase de la portada de Sistema (MV-035).'),
             new DefinicionParametro('tributario', 'igv_porcentaje', TipoParametro::Decimal, '18.00', 'Tasa del IGV, en porcentaje.', esSensible: true),
             // Cambiarla con datos registrados rehace todas las conversiones: no se edita desde la pantalla.
             new DefinicionParametro('general', 'moneda_local', TipoParametro::Texto, 'PEN', 'Moneda en la que se lleva la contabilidad y se suman los resultados (código ISO).', esEditable: false, esSensible: true),

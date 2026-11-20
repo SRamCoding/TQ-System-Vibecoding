@@ -115,11 +115,81 @@ final class NavegacionService
             }
 
             if ($internas !== []) {
+                $internas = $this->enSuOrden($usuario, $proceso, $internas);
                 $procesos[] = ['proceso' => $proceso, 'caja' => $this->cajaDeProceso($proceso, $internas), 'internas' => $internas];
             }
         }
 
         return $procesos;
+    }
+
+    /**
+     * MV-035: las cajas internas en el orden que la persona eligió; las que no estaban en su orden (una caja nueva, un
+     * permiso nuevo) van al final, en el orden original.
+     *
+     * @param  list<CajaModulo>  $internas
+     * @return list<CajaModulo>
+     */
+    private function enSuOrden(User $usuario, Proceso $proceso, array $internas): array
+    {
+        $orden = $this->ordenGuardado($usuario, $proceso);
+
+        if ($orden === null) {
+            return $internas;
+        }
+
+        $lugar = array_flip($orden);
+        $original = array_flip(array_map(fn (CajaModulo $c): string => $c->clave, $internas));
+        usort($internas, fn (CajaModulo $a, CajaModulo $b): int => [$lugar[$a->clave] ?? PHP_INT_MAX, $original[$a->clave]] <=> [$lugar[$b->clave] ?? PHP_INT_MAX, $original[$b->clave]]);
+
+        return $internas;
+    }
+
+    /** @return list<string>|null */
+    public function ordenGuardado(User $usuario, Proceso $proceso): ?array
+    {
+        static $leidos = [];
+        $clave = $usuario->id.'|'.$proceso->value;
+
+        if (! array_key_exists($clave, $leidos)) {
+            $json = DB::table('orden_cajas_proceso')->where('user_id', $usuario->id)->where('proceso', $proceso->value)->value('claves');
+            $leidos[$clave] = $json === null ? null : array_values(array_filter((array) json_decode((string) $json, true), is_string(...)));
+        }
+
+        return $leidos[$clave];
+    }
+
+    /**
+     * MV-035: guarda el orden de las cajas de un proceso para la persona; una lista vacía vuelve al orden original. Solo
+     * cuenta lo que la persona puede ver.
+     *
+     * @param  list<string>  $claves
+     */
+    public function ordenar(User $usuario, Proceso $proceso, array $claves): void
+    {
+        $validas = array_keys($proceso->cajas());
+        $claves = array_values(array_unique(array_filter($claves, fn (mixed $c): bool => is_string($c) && in_array($c, $validas, true))));
+
+        if ($claves === []) {
+            DB::table('orden_cajas_proceso')->where('user_id', $usuario->id)->where('proceso', $proceso->value)->delete();
+
+            return;
+        }
+
+        DB::table('orden_cajas_proceso')->upsert(
+            [['user_id' => $usuario->id, 'proceso' => $proceso->value, 'claves' => json_encode($claves), 'created_at' => now(), 'updated_at' => now()]],
+            ['user_id', 'proceso'], ['claves', 'updated_at'],
+        );
+    }
+
+    /**
+     * MV-035: la caja que se abre al entrar: la del medio en el orden de la persona (de 3 la 2.ª, de 4 la 2.ª, de 6 la 3.ª).
+     *
+     * @param  list<CajaModulo>  $internas
+     */
+    public static function cajaDelMedio(array $internas): CajaModulo
+    {
+        return $internas[intdiv(count($internas) - 1, 2)];
     }
 
     /**

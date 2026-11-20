@@ -1,7 +1,9 @@
 <?php
 
 declare(strict_types=1);
+use App\Modules\Nucleo\Navegacion\Proceso;
 use App\Modules\Nucleo\Services\AsistenteService;
+use App\Modules\Nucleo\Services\NavegacionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,3 +25,10 @@ Route::middleware(['web', 'auth'])->prefix('asistente')->group(function (): void
 
 // MV-021: Comprobantes se partió; los enlaces viejos van a las facturas emitidas.
 Route::middleware(['web'])->get('comprobantes', fn () => redirect('/facturas-emitidas'));
+
+// MV-035: el orden de las cajas de un proceso, por persona (lista vacía: el orden original).
+Route::middleware(['web', 'auth'])->post('procesos/{proceso}/orden', function (Request $r, string $proceso) {
+    app(NavegacionService::class)->ordenar($r->user(), Proceso::from($proceso), (array) $r->input('claves', []));
+
+    return response()->noContent();
+});

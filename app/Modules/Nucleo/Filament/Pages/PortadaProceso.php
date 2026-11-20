@@ -14,9 +14,8 @@ use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 
 /**
- * La portada de un proceso (MV-020): al abrir su caja del inicio, sus cajas internas (las pantallas que agrupa), del
- * tamaño de las de una subparte. Cada una abre su pantalla en la misma pestaña; allá, pestañas con sus hermanas y la
- * miga para volver aquí.
+ * La entrada de un proceso (MV-035, reemplaza MV-020): lleva a su caja del medio; la barra del proceso (frase y cajas)
+ * la pone el gancho PAGE_START en cada pantalla del proceso.
  */
 final class PortadaProceso extends Page
 {
@@ -31,10 +30,13 @@ final class PortadaProceso extends Page
         return Filament::auth()->user() instanceof User;
     }
 
+    /** MV-035: entrar a un proceso abre su caja del medio, en el orden de la persona. */
     public function mount(string $proceso): void
     {
         $this->proceso = $proceso;
-        abort_if($this->datos() === null, 404);
+        $datos = $this->datos();
+        abort_if($datos === null, 404);
+        $this->redirect(NavegacionService::cajaDelMedio($datos['internas'])->url);
     }
 
     public function getTitle(): string

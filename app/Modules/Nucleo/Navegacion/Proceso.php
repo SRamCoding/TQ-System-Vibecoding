@@ -93,6 +93,34 @@ enum Proceso: string
         };
     }
 
+    /**
+     * MV-035: la frase de su portada, una línea en el color de su franja. Esta es la propuesta; la que se muestra es la del
+     * parámetro `procesos.frase_<clave>` (Configuración), que se puede cambiar sin tocar el código.
+     */
+    public function frase(): string
+    {
+        return match ($this) {
+            self::Mien => 'Lo tuyo, de un vistazo.',
+            self::Techquk => 'Así va Techquk.',
+            self::ConseguirNegocio => '¡Vamos por esas oportunidades!',
+            self::GerenciaProyectos => 'Cada proyecto, bajo control.',
+            self::Abastecer => 'Lo que la obra necesita, a tiempo.',
+            self::FacturacionCobranza => 'Lo trabajado, cobrado.',
+            self::Postventa => 'El cliente sigue siendo nuestro.',
+            self::PresupuestarCotizar => 'Números claros, ofertas que ganan.',
+            self::Finanzas => 'La caja en orden.',
+            self::Personas => 'La gente correcta en cada obra.',
+            self::Directorio => 'Todo en su sitio.',
+            self::Sistema => 'Lo que hace funcionar todo.',
+        };
+    }
+
+    /** El nombre del parámetro con su frase. */
+    public function parametroFrase(): string
+    {
+        return 'procesos.frase_'.str_replace('-', '_', $this->value);
+    }
+
     public function animacion(): AnimacionCaja
     {
         return match ($this) {
@@ -114,7 +142,8 @@ enum Proceso: string
         return match ($this) {
             self::Mien => ['mien' => null],
             self::Techquk => ['resultados' => '¿Cuánto se ganó?', 'presupuesto-empresa' => 'Presupuesto de la empresa', 'lo-aprendido' => 'Lo aprendido', 'reglas-negocio' => 'Reglas del negocio'],
-            self::ConseguirNegocio => ['oportunidades' => 'Oportunidades', 'convocatorias' => 'Convocatorias del SEACE', 'campanias' => 'Campañas'],
+            // MV-035: el orden original, con Oportunidades al centro.
+            self::ConseguirNegocio => ['convocatorias' => 'Convocatorias del SEACE', 'oportunidades' => 'Oportunidades', 'campanias' => 'Campañas'],
             self::GerenciaProyectos => ['proyectos' => 'Proyectos', 'contratos' => 'Contratos', 'asignacion' => 'Personal asignado', 'tareo' => 'Tareo', 'subcontratos' => 'Subcontratos'],
             self::Abastecer => ['requerimientos' => 'Requerimientos', 'ordenes' => 'Órdenes', 'almacen' => 'Almacén', 'herramientas' => 'Herramientas'],
             self::FacturacionCobranza => ['valorizaciones' => 'Valorizaciones', 'facturas-emitidas' => 'Facturas emitidas', 'cobranzas' => 'Cobranzas'],
