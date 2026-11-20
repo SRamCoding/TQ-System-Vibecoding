@@ -31,6 +31,7 @@ use App\Modules\Erp\Compras\Models\Orden;
 use App\Modules\Erp\Compras\Services\ComprasService;
 use App\Modules\Erp\Contratos\Models\Contrato;
 use App\Modules\Erp\Contratos\Services\ContratosService;
+use App\Modules\Erp\Finanzas\Services\FinanzasService;
 use App\Modules\Erp\Personal\Models\Colaborador;
 use App\Modules\Erp\Personal\Services\PersonalService;
 use App\Modules\Erp\Presupuestos\Models\Insumo;
@@ -144,6 +145,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: personal, tareo, valorizaciones y subcontratos');
             $this->tramo4();
+
+            $this->command?->info('Demo: facturación, cobranza y rendiciones');
+            $this->tramo5();
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -873,8 +877,16 @@ final class DemoSeeder extends Seeder
             $compras->recibir($orden->id, [$linea->id => $recibido], $fecha->addDays(4), 'GR-'.str_pad((string) $orden->id, 6, '0', STR_PAD_LEFT));
         }
 
-        if (bccomp($pagado, '0', 2) > 0 && bccomp($pagado, $ejecutado, 2) === 0) {
-            $compras->pagar($orden->id);
+        // Tramo 5: la factura del proveedor contra la orden y su pago por Tesorería.
+        if (bccomp($recibido, '0', 3) > 0) {
+            $fin = app(FinanzasService::class);
+            $factura = $fin->registrarCompra($orden->id, sprintf('F%03d-%08d', 1 + $orden->id % 9, 4000 + $orden->id), null, $fecha->addDays(6), 30);
+
+            if (bccomp($pagado, '0', 2) > 0 && bccomp($pagado, $ejecutado, 2) === 0) {
+                $this->en($fecha->addDays(25), fn () => $fin->pagar($factura->id, $fecha->addDays(25)));
+            } elseif ($orden->id % 3 === 0) {
+                $fin->programar($factura->id, CarbonImmutable::parse('2026-11-27'));
+            }
         }
     }
 
@@ -1098,5 +1110,75 @@ final class DemoSeeder extends Seeder
             $val->update(['estado' => 'pagada']);
         });
         $this->en('2026-09-30', fn () => $v->valorizarSubcontrato($sc->id, '2026-09', '40'));
+    }
+
+    /** Tramo 5 (ficha t5-finanzas): lo que cada proyecto facturó y cobró, la factura del cable, y fondos con su rendición. */
+    private function tramo5(): void
+    {
+        $fin = app(FinanzasService::class);
+        $contratos = app(ContratosService::class);
+        // [proyecto (nombre empieza con), [[% del vendido, emisión, cobrado el o null]]]
+        $plan = [
+            ['Videovigilancia y centro de monitoreo', [['100', '2024-11-20', '2025-01-15']]],
+            ['Cableado estructurado', [['100', '2024-09-15', '2024-10-20']]],
+            ['Suministro de 60 computadoras', [['100', '2024-11-04', '2024-12-05']]],
+            ['Sala de videoconferencia', [['50', '2025-02-12', '2025-02-14'], ['50', '2025-03-25', '2025-04-24']]],
+            ['Mantenimiento de CCTV', [['25', '2026-04-05', '2026-05-04'], ['25', '2026-07-05', '2026-08-03'], ['25', '2026-10-05', null]]],
+            ['Sistema de información hospitalaria', [['30', '2025-12-20', '2026-02-10'], ['25', '2026-05-20', '2026-07-15'], ['15', '2026-10-20', null]]],
+            ['Telemetría de pozos', [['50', '2025-04-25', '2025-04-28'], ['50', '2025-09-05', '2025-10-06']]],
+        ];
+
+        foreach ($plan as [$nombre, $facturas]) {
+            $pid = (int) DB::table('proyectos')->where('nombre', 'like', $nombre.'%')->value('id');
+            $ct = Contrato::query()->where('proyecto_id', $pid)->firstOrFail();
+            $vendido = (string) $contratos->ventaNeta($pid);
+
+            foreach ($facturas as [$pct, $emision, $cobro]) {
+                $comp = $this->en($emision, fn () => $fin->facturarContrato($ct->id, bcadd(bcdiv(bcmul($vendido, $pct, 6), '100', 6), '0.005', 2), CarbonImmutable::parse($emision)));
+
+                if ($cobro !== null) {
+                    $this->en($cobro, fn () => $fin->cobrar($comp->id, CarbonImmutable::parse($cobro)));
+                }
+            }
+        }
+
+        // P8 factura sus valorizaciones aprobadas; cobra las dos primeras.
+        foreach (DB::table('valorizaciones')->where('estado', 'aprobada')->orderBy('numero')->get() as $n => $v) {
+            $emision = CarbonImmutable::parse($v->periodo.'-28')->addDays(5);
+            $comp = $this->en($emision, fn () => $fin->facturarValorizacion($v->id, $emision));
+
+            if ($n < 2) {
+                $this->en($emision->addDays(32), fn () => $fin->cobrar($comp->id, $emision->addDays(32)));
+            }
+        }
+
+        // Plaza de Armas: la factura del cable por lo recibido (1,248.00 + IGV), por pagar; y la rendición de Julio.
+        $plaza = (int) DB::table('proyectos')->where('nombre', 'like', '%Plaza de Armas%')->value('id');
+        $cable = (int) DB::table('ordenes')->where('proyecto_id', $plaza)->where('proveedor_nombre', 'Proveedor Andino S.A.C.')->value('id');
+        $this->en('2026-11-19', fn () => $fin->registrarCompra($cable, 'F001-00004512', '2069950001'.DocumentoIdentidad::digitoVerificadorRuc('2069950001'), CarbonImmutable::parse('2026-11-19'), 30));
+        $pc = fn (string $c): int => (int) DB::table('partidas_control')->where('proyecto_id', $plaza)->where('codigo', $c)->value('id');
+        $this->en('2026-11-10', function () use ($fin, $plaza, $pc): void {
+            $f = $fin->crearFondo($plaza, 'rendicion', 'Julio Chávez Sandoval', '800.00', CarbonImmutable::parse('2026-11-10'));
+            $a = $fin->registrarGasto($f->id, CarbonImmutable::parse('2026-11-11'), 'Movilidad a la obra (semana)', 'B002-000318', '120.00', $pc('PC-04'));
+            $b = $fin->registrarGasto($f->id, CarbonImmutable::parse('2026-11-12'), 'Ferretería: tarugos, cintillos y cinta aislante', 'B011-004422', '86.50', $pc('PC-02.03'));
+            $fin->registrarGasto($f->id, CarbonImmutable::parse('2026-11-18'), 'Almuerzo de la cuadrilla (3 personas)', 'B003-001207', '54.00', $pc('PC-04'), true);
+            $fin->aprobarGasto($a->id);
+            $fin->aprobarGasto($b->id);
+        });
+
+        $p8 = (int) DB::table('proyectos')->where('nombre', 'like', 'Red de datos y enlaces%')->value('id');
+        $gg8 = (int) DB::table('partidas_control')->where('proyecto_id', $p8)->where('es_gastos_generales', true)->where('es_hoja', true)->value('id');
+        $this->en('2026-10-01', function () use ($fin, $p8, $gg8): void {
+            $f = $fin->crearFondo($p8, 'caja_chica', 'Carla Ríos Seminario', '1500.00', CarbonImmutable::parse('2026-10-01'));
+
+            foreach ([['2026-10-06', 'Fotocopias de planos y expediente', '45.00'], ['2026-10-14', 'Movilidad a la sede descentralizada', '180.00'], ['2026-10-22', 'Útiles para el almacén de obra', '96.40']] as [$fecha, $desc, $monto]) {
+                $fin->aprobarGasto($fin->registrarGasto($f->id, CarbonImmutable::parse($fecha), $desc, 'B001-0'.random_int(10000, 99999), $monto, $gg8)->id);
+            }
+
+            $fin->rendir($f->id, CarbonImmutable::parse('2026-10-31'));
+        });
+
+        // Conciliado todo lo que pasó hasta octubre.
+        DB::table('movimientos_caja')->where('fecha', '<', '2026-11-01')->update(['conciliado' => true]);
     }
 }
