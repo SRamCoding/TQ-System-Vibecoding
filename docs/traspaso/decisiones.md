@@ -653,3 +653,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 4.2: la barra lateral solo se expande o se comprime»
+
+### MV-051 · 2026-11-20 · Las barras laterales siempre entran, sin barra de desplazamiento
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-4, punto 3) «Que entren siempre, ajustándose al alto: cada elemento y el espacio
+  entre ellos con un máximo y un mínimo; primero se quita el aire, después se achica el ícono, nunca por debajo de unos
+  28 px. Respaldo para el caso extremo: se puede desplazar sin que se dibuje la barra de desplazamiento, con un degradado
+  suave que avisa que hay más. Vale para la principal y todas las internas. Con teclado, el elemento enfocado siempre se
+  trae a la vista».
+- **Decisión:** lo dicho.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 4.3: las barras laterales siempre entran»

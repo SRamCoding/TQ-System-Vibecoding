@@ -9,6 +9,27 @@
     vez (en el encabezado).
 --}}
 <style>
+    /* MV-051: las barras laterales (principal e internas) siempre entran. Cada medida tiene su máximo (el de antes) y su
+       mínimo, y entre los dos se ajusta al alto de la ventana: primero se quita el aire, después se achica el ícono
+       (nunca un elemento de menos de 28 px de alto) y, expandida, un poco la letra. En el caso extremo se desplaza sin
+       dibujar la barra de desplazamiento, con un degradado arriba o abajo que avisa que hay más. */
+    .fi-main-sidebar .fi-sidebar-nav { padding-block: clamp(0.25rem, 1.6vh, 2rem); }
+    .fi-main-sidebar .fi-sidebar-nav-groups { gap: clamp(0rem, 1.4vh, 1.75rem); }
+    .fi-main-sidebar .fi-sidebar-group-btn { padding-block: clamp(0rem, 0.6vh, 0.5rem); }
+    .fi-main-sidebar .fi-sidebar-group-label { font-size: clamp(0.65rem, 1.6vh, 0.75rem); }
+    .fi-main-sidebar .fi-sidebar-group-items { gap: clamp(0rem, 0.4vh, 0.25rem); }
+    .fi-main-sidebar .fi-sidebar-item-btn, .fi-page-sub-navigation-sidebar .fi-sidebar-item-btn { min-height: 28px; padding-block: clamp(0.1rem, 0.9vh, 0.5rem); }
+    .fi-main-sidebar .fi-sidebar-item-icon { width: clamp(1.15rem, 3vh, 1.5rem); height: clamp(1.15rem, 3vh, 1.5rem); }
+    .fi-main-sidebar .fi-sidebar-item-label, .fi-page-sub-navigation-sidebar .fi-sidebar-item-label { font-size: clamp(0.8rem, 2vh, 0.875rem); }
+    .fi-page-sub-navigation-sidebar .fi-sidebar-group-items, .fi-page-sub-navigation-sidebar { gap: clamp(0rem, 0.4vh, 0.25rem); }
+    /* La barra lateral interna, a la vista mientras se desplaza el contenido, y nunca más alta que la ventana. */
+    @media (min-width: 1024px) { .fi-page-sub-navigation-sidebar { position: sticky; top: 4.5rem; max-height: calc(100vh - 5.5rem); overflow-y: auto; } }
+    .fi-main-sidebar .fi-sidebar-nav, .fi-page-sub-navigation-sidebar { scrollbar-width: none; }
+    .fi-main-sidebar .fi-sidebar-nav::-webkit-scrollbar, .fi-page-sub-navigation-sidebar::-webkit-scrollbar { display: none; }
+    [data-tq-hay-mas="abajo"] { mask-image: linear-gradient(to bottom, #000 calc(100% - 2.5rem), transparent); }
+    [data-tq-hay-mas="arriba"] { mask-image: linear-gradient(to top, #000 calc(100% - 2.5rem), transparent); }
+    [data-tq-hay-mas="ambos"] { mask-image: linear-gradient(to bottom, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent); }
+
     /* MV-046: sin ruta (miga de pan) en ninguna pantalla; sin título grande en la pantalla de una caja de proceso (lo dicen
        la caja elegida y el nombre del módulo). */
     .fi-breadcrumbs { display: none !important; }
@@ -98,5 +119,22 @@
         })
         document.addEventListener('DOMContentLoaded', () => { window.tqMarcarProceso(false); marcarSubnav() })
         window.addEventListener('resize', () => window.tqMarcarProceso(false))
+
+        // MV-051: el degradado que avisa que hay más, y el elemento enfocado con teclado siempre a la vista.
+        const desplazables = () => document.querySelectorAll('.fi-main-sidebar .fi-sidebar-nav, .fi-page-sub-navigation-sidebar')
+        const avisar = (el) => {
+            const arriba = el.scrollTop > 2, abajo = el.scrollTop + el.clientHeight < el.scrollHeight - 2
+            arriba && abajo ? (el.dataset.tqHayMas = 'ambos') : arriba ? (el.dataset.tqHayMas = 'arriba') : abajo ? (el.dataset.tqHayMas = 'abajo') : delete el.dataset.tqHayMas
+        }
+        const preparar = () => desplazables().forEach((el) => {
+            avisar(el)
+            if (el.tqPreparado) return
+            el.tqPreparado = true
+            el.addEventListener('scroll', () => avisar(el), { passive: true })
+            el.addEventListener('focusin', (e) => e.target.scrollIntoView?.({ block: 'nearest' }))
+        })
+        document.addEventListener('DOMContentLoaded', preparar)
+        document.addEventListener('livewire:navigated', () => requestAnimationFrame(preparar))
+        window.addEventListener('resize', () => desplazables().forEach(avisar))
     })()
 </script>
