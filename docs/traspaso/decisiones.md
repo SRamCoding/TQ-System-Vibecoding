@@ -603,3 +603,18 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 2.3: sin ruta; el nombre del módulo con la letra del logo»
+
+### MV-047 · 2026-11-20 · Sin el haz de luz al cambiar dentro de un mismo módulo
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/observaciones-3.md`, punto 1) «Que en esos cambios no aparezca el haz de luz:
+  la marca de la opción se desliza y el contenido de la derecha cambia, nada más. El haz sigue para lo demás: cambiar
+  de módulo, abrir una caja desde el inicio, ir desde una tarjeta de Mien. Si un cambio interno tarda más de un segundo,
+  una señal discreta dentro del área del contenido». Y, a la pregunta de si tampoco al cambiar entre las cajas de la
+  barra de un proceso: «No, tampoco ahí».
+- **Decisión:** los cambios dentro de un módulo (cajas de la barra de un proceso y opciones de una barra lateral
+  interna) no encienden la franja; si tardan más de un segundo, el contenido se atenúa y una línea fina recorre su borde.
+  Precisa MV-043.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 3.1: sin el haz dentro de un módulo»

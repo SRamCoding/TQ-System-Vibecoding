@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v14
+- **Versión:** v15
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-047** (cruza módulos) · Dentro de un módulo (cajas del proceso, barra lateral interna) no se enciende el haz; si
+  tarda más de 1 s, una señal discreta en el contenido.
 - **MV-046** (cruza módulos) · Sin ruta ni título grande; bajo la frase, el nombre del módulo en Audiowide.
 - **MV-045** (cruza módulos) · En las barras laterales internas, la marca de la opción elegida se desliza en vertical.
 - **MV-044** (cruza módulos) · La barra de cajas queda quieta entre pantallas; solo se desliza la marca de la elegida,
@@ -187,6 +189,12 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   proceso no aparece el título grande (la caja elegida y el nombre del módulo dicen dónde se está); en una ficha (por
   ejemplo, una oportunidad) se queda el título, que dice qué registro es.
 
+- **Cuándo se enciende el haz (MV-047):** al cambiar de módulo desde la barra lateral principal, abrir una caja desde el
+  inicio, ir desde Mien o cualquier otro enlace. **No** al presionar una caja de la barra de un proceso ni una opción de
+  una barra lateral interna (o su menú en el celular): ahí solo se desliza la marca y cambia el contenido. Si ese cambio
+  interno tarda más de 1 s, el contenido se atenúa (55 %) y una línea fina del azul de resaltado recorre su borde de
+  arriba hasta que llega lo nuevo (con «reducir animaciones», la línea quieta).
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -266,6 +274,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v15** (MV-047): sin el haz dentro de un módulo; señal discreta en el contenido si tarda.
 
 - **v14** (MV-046): sin ruta ni título grande; el nombre del módulo bajo la frase.
 

@@ -4,6 +4,7 @@
     tras otra; al llegar la pantalla, la carga completa la franja, destella y se apaga. Reemplaza la barra de progreso de
     Livewire. Con «reducir movimiento» o «reducir animaciones», la franja se llena sin chispas ni destello.
     Va fija (se ubica bajo la barra superior al empezar) y se conserva viva entre pantallas (`x-persist`).
+    MV-047: no se enciende al cambiar dentro de un mismo módulo (cajas de un proceso, barra lateral interna).
 --}}
 <div class="tq-energia" aria-hidden="true">
     <style>
@@ -32,6 +33,15 @@
         @media (prefers-reduced-motion: reduce) { .tq-energia-chispa { display: none; } .tq-energia.tq-cargando .tq-energia-llenado { animation: none; transform: scaleX(.88); } }
         html.tq-sin-animaciones .tq-energia-chispa { display: none; }
         html.tq-sin-animaciones .tq-energia.tq-cargando .tq-energia-llenado { animation: none; transform: scaleX(.88); }
+        /* MV-047: la señal discreta de un cambio interno que tarda: el contenido se atenúa y una línea fina recorre su borde de arriba. */
+        .tq-contenido-esperando { position: relative; }
+        .tq-contenido-esperando > :not(.tq-cargando-contenido) { opacity: .55; transition: opacity 200ms ease; }
+        .tq-cargando-contenido { position: absolute; left: 0; right: 0; top: -0.5rem; height: 2px; overflow: hidden; border-radius: 9999px; background: color-mix(in oklab, var(--primary-600) 12%, transparent); }
+        .tq-cargando-contenido::after { content: ''; position: absolute; inset: 0; width: 30%; border-radius: inherit; background: var(--primary-600); animation: tq-contenido-va 1s ease-in-out infinite; }
+        .dark .tq-cargando-contenido::after { background: var(--primary-400); }
+        @keyframes tq-contenido-va { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+        @media (prefers-reduced-motion: reduce) { .tq-cargando-contenido::after { animation: none; width: 100%; opacity: .6; } }
+        html.tq-sin-animaciones .tq-cargando-contenido::after { animation: none; width: 100%; opacity: .6; }
     </style>
     <span class="tq-energia-llenado"></span>
     <span class="tq-energia-chispa"></span>
@@ -41,9 +51,28 @@
             if (window.tqEnergia) return
             window.tqEnergia = true
             const franja = () => document.querySelector('.tq-energia')
-            let apagar = null
+            let apagar = null, lento = null, interna = false
+            // MV-047: un cambio dentro del mismo módulo (las cajas de la barra de un proceso o una barra lateral interna)
+            // no enciende la franja; si tarda más de un segundo, una señal discreta dentro del área del contenido.
+            const INTERNOS = '.tq-proceso a, .fi-page-sub-navigation-sidebar a, .fi-page-sub-navigation-dropdown a, .fi-page-sub-navigation-select'
+            document.addEventListener('click', (e) => { interna = !! e.target.closest?.(INTERNOS) }, true)
             document.addEventListener('livewire:navigate', (e) => {
                 if (e.detail?.cached) return
+                clearTimeout(lento)
+                if (interna) {
+                    interna = false
+                    lento = setTimeout(() => {
+                        const zona = document.querySelector('.fi-page-content')
+                        if (! zona || zona.querySelector(':scope > .tq-cargando-contenido')) return
+                        const senal = document.createElement('div')
+                        senal.className = 'tq-cargando-contenido'
+                        senal.setAttribute('role', 'status')
+                        senal.setAttribute('aria-label', 'Cargando')
+                        zona.classList.add('tq-contenido-esperando')
+                        zona.prepend(senal)
+                    }, 1000)
+                    return
+                }
                 const f = franja()
                 if (! f) return
                 clearTimeout(apagar)
@@ -55,6 +84,7 @@
                 f.classList.add('tq-cargando')
             })
             document.addEventListener('livewire:navigated', () => {
+                clearTimeout(lento)
                 const f = franja()
                 if (! f || ! f.classList.contains('tq-cargando')) return
                 f.classList.replace('tq-cargando', 'tq-llego')
