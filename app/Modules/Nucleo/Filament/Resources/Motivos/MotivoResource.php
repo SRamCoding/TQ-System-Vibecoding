@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Nucleo\Filament\Resources\Motivos;
 
 use App\Modules\Nucleo\Filament\AccionFilament;
-use App\Modules\Nucleo\Filament\Clusters\Configuracion;
+use App\Modules\Nucleo\Filament\Clusters\Listas;
 use App\Modules\Nucleo\Filament\EtiquetasEnEspanol;
 use App\Modules\Nucleo\Filament\Resources\Motivos\Pages\ListarMotivos;
 use App\Modules\Nucleo\Models\Motivo;
@@ -35,7 +35,7 @@ final class MotivoResource extends Resource
 
     protected static ?string $model = Motivo::class;
 
-    protected static ?string $cluster = Configuracion::class;
+    protected static ?string $cluster = Listas::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 

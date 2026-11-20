@@ -23,13 +23,17 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [op-asistente](fichas/op-asistente.md) | Opcional | aprobada | v1 | `aprobado/op-asistente-v1` |
 | [op-gran-momento](fichas/op-gran-momento.md) | Opcional | aprobada | v1 | `aprobado/op-gran-momento-v1` |
 | [t6-postventa](fichas/t6-postventa.md) | Flujo 8 | aprobada | v1 | `aprobado/t6-postventa-v1` |
-| [t7-personas](fichas/t7-personas.md) | Flujo 9 | aprobada | v1 | `aprobado/t7-personas-v1` |
-| [t8-tableros](fichas/t8-tableros.md) | Parte 5 | aprobada | v1 | `aprobado/t8-tableros-v1` |
+| [t7-personas](fichas/t7-personas.md) | Flujo 9 | en curso (v1 aprobada) | v2 | `aprobado/t7-personas-v1` |
+| [t8-tableros](fichas/t8-tableros.md) | Parte 5 | en curso (v1 aprobada) | v2 | `aprobado/t8-tableros-v1` |
 | [t9-cierre](fichas/t9-cierre.md) | Flujo 6 | aprobada | v1 | `aprobado/t9-cierre-v1` |
+| [r1-inicio-procesos](fichas/r1-inicio-procesos.md) | Ronda 1 | en curso | v1 | — |
 
 ## Registro del repositorio
 
 Lo que no es de ninguna ficha: el arranque y los cambios generales.
+
+- 2026-11-20 · Ronda de cambios 1 de Sebastián: reorganizar el sistema por procesos (MV-016 en adelante), en siete
+  pasos con un commit cada uno. Las fichas que toca suben de versión y quedan «en curso» hasta su «así me gusta».
 
 - 2026-11-19 · Arranque: copia del repo original en el commit `a5e5972`, sin pruebas, CI ni sitio de documentación;
   app en el puerto 8001 y base en el 5433.

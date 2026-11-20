@@ -12,11 +12,14 @@ use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 use Livewire\Attributes\Url;
 
 /** MVP rápido (t8-tableros): el tablero de inicio de cada rol, con una pestaña por cada rol que la persona puede ver. */
 final class MiTablero extends Page
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $slug = 'mi-tablero';
 
     protected static ?string $title = 'Mi tablero';
@@ -39,13 +42,32 @@ final class MiTablero extends Page
         return $u instanceof User && self::rolesDe($u) !== [];
     }
 
+    /** MV-017: el tablero ahora está dentro de Mien; esta dirección queda para los enlaces viejos. */
     public function mount(): void
     {
-        $roles = self::rolesDe(Filament::auth()->user());
+        $this->redirect('/mien'.($this->rol !== null ? '?rol='.urlencode($this->rol) : ''));
+    }
 
-        if (! isset($roles[$this->rol ?? ''])) {
-            $this->rol = array_key_first($roles);
+    /** El tablero del rol, con sus pestañas, para la sección ancha de Mien; null si la persona no tiene ningún rol con tablero. */
+    public static function seccionParaMien(User $usuario, ?string $rol): ?HtmlString
+    {
+        $roles = self::rolesDe($usuario);
+
+        if ($roles === []) {
+            return null;
         }
+
+        $rol = isset($roles[$rol ?? '']) ? $rol : array_key_first($roles);
+        $t = app(TablerosService::class);
+        $datos = match ($rol) {
+            'almacen' => $t->almacen(),
+            'tesoreria' => $t->tesoreria(),
+            'comercial' => $t->comercial(),
+            'gerencia' => $t->gerencia(),
+            default => $t->jefatura(),
+        };
+
+        return new HtmlString(view('tableros::tablero', ['t' => $datos, 'roles' => $roles, 'actual' => $rol, 'enMien' => true])->render());
     }
 
     public function getSubheading(): string

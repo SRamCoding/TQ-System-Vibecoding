@@ -1,5 +1,7 @@
 @php
-    $secciones = $this->secciones();
+    $mien = $this->mien();
+    $columnas = $this->columnas();
+    $secciones = $this->cajas();
     $estacion = $this->estacion();
 @endphp
 
@@ -273,21 +275,59 @@
             })
         </script>
 
+        {{-- MV-016 a MV-018: Mien arriba, a lo ancho; debajo, las franjas en dos columnas de alto parecido (en el celular, una). --}}
+        <style>
+            .tq-celda-ancha { width: 100%; height: 6.5rem; }
+            .tq-celda-ancha:has(> .tq-activa) { width: 100%; height: 6.5rem; }
+            .tq-celda-ancha .tq-caja-modulo { flex-direction: row; justify-content: flex-start; gap: 1rem; padding-inline: 1.5rem; text-align: left; }
+            .tq-celda-ancha .tq-caja-modulo.tq-activa, .tq-celda-ancha .tq-caja-modulo.tq-final { justify-content: flex-start; padding-top: 0.75rem; }
+            .tq-celda-ancha .tq-caja-modulo.tq-activa:not(.tq-final) .tq-caja-modulo-marco { display: flex; }
+            .tq-celda-ancha .tq-caja-modulo-nombre { font-size: 1.125rem; }
+            .tq-celda-ancha .tq-caja-texto { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+            .tq-caja-modulo-descripcion { font-size: 0.875rem; line-height: 1.25rem; color: var(--gray-600); }
+            .dark .tq-caja-modulo-descripcion { color: var(--gray-300); }
+            .tq-celda-ancha .tq-caja-preguntas { position: relative; flex: 1; height: 100%; }
+            .tq-celda-ancha .tq-caja-contador { position: absolute; right: 1rem; bottom: 0.5rem; }
+            .tq-franjas { display: flex; flex-direction: column; margin-top: 1.5rem; }
+            .tq-columna { display: contents; }
+            .tq-franjas .tq-area { margin-top: 0; padding-top: 1.5rem; border-top: 1px solid var(--gray-200); }
+            .tq-franjas .tq-area:first-child { padding-top: 1.5rem; }
+            .dark .tq-franjas .tq-area { border-top-color: var(--gray-700); }
+            @media (min-width: 1024px) {
+                .tq-franjas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 2.5rem; align-items: start; }
+                .tq-columna { display: flex; flex-direction: column; }
+                .tq-columna .tq-area { order: 0 !important; }
+            }
+        </style>
         <div class="tq-inicio-cajas" @if ($estacion !== null) data-tq-estacion="{{ $estacion->value }}" @endif>
-        @foreach ($secciones as $seccion)
-            <section class="tq-area" data-area="{{ $seccion['area']->value }}">
-                <header class="tq-area-encabezado">
-                    <h2 class="tq-area-titulo">{{ $seccion['area']->etiqueta() }}</h2>
-                    <p class="tq-area-descripcion">{{ $seccion['area']->descripcion() }}</p>
-                </header>
+            @if ($mien !== null)
+                <section class="tq-area" data-area="{{ $mien->area->value }}">
+                    @include('nucleo::filament.widgets.caja-modulo', ['caja' => $mien, 'ancha' => true])
+                </section>
+            @endif
 
-                <div class="tq-cajas-modulos">
-                    @foreach ($seccion['cajas'] as $caja)
-                        @include('nucleo::filament.widgets.caja-modulo', ['caja' => $caja])
-                    @endforeach
-                </div>
-            </section>
-        @endforeach
+            <div class="tq-franjas">
+                @foreach ($columnas as $columna)
+                    @if ($columna !== [])
+                        <div class="tq-columna">
+                            @foreach ($columna as $seccion)
+                                <section class="tq-area" data-area="{{ $seccion['franja']->areaDeColor()->value }}" data-franja="{{ $seccion['franja']->value }}" style="order: {{ $seccion['orden'] }}">
+                                    <header class="tq-area-encabezado">
+                                        <h2 class="tq-area-titulo">{{ $seccion['franja']->etiqueta() }}</h2>
+                                        <p class="tq-area-descripcion">{{ $seccion['franja']->descripcion() }}</p>
+                                    </header>
+
+                                    <div class="tq-cajas-modulos">
+                                        @foreach ($seccion['cajas'] as $caja)
+                                            @include('nucleo::filament.widgets.caja-modulo', ['caja' => $caja])
+                                        @endforeach
+                                    </div>
+                                </section>
+                            @endforeach
+                        </div>
+                    @endif
+                @endforeach
+            </div>
         </div>
     @endif
 </x-filament-widgets::widget>

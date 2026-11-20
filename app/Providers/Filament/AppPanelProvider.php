@@ -121,6 +121,8 @@ final class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => ModoDesarrollo::activo() ? Livewire::mount(BarraDesarrollo::class) : '')
             // Plan 1.3d: fondo propio de la barra superior y estado guardado de la barra lateral.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.navegacion')->render())
+            // MV-020: dentro de una pantalla de un proceso, la miga a su portada y pestañas con sus hermanas.
+            ->renderHook(PanelsRenderHook::PAGE_START, fn (): string => rescue(fn (): string => ($u = $this->usuario()) !== null && ($datos = app(NavegacionService::class)->procesoDeRuta($u, BarraModulos::rutaActual())) !== null ? view('nucleo::filament.procesos.pestanas', ['datos' => $datos])->render() : '', ''))
             // Plan 1.4ab: la escala de letra del prototipo de Proyectos y la línea fina bajo la barra superior.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.tipografia')->render())
             // Plan 1.4u, D1: el clima del lugar de la computadora, en todas las pantallas. Es decoración: si falla, nada. Los

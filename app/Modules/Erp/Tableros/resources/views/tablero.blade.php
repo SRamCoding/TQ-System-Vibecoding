@@ -2,10 +2,13 @@
     $tonos = ['danger' => 'text-danger-600 dark:text-danger-400', 'warning' => 'text-warning-600 dark:text-warning-400', 'success' => 'text-success-600 dark:text-success-400'];
 @endphp
 <div class="space-y-6">
+    @if ($enMien ?? false)
+        <h2 class="text-base font-bold">{{ count($roles) > 1 ? 'El tablero de tu rol' : 'Tablero · '.$roles[$actual] }}</h2>
+    @endif
     @if (count($roles) > 1)
         <x-filament::tabs>
             @foreach ($roles as $clave => $nombre)
-                <x-filament::tabs.item :active="$clave === $actual" tag="a" :href="'/mi-tablero?rol='.$clave">{{ $nombre }}</x-filament::tabs.item>
+                <x-filament::tabs.item :active="$clave === $actual" tag="a" :href="'/mien?rol='.$clave">{{ $nombre }}</x-filament::tabs.item>
             @endforeach
         </x-filament::tabs>
     @endif

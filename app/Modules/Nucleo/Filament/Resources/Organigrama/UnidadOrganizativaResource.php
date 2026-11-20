@@ -6,7 +6,6 @@ namespace App\Modules\Nucleo\Filament\Resources\Organigrama;
 
 use App\Modules\Nucleo\Enums\TipoUnidadOrganizativa;
 use App\Modules\Nucleo\Filament\AccionFilament;
-use App\Modules\Nucleo\Filament\Clusters\Seguridad;
 use App\Modules\Nucleo\Filament\EtiquetasEnEspanol;
 use App\Modules\Nucleo\Filament\Resources\Organigrama\Pages\ListarUnidades;
 use App\Modules\Nucleo\Filament\Resources\Organigrama\Pages\VerUnidad;
@@ -43,7 +42,7 @@ final class UnidadOrganizativaResource extends Resource
 
     protected static ?string $model = UnidadOrganizativa::class;
 
-    protected static ?string $cluster = Seguridad::class;
+    protected static ?string $cluster = null;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
 

@@ -23,12 +23,11 @@ final readonly class ModulosDeLaBarra implements FuenteDeLista
 
     public function opciones(User $usuario): array
     {
+        // MV-016: la barra muestra las cajas de proceso, no las pantallas.
         $opciones = [];
 
-        foreach ($this->navegacion->porArea($this->navegacion->permitidos($usuario)) as $seccion) {
-            foreach ($seccion['cajas'] as $caja) {
-                $opciones[$caja->clave] = $caja->nombre;
-            }
+        foreach ($this->navegacion->cajasDeProceso($usuario) as $caja) {
+            $opciones[$caja->clave] = $caja->nombre;
         }
 
         return $opciones;

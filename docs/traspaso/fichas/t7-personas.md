@@ -1,7 +1,7 @@
 # Ficha · Personas: demanda, selección, habilitación, planilla y salida (flujo 9)
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v2
 - **Tramo de la ruta:** fuera de la ruta (MV-015)
 - **Aprobada (v1):** 2026-11-20 · etiqueta `aprobado/t7-personas-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-4-flujo-09.md`; `parte-8-criterios-aceptacion.md` (F9: J. Chávez
@@ -20,13 +20,14 @@ las horas contra su costo estándar por proyecto. La salida arma la lista de pen
 
 ## Decisiones de Sebastián
 
+- **MV-016** (cruza módulos) · Sus pantallas van en el proceso Personas; «Personas» pasa a ser «Fichas laborales».
 - **MV-015** (general) · Lo que el v4 tenía y la ruta dejó fuera también entra; flujo 9 con planilla.
 - **MV-009** (general) · Aprobada sin revisión; los cambios vienen al final.
 
 ## Pantallas y navegación
 
-- **Inicio:** cajas «Personas», «Demanda y selección» y «Planilla» en el área ERP.
-- **Personas** `/personas`: persona (categoría, vínculo y régimen debajo), remuneración, habilitación de campo («hasta
+- **Inicio:** proceso «Personas» (franja De Apoyo, MV-016) con «Fichas laborales», «Demanda y selección» y «Planilla».
+- **Fichas laborales** `/fichas-laborales`: persona (categoría, vínculo y régimen debajo), remuneración, habilitación de campo («hasta
   dd/mm/aaaa», en rojo si venció o no tiene), certificaciones con su vencimiento, experiencia («3 proyectos: …») y
   salida (motivo y liquidación debajo). Filtro Activos / Que se fueron / Todos. Subtítulo: cuántos documentos vencen
   en 30 días. Botones por fila: **Documento** (agrega SCTR, examen, inducción o certificación) y **Salida**.
@@ -108,3 +109,8 @@ horas tareadas). Permisos nuevos `erp.personal.autorizar` y `erp.personal.planil
 `app/Modules/Erp/Personal/` (`Services/PersonasService.php`, `Services/PersonalService.php::tarear`, páginas
 `Filament/Pages/Personas.php`, `Vacantes.php`, `Planilla.php`, vistas `resources/views/demanda`, `boleta`,
 `diferencia`, migración `2026_11_21_200001_personas_planilla_y_salida.php`); datos en `DemoSeeder::personas()`.
+
+## Cambios desde la versión anterior
+
+- **v2** (ronda 1, MV-016): la pantalla «Personas» pasa a llamarse «Fichas laborales» y vive en `/fichas-laborales`
+  (en `/personas` chocaba con Personas y empresas y no se podía abrir). Sus cajas van en el proceso Personas (De Apoyo).

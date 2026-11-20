@@ -31,9 +31,9 @@ final class Personas extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $slug = 'personas';
+    protected static ?string $slug = 'fichas-laborales';
 
-    protected static ?string $title = 'Personas';
+    protected static ?string $title = 'Fichas laborales';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-identification';
 

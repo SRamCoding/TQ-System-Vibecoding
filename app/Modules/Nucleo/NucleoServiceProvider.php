@@ -215,6 +215,7 @@ use App\Modules\Nucleo\Imagenes\RegistroImagenes;
 use App\Modules\Nucleo\Listeners\RegistrarUltimoAcceso;
 use App\Modules\Nucleo\Listeners\ReiniciarEleccionDeModulos;
 use App\Modules\Nucleo\Listeners\RevisarClaveAlEntrar;
+use App\Modules\Nucleo\Mien\RegistroSeccionesMien;
 use App\Modules\Nucleo\Mien\RegistroTarjetasMien;
 use App\Modules\Nucleo\Mien\TarjetaMien;
 use App\Modules\Nucleo\Mien\Tarjetas\TarjetaMisAprobaciones;
@@ -406,6 +407,7 @@ final class NucleoServiceProvider extends ServiceProvider
         // Plan 2.0, D5: quién guarda detalles de «Otro» de cada catálogo.
         $this->app->singleton(RegistroOtrosDeCatalogo::class);
         $this->app->singleton(RegistroTarjetasMien::class);
+        $this->app->singleton(RegistroSeccionesMien::class);
         $this->app->singleton(RegistroResumenesAprobacion::class);
         $this->app->singleton(RegistroPestanasFicha::class);
         // Por petición: `once()` guarda ahí los posibles duplicados, que la portada y el filtro piden juntos (plan 1.4m).
@@ -665,16 +667,33 @@ final class NucleoServiceProvider extends ServiceProvider
             preguntas: ['¿Quién es este cliente y cómo lo contacto?', '¿Con qué proveedores trabajamos?', '¿Quién es el contacto principal de cada empresa?', '¿Dónde están sus sedes y sus cuentas bancarias?'],
             animacion: AnimacionCaja::Apreton,
         ));
+        // MV-016: la vieja caja «Usuarios y organigrama» se parte: Usuarios (Sistema) y Organigrama (Directorio y catálogos).
         $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
-            'seguridad', 'Usuarios y organigrama', '/seguridad', permiso: 'usuarios.ver', area: AreaModulo::Nucleo,
-            icono: 'tq-tres-personas', descripcion: 'Cuentas, roles, unidades y puestos',
-            preguntas: ['¿Quién tiene acceso al sistema?', '¿Qué puede hacer cada persona?', '¿Quién es jefe de quién?'],
+            'usuarios', 'Usuarios', '/seguridad', permiso: 'usuarios.ver', area: AreaModulo::Nucleo,
+            icono: 'tq-tres-personas', descripcion: 'Cuentas, roles y permisos',
+            preguntas: ['¿Quién tiene acceso al sistema?', '¿Qué puede hacer cada persona?'],
             animacion: AnimacionCaja::Personas,
         ));
         $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
+            'organigrama', 'Organigrama', '/organigrama', permiso: 'organigrama.ver', area: AreaModulo::Nucleo,
+            icono: 'heroicon-o-rectangle-group', descripcion: 'Unidades, puestos y jefaturas',
+            preguntas: ['¿Quién es jefe de quién?'],
+        ));
+        // MV-016: lo que sale de Configuración. Reglas del negocio va a Techquk; Listas, a Directorio y catálogos.
+        $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
+            'reglas-negocio', 'Reglas del negocio', '/reglas-negocio', permiso: 'catalogos.ver', area: AreaModulo::Nucleo,
+            icono: 'heroicon-o-scale', descripcion: 'Quién aprueba qué y los parámetros que deciden cómo trabaja Techquk',
+            preguntas: ['¿Quién aprueba una compra grande?', '¿Con qué margen mínimo se cotiza?'],
+        ));
+        $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
+            'listas', 'Listas', '/listas', permiso: 'catalogos.ver', area: AreaModulo::Nucleo,
+            icono: 'heroicon-o-list-bullet', descripcion: 'Catálogos y motivos',
+            preguntas: ['¿Qué monedas, unidades y catálogos usamos?', '¿Qué motivos hay para anular o rechazar?'],
+        ));
+        $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
             'configuracion', 'Configuración', '/configuracion', permiso: 'catalogos.ver', area: AreaModulo::Nucleo,
-            icono: 'heroicon-o-cog-6-tooth', descripcion: 'Parámetros, tipos de cambio, catálogos, estados y motivos',
-            preguntas: ['¿A cuánto está el dólar hoy?', '¿Qué monedas, unidades y catálogos usamos?', '¿Qué estados y motivos tiene cada documento?'],
+            icono: 'heroicon-o-cog-6-tooth', descripcion: 'Parámetros, tipo de cambio y estados',
+            preguntas: ['¿A cuánto está el dólar hoy?', '¿Qué estados tiene cada documento?'],
             animacion: AnimacionCaja::Rueda,
         ));
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
@@ -698,8 +717,8 @@ final class NucleoServiceProvider extends ServiceProvider
     {
         $this->app->make(RegistroPantallas::class)->registrar(
             'app',
-            paginas: [Configuracion::class, Catalogos::class, Alertas::class, InteligenciaArtificial::class, Seguridad::class, MisPreferencias::class, VistaPreviaFechas::class, RenovarClave::class, FaltaGerenteGeneral::class, MisDatos::class, Mien::class, MisAvisos::class, MisAprobaciones::class, SaludDelSistema::class, ConfiguracionInicial::class, RolesPermisos::class, Filament\Pages\SolicitudesPermiso::class, Filament\Pages\TicketsAyuda::class],
-            recursos: [ParametroResource::class, TipoCambioResource::class, EstadoResource::class, MotivoResource::class, SerieDocumentoResource::class, ReglaAprobacionResource::class, PartyResource::class, UsuarioResource::class, UnidadOrganizativaResource::class, ConflictoResource::class, IncompatibilidadResource::class],
+            paginas: [Configuracion::class, Filament\Clusters\Listas::class, Filament\Clusters\ReglasNegocio::class, Catalogos::class, Alertas::class, InteligenciaArtificial::class, Seguridad::class, MisPreferencias::class, VistaPreviaFechas::class, RenovarClave::class, FaltaGerenteGeneral::class, MisDatos::class, Mien::class, Filament\Pages\PortadaProceso::class, MisAvisos::class, MisAprobaciones::class, SaludDelSistema::class, ConfiguracionInicial::class, RolesPermisos::class, Filament\Pages\SolicitudesPermiso::class, Filament\Pages\TicketsAyuda::class],
+            recursos: [ParametroResource::class, Filament\Resources\Parametros\ParametroNegocioResource::class, TipoCambioResource::class, EstadoResource::class, MotivoResource::class, SerieDocumentoResource::class, ReglaAprobacionResource::class, PartyResource::class, UsuarioResource::class, UnidadOrganizativaResource::class, ConflictoResource::class, IncompatibilidadResource::class],
         );
     }
 

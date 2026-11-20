@@ -45,7 +45,7 @@ final class BarraModulos
     public static function navegacion(?User $usuario): NavigationBuilder|false
     {
         $navegacion = app(NavegacionService::class);
-        $permitidos = $usuario === null ? [] : $navegacion->permitidos($usuario);
+        $permitidos = $usuario === null ? [] : $navegacion->cajasDeProceso($usuario);
 
         if ($usuario === null || $permitidos === []) {
             return false;
@@ -53,10 +53,10 @@ final class BarraModulos
 
         $ocultos = $navegacion->ocultos($usuario);
         $grupos = array_map(
-            fn (array $seccion): NavigationGroup => NavigationGroup::make($seccion['area']->etiqueta())
-                ->extraSidebarAttributes(['data-tq-area' => $seccion['area']->value])
-                ->items(array_map(fn (CajaModulo $caja): NavigationItem => self::item($caja, in_array($caja->clave, $ocultos, true)), $seccion['cajas'])),
-            $navegacion->porArea($permitidos),
+            fn (array $seccion): NavigationGroup => NavigationGroup::make($seccion['franja']->etiqueta())
+                ->extraSidebarAttributes(['data-tq-area' => $seccion['franja']->areaDeColor()->value])
+                ->items(array_map(fn (CajaModulo $caja): NavigationItem => self::item($caja, in_array($caja->clave, $ocultos, true), $usuario), $seccion['cajas'])),
+            $navegacion->porFranja($permitidos),
         );
 
         return (new NavigationBuilder)->groups($grupos);
@@ -101,15 +101,16 @@ final class BarraModulos
             ->hidden(fn (): bool => ! self::barraVisible() || ! self::hayModulos());
     }
 
-    private static function item(CajaModulo $caja, bool $oculto): NavigationItem
+    private static function item(CajaModulo $caja, bool $oculto, User $usuario): NavigationItem
     {
         $ruta = self::ruta($caja->url);
 
         return NavigationItem::make($caja->nombre)
             ->url($caja->url)
             ->icon($caja->icono)
-            // Activo también en sus pantallas internas: la URL de la caja es el prefijo.
-            ->isActiveWhen(fn (): bool => str_starts_with(self::rutaActual().'/', rtrim($ruta, '/').'/'))
+            // Activo en su portada y en sus pantallas internas (MV-020).
+            ->isActiveWhen(fn (): bool => str_starts_with(self::rutaActual().'/', rtrim($ruta, '/').'/')
+                || (app(NavegacionService::class)->procesoDeRuta($usuario, self::rutaActual())['caja'] ?? null)?->clave === $caja->clave)
             ->extraAttributes(array_filter([
                 'data-modulo' => $caja->clave,
                 'data-tq-barra' => true,
@@ -194,7 +195,7 @@ final class BarraModulos
         $usuario = self::usuario();
         $navegacion = app(NavegacionService::class);
 
-        return $usuario === null ? [] : array_merge(...array_map(fn (array $seccion): array => $seccion['cajas'], $navegacion->porArea($navegacion->permitidos($usuario))));
+        return $usuario === null ? [] : $navegacion->cajasDeProceso($usuario);
     }
 
     /** @return list<string> */

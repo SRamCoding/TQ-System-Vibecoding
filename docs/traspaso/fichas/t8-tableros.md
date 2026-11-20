@@ -1,7 +1,7 @@
 # Ficha · Tableros de inicio por rol
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v2
 - **Tramo de la ruta:** fuera de la ruta (MV-015)
 - **Aprobada (v1):** 2026-11-20 · etiqueta `aprobado/t8-tableros-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-5-interfaz-roles.md` («Los tableros de inicio»: Jefatura de
@@ -16,12 +16,14 @@ que las pantallas de cada módulo (dinero del proyecto, contratos, flujo de caja
 
 ## Decisiones de Sebastián
 
+- **MV-017** (cruza módulos) · Mien absorbe el tablero por rol: se ve dentro de Mien, debajo de sus tarjetas.
 - **MV-015** (general) · Lo que el v4 tenía y la ruta dejó fuera también entra; tableros por rol.
 - **MV-009** (general) · Aprobada sin revisión; los cambios vienen al final.
 
 ## Pantallas y navegación
 
-- **Inicio:** caja «Mi tablero» en el área ERP.
+- **Inicio:** ya no tiene caja propia (MV-017): el tablero se ve dentro de Mien, debajo de sus tarjetas, con el título
+  «El tablero de tu rol»; `/mi-tablero` lleva a `/mien`.
 - **Mi tablero** `/mi-tablero?rol=…`: subtítulo con el rol y la fecha; pestañas con los roles que la persona puede ver
   (si es uno solo, no hay pestañas); cuatro tarjetas (etiqueta, número en color si hay alerta, nota) y tres secciones
   con listas cuyas filas son enlaces (en rojo lo vencido, en ámbar lo que está al límite).
@@ -83,3 +85,8 @@ Sin tablas nuevas. Qué pestañas ve cada quien sale de los permisos de ver que 
 
 `app/Modules/Erp/Tableros/` (`Services/TablerosService.php`, `Filament/Pages/MiTablero.php`,
 `resources/views/tablero.blade.php`, provider registrado en `bootstrap/providers.php`).
+
+## Cambios desde la versión anterior
+
+- **v2** (ronda 1, MV-017): «Mi tablero» deja de ser caja del inicio. El tablero por rol se ve dentro de Mien
+  (`/mien`), debajo de sus tarjetas, con las mismas pestañas (`/mien?rol=…`). `/mi-tablero` lleva a Mien.

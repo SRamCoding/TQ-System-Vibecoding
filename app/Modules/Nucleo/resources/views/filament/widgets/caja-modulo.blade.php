@@ -10,7 +10,7 @@
     descripción en el tooltip de Filament, como antes. En el celular, nada (D4).
 --}}
 @php /** @var \App\Modules\Nucleo\Navegacion\CajaModulo $caja */ @endphp
-<div class="tq-celda-modulo">
+<div @class(['tq-celda-modulo', 'tq-celda-ancha' => $ancha ?? false])>
     <a
         href="{{ $caja->url }}"
         rel="noopener"
@@ -45,7 +45,15 @@
         <x-filament::icon :icon="$caja->icono" class="tq-caja-marca-agua" aria-hidden="true" />
         {{-- Plan 1.4t: las hojas de otoño y la escarcha de invierno, distintas en cada caja; el CSS las muestra solo en su estación. --}}
         <span class="tq-caja-adornos" aria-hidden="true">{!! \App\Modules\Nucleo\Navegacion\AdornosDeEstacion::hojas($caja->clave) !!}{!! \App\Modules\Nucleo\Navegacion\AdornosDeEstacion::hielo($caja->clave) !!}</span>
-        <span class="tq-caja-modulo-nombre">{{ $caja->nombre }}</span>
+        @if ($ancha ?? false)
+            {{-- MV-017: Mien a lo ancho lleva su descripción junto al nombre. --}}
+            <span class="tq-caja-texto" x-show="! ($data.activa && ! $data.final)">
+                <span class="tq-caja-modulo-nombre">{{ $caja->nombre }}</span>
+                <span class="tq-caja-modulo-descripcion">{{ $caja->descripcion }}</span>
+            </span>
+        @else
+            <span class="tq-caja-modulo-nombre">{{ $caja->nombre }}</span>
+        @endif
         @if ($caja->preguntas !== [])
             <span class="tq-caja-preguntas" x-show="activa && ! final" x-cloak>
                 <span class="tq-caja-pregunta" x-bind:class="{ 'tq-visible': visible }" x-text="preguntas[indice] ?? ''"></span>

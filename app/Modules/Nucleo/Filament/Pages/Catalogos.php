@@ -9,7 +9,7 @@ use App\Modules\Nucleo\Enums\Catalogo;
 use App\Modules\Nucleo\Enums\GrupoCatalogo;
 use App\Modules\Nucleo\Excepciones\ErrorDeNegocio;
 use App\Modules\Nucleo\Filament\AccionFilament;
-use App\Modules\Nucleo\Filament\Clusters\Configuracion;
+use App\Modules\Nucleo\Filament\Clusters\Listas;
 use App\Modules\Nucleo\Models\Concerns\BusquedaSinAcentos;
 use App\Modules\Nucleo\Models\Concerns\ElementoCatalogo;
 use App\Modules\Nucleo\Models\RedSocial;
@@ -47,7 +47,7 @@ final class Catalogos extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $cluster = Configuracion::class;
+    protected static ?string $cluster = Listas::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-queue-list';
 
@@ -126,7 +126,7 @@ final class Catalogos extends Page implements HasTable
      */
     public function getBreadcrumbs(): array
     {
-        $migas = [...Configuracion::unshiftClusterBreadcrumbs([]), self::getUrl() => 'Catálogos'];
+        $migas = [...Listas::unshiftClusterBreadcrumbs([]), self::getUrl() => 'Catálogos'];
 
         return [...$migas, $this->abierto()?->titulo() ?? 'Listado'];
     }

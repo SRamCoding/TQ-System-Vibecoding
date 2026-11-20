@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Nucleo\Filament\Pages;
 
+use App\Modules\Nucleo\Mien\RegistroSeccionesMien;
 use App\Modules\Nucleo\Mien\RegistroTarjetasMien;
 use App\Modules\Nucleo\Mien\TarjetaMien;
 use App\Modules\Nucleo\Models\User;
@@ -12,6 +13,8 @@ use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
+use Livewire\Attributes\Url;
 
 /**
  * «Mien», el tablero personal (plan 1.4l): lo relevante del negocio para cada persona, en tarjetas que aporta cada
@@ -28,6 +31,10 @@ final class Mien extends Page
     /** La barra de módulos se arma con las cajas: la de «Mien» la pone ahí. */
     protected static bool $shouldRegisterNavigation = false;
 
+    /** MV-017: el rol cuyo tablero se ve debajo de las tarjetas (antes, «Mi tablero»). */
+    #[Url]
+    public ?string $rol = null;
+
     public static function canAccess(): bool
     {
         return Filament::auth()->user() instanceof User;
@@ -36,8 +43,16 @@ final class Mien extends Page
     public function content(Schema $schema): Schema
     {
         return $schema->components([
-            View::make('nucleo::filament.mien.tablero')->viewData(fn (): array => ['tarjetas' => $this->tarjetas()]),
+            View::make('nucleo::filament.mien.tablero')->viewData(fn (): array => ['tarjetas' => $this->tarjetas(), 'secciones' => $this->secciones()]),
         ]);
+    }
+
+    /** @return list<Htmlable> */
+    private function secciones(): array
+    {
+        $usuario = Filament::auth()->user();
+
+        return $usuario instanceof User ? app(RegistroSeccionesMien::class)->para($usuario, $this->rol) : [];
     }
 
     /** @return list<TarjetaMien> */

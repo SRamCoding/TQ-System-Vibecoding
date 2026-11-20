@@ -33,6 +33,8 @@ final readonly class CajaModulo
         public array $preguntas = [],
         /** Con qué termina el ícono después de las preguntas (D6); sin una propia, el pulso (D7). */
         public AnimacionCaja $animacion = AnimacionCaja::Pulso,
+        /** Solo las cajas de proceso del inicio (MV-016): la franja en que van. */
+        public ?Franja $franja = null,
     ) {
         // Hasta 40: es lo que cabe en `modulos_ocultos.clave_modulo` (plan 1.4f, D2).
         if (preg_match('/^[a-z][a-z0-9-]{0,39}$/', $clave) !== 1) {
@@ -44,5 +46,11 @@ final readonly class CajaModulo
                 throw new InvalidArgumentException("La caja [{$clave}] tiene una pregunta vacía.");
             }
         }
+    }
+
+    /** La misma caja con otro nombre: el que le da su proceso (Proceso::cajas). */
+    public function conNombre(?string $nombre): self
+    {
+        return $nombre === null ? $this : new self($this->clave, $nombre, $this->url, $this->permiso, $this->area, $this->icono, $this->descripcion, $this->preguntas, $this->animacion, $this->franja);
     }
 }

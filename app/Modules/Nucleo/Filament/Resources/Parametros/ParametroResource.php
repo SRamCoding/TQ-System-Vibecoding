@@ -22,12 +22,13 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Parámetros del negocio (M9): solo lectura más la acción registrada «Cambiar parámetro».
  */
-final class ParametroResource extends Resource
+class ParametroResource extends Resource
 {
     use EtiquetasEnEspanol;
 
@@ -44,6 +45,25 @@ final class ParametroResource extends Resource
     protected static ?string $slug = 'parametros';
 
     protected static ?int $navigationSort = 1;
+
+    /** MV-016: los grupos que deciden cómo trabaja Techquk van a «Reglas del negocio», junto con los sensibles (dinero). */
+    public const array GRUPOS_NEGOCIO = ['crm', 'presupuestos', 'tributario'];
+
+    /** Los de la plataforma; los del negocio, en ParametroNegocioResource. */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->whereNotIn('id', self::idsDelNegocio());
+    }
+
+    /** @return list<int> */
+    protected static function idsDelNegocio(): array
+    {
+        $servicio = app(ParametrosService::class);
+
+        return Parametro::query()->get(['id', 'grupo', 'clave'])
+            ->filter(fn (Parametro $p): bool => in_array($p->grupo, self::GRUPOS_NEGOCIO, true) || $servicio->esSensible("{$p->grupo}.{$p->clave}"))
+            ->pluck('id')->map(fn (mixed $id): int => (int) $id)->values()->all();
+    }
 
     public static function canViewAny(): bool
     {
@@ -104,7 +124,7 @@ final class ParametroResource extends Resource
             ]);
     }
 
-    private static function accionCambiar(Accion $accion, bool $sensible): Action
+    protected static function accionCambiar(Accion $accion, bool $sensible): Action
     {
         return AccionFilament::desde(
             $accion,
@@ -120,7 +140,7 @@ final class ParametroResource extends Resource
                 || app(ParametrosService::class)->esSensible(self::nombre($record)) !== $sensible);
     }
 
-    private static function nombre(Parametro $record): string
+    protected static function nombre(Parametro $record): string
     {
         return "{$record->grupo}.{$record->clave}";
     }

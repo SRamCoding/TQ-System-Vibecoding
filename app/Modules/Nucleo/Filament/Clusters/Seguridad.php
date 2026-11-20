@@ -15,9 +15,9 @@ final class Seguridad extends Cluster
 {
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 
-    protected static ?string $navigationLabel = 'Usuarios y organigrama';
+    protected static ?string $navigationLabel = 'Usuarios';
 
-    protected static ?string $clusterBreadcrumb = 'Usuarios y organigrama';
+    protected static ?string $clusterBreadcrumb = 'Usuarios';
 
     protected static ?string $slug = 'seguridad';
 

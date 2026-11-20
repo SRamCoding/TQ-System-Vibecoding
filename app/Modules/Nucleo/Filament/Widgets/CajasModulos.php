@@ -6,16 +6,16 @@ namespace App\Modules\Nucleo\Filament\Widgets;
 
 use App\Modules\Nucleo\Enums\Temporada;
 use App\Modules\Nucleo\Models\User;
-use App\Modules\Nucleo\Navegacion\AreaModulo;
 use App\Modules\Nucleo\Navegacion\CajaModulo;
 use App\Modules\Nucleo\Navegacion\EstacionDeLaApariencia;
+use App\Modules\Nucleo\Navegacion\Franja;
 use App\Modules\Nucleo\Services\NavegacionService;
 use Filament\Facades\Filament;
 use Filament\Widgets\Widget;
 
 /**
- * Inicio: una caja por módulo permitido (NavegacionService, plan 1.4f), agrupadas por área (Núcleo, CRM, ERP); cada una abre su
- * módulo en otra pestaña.
+ * Inicio (MV-016 a MV-018): Mien arriba y a lo ancho; debajo, las cajas de proceso agrupadas en franjas (Estratégicos,
+ * Misionales, De Apoyo, Plataforma) y repartidas en dos columnas. Cada caja abre la portada de su proceso.
  */
 final class CajasModulos extends Widget
 {
@@ -31,23 +31,45 @@ final class CajasModulos extends Widget
     protected string $view = 'nucleo::filament.widgets.cajas-modulos';
 
     /**
+     * Las cajas de proceso que la persona ve (MV-016), Mien primero.
+     *
      * @return list<CajaModulo>
      */
     public function cajas(): array
     {
         $usuario = Filament::auth()->user();
 
-        return $usuario instanceof User ? app(NavegacionService::class)->permitidos($usuario) : [];
+        return $usuario instanceof User ? app(NavegacionService::class)->cajasDeProceso($usuario) : [];
+    }
+
+    /** Mien, arriba de todo y a lo ancho (MV-017). */
+    public function mien(): ?CajaModulo
+    {
+        foreach ($this->cajas() as $caja) {
+            if ($caja->franja === Franja::Personal) {
+                return $caja;
+            }
+        }
+
+        return null;
     }
 
     /**
-     * Las áreas que tienen alguna caja permitida, en el orden de `AreaModulo`, con sus cajas: el mismo orden que la barra.
+     * Las franjas con alguna caja, repartidas en dos columnas de alto parecido (MV-018). Cada una lleva su lugar en el
+     * orden de siempre, para el celular (una sola columna).
      *
-     * @return list<array{area: AreaModulo, cajas: list<CajaModulo>}>
+     * @return array{0: list<array{franja: Franja, cajas: list<CajaModulo>, orden: int}>, 1: list<array{franja: Franja, cajas: list<CajaModulo>, orden: int}>}
      */
-    public function secciones(): array
+    public function columnas(): array
     {
-        return app(NavegacionService::class)->porArea($this->cajas());
+        $navegacion = app(NavegacionService::class);
+        $secciones = array_values(array_filter($navegacion->porFranja($this->cajas()), fn (array $s): bool => $s['franja'] !== Franja::Personal));
+
+        foreach ($secciones as $i => $seccion) {
+            $secciones[$i]['orden'] = $i;
+        }
+
+        return $navegacion->enDosColumnas($secciones);
     }
 
     /** Plan 1.4r: la estación que visten las cajas, o null con la preferencia apagada (las cajas como antes). */

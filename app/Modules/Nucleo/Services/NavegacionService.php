@@ -9,7 +9,9 @@ use App\Modules\Nucleo\Models\ModuloOculto;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Navegacion\AreaModulo;
 use App\Modules\Nucleo\Navegacion\CajaModulo;
+use App\Modules\Nucleo\Navegacion\Franja;
 use App\Modules\Nucleo\Navegacion\OcultosDelPedido;
+use App\Modules\Nucleo\Navegacion\Proceso;
 use App\Modules\Nucleo\Navegacion\RegistroModulos;
 use Illuminate\Support\Facades\DB;
 
@@ -45,7 +47,7 @@ final class NavegacionService
     {
         // Una sola lectura por pedido (plan 1.12, prueba de carga: se leía 5 veces).
         $guardados = app(OcultosDelPedido::class)->de($usuario->id);
-        $permitidos = array_map(fn (CajaModulo $caja): string => $caja->clave, $this->permitidos($usuario));
+        $permitidos = array_map(fn (CajaModulo $caja): string => $caja->clave, $this->cajasDeProceso($usuario));
 
         return array_values(array_intersect($permitidos, $guardados));
     }
@@ -60,7 +62,7 @@ final class NavegacionService
         $ocultos = $this->ocultos($usuario);
 
         return array_values(array_filter(
-            $this->permitidos($usuario),
+            $this->cajasDeProceso($usuario),
             fn (CajaModulo $caja): bool => ! in_array($caja->clave, $ocultos, true),
         ));
     }
@@ -87,6 +89,162 @@ final class NavegacionService
         return $secciones;
     }
 
+    /**
+     * Los procesos que la persona ve (MV-016): los que tienen al menos una caja interna permitida, en el orden de
+     * `Proceso`, cada uno con su caja del inicio y sus cajas internas (con el nombre que les da el proceso).
+     *
+     * @return list<array{proceso: Proceso, caja: CajaModulo, internas: list<CajaModulo>}>
+     */
+    public function procesos(User $usuario): array
+    {
+        $permitidas = [];
+
+        foreach ($this->permitidos($usuario) as $caja) {
+            $permitidas[$caja->clave] = $caja;
+        }
+
+        $procesos = [];
+
+        foreach (Proceso::cases() as $proceso) {
+            $internas = [];
+
+            foreach ($proceso->cajas() as $clave => $nombre) {
+                if (isset($permitidas[$clave])) {
+                    $internas[] = $permitidas[$clave]->conNombre($nombre);
+                }
+            }
+
+            if ($internas !== []) {
+                $procesos[] = ['proceso' => $proceso, 'caja' => $this->cajaDeProceso($proceso, $internas), 'internas' => $internas];
+            }
+        }
+
+        return $procesos;
+    }
+
+    /**
+     * Las cajas de proceso que la persona ve, Mien primero: lo que muestran el inicio y la barra lateral.
+     *
+     * @return list<CajaModulo>
+     */
+    public function cajasDeProceso(User $usuario): array
+    {
+        return array_column($this->procesos($usuario), 'caja');
+    }
+
+    /**
+     * El proceso y la caja interna de una ruta (`/ordenes/12` es Órdenes, de Abastecer), para las pestañas y la miga
+     * (MV-020). Gana la URL más larga que sea prefijo.
+     *
+     * @return array{proceso: Proceso, caja: CajaModulo, internas: list<CajaModulo>, actual: CajaModulo}|null
+     */
+    public function procesoDeRuta(User $usuario, string $ruta): ?array
+    {
+        $ruta = '/'.trim($ruta, '/').'/';
+        $mejor = null;
+        $largo = 0;
+
+        foreach ($this->procesos($usuario) as $proceso) {
+            foreach ($proceso['internas'] as $interna) {
+                $url = '/'.trim((string) parse_url($interna->url, PHP_URL_PATH), '/').'/';
+
+                if (str_starts_with($ruta, $url) && strlen($url) > $largo) {
+                    $mejor = [...$proceso, 'actual' => $interna];
+                    $largo = strlen($url);
+                }
+            }
+        }
+
+        return $mejor;
+    }
+
+    /**
+     * Cajas de proceso agrupadas por franja, en el orden de `Franja`; solo las franjas con alguna caja (MV-016: una franja
+     * vacía desaparece con su título).
+     *
+     * @param  list<CajaModulo>  $cajas
+     * @return list<array{franja: Franja, cajas: list<CajaModulo>}>
+     */
+    public function porFranja(array $cajas): array
+    {
+        $secciones = [];
+
+        foreach (Franja::cases() as $franja) {
+            $deLaFranja = array_values(array_filter($cajas, fn (CajaModulo $caja): bool => $caja->franja === $franja));
+
+            if ($deLaFranja !== []) {
+                $secciones[] = ['franja' => $franja, 'cajas' => $deLaFranja];
+            }
+        }
+
+        return $secciones;
+    }
+
+    /**
+     * Reparte las franjas en dos columnas de alto parecido (MV-018), cada franja entera. El alto de una franja se estima
+     * como su título más sus filas de tres cajas; de los repartos posibles gana el de menor diferencia y, a igual
+     * diferencia, el que deja las franjas en su orden (las primeras a la izquierda).
+     *
+     * @template T of array{cajas: list<CajaModulo>}
+     *
+     * @param  list<T>  $secciones
+     * @return array{0: list<T>, 1: list<T>}
+     */
+    public function enDosColumnas(array $secciones): array
+    {
+        $n = count($secciones);
+        $altos = array_map(fn (array $s): float => 1.3 + ceil(count($s['cajas']) / 3), $secciones);
+        $mejor = null;
+        $puntaje = INF;
+
+        // Bit en 1: va a la derecha. La primera franja siempre a la izquierda (el espejo es el mismo reparto).
+        for ($mascara = 0; $mascara < (1 << max($n - 1, 0)); $mascara++) {
+            $izquierda = $derecha = 0.0;
+            $enOrden = true;
+            $yaDerecha = false;
+
+            for ($i = 0; $i < $n; $i++) {
+                $aLaDerecha = $i > 0 && (($mascara >> ($i - 1)) & 1) === 1;
+                $aLaDerecha ? $derecha += $altos[$i] : $izquierda += $altos[$i];
+                $enOrden = $enOrden && ! ($yaDerecha && ! $aLaDerecha);
+                $yaDerecha = $yaDerecha || $aLaDerecha;
+            }
+
+            $valor = abs($izquierda - $derecha) * 10 + ($enOrden ? 0 : 1);
+
+            if ($valor < $puntaje) {
+                $puntaje = $valor;
+                $mejor = $mascara;
+            }
+        }
+
+        $columnas = [[], []];
+
+        foreach ($secciones as $i => $seccion) {
+            $columnas[$i > 0 && ((($mejor ?? 0) >> ($i - 1)) & 1) === 1 ? 1 : 0][] = $seccion;
+        }
+
+        return $columnas;
+    }
+
+    /** @param  list<CajaModulo>  $internas */
+    private function cajaDeProceso(Proceso $proceso, array $internas): CajaModulo
+    {
+        if ($proceso === Proceso::Mien) {
+            $mien = $internas[0];
+
+            return new CajaModulo($mien->clave, $mien->nombre, $mien->url, null, $mien->area, $mien->icono, $proceso->descripcion(), $mien->preguntas, $mien->animacion, Franja::Personal);
+        }
+
+        // Las preguntas del proceso: la primera de cada caja interna, hasta tres.
+        $preguntas = array_slice(array_values(array_unique(array_filter(array_map(fn (CajaModulo $c): ?string => $c->preguntas[0] ?? null, $internas)))), 0, 3);
+
+        return new CajaModulo(
+            $proceso->value, $proceso->nombre(), $proceso->url(), permiso: null, area: $proceso->franja()->areaDeColor(),
+            icono: $proceso->icono(), descripcion: $proceso->descripcion(), preguntas: $preguntas, animacion: $proceso->animacion(), franja: $proceso->franja(),
+        );
+    }
+
     /** Si la persona prendió la barra de módulos (preferencia `navegacion.barra_modulos`, plan 1.4g). */
     public function barraVisible(User $usuario): bool
     {
@@ -108,7 +266,7 @@ final class NavegacionService
     {
         $clave = $this->preferencias->opcion($usuario, 'navegacion.pantalla_inicio');
 
-        foreach ($this->permitidos($usuario) as $caja) {
+        foreach ([...$this->cajasDeProceso($usuario), ...$this->permitidos($usuario)] as $caja) {
             if ($caja->clave === $clave) {
                 return $caja->url;
             }
@@ -134,7 +292,7 @@ final class NavegacionService
     public function ocultar(User $usuario, array $ocultos): void
     {
         $ocultos = array_values(array_unique($ocultos));
-        $permitidos = array_map(fn (CajaModulo $caja): string => $caja->clave, $this->permitidos($usuario));
+        $permitidos = array_map(fn (CajaModulo $caja): string => $caja->clave, $this->cajasDeProceso($usuario));
 
         if (array_diff($ocultos, $permitidos) !== []) {
             throw PreferenciaRechazada::moduloNoDisponible();

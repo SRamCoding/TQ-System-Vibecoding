@@ -107,7 +107,7 @@ final readonly class AprobacionesService
                 "firma:{$firmada->id}",
                 ['persona' => $usuario->name, 'documento' => $definicion->nombre().' '.$definicion->identificador($documento)],
                 $documento,
-                route('filament.app.configuracion.resources.aprobaciones.index', ['tab' => 'autoaprobaciones']),
+                route('filament.app.reglas-negocio.resources.aprobaciones.index', ['tab' => 'autoaprobaciones']),
             );
 
             return $firmada;

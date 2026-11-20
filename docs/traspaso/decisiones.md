@@ -198,3 +198,67 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** los de «Postventa», «Personas», «Tableros» y «Cierre»
+
+### MV-016 · 2026-11-20 · El sistema se organiza por procesos: cuatro franjas y 11 cajas
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (conversado el 19 y 20 de noviembre) «Dejan de existir las áreas Núcleo, CRM y ERP. Hay cuatro
+  franjas, en plural: Estratégicos, Misionales, De Apoyo y Plataforma. 11 cajas en total. Al abrir cada caja aparecen
+  sus cajas internas […], que son las pantallas que ya existen».
+- **Decisión:** el inicio y la barra lateral muestran procesos, no módulos. Estratégicos: Techquk (¿Cuánto se ganó?,
+  Presupuesto de la empresa, Lo aprendido, Reglas del negocio). Misionales: Conseguir el negocio (Oportunidades,
+  Convocatorias del SEACE, Campañas), Gerencia de proyectos (Proyectos, Contratos, Personal asignado, Tareo,
+  Subcontratos), Abastecer (Requerimientos, Órdenes, Almacén), Facturación y cobranza (Valorizaciones, Facturas
+  emitidas, Cobranzas), Postventa (Tickets y series, Suscripciones). De Apoyo: Presupuestar y cotizar (Presupuestos,
+  Cotizaciones), Finanzas (Facturas de proveedor, Tablero de pagos, Flujo de caja y conciliación, Rendiciones,
+  Servicios con vigencia, Para el contador), Personas (Fichas laborales, Demanda y selección, Planilla), Directorio y
+  catálogos (Personas y empresas, Catálogo de productos, Listas, Organigrama). Plataforma: Sistema (Usuarios,
+  Configuración, Solicitudes de permiso, Tickets de ayuda). Reglas del negocio (aprobaciones y parámetros sensibles) y
+  Listas (catálogos y motivos) salen de Configuración. Los nombres de cajas y franjas son exactamente esos.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 1: el inicio por procesos»
+
+### MV-017 · 2026-11-20 · Mien va arriba, a lo ancho, y absorbe «Mi tablero»
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** «Mien va arriba de todo, a lo ancho, y absorbe "Mi tablero" (el tablero por rol)».
+- **Decisión:** en el inicio, Mien es una caja ancha encima de las franjas. El tablero por rol deja de ser una caja y
+  se ve dentro de Mien, debajo de sus tarjetas, con las mismas pestañas por rol.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 1: el inicio por procesos»
+
+### MV-018 · 2026-11-20 · Las franjas se reparten solas en dos columnas
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** «Las franjas se reparten en dos columnas de alto parecido. Cada franja va junta, con su título.
+  El reparto se calcula solo según las cajas que ve cada persona (filtradas por su rol). Si una franja queda vacía para
+  alguien, desaparece con su título. En el celular, una columna».
+- **Decisión:** lo dicho, para cada persona según sus permisos.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 1: el inicio por procesos»
+
+### MV-019 · 2026-11-20 · Los colores siguen como están; los nuevos se consultan
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** «Los colores siguen por ahora como están. Que cada franja se distinga es lo que importa;
+  pregúntame antes de elegir colores nuevos».
+- **Decisión:** no se crea ningún color. Cada franja usa uno de los colores de siempre y se distingue de las otras.
+  Los colores propios de cada franja quedan pendientes de Sebastián.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 1: el inicio por procesos»
+
+### MV-020 · 2026-11-20 · Cada proceso abre una portada con sus cajas; dentro, pestañas y miga
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** eligió «Portada con cajas» (y no entrar directo con pestañas, como Configuración) y «Pestañas +
+  miga» (y no solo la miga), entre las opciones que le dio el agente.
+- **Decisión:** la caja de un proceso abre su portada, con sus cajas internas del tamaño de las del inicio. Dentro de
+  una pantalla interna, arriba, la miga «Proceso › Pantalla» para volver a la portada y una fila de pestañas con las
+  pantallas hermanas del proceso. La barra lateral muestra las cajas de proceso.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 1: el inicio por procesos»

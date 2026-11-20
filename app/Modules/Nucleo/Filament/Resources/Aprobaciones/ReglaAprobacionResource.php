@@ -9,7 +9,7 @@ use App\Modules\Nucleo\Enums\FirmanteAprobacion;
 use App\Modules\Nucleo\Estados\DefinicionDocumento;
 use App\Modules\Nucleo\Estados\RegistroDocumentos;
 use App\Modules\Nucleo\Filament\AccionFilament;
-use App\Modules\Nucleo\Filament\Clusters\Configuracion;
+use App\Modules\Nucleo\Filament\Clusters\ReglasNegocio;
 use App\Modules\Nucleo\Filament\EtiquetasEnEspanol;
 use App\Modules\Nucleo\Filament\Resources\Aprobaciones\Pages\ListarReglasAprobacion;
 use App\Modules\Nucleo\Models\PasoReglaAprobacion;
@@ -40,7 +40,7 @@ final class ReglaAprobacionResource extends Resource
 
     protected static ?string $model = ReglaAprobacion::class;
 
-    protected static ?string $cluster = Configuracion::class;
+    protected static ?string $cluster = ReglasNegocio::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-document-check';
 
@@ -52,7 +52,7 @@ final class ReglaAprobacionResource extends Resource
 
     protected static ?string $slug = 'aprobaciones';
 
-    protected static ?int $navigationSort = 13;
+    protected static ?int $navigationSort = 1;
 
     public static function canViewAny(): bool
     {
