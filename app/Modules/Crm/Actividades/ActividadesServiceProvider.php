@@ -11,8 +11,10 @@ use App\Modules\Crm\Actividades\Services\AporteActividadesACuentas;
 use App\Modules\Crm\Actividades\Services\ProximaAccionDesdeActividades;
 use App\Modules\Crm\Cuentas\Actividad\ActividadDeCuentas;
 use App\Modules\Crm\Oportunidades\Services\ProximaAccionDeOportunidades;
+use App\Modules\Nucleo\Mien\RegistroPendientesMien;
 use App\Modules\Nucleo\Mien\RegistroTarjetasMien;
 use App\Modules\Nucleo\Mien\TarjetaMien;
+use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Navegacion\RegistroPantallas;
 use App\Modules\Nucleo\Seguridad\RegistroPermisos;
 use Filament\Support\Facades\FilamentView;
@@ -45,6 +47,16 @@ final class ActividadesServiceProvider extends ServiceProvider
         Livewire::component('agenda-muelle', Filament\Muelle\AgendaMuelle::class);
         FilamentView::registerRenderHook(PanelsRenderHook::BODY_END,
             fn (): string => auth()->user()?->can(ActividadesService::PERMISO_VER) === true ? Livewire::mount('agenda-muelle') : '');
+        // MV-032: lo de hoy y lo vencido cuenta para la estrella de Mien.
+        $this->app->make(RegistroPendientesMien::class)->registrar('agenda', function (User $u): array {
+            if (! $u->can(ActividadesService::PERMISO_VER)) {
+                return ['cantidad' => 0, 'texto' => ''];
+            }
+
+            $a = app(ActividadesService::class)->miAgenda($u->id);
+
+            return ['cantidad' => count($a['hoy']) + count($a['vencidas']), 'texto' => 'actividades para hoy o vencidas'];
+        });
         $this->app->make(RegistroTarjetasMien::class)->registrar(new TarjetaMien(
             'mi-agenda', 'Mi agenda', ActividadesService::PERMISO_VER, Filament\Muelle\TarjetaMiAgenda::class, 5,
         ));

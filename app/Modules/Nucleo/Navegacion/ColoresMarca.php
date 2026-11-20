@@ -37,6 +37,18 @@ final class ColoresMarca
     /** El dorado en modo oscuro: brillante, 10,6:1 sobre el fondo casi negro. */
     public const string DORADO_OSCURO = '#F2C14E';
 
+    /** MV-033: los colores de las franjas que no tenían uno propio para el modo oscuro, y el gris de Plataforma. */
+    public const string AZUL_NOCHE_OSCURO = '#6F9BFF';
+
+    public const string LILA_OSCURO = '#C3A6FF';
+
+    /** El turquesa como texto en modo claro: el del logo no llega a 4,5:1 sobre blanco (2,2); este, 5,2. */
+    public const string TURQUESA_TEXTO = '#00788A';
+
+    public const string GRIS_PLATAFORMA = '#6E7781';
+
+    public const string GRIS_PLATAFORMA_OSCURO = '#9DA5AE';
+
     /** Fondo de la barra superior en modo claro (plan 1.3d, D4): distingue la barra, del logo al avatar, del resto. */
     public const string PERLA = '#EEEAE2';
 
@@ -140,6 +152,7 @@ final class ColoresMarca
             AreaModulo::Nucleo => self::AZUL_NOCHE,
             AreaModulo::Crm => $tema === 'claro' ? self::MORADO_CLARO : self::MORADO,
             AreaModulo::Erp => self::TURQUESA,
+            AreaModulo::Plataforma => self::GRIS_PLATAFORMA,
         }), 1);
     }
 }

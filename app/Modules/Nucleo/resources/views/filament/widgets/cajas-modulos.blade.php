@@ -21,18 +21,21 @@
             línea. El color sale de los nombres declarados en el proveedor del panel, nunca de un código a mano.
         --}}
         <style>
+            /* MV-033: el color de cada franja, en claro y en oscuro. `--tq-area-texto` es el de los títulos (4,5:1 o más). */
             .tq-area[data-area="personal"] { --tq-area-color: var(--dorado-600); }
-            .tq-area[data-area="nucleo"] { --tq-area-color: var(--primary-600); }
-            .tq-area[data-area="crm"] { --tq-area-color: var(--morado-600); }
-            .tq-area[data-area="erp"] { --tq-area-color: var(--info-600); }
+            .tq-area[data-area="nucleo"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE }}; }
+            .tq-area[data-area="crm"] { --tq-area-color: var(--morado-600); --tq-area-texto: var(--morado-700); }
+            .tq-area[data-area="erp"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::TURQUESA_LOGO_CLARO }}; --tq-area-texto: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::TURQUESA_TEXTO }}; }
+            .tq-area[data-area="plataforma"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::GRIS_PLATAFORMA }}; }
             .dark .tq-area[data-area="personal"] { --tq-area-color: var(--dorado-400); }
-            .dark .tq-area[data-area="nucleo"] { --tq-area-color: var(--primary-400); }
-            .dark .tq-area[data-area="crm"] { --tq-area-color: var(--morado-400); }
-            .dark .tq-area[data-area="erp"] { --tq-area-color: var(--info-400); }
+            .dark .tq-area[data-area="nucleo"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE_OSCURO }}; }
+            .dark .tq-area[data-area="crm"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::LILA_OSCURO }}; --tq-area-texto: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::LILA_OSCURO }}; }
+            .dark .tq-area[data-area="erp"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::TURQUESA }}; --tq-area-texto: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::TURQUESA }}; }
+            .dark .tq-area[data-area="plataforma"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::GRIS_PLATAFORMA_OSCURO }}; }
             .tq-area + .tq-area { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200); }
             .dark .tq-area + .tq-area { border-top-color: var(--gray-700); }
             .tq-area-encabezado { margin-bottom: 1rem; padding-left: 0.75rem; border-left: 4px solid var(--tq-area-color); }
-            .tq-area-titulo { font-size: 1rem; font-weight: 700; line-height: 1.5rem; color: var(--tq-area-color); }
+            .tq-area-titulo { font-size: 1rem; font-weight: 700; line-height: 1.5rem; color: var(--tq-area-texto, var(--tq-area-color)); }
             .tq-area-descripcion { font-size: 0.875rem; line-height: 1.25rem; color: var(--gray-500); }
             .dark .tq-area-descripcion { color: var(--gray-400); }
             /* Plan 1.4q: filas que se acomodan solas, de celdas de 9 × 6,5 rem. Con mouse, cada fila reserva lo que crece una
@@ -301,9 +304,8 @@
         </style>
         <div class="tq-inicio-cajas" @if ($estacion !== null) data-tq-estacion="{{ $estacion->value }}" @endif>
             @if ($mien !== null)
-                <section class="tq-area" data-area="{{ $mien->area->value }}">
-                    @include('nucleo::filament.widgets.caja-modulo', ['caja' => $mien, 'ancha' => true])
-                </section>
+                {{-- MV-032: Mien sin caja, la estrella dorada centrada. --}}
+                @include('nucleo::filament.widgets.estrella-mien', ['caja' => $mien, 'pendientes' => $this->pendientes()])
             @endif
 
             <div class="tq-franjas">

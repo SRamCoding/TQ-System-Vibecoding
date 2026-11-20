@@ -140,10 +140,13 @@
        2026-10-23): Personal dorado, Núcleo azul noche (el de Filament), CRM morado, ERP turquesa. Mismos tonos que
        Filament usa para el azul: el 700 en claro (el 600 del dorado, que es el exacto) y el 400 en oscuro. */
     [data-tq-area="personal"] { --tq-area-activo: var(--dorado-600); --tq-area-activo-oscuro: var(--dorado-400); }
-    [data-tq-area="crm"] { --tq-area-activo: var(--morado-700); --tq-area-activo-oscuro: var(--morado-400); }
-    [data-tq-area="erp"] { --tq-area-activo: var(--info-700); --tq-area-activo-oscuro: var(--info-400); }
-    [data-tq-area]:not([data-tq-area="nucleo"]) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > :is(.fi-icon, .fi-sidebar-item-label) { color: var(--tq-area-activo); }
-    .dark [data-tq-area]:not([data-tq-area="nucleo"]) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > :is(.fi-icon, .fi-sidebar-item-label) { color: var(--tq-area-activo-oscuro); }
+    [data-tq-area="crm"] { --tq-area-activo: var(--morado-700); --tq-area-activo-oscuro: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::LILA_OSCURO }}; }
+    [data-tq-area="erp"] { --tq-area-activo: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::TURQUESA_TEXTO }}; --tq-area-activo-oscuro: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::TURQUESA }}; }
+    /* MV-033: Estratégicos (azul noche) y Plataforma (gris), también en la barra. */
+    [data-tq-area="nucleo"] { --tq-area-activo: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE }}; --tq-area-activo-oscuro: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE_OSCURO }}; }
+    [data-tq-area="plataforma"] { --tq-area-activo: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::GRIS_PLATAFORMA }}; --tq-area-activo-oscuro: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::GRIS_PLATAFORMA_OSCURO }}; }
+    [data-tq-area] .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > :is(.fi-icon, .fi-sidebar-item-label) { color: var(--tq-area-activo); }
+    .dark [data-tq-area] .fi-sidebar-item.fi-active > .fi-sidebar-item-btn > :is(.fi-icon, .fi-sidebar-item-label) { color: var(--tq-area-activo-oscuro); }
     [data-tq-area]:not(:has([data-tq-barra]:not(.tq-oculto))) { display: none !important; }
 
     @keyframes tq-entrar-barra { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }

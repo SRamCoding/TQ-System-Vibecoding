@@ -18,6 +18,9 @@ enum AreaModulo: string
     case Crm = 'crm';
     case Erp = 'erp';
 
+    /** MV-033: el color de la franja Plataforma, un gris neutro sin color de marca. */
+    case Plataforma = 'plataforma';
+
     public function etiqueta(): string
     {
         return match ($this) {
@@ -25,6 +28,7 @@ enum AreaModulo: string
             self::Nucleo => 'Núcleo',
             self::Crm => 'CRM',
             self::Erp => 'ERP',
+            self::Plataforma => 'Plataforma',
         };
     }
 
@@ -35,6 +39,7 @@ enum AreaModulo: string
             self::Nucleo => 'La base común: personas y empresas, catálogos, permisos y configuración.',
             self::Crm => 'Todo para vender: cuentas, oportunidades, cotizaciones y licitaciones.',
             self::Erp => 'Todo para ejecutar los proyectos: contratos, compras, almacén, personal y finanzas.',
+            self::Plataforma => 'El sistema mismo.',
         };
     }
 
@@ -46,6 +51,7 @@ enum AreaModulo: string
             self::Nucleo => 'primary',
             self::Crm => 'morado',
             self::Erp => 'info',
+            self::Plataforma => 'gray',
         };
     }
 }

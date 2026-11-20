@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Nucleo\Filament\Widgets;
 
 use App\Modules\Nucleo\Enums\Temporada;
+use App\Modules\Nucleo\Mien\RegistroPendientesMien;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Navegacion\CajaModulo;
 use App\Modules\Nucleo\Navegacion\EstacionDeLaApariencia;
@@ -52,6 +53,18 @@ final class CajasModulos extends Widget
         }
 
         return null;
+    }
+
+    /**
+     * Cuántas cosas esperan a la persona, para el número de la estrella de Mien (MV-032).
+     *
+     * @return array{total: int, resumen: string}
+     */
+    public function pendientes(): array
+    {
+        $usuario = Filament::auth()->user();
+
+        return $usuario instanceof User ? app(RegistroPendientesMien::class)->de($usuario) : ['total' => 0, 'resumen' => 'Todo al día'];
     }
 
     /**

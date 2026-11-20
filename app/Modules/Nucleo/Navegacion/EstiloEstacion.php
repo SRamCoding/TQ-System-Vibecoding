@@ -29,9 +29,9 @@ final class EstiloEstacion
      * turquesa quedaría pegado al agua de piscina, pasa a azul mar, y el CRM a coral: entre dos áreas, 30° o más. Sin
      * el ajuste del Núcleo, que solo sirve para que su azul noche no se vuelva azul rey.
      */
-    public const array MATIZ_DE_ESTACION = ['verano' => ['personal' => 85.0, 'nucleo' => 195.0, 'erp' => 245.0, 'crm' => 20.0]];
+    public const array MATIZ_DE_ESTACION = ['verano' => ['personal' => 85.0, 'nucleo' => 245.0, 'erp' => 195.0, 'crm' => 20.0]];
 
-    private const array AJUSTE_DEL_AREA = ['nucleo' => ['croma' => 0.65, 'oscurecer' => 0.08]];
+    private const array AJUSTE_DEL_AREA = ['nucleo' => ['croma' => 0.65, 'oscurecer' => 0.08], 'plataforma' => ['croma' => 0.12]];
 
     /**
      * Por estación y tema, cada parte como [claridad, croma] (nulo: la parte no se usa). El texto blanco del verano es

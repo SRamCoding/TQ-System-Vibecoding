@@ -248,7 +248,7 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Decisión:** no se crea ningún color. Cada franja usa uno de los colores de siempre y se distingue de las otras.
   Los colores propios de cada franja quedan pendientes de Sebastián.
 - **Alcance:** ficha
-- **Estado:** vigente
+- **Estado:** reemplazada por MV-033
 - **Commit:** el de «Ronda 1 · paso 1: el inicio por procesos»
 
 ### MV-020 · 2026-11-20 · Cada proceso abre una portada con sus cajas; dentro, pestañas y miga
@@ -399,3 +399,33 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Pedido 2: ícono de Postventa»
+
+### MV-032 · 2026-11-20 · El inicio centrado: la ventana del saludo y la estrella de Mien
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/inicio-ventana-y-mien.md`, propuesta aprobada en el lienzo
+  https://claude.ai/artifact/QvZvCuBrPV7VLCCcf7ZraW) «Todo lo de arriba del inicio va centrado: la ventana con la
+  animación del momento del día, el saludo grande, la frase, Mien sin caja». «La animación del saludo ya no va
+  suelta: se ve a través de una ventana». «Mien deja de ser una caja. Es una estrella dorada grande, centrada».
+- **Decisión:** de arriba abajo y centrados: la ventana (168 × 180, arco de medio punto, alféizar, dos travesaños y un
+  parante, marco de madera) con la escena del cielo según la hora y el clima; el saludo en 40 px; la frase en cursiva
+  gris (620 px como máximo); la estrella de Mien (112 px, halo que late, tres destellos, número de pendientes, «Mien»
+  y su resumen; pálida y sin halo cuando todo está al día); debajo, las franjas. En la barra lateral, Mien sigue igual.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Pedido 3: inicio centrado, ventana, estrella de Mien y colores por franja»
+
+### MV-033 · 2026-11-20 · Los colores de las franjas
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (punto 4 de `inicio-ventana-y-mien.md`) «reemplaza los colores por área (CRM morado, ERP
+  turquesa, Núcleo azul noche). Cada franja queda en un escalón de claridad distinto, para que se distingan aunque
+  alguien no perciba bien los colores, y el oro queda solo para Mien». Y en la ronda: «donde te dije "los colores
+  siguen por ahora como están" ya no aplica».
+- **Decisión:** Misionales turquesa (`#0FC2C4`, texto `#00788A`; oscuro `#00DAFF`), Estratégicos azul noche
+  (`#01006F`; oscuro `#6F9BFF`), De Apoyo morado (`#B35FD0`; oscuro `#C3A6FF`), Plataforma gris neutro (`#6E7781`;
+  oscuro `#9DA5AE`) y Mien oro (`#936600`; oscuro `#F2C14E`). Todo lo que tomaba el color del área lo toma de su
+  franja. Reemplaza MV-019.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Pedido 3: inicio centrado, ventana, estrella de Mien y colores por franja»

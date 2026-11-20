@@ -40,16 +40,18 @@ enum Franja: string
     }
 
     /**
-     * El color de cada franja (MV-019: los colores siguen como estaban; elegir colores nuevos queda pendiente). Se toma
-     * prestado el de un área vieja, así los estilos por estación y la barra lateral siguen funcionando sin tocarlos.
+     * El color de cada franja (MV-033, reemplaza MV-019): Misionales turquesa, Estratégicos azul noche, De Apoyo morado,
+     * Plataforma gris neutro y el oro solo para Mien. Se toma el área cuyo color es ese, así los estilos por estación, la
+     * barra lateral y las portadas siguen funcionando.
      */
     public function areaDeColor(): AreaModulo
     {
         return match ($this) {
-            self::Personal, self::Estrategicos => AreaModulo::Personal,
+            self::Personal => AreaModulo::Personal,
+            self::Estrategicos => AreaModulo::Nucleo,
             self::Misionales => AreaModulo::Erp,
             self::Apoyo => AreaModulo::Crm,
-            self::Plataforma => AreaModulo::Nucleo,
+            self::Plataforma => AreaModulo::Plataforma,
         };
     }
 }

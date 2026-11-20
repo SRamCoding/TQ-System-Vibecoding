@@ -215,6 +215,7 @@ use App\Modules\Nucleo\Imagenes\RegistroImagenes;
 use App\Modules\Nucleo\Listeners\RegistrarUltimoAcceso;
 use App\Modules\Nucleo\Listeners\ReiniciarEleccionDeModulos;
 use App\Modules\Nucleo\Listeners\RevisarClaveAlEntrar;
+use App\Modules\Nucleo\Mien\RegistroPendientesMien;
 use App\Modules\Nucleo\Mien\RegistroSeccionesMien;
 use App\Modules\Nucleo\Mien\RegistroTarjetasMien;
 use App\Modules\Nucleo\Mien\TarjetaMien;
@@ -408,6 +409,7 @@ final class NucleoServiceProvider extends ServiceProvider
         $this->app->singleton(RegistroOtrosDeCatalogo::class);
         $this->app->singleton(RegistroTarjetasMien::class);
         $this->app->singleton(RegistroSeccionesMien::class);
+        $this->app->singleton(RegistroPendientesMien::class);
         $this->app->singleton(RegistroResumenesAprobacion::class);
         $this->app->singleton(RegistroPestanasFicha::class);
         // Por petición: `once()` guarda ahí los posibles duplicados, que la portada y el filtro piden juntos (plan 1.4m).
@@ -509,6 +511,8 @@ final class NucleoServiceProvider extends ServiceProvider
         // Plan 2.0, D5: lo escrito en «Otra red».
         $this->app->make(RegistroOtrosDeCatalogo::class)->registrar(Catalogo::RedesSociales, OtrasRedesSociales::class);
         // Plan 2.22, P6: la bandeja de firmas de cada persona, en su tablero.
+        // MV-032: lo que espera la firma de la persona cuenta para la estrella de Mien.
+        $this->app->make(RegistroPendientesMien::class)->registrar('firmas', fn (User $u): array => ['cantidad' => count(app(AprobacionesService::class)->porFirmar($u)), 'texto' => 'esperan tu firma']);
         $this->app->make(RegistroTarjetasMien::class)->registrar(new TarjetaMien('mis-aprobaciones', 'Mis aprobaciones', null, TarjetaMisAprobaciones::class, 10));
         $acciones = $this->app->make(RegistroAcciones::class);
         $acciones->registrar(MostrarBarraModulos::class);

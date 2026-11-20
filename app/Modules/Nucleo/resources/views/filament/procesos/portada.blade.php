@@ -6,14 +6,17 @@
 <div class="tq-portada-proceso" data-area="{{ $datos['caja']->area->value }}">
     @include('nucleo::filament.partials.cajas-con-panel')
     <style>
+        /* MV-033: el color de la franja, como en el inicio. */
         .tq-portada-proceso[data-area="personal"] { --tq-area-color: var(--dorado-600); }
-        .tq-portada-proceso[data-area="nucleo"] { --tq-area-color: var(--primary-600); }
-        .tq-portada-proceso[data-area="crm"] { --tq-area-color: var(--morado-600); }
-        .tq-portada-proceso[data-area="erp"] { --tq-area-color: var(--info-600); }
+        .tq-portada-proceso[data-area="nucleo"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE }}; }
+        .tq-portada-proceso[data-area="crm"] { --tq-area-color: var(--morado-700); }
+        .tq-portada-proceso[data-area="erp"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::TURQUESA_TEXTO }}; }
+        .tq-portada-proceso[data-area="plataforma"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::GRIS_PLATAFORMA }}; }
         .dark .tq-portada-proceso[data-area="personal"] { --tq-area-color: var(--dorado-400); }
-        .dark .tq-portada-proceso[data-area="nucleo"] { --tq-area-color: var(--primary-400); }
-        .dark .tq-portada-proceso[data-area="crm"] { --tq-area-color: var(--morado-400); }
-        .dark .tq-portada-proceso[data-area="erp"] { --tq-area-color: var(--info-400); }
+        .dark .tq-portada-proceso[data-area="nucleo"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE_OSCURO }}; }
+        .dark .tq-portada-proceso[data-area="crm"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::LILA_OSCURO }}; }
+        .dark .tq-portada-proceso[data-area="erp"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::TURQUESA }}; }
+        .dark .tq-portada-proceso[data-area="plataforma"] { --tq-area-color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::GRIS_PLATAFORMA_OSCURO }}; }
         .tq-portada-proceso .tq-caja-catalogo { border-top-color: var(--tq-area-color); }
         .tq-portada-proceso .tq-caja-catalogo:hover { --tw-ring-color: var(--tq-area-color); }
         .tq-portada-proceso .tq-caja-catalogo-icono { color: var(--tq-area-color); }

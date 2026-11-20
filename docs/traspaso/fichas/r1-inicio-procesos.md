@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v1
+- **Versión:** v2
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-020); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -21,7 +21,9 @@ menos una pantalla.
 - **MV-017** (cruza módulos) · Mien arriba, a lo ancho, y absorbe «Mi tablero».
 - **MV-018** (ficha) · Las franjas se reparten solas en dos columnas de alto parecido; una vacía desaparece; en el
   celular, una columna.
-- **MV-019** (ficha) · Los colores siguen como estaban; los nuevos, se le consultan.
+- **MV-033** (cruza módulos) · Colores por franja: Misionales turquesa, Estratégicos azul noche, De Apoyo morado,
+  Plataforma gris, el oro solo para Mien; en oscuro, cada una en su versión clara (reemplaza MV-019).
+- **MV-032** (ficha) · Inicio centrado: ventana del saludo, saludo grande, frase, Mien como estrella sin caja.
 - **MV-031** (ficha) · Postventa lleva su ícono propio: el rompecabezas armado con la flecha que sigue.
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
@@ -31,7 +33,8 @@ menos una pantalla.
 
 ## Pantallas y navegación
 
-- **Inicio** `/`: Mien como caja ancha (ícono, nombre y su descripción; al dejar el mouse, sus preguntas). Debajo, las
+- **Inicio** `/` (v2, MV-032): centrados, la **ventana** del saludo, el **saludo** grande, la **frase** y la
+  **estrella de Mien**; debajo, las
   franjas con su título y su frase, repartidas en dos columnas desde 1024 px de ancho; en pantallas más chicas, una
   sola columna en el orden Estratégicos, Misionales, De Apoyo, Plataforma.
   - **El reparto:** se estima el alto de cada franja como su título (1,3 filas) más sus filas de tres cajas; de los
@@ -77,6 +80,24 @@ menos una pantalla.
   1,9, `currentColor`, sin texto; Postventa usa `tq-rompecabezas-flecha` (MV-031), con una lengüeta por borde interior
   para que no se empaste. Referencias en `docs/vibe/referencias/`.
 
+- **La ventana (MV-032):** 168 × 180, arco de medio punto, alféizar, travesaños donde empieza el arco y a media altura
+  de la parte recta, parante al centro; marco `#6B4A2E` (5 px; travesaños 3 px), `#A07850` en oscuro. Adentro, recortada
+  por la forma, la escena de la **transición del cielo** (t3b, la fase de la hora de la sede): amanecer (sol bajo a la
+  izquierda, cielo rosado), día (la de la propuesta), atardecer (sol bajo a la derecha, naranja y morado) y noche (luna
+  y estrellas que titilan); con nubes si el clima de la sede es nublado o niebla y además lluvia si llueve. En modo
+  oscuro, siempre la noche. El sol sube y baja 4 px en 6 s. El dibujo de una fecha especial se ve dentro de la
+  ventana. Quieta con «reducir movimiento» o «reducir animaciones». `aria-hidden`.
+- **La estrella de Mien (MV-032):** enlace a `/mien` con `aria-label` («Mien: 6 pendientes · …»); estrella de 112 px
+  con degradado `#F9D77E` → `#D9A21F`, contorno dorado del sistema y un brillo en la punta; halo radial de 168 px que
+  late en 4 s; tres destellos de cuatro puntas que titilan desfasados (3 s); el número de pendientes arriba a la
+  derecha (tinta y blanco en claro; dorado `#F2C14E` y tinta en oscuro). Debajo «Mien» en dorado y el resumen
+  («6 pendientes · 6 actividades para hoy o vencidas»; con firmas: «· 2 esperan tu firma»). Al pasar el mouse o con
+  foco crece a 1,06 y el halo se enciende. Todo al día: sin halo ni número y más pálida. Los pendientes son la suma de
+  lo que registra cada módulo: las firmas que esperan a la persona y sus actividades de hoy y vencidas.
+- **Colores por franja (MV-033):** ver la decisión; los títulos de franja usan la versión de texto (4,5:1 o más):
+  turquesa `#00788A` y morado `morado-700` en claro. En verano, Estratégicos toma el azul mar (245) y Misionales el agua
+  de piscina (195), al revés que antes, para seguir el color de cada franja; Plataforma no tiene color de verano (gris).
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -101,9 +122,6 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Supuestos sin confirmar
 
-- **Colores por franja** (MV-019 manda no crear ninguno): Estratégicos usa el dorado de Mien; Misionales, el turquesa
-  del viejo ERP; De Apoyo, el morado del viejo CRM; Plataforma, el azul noche del viejo Núcleo. **Pendiente de
-  Sebastián:** los colores definitivos por franja.
 - **«Parámetros sensibles»** se tomó como los parámetros que deciden cómo trabaja Techquk (los grupos de arriba) más los
   marcados como sensibles de dinero.
 - **Organigrama** se abre solo, sin las pestañas de Usuarios; **Usuarios** conserva roles, conflictos e incompatibles.
@@ -111,7 +129,6 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Pendientes que decide Sebastián
 
-- Los colores de cada franja.
 - Si se renumeran los códigos de los procesos.
 - Si contrato y proyecto pueden ser ejes separados.
 - Si el uso de las herramientas se carga como costo al proyecto (MV-028).
@@ -121,6 +138,7 @@ contar solas, porque no coinciden con ningún proceso).
 - **Qué proceso agrupa qué pantalla** vive en un enum del núcleo (`Proceso`), no en una tabla configurable.
 - **Los procesos se recalculan** varias veces por página (inicio, barra, pestañas) sin guardarlos.
 - **El reparto en dos columnas** se estima con tres cajas por fila, no con el ancho real de la pantalla.
+- **La ventana** usa la fase del cielo calculada al dibujar la página; si la hora cambia, se ve al recargar.
 - **La sección del tablero por rol** se dibuja dentro de Mien como HTML, no como un componente con su propia carga.
 
 ## Dónde está en el código
@@ -130,3 +148,9 @@ contar solas, porque no coinciden con ningún proceso).
 `widgets/cajas-modulos.blade.php`, `Filament/Pages/PortadaProceso.php` con `views/filament/procesos/`, el gancho
 `PAGE_START` en `app/Providers/Filament/AppPanelProvider.php`, `Filament/Clusters/Listas.php` y `ReglasNegocio.php`,
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
+
+## Cambios desde la versión anterior
+
+- **v2** (MV-030 a MV-033): íconos propios de Conseguir el negocio y Postventa; el inicio centrado con la ventana del
+  saludo, el saludo grande, la frase y la estrella de Mien (ya no hay caja ancha de Mien); los colores por franja en
+  claro y oscuro, con un gris nuevo para Plataforma (reemplaza el supuesto de colores prestados de la v1).
