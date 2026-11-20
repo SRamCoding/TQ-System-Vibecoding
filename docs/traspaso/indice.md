@@ -21,6 +21,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t5-finanzas](fichas/t5-finanzas.md) | T5 | aprobada | v3 | `aprobado/t5-finanzas-v3` |
 | [op-solicitudes-permiso](fichas/op-solicitudes-permiso.md) | Opcional | aprobada | v1 | `aprobado/op-solicitudes-permiso-v1` |
 | [op-asistente](fichas/op-asistente.md) | Opcional | aprobada | v1 | `aprobado/op-asistente-v1` |
+| [op-gran-momento](fichas/op-gran-momento.md) | Opcional | aprobada | v1 | `aprobado/op-gran-momento-v1` |
 
 ## Registro del repositorio
 
@@ -28,6 +29,8 @@ Lo que no es de ninguna ficha: el arranque y los cambios generales.
 
 - 2026-11-19 · Arranque: copia del repo original en el commit `a5e5972`, sin pruebas, CI ni sitio de documentación;
   app en el puerto 8001 y base en el 5433.
+- 2026-11-20 · Ruta completa: tramos 0 a 5, la transición del cielo y los tres opcionales construidos y aprobados
+  (MV-009, MV-014). Falta la ronda de cambios de Sebastián y, cuando diga que está terminado, la auditoría de cierre.
 - 2026-11-19 · Checkpoint: tramos 0, 1 y 2 terminados y aprobados (MV-009). Sigue el tramo 3 (requerimientos,
   cuadro comparativo, órdenes de compra y servicio, almacén, recepción y despacho, reclasificación), que reemplaza el
   gasto de demostración (MV-003) por órdenes reales. La base de demo se rehace con `php artisan migrate:fresh --seed`.

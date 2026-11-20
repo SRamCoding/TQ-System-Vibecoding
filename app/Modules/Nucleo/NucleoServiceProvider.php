@@ -1001,6 +1001,10 @@ final class NucleoServiceProvider extends ServiceProvider
     {
         $this->app->make(RegistroGranMomento::class)->registrar(
             new VarianteGranMomento(Ocasion::Navidad, 'navidad-establo', 'El nacimiento, en silueta', '¡Feliz Navidad!', 'nucleo::filament.gran-momento.navidad-establo'),
+            // MVP rápido (op-gran-momento, plan 1.4d paso 7): las otras tres variantes.
+            new VarianteGranMomento(Ocasion::Navidad, 'navidad-estrella', 'La estrella sobre los cerros', '¡Feliz Navidad!', 'nucleo::filament.gran-momento.navidad-estrella'),
+            new VarianteGranMomento(Ocasion::AnioNuevo, 'anio-nuevo-fuegos', 'Fuegos sobre la ciudad', '¡Feliz Año Nuevo!', 'nucleo::filament.gran-momento.anio-nuevo-fuegos'),
+            new VarianteGranMomento(Ocasion::AnioNuevo, 'anio-nuevo-amanecer', 'El primer amanecer', '¡Feliz Año Nuevo!', 'nucleo::filament.gran-momento.anio-nuevo-amanecer'),
         );
     }
 
@@ -1071,6 +1075,8 @@ final class NucleoServiceProvider extends ServiceProvider
             new DefinicionParametro('adjuntos', 'tamano_maximo_mb', TipoParametro::Entero, 20, 'Tamaño máximo de un archivo adjunto, en MB (de 1 a 50, el techo del servidor). Un tipo de adjunto puede pedir menos.', validador: ValidadorTamanoAdjunto::class),
             new DefinicionParametro('adjuntos', 'extensiones', TipoParametro::Texto, 'pdf,jpg,jpeg,png,webp,xlsx,docx,xml,zip', 'Extensiones que se aceptan como adjunto, separadas por comas. Además se revisa que el contenido sea de verdad de ese tipo.'),
             new DefinicionParametro('interfaz', 'clima_activo', TipoParametro::Booleano, true, 'Muestra el clima en el dibujo del inicio. El navegador pide permiso de ubicación y consulta Open-Meteo con la posición redondeada a unos 10 km; no pasa por el servidor ni se guarda.'),
+            // MVP rápido (op-gran-momento): cada cuántos minutos se repite la ambientación de pantalla completa de una fecha.
+            new DefinicionParametro('interfaz', 'ambientacion_minutos', TipoParametro::Entero, 240, 'Cada cuántos minutos, como mínimo, se repite la ambientación de pantalla completa de Navidad y Año Nuevo para una persona.'),
             new DefinicionParametro('interfaz', 'clima_ubicacion_respaldo', TipoParametro::Texto, '-6.77,-79.84', 'Ubicación para el clima cuando la persona no da permiso de ubicación: «latitud,longitud» (Chiclayo por defecto).', validador: ValidadorCoordenadas::class),
             new DefinicionParametro('interfaz', 'ambientacion_activa', TipoParametro::Booleano, true, 'Muestra la ambientación de la fecha (animación del inicio, franja e ícono). Cada persona puede apagarla para sí en su perfil.'),
             new DefinicionParametro('interfaz', 'aniversario_techquk', TipoParametro::Texto, ValidadorAniversario::SIN_FECHA, 'Fecha de fundación de Techquk como AAAA-MM-DD (por ejemplo, 2010-05-15), o «sin fecha». Da el día del aniversario y los años del agradecimiento. Lo decide Gerencia.', validador: ValidadorAniversario::class),

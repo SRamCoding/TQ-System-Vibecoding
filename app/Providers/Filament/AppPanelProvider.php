@@ -107,6 +107,8 @@ final class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => view('nucleo::filament.cielo')->render())
             // MVP rápido (op-asistente): el asistente de ayuda «n_n».
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => view('nucleo::filament.asistente')->render())
+            // MVP rápido (op-gran-momento): la ambientación de pantalla completa de Navidad y Año Nuevo.
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => view('nucleo::filament.ambientacion-festiva')->render())
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? Livewire::mount(GuardarTema::class) : '')
             // El panel de aplicaciones, en todas las pantallas (plan 1.4p, D1). Si falla, la pantalla sale igual, sin él.
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? rescue(fn (): string => Livewire::mount(PanelAplicaciones::class), '') : '')
