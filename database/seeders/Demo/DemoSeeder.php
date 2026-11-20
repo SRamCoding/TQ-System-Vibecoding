@@ -784,7 +784,7 @@ final class DemoSeeder extends Seeder
         $parametros->cambiarDesdeTexto(EmpresaService::PARAMETRO, $base.DocumentoIdentidad::digitoVerificadorRuc($base), $parametros->ficha(EmpresaService::PARAMETRO)['version']);
 
         foreach (['Sede principal Valle Norte' => 'Av. Los Próceres 1250, Valle Norte', 'Oficina Lima' => 'Calle Las Begonias 415, Lima', 'Almacén La Pampa' => 'Carretera a La Pampa km 4, Valle Norte'] as $nombre => $direccion) {
-            app(SedesPartyService::class)->agregar($techquk->id, new DatosSede($nombre, $direccion));
+            app(SedesPartyService::class)->agregar($techquk->id, new DatosSede($nombre, $direccion, latitud: str_contains($nombre, 'Lima') ? '-12.0931' : '-6.7714', longitud: str_contains($nombre, 'Lima') ? '-77.0465' : '-79.8409'));
         }
     }
 

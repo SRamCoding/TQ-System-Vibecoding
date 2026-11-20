@@ -163,3 +163,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (interfaz del núcleo)
 - **Estado:** vigente
 - **Commit:** se anota al construirla
+
+### MV-013 · 2026-11-20 · El cielo cambia como en la realidad, sin saltos
+
+- **Ficha:** `fichas/t3b-transicion-cielo.md`
+- **Dijo Sebastián:** «algo que sea similar a lo que pasa en realidad, el sol se va escondiendo y el ambiente es como
+  de un color y luego más oscuro poco a poco hasta que en una hora en particular ya está oscuro».
+- **Decisión:** en el tema «Sistema», el ambiente sigue la altura del sol de forma continua: luz dorada mientras baja,
+  naranja y rosado al ocultarse, la hora azul y luego oscuro, sin un cambio de tema perceptible; al amanecer, al revés.
+  Precisa MV-012 (la ubicación sigue igual).
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Transición del cielo»
