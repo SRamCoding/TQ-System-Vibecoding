@@ -14,7 +14,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t2-contratos](fichas/t2-contratos.md) | T2 | aprobada | v2 | `aprobado/t2-contratos-v2` |
 | [t2-formula-polinomica](fichas/t2-formula-polinomica.md) | T2 | aprobada | v1 | `aprobado/t2-formula-polinomica-v1` |
 | [t2-presupuesto-empresa](fichas/t2-presupuesto-empresa.md) | T2 | aprobada | v1 | `aprobado/t2-presupuesto-empresa-v1` |
-| [t3-compras](fichas/t3-compras.md) | T3 | aprobada | v1 | `aprobado/t3-compras-v1` |
+| [t3-compras](fichas/t3-compras.md) | T3 | en curso (v1 aprobada) | v2 | `aprobado/t3-compras-v1` |
 | [t3b-transicion-cielo](fichas/t3b-transicion-cielo.md) | T3b | aprobada | v1 | `aprobado/t3b-transicion-cielo-v1` |
 | [t4-personal-tareo](fichas/t4-personal-tareo.md) | T4 | aprobada | v1 | `aprobado/t4-personal-tareo-v1` |
 | [t4-valorizaciones](fichas/t4-valorizaciones.md) | T4 | aprobada | v1 | `aprobado/t4-valorizaciones-v1` |

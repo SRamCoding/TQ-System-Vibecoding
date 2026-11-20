@@ -25,7 +25,7 @@ final class ComprasServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [Almacen::class], recursos: [RequerimientoResource::class, OrdenResource::class]);
+        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [Almacen::class, Filament\Pages\Herramientas::class], recursos: [RequerimientoResource::class, OrdenResource::class]);
     }
 
     public function boot(): void
@@ -51,5 +51,8 @@ final class ComprasServiceProvider extends ServiceProvider
         $modulos->registrar(new CajaModulo('almacen', 'Almacén', '/almacen', permiso: ComprasService::PERMISO_VER, area: AreaModulo::Erp,
             icono: 'heroicon-o-archive-box', descripcion: 'El stock del Almacén Central, lo reservado y lo disponible',
             preguntas: ['¿Tenemos postes en almacén?', '¿Cuánto vale el stock?']));
+        // MV-028: junto al almacén, el control de las herramientas propias.
+        $modulos->registrar(new CajaModulo('herramientas', 'Herramientas', '/herramientas', permiso: ComprasService::PERMISO_VER, area: AreaModulo::Erp, icono: 'heroicon-o-cube',
+            descripcion: 'Qué herramienta está en qué obra, quién la tiene y cuándo debe volver', preguntas: ['¿Dónde está la camioneta?', '¿Qué herramienta no ha vuelto?']));
     }
 }

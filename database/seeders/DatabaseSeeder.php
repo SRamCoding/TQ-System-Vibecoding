@@ -38,6 +38,8 @@ final class DatabaseSeeder extends Seeder
 
         // MVP rápido (ficha t0-datos-demo): la cartera de demostración, solo en local.
         $this->call(Demo\DemoSeeder::class);
+        // MV-028: las herramientas de la demo.
+        $this->call(Demo\HerramientasSeeder::class);
     }
 
     /**

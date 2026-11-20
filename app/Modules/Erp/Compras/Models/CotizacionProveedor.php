@@ -12,7 +12,7 @@ class CotizacionProveedor extends Model
 {
     protected $table = 'cuadro_cotizaciones';
 
-    protected $fillable = ['cuadro_id', 'proveedor_party_id', 'plazo_dias', 'forma_pago', 'evaluacion'];
+    protected $fillable = ['codigo', 'cuadro_id', 'proveedor_party_id', 'plazo_dias', 'forma_pago', 'evaluacion'];
 
     protected function casts(): array
     {

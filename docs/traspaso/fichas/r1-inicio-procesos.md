@@ -100,6 +100,7 @@ contar solas, porque no coinciden con ningún proceso).
 - Los colores de cada franja.
 - Si se renumeran los códigos de los procesos.
 - Si contrato y proyecto pueden ser ejes separados.
+- Si el uso de las herramientas se carga como costo al proyecto (MV-028).
 
 ## Atajos tomados
 

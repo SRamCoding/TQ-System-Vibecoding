@@ -337,3 +337,25 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Ronda 1 · paso 5: la agenda en el muelle»
+
+### MV-027 · 2026-11-20 · La cotización del proveedor se llama «oferta de proveedor» (OFP-001)
+
+- **Ficha:** `fichas/t3-compras.md`
+- **Dijo Sebastián:** «Lo que hoy se llama "cotización del proveedor" pasa a llamarse "oferta de proveedor", con su
+  propia numeración (OFP-001). La palabra "cotización" queda solo para lo que Techquk le ofrece a sus clientes».
+- **Decisión:** lo dicho, en pantallas, documentos y datos.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 6: ofertas de proveedor y herramientas»
+
+### MV-028 · 2026-11-20 · Control de herramientas propias en Abastecer
+
+- **Ficha:** `fichas/t3-compras.md`
+- **Dijo Sebastián:** «Nuevo, dentro de Abastecer, junto al almacén: el control de herramientas propias (taladros,
+  escaleras, camioneta, equipos de medición): qué herramienta está en qué obra, quién la tiene y cuándo debe volver.
+  Por ahora solo se controla dónde está; si su uso se carga como costo al proyecto queda pendiente».
+- **Decisión:** caja «Herramientas» en Abastecer que solo controla dónde está cada una. **Pendiente de Sebastián:** si
+  su uso cuesta al proyecto.
+- **Alcance:** negocio
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 6: ofertas de proveedor y herramientas»

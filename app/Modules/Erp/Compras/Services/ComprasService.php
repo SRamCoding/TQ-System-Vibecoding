@@ -220,7 +220,9 @@ final readonly class ComprasService
         }
 
         return DB::transaction(function () use ($cuadro, $proveedorPartyId, $plazoDias, $formaPago, $evaluacion, $precios): CotizacionProveedor {
-            $c = $cuadro->cotizaciones()->create(['proveedor_party_id' => $proveedorPartyId, 'plazo_dias' => $plazoDias, 'forma_pago' => $formaPago, 'evaluacion' => $evaluacion]);
+            // MV-027: la oferta de proveedor lleva su numeración propia (OFP-001).
+            $siguiente = (int) DB::table('cuadro_cotizaciones')->count() + 1;
+            $c = $cuadro->cotizaciones()->create(['codigo' => sprintf('OFP-%03d', $siguiente), 'proveedor_party_id' => $proveedorPartyId, 'plazo_dias' => $plazoDias, 'forma_pago' => $formaPago, 'evaluacion' => $evaluacion]);
 
             foreach ($precios as $lineaId => $precio) {
                 $c->precios()->create(['requerimiento_linea_id' => $lineaId, 'precio_unitario' => $precio]);

@@ -1,7 +1,7 @@
 # Ficha · Compras y almacén: de la necesidad al costo (flujo 2)
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v2
 - **Tramo de la ruta:** T3
 - **Aprobada:** 2026-11-20 · etiqueta `aprobado/t3-compras-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-4-flujo-02.md` (requerimiento, doce tipos de compra, aprobación con
@@ -12,7 +12,7 @@
 El especialista arma un requerimiento desde el proyecto: cada línea declara su tipo de compra y su partida, y el
 sistema muestra el stock y cómo queda cada partida («quedaría al 91 %»). Si una línea excede su partida, quien aprueba
 tiene que escribir el motivo. Al aprobarse, lo que hay en el Almacén Central se reserva (su costo queda comprometido) y
-se atiende con un despacho; lo demás va a Compras, que abre un cuadro comparativo con las cotizaciones de los
+se atiende con un despacho; lo demás va a Compras, que abre un cuadro comparativo con las ofertas de los
 proveedores y adjudica con motivo obligatorio. Nace la orden de compra o de servicio, que hereda líneas, imputaciones y
 precios; al aprobarse compromete el costo en cada partida (con motivo si excede). La recepción en obra (o la
 conformidad del servicio) pasa a ejecutado lo recibido. Desde aquí **el costo de los proyectos entra por órdenes**,
@@ -20,6 +20,8 @@ no por el gasto de demostración: el tablero de cada proyecto se mueve con las c
 
 ## Decisiones de Sebastián
 
+- **MV-027** (cruza módulos) · «Oferta de proveedor» (OFP-001); «cotización» solo para lo que Techquk ofrece a sus clientes.
+- **MV-028** (negocio) · Control de herramientas propias en Abastecer; solo dónde está.
 - **MV-003** (ficha) · El gasto de demostración se va con las órdenes: aquí se reemplaza en los costos de proyecto
   (queda solo para el gasto directo de la empresa).
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
@@ -36,7 +38,7 @@ no por el gasto de demostración: el tablero de cada proyecto se mueve con las c
   comprometido, este requerimiento, «quedaría al» en ámbar desde 90 % y rojo sobre 100 %), «Cuadro comparativo» (un
   proveedor por columna: precio por ítem, total, plazo, forma de pago, evaluación histórica, «elegido» y el motivo) y
   «Aprobación». Botones según el estado: Enviar a aprobación, Aprobar (pide motivo si excede), Rechazar (comentario
-  obligatorio), Despachar a obra, Abrir cuadro comparativo, Agregar cotización, Adjudicar.
+  obligatorio), Despachar a obra, Abrir cuadro comparativo, Agregar oferta de proveedor, Adjudicar.
 - **Órdenes** `/ordenes`: orden (tipo debajo), proveedor, proyecto o «Gasto directo», monto, entrega, estado; filtros
   por estado y clase. **Ficha**: ítems (cantidad, precio, subtotal, imputación, recibido con comprometido y ejecutado
   debajo) y «Seguimiento» (entrega pactada, lugar, forma de pago, quién aprobó y si con motivo de exceso, seguimiento,
@@ -56,7 +58,7 @@ no por el gasto de demostración: el tablero de cada proyecto se mueve con las c
 | Rechazar | comentario (obligatorio) | por aprobar | rechazado (se puede corregir y volver a enviar) |
 | Despachar a obra | línea reservada, fecha | reservada | sale del almacén; su comprometido pasa a ejecutado |
 | Abrir cuadro comparativo | — | quedan líneas por comprar | `CC-AAAA-NNNN` abierto |
-| Agregar cotización | proveedor (ficha), plazo, forma de pago, evaluación, precio por línea | cuadro abierto | — |
+| Agregar oferta de proveedor | proveedor (ficha), plazo, forma de pago, evaluación, precio por línea | cuadro abierto | — |
 | Adjudicar | proveedor elegido, motivo (obligatorio), lugar de entrega | — | `OC-` (si el tipo es un bien) u `OS-` en borrador con las líneas, imputaciones y precios elegidos |
 | Aprobar orden | motivo del exceso | si alguna partida se excede, el motivo es obligatorio («excede PC-02.01 en S/ 48.00») | aprobada; cada línea comprometida en su partida (o centro de costo) |
 | Registrar recepción / Dar conformidad | fecha, guía, dónde (obra o Almacén Central), cantidad por línea, observación | no más de lo pedido | recibida parcial o recibida; lo recibido pasa a ejecutado (en almacén, sin imputación, entra al stock a costo promedio) |
@@ -92,7 +94,7 @@ Escenario del v4 en la demo, proyecto **«Videovigilancia de la Plaza de Armas d
 - Contrato CT-2026-0003 a 30 días: penalidad diaria **205.96**, tope **2,471.51**. Carta fianza de 2,471.51 con
   comisión **180.00** → OS imputada a **PC-04**.
 - REQ «Instalación de postes»: 4 kits de cimentación con 6 en almacén → reservados, **PC-02.02 comprometido +480.00**;
-  la grúa (650.00 a PC-04) y los conectores (PC-01.01) van a un cuadro abierto con una cotización.
+  la grúa (650.00 a PC-04) y los conectores (PC-01.01) van a un cuadro abierto con una oferta de proveedor.
 - REQ del cable: 650 m a 2.40; cuadro con Proveedor Andino (2.40, 2 días, 30 días, 4.5/5) y Redes del Norte (2.60, 1 día,
   contado, 3.8/5); adjudicado a Andino con motivo → **OC por 1,560.00** aprobada con motivo porque **PC-02.01 queda en
   −48.00**; recibidos 520 m en obra → **ejecutado 1,248.00**, comprometido sigue en 1,560.00, orden «recibida
@@ -126,3 +128,25 @@ Escenario del v4 en la demo, proyecto **«Videovigilancia de la Plaza de Armas d
 `Services/ComprasService.php`, `Filament/Resources/Requerimientos`, `Filament/Resources/Ordenes`,
 `Filament/Pages/Almacen.php`, `resources/views/cuadro.blade.php`); la comisión en `ContratosService::registrarGarantia()`;
 datos en `DemoSeeder::compraDemo()` y `plazaDeArmas()`.
+
+## Cambios desde la versión anterior
+
+- **v2** (ronda 1, MV-027 y MV-028):
+  - **Ofertas de proveedor:** cada una lleva su código `OFP-001`, `OFP-002`… (correlativo global; las que ya existían
+    se numeraron por orden de creación). En el requerimiento: botón «Agregar oferta de proveedor», el cuadro dice
+    «N ofertas de proveedor» y cada columna lleva el código encima del proveedor; al adjudicar se elige «OFP-00N ·
+    proveedor». Columna nueva `cuadro_cotizaciones.codigo` (texto 20, única).
+  - **Herramientas** `/herramientas` (caja en Abastecer, junto a Almacén): código `HER-001`, herramienta (tipo, marca y
+    modelo, serie), dónde está (proyecto o «En almacén», «En mantenimiento»), quién la tiene (colaborador), debe volver
+    (rojo y «atrasada N d» si pasó), estado. Primero las que están en obra, por fecha de vuelta. Subtítulo: total, en
+    obra y atrasadas. Operaciones: **Nueva herramienta** (nombre, tipo: eléctrica, trabajo en altura, vehículo,
+    medición, manual; marca y modelo; serie o placa) entra al almacén; **Enviar a obra** (proyecto en ejecución o
+    preparación, quién la lleva, sale el, debe volver el; no antes de la salida; solo si está en el almacén);
+    **Volvió** (fecha, «pasa a mantenimiento», nota). Cada paso queda en `herramienta_movimientos` (salida, devolución,
+    mantenimiento). Tablas nuevas `herramientas` y `herramienta_movimientos`.
+  - **Demo:** 10 herramientas: 6 en obra (la camioneta y la certificadora, atrasadas 3 y 2 días), 3 en el almacén y la
+    fusionadora en mantenimiento.
+  - **Pendiente de Sebastián:** si el uso de una herramienta se carga como costo al proyecto (no se construyó).
+  - **Atajos:** el estado de la herramienta es texto; los códigos OFP y HER salen de contar filas (sin bloqueo); la
+    tabla y el modelo siguen llamándose `cuadro_cotizaciones` y `CotizacionProveedor`; quién la tiene se lee de la
+    tabla de colaboradores del módulo Personal con un join.

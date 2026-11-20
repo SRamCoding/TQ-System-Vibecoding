@@ -83,8 +83,8 @@ final class VerRequerimiento extends ViewRecord
                 ->action(fn (array $data) => $this->hacer(fn () => $s()->despachar((int) $data['linea'], CarbonImmutable::parse($data['fecha'])), 'Despachado: el costo pasó a ejecutado.')),
             Action::make('cuadro')->label('Abrir cuadro comparativo')->icon('heroicon-o-table-cells')->color('gray')
                 ->visible(fn (): bool => Compras::puede(ComprasService::PERMISO_COMPRAR) && $this->req()->estado === 'aprobado' && $this->req()->lineas->where('atencion', 'compra')->contains('estado', 'pendiente'))
-                ->action(fn () => $this->hacer(fn () => $s()->crearCuadro($this->req()->id), 'Cuadro abierto: agrega las cotizaciones de los proveedores.')),
-            Action::make('cotizacion')->label('Agregar cotización')->icon('heroicon-o-plus')->color('gray')->slideOver()
+                ->action(fn () => $this->hacer(fn () => $s()->crearCuadro($this->req()->id), 'Cuadro abierto: agrega las ofertas de los proveedores.')),
+            Action::make('cotizacion')->label('Agregar oferta de proveedor')->icon('heroicon-o-plus')->color('gray')->slideOver()
                 ->visible(fn (): bool => Compras::puede(ComprasService::PERMISO_COMPRAR) && $this->cuadro() !== null)
                 ->schema(fn (): array => [
                     Select::make('proveedor')->label('Proveedor')->required()->searchable()
@@ -111,7 +111,7 @@ final class VerRequerimiento extends ViewRecord
                 ->visible(fn (): bool => Compras::puede(ComprasService::PERMISO_COMPRAR) && ($this->cuadro()?->cotizaciones()->exists() ?? false))
                 ->schema([
                     Select::make('cotizacion')->label('Proveedor elegido')->required()
-                        ->options(fn (): array => $this->cuadro()?->cotizaciones->mapWithKeys(fn ($c): array => [$c->id => DB::table('parties')->where('id', $c->proveedor_party_id)->value('razon_social')])->all() ?? []),
+                        ->options(fn (): array => $this->cuadro()?->cotizaciones->mapWithKeys(fn ($c): array => [$c->id => $c->codigo.' · '.DB::table('parties')->where('id', $c->proveedor_party_id)->value('razon_social')])->all() ?? []),
                     Textarea::make('motivo')->label('Motivo · obligatorio')->required()->rows(3)->placeholder('Menor precio, crédito a 30 días y buen historial.'),
                     TextInput::make('lugar')->label('Lugar de entrega')->default('Obra'),
                 ])

@@ -6,9 +6,9 @@
         $s = fn ($n) => number_format((float) $n, 2);
     @endphp
     <div class="mb-6">
-        <p class="mb-2 text-sm font-semibold">{{ $cuadro->codigo }} · {{ $cuadro->cotizaciones->count() }} cotizaciones · {{ $cuadro->estado === 'adjudicado' ? 'adjudicado' : 'abierto' }}</p>
+        <p class="mb-2 text-sm font-semibold">{{ $cuadro->codigo }} · {{ $cuadro->cotizaciones->count() }} ofertas de proveedor · {{ $cuadro->estado === 'adjudicado' ? 'adjudicado' : 'abierto' }}</p>
         @if ($cuadro->cotizaciones->isEmpty())
-            <p class="text-sm text-gray-500">Todavía no hay cotizaciones: usa «Agregar cotización».</p>
+            <p class="text-sm text-gray-500">Todavía no hay ofertas: usa «Agregar oferta de proveedor».</p>
         @else
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -16,7 +16,7 @@
                         <tr class="text-left text-gray-500 dark:text-gray-400">
                             <th class="py-1.5 pr-3"></th>
                             @foreach ($cuadro->cotizaciones as $c)
-                                <th @class(['py-1.5 pr-3 text-right', 'text-success-600 dark:text-success-400' => $cuadro->cotizacion_elegida_id === $c->id])>{{ $nombre($c) }}</th>
+                                <th @class(['py-1.5 pr-3 text-right', 'text-success-600 dark:text-success-400' => $cuadro->cotizacion_elegida_id === $c->id])><span class="block font-mono text-xs">{{ $c->codigo }}</span>{{ $nombre($c) }}</th>
                             @endforeach
                         </tr>
                     </thead>
