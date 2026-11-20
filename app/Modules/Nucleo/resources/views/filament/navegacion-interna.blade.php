@@ -38,16 +38,20 @@
             const barra = document.querySelector('.tq-proceso')
             if (! barra) { delete document.documentElement.dataset.tqEnCaja; return }
             const ruta = sinBarra(location.pathname)
-            let elegida = null, largo = 0, exacta = false
+            let elegida = null, largo = 0, exacta = false, prefijoElegido = '/'
             barra.querySelectorAll('[data-caja]').forEach((caja) => {
                 JSON.parse(caja.dataset.rutas || '[]').forEach((r) => {
                     const prefijo = sinBarra(r)
-                    if (ruta.startsWith(prefijo) && prefijo.length > largo) { elegida = caja; largo = prefijo.length; exacta = ruta === prefijo }
+                    if (ruta.startsWith(prefijo) && prefijo.length > largo) { elegida = caja; largo = prefijo.length; exacta = ruta === prefijo; prefijoElegido = prefijo }
                 })
             })
             barra.querySelectorAll('[data-caja]').forEach((caja) => caja === elegida ? caja.setAttribute('aria-current', 'page') : caja.removeAttribute('aria-current'))
-            // MV-046: en la pantalla de una caja (no en una ficha), sin título grande.
-            exacta ? (document.documentElement.dataset.tqEnCaja = '1') : delete document.documentElement.dataset.tqEnCaja
+            // MV-046: en la pantalla de una caja (no en una ficha), sin título grande. MV-048: también en las opciones de
+            // una barra lateral interna (Configuración, Listas…), que viven un nivel debajo de su caja.
+            const conBarraInterna = !! document.querySelector('.fi-page-sub-navigation-sidebar, .fi-page-sub-navigation-select, .fi-page-sub-navigation-dropdown')
+            const tramos = (r) => r.split('/').filter(Boolean).length
+            const unNivel = elegida !== null && tramos(ruta) - tramos(prefijoElegido) <= 1
+            exacta || (conBarraInterna && unNivel) ? (document.documentElement.dataset.tqEnCaja = '1') : delete document.documentElement.dataset.tqEnCaja
             const marca = barra.querySelector('.tq-proceso-marca')
             if (! marca || ! elegida) { marca?.classList.remove('tq-lista'); return }
             const quieta = ! animar || sinMovimiento() || ! marca.classList.contains('tq-lista')

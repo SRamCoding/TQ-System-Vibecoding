@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v15
+- **Versión:** v16
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-048** (cruza módulos) · Tampoco hay título grande en las opciones de una barra lateral interna.
 - **MV-047** (cruza módulos) · Dentro de un módulo (cajas del proceso, barra lateral interna) no se enciende el haz; si
   tarda más de 1 s, una señal discreta en el contenido.
 - **MV-046** (cruza módulos) · Sin ruta ni título grande; bajo la frase, el nombre del módulo en Audiowide.
@@ -187,7 +188,10 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   antes del contenido. Orden: barra de cajas, frase, nombre del módulo, contenido.
 - **Sin ruta ni título grande (MV-046):** la miga de pan no aparece en ninguna pantalla. En la pantalla de una caja de
   proceso no aparece el título grande (la caja elegida y el nombre del módulo dicen dónde se está); en una ficha (por
-  ejemplo, una oportunidad) se queda el título, que dice qué registro es.
+  ejemplo, una oportunidad) se queda el título, que dice qué registro es. **MV-048:** tampoco en las opciones de una
+  barra lateral interna (un nivel debajo de su caja): Reglas del negocio (`/reglas-negocio/…`), Listas (`/listas/…`),
+  Usuarios (`/seguridad/…`) y Configuración (`/configuracion/…`), las cuatro cajas que llevan a una barra lateral
+  interna; la revisión de las cajas de los 11 procesos no encontró otros casos.
 
 - **Cuándo se enciende el haz (MV-047):** al cambiar de módulo desde la barra lateral principal, abrir una caja desde el
   inicio, ir desde Mien o cualquier otro enlace. **No** al presionar una caja de la barra de un proceso ni una opción de
@@ -274,6 +278,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v16** (MV-048): sin título grande en las pantallas con barra lateral interna.
 
 - **v15** (MV-047): sin el haz dentro de un módulo; señal discreta en el contenido si tarda.
 

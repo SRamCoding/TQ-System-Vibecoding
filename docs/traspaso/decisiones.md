@@ -618,3 +618,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 3.1: sin el haz dentro de un módulo»
+
+### MV-048 · 2026-11-20 · Sin título grande también en las pantallas con barra lateral interna
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-3, punto 2) «Quitarlo ahí y en todas las pantallas con barra lateral interna
+  (Configuración, Listas y las demás): debajo del nombre del módulo van directo la barra lateral y el contenido. Revisa
+  todas las pantallas internas de los 11 procesos».
+- **Decisión:** completa MV-046: las opciones de una barra lateral interna tampoco llevan título grande.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 3.2: sin título en las pantallas con barra lateral interna»
