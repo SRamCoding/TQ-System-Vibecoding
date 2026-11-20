@@ -171,10 +171,12 @@ final readonly class ActividadesService
         foreach (Actividad::query()->where('actividades.responsable_user_id', $userId)->where('actividades.es_realizada', false)
             ->where('actividades.fecha', '<=', $ahora->endOfDay()->addDays(self::DIAS_POR_VENCER))
             ->leftJoin('cuentas', 'cuentas.id', '=', 'actividades.cuenta_id')->leftJoin('parties', 'parties.id', '=', 'cuentas.party_id')
-            ->orderBy('actividades.fecha')->get(['actividades.asunto', 'actividades.fecha', 'actividades.tipo', 'parties.razon_social as cuenta']) as $a) {
+            ->orderBy('actividades.fecha')->get(['actividades.asunto', 'actividades.fecha', 'actividades.tipo', 'actividades.oportunidad_id', 'cuentas.party_id', 'parties.razon_social as cuenta']) as $a) {
             $fecha = CarbonImmutable::parse($a->fecha)->setTimezone('America/Lima');
             $grupo = $fecha->lt($ahora) ? 'vencidas' : ($fecha->isSameDay($ahora) ? 'hoy' : 'por_vencer');
-            $grupos[$grupo][] = ['asunto' => (Actividad::TIPOS[$a->tipo] ?? $a->tipo).' · '.$a->asunto, 'cuando' => $fecha->format($grupo === 'hoy' ? 'H:i' : 'd/m H:i'), 'cuenta' => $a->getAttribute('cuenta')];
+            $grupos[$grupo][] = ['asunto' => (Actividad::TIPOS[$a->tipo] ?? $a->tipo).' · '.$a->asunto, 'cuando' => $fecha->format($grupo === 'hoy' ? 'H:i' : 'd/m H:i'), 'cuenta' => $a->getAttribute('cuenta'),
+                // MV-052: adónde lleva desde el globo de Mien: la oportunidad o, si no tiene, la ficha del cliente.
+                'url' => $a->oportunidad_id !== null ? '/oportunidades/'.$a->oportunidad_id : ($a->getAttribute('party_id') !== null ? '/personas/'.$a->getAttribute('party_id') : '/agenda')];
         }
 
         return $grupos;

@@ -512,7 +512,13 @@ final class NucleoServiceProvider extends ServiceProvider
         $this->app->make(RegistroOtrosDeCatalogo::class)->registrar(Catalogo::RedesSociales, OtrasRedesSociales::class);
         // Plan 2.22, P6: la bandeja de firmas de cada persona, en su tablero.
         // MV-032: lo que espera la firma de la persona cuenta para la estrella de Mien.
-        $this->app->make(RegistroPendientesMien::class)->registrar('firmas', fn (User $u): array => ['cantidad' => count(app(AprobacionesService::class)->porFirmar($u)), 'texto' => 'esperan tu firma']);
+        $this->app->make(RegistroPendientesMien::class)->registrar('firmas', function (User $u): array {
+            $bandeja = app(AprobacionesService::class)->bandeja($u, app(RegistroResumenesAprobacion::class));
+
+            return ['cantidad' => count($bandeja), 'texto' => 'esperan tu firma', 'grupos' => [['titulo' => 'Esperan tu firma', 'items' => array_map(fn ($p): array => [
+                'texto' => "{$p->documento} espera tu firma", 'nota' => 'S/ '.number_format((float) $p->montoSoles, 2).' · '.$p->solicitante, 'url' => $p->enlace ?? '/mis-aprobaciones', 'tono' => 'warning',
+            ], $bandeja)]]];
+        });
         $this->app->make(RegistroTarjetasMien::class)->registrar(new TarjetaMien('mis-aprobaciones', 'Mis aprobaciones', null, TarjetaMisAprobaciones::class, 10));
         $acciones = $this->app->make(RegistroAcciones::class);
         $acciones->registrar(MostrarBarraModulos::class);

@@ -48,6 +48,30 @@ final class MiTablero extends Page
         $this->redirect('/mien'.($this->rol !== null ? '?rol='.urlencode($this->rol) : ''));
     }
 
+    /**
+     * MV-052: las listas del tablero del primer rol de la persona, como grupos del globo de Mien.
+     *
+     * @return list<array{titulo: string, items: list<array{texto: string, nota: ?string, url: string, tono: ?string}>}>
+     */
+    public static function gruposParaMien(User $usuario): array
+    {
+        $roles = self::rolesDe($usuario);
+
+        if ($roles === []) {
+            return [];
+        }
+
+        $rol = array_key_first($roles);
+        $t = app(TablerosService::class);
+        $datos = match ($rol) {
+            'almacen' => $t->almacen(), 'tesoreria' => $t->tesoreria(), 'comercial' => $t->comercial(), 'gerencia' => $t->gerencia(), default => $t->jefatura()
+        };
+
+        return array_map(fn (array $l): array => ['titulo' => $l['titulo'].' · '.$roles[$rol], 'items' => array_map(fn (array $i): array => [
+            'texto' => (string) $i['texto'], 'nota' => $i['nota'] ?? null, 'url' => (string) ($i['url'] ?? '/mien'), 'tono' => $i['tono'] ?? null,
+        ], $l['items'])], $datos['listas']);
+    }
+
     /** El tablero del rol, con sus pestañas, para la sección ancha de Mien; null si la persona no tiene ningún rol con tablero. */
     public static function seccionParaMien(User $usuario, ?string $rol): ?HtmlString
     {

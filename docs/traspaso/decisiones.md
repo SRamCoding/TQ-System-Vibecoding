@@ -666,3 +666,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 4.3: las barras laterales siempre entran»
+
+### MV-052 · 2026-11-20 · La estrella de Mien en la barra lateral abre un globo con Mien resumido
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-4, punto 4) «Al presionar la estrella de la barra lateral principal, no se va a la
+  página de Mien: se abre un globo pegado a la estrella con Mien resumido. No se puede olvidar ningún pendiente. Clic
+  afuera, Esc u otro clic en la estrella lo cierran. Ctrl + clic abre Mien completo en una pestaña nueva. Desde el globo
+  solo se mira y se salta: cada pendiente es un enlace al lugar donde se resuelve; no se aprueba ni se rechaza desde
+  ahí».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 4.4: el globo de Mien en la barra lateral»

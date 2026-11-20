@@ -55,7 +55,13 @@ final class ActividadesServiceProvider extends ServiceProvider
 
             $a = app(ActividadesService::class)->miAgenda($u->id);
 
-            return ['cantidad' => count($a['hoy']) + count($a['vencidas']), 'texto' => 'actividades para hoy o vencidas'];
+            $items = fn (array $lista, string $tono): array => array_map(fn (array $x): array => ['texto' => $x['asunto'], 'nota' => $x['cuando'].($x['cuenta'] ? ' · '.$x['cuenta'] : ''), 'url' => $x['url'], 'tono' => $tono], $lista);
+
+            return ['cantidad' => count($a['hoy']) + count($a['vencidas']), 'texto' => 'actividades para hoy o vencidas', 'grupos' => [
+                ['titulo' => 'Actividades vencidas', 'items' => $items($a['vencidas'], 'danger')],
+                ['titulo' => 'Actividades de hoy', 'items' => $items($a['hoy'], 'info')],
+                ['titulo' => 'Actividades por vencer', 'items' => $items($a['por_vencer'], 'warning')],
+            ]];
         });
         $this->app->make(RegistroTarjetasMien::class)->registrar(new TarjetaMien(
             'mi-agenda', 'Mi agenda', ActividadesService::PERMISO_VER, Filament\Muelle\TarjetaMiAgenda::class, 5,

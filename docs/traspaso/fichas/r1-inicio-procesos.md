@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v19
+- **Versión:** v20
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-052** (ficha) · La estrella de Mien en la barra lateral abre un globo con todos los pendientes; Ctrl + clic, Mien.
 - **MV-051** (cruza módulos) · Las barras laterales se ajustan al alto; en el extremo se desplazan sin barra, con degradado.
 - **MV-050** (cruza módulos) · La barra lateral solo se expande (ancho fijo) o se comprime (íconos), con un botón.
 - **MV-049** (cruza módulos) · Nadie elige qué módulos ver; se quedan solo los permisos del rol (y el orden de las cajas).
@@ -215,6 +216,17 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   desplazó) avisa que hay más; con teclado, el elemento enfocado se trae a la vista. Con Mien, las 11 cajas y los 5
   títulos de franja, la principal entra sin desplazarse desde unos 500 px de alto.
 
+- **El globo de Mien (MV-052):** en la barra lateral principal (expandida o comprimida), clic en la estrella de Mien no
+  navega: abre a su derecha un globo de 22 rem (hasta 520 px de alto) con una puntita hacia la estrella, que queda
+  resaltada en dorado mientras está abierto. Arriba, «Mien» y el resumen («6 pendientes · …»); debajo, todos los
+  pendientes agrupados con un título chico y su cantidad: Esperan tu firma, Actividades vencidas, de hoy y por vencer, y
+  las listas del tablero de su primer rol (Qué vence, Dónde se va el costo, Esperan algo de mí…). Cada pendiente, con un
+  punto del color de su estado (rojo, ámbar, azul), es un enlace a donde se resuelve (la firma a su documento; la
+  actividad a su oportunidad o a la ficha del cliente) y al saltar el globo se cierra. Un grupo de más de 5 muestra 5 y
+  «Ver los N». Abajo, «Abrir Mien completo». Se cierra con clic afuera, Esc u otro clic en la estrella; Ctrl, Cmd, Shift
+  o la rueda abren `/mien` en otra pestaña. No se aprueba ni se rechaza desde el globo. Se pide de nuevo cada vez que se
+  abre.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -296,6 +308,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v20** (MV-052): el globo de Mien en la barra lateral.
 
 - **v19** (MV-051): las barras laterales se ajustan al alto; sin barra de desplazamiento.
 

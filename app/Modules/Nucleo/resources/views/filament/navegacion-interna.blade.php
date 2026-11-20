@@ -120,6 +120,16 @@
         document.addEventListener('DOMContentLoaded', () => { window.tqMarcarProceso(false); marcarSubnav() })
         window.addEventListener('resize', () => window.tqMarcarProceso(false))
 
+        // MV-052: la estrella de Mien de la barra lateral principal abre su globo; Ctrl, Cmd, Shift o la rueda abren Mien
+        // en otra pestaña, como cualquier enlace.
+        document.addEventListener('click', (e) => {
+            const enlace = e.target.closest?.('.fi-main-sidebar [data-modulo="mien"] a, .fi-main-sidebar a[data-modulo="mien"]')
+            if (! enlace || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return
+            e.preventDefault()
+            e.stopImmediatePropagation()
+            window.dispatchEvent(new CustomEvent('tq-globo-mien', { detail: { rect: (enlace.querySelector('.fi-sidebar-item-icon') ?? enlace).getBoundingClientRect() } }))
+        }, true)
+
         // MV-051: el degradado que avisa que hay más, y el elemento enfocado con teclado siempre a la vista.
         const desplazables = () => document.querySelectorAll('.fi-main-sidebar .fi-sidebar-nav, .fi-page-sub-navigation-sidebar')
         const avisar = (el) => {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Erp\Tableros;
 
 use App\Modules\Erp\Tableros\Filament\Pages\MiTablero;
+use App\Modules\Nucleo\Mien\RegistroPendientesMien;
 use App\Modules\Nucleo\Mien\RegistroSeccionesMien;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Navegacion\RegistroPantallas;
@@ -23,6 +24,8 @@ final class TablerosServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/resources/views', 'tableros');
         // MV-017: el tablero por rol vive ahora dentro de Mien, debajo de sus tarjetas; /mi-tablero lleva allá.
+        // MV-052: lo que el tablero de su rol muestra en sus listas también entra al globo de Mien.
+        $this->app->make(RegistroPendientesMien::class)->registrar('tablero-rol', fn (User $u): array => ['cantidad' => 0, 'texto' => '', 'grupos' => MiTablero::gruposParaMien($u)]);
         $this->app->make(RegistroSeccionesMien::class)->registrar('tablero-rol', fn (User $usuario, ?string $rol): ?HtmlString => MiTablero::seccionParaMien($usuario, $rol));
     }
 }

@@ -12,6 +12,7 @@ use App\Modules\Nucleo\Filament\BienvenidaConfiguracion;
 use App\Modules\Nucleo\Filament\BordeBarraLateral;
 use App\Modules\Nucleo\Filament\CampanaAvisos;
 use App\Modules\Nucleo\Filament\Desarrollo\BarraDesarrollo;
+use App\Modules\Nucleo\Filament\GloboMien;
 use App\Modules\Nucleo\Filament\GranMomentoEnPantalla;
 use App\Modules\Nucleo\Filament\GuardarTema;
 use App\Modules\Nucleo\Filament\Pages\Inicio;
@@ -110,6 +111,8 @@ final class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => self::persistir('tq-cielo', view('nucleo::filament.cielo')->render()))
             // MV-043: al cambiar de pantalla, una carga de energía recorre la franja bajo la barra de arriba.
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? self::persistir('tq-energia', view('nucleo::filament.carga-energia')->render()) : '')
+            // MV-052: el globo de Mien que abre la estrella de la barra lateral.
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? self::persistir('tq-globo-mien', Livewire::mount(GloboMien::class)) : '')
             // MVP rápido (op-asistente): el asistente de ayuda «n_n».
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => self::persistir('tq-asistente', view('nucleo::filament.asistente')->render()))
             // MVP rápido (op-gran-momento): la ambientación de pantalla completa de Navidad y Año Nuevo.
