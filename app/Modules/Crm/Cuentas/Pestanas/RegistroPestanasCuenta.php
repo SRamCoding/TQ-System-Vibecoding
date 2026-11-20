@@ -57,6 +57,16 @@ final class RegistroPestanasCuenta
         return self::ordenadas(array_filter($this->botones, fn (BotonCuenta $b): bool => $this->puedeVer($usuario, $b->permiso)));
     }
 
+    /**
+     * Todas, en su orden: MV-022 las lleva también a la ficha de la persona o empresa.
+     *
+     * @return list<PestanaCuenta>
+     */
+    public function todas(): array
+    {
+        return self::ordenadas($this->pestanas);
+    }
+
     public function puedeVer(?User $usuario, ?string $permiso): bool
     {
         return $usuario !== null && ($permiso === null || $usuario->can($permiso));

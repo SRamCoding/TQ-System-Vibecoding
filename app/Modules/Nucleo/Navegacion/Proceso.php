@@ -123,8 +123,7 @@ enum Proceso: string
             self::PresupuestarCotizar => ['presupuestos' => 'Presupuestos', 'cotizaciones' => 'Cotizaciones'],
             self::Finanzas => ['facturas-proveedor' => 'Facturas de proveedor', 'tablero-pagos' => 'Tablero de pagos', 'flujo-caja' => 'Flujo de caja y conciliación', 'rendiciones' => 'Rendiciones', 'servicios-vigencia' => 'Servicios con vigencia', 'exportar-contador' => 'Para el contador'],
             self::Personas => ['fichas-laborales' => 'Fichas laborales', 'vacantes' => 'Demanda y selección', 'planilla' => 'Planilla'],
-            // Cuentas, mientras llega el paso 3 (pasa a la ficha de la persona o empresa).
-            self::Directorio => ['personas' => 'Personas y empresas', 'catalogo' => 'Catálogo de productos', 'listas' => 'Listas', 'organigrama' => 'Organigrama', 'cuentas' => 'Cuentas'],
+            self::Directorio => ['personas' => 'Personas y empresas', 'catalogo' => 'Catálogo de productos', 'listas' => 'Listas', 'organigrama' => 'Organigrama'],
             self::Sistema => ['usuarios' => 'Usuarios', 'configuracion' => 'Configuración', 'solicitudes-permiso' => 'Solicitudes de permiso', 'tickets-ayuda' => 'Tickets de ayuda'],
         };
     }

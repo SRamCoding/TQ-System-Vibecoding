@@ -27,6 +27,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t8-tableros](fichas/t8-tableros.md) | Parte 5 | en curso (v1 aprobada) | v2 | `aprobado/t8-tableros-v1` |
 | [t9-cierre](fichas/t9-cierre.md) | Flujo 6 | aprobada | v1 | `aprobado/t9-cierre-v1` |
 | [r1-inicio-procesos](fichas/r1-inicio-procesos.md) | Ronda 1 | en curso | v1 | — |
+| [r1-personas-empresas](fichas/r1-personas-empresas.md) | Ronda 1 | en curso | v1 | — |
 
 ## Registro del repositorio
 

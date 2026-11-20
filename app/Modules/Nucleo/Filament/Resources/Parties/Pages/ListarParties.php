@@ -18,6 +18,7 @@ use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Url;
 
 /**
  * La portada de Personas y empresas (plan 1.4m): pestañas por tipo con su cantidad (D1, sin cajas), los avisos de
@@ -39,8 +40,30 @@ final class ListarParties extends ListRecords
     #[Locked]
     public array $avisos = ['incompletas' => [], 'totalIncompletas' => 0, 'duplicados' => 0];
 
+    /**
+     * MV-022: al entrar, dos cajas internas; cada una muestra solo las fichas con esos papeles. Una empresa con los dos
+     * papeles es un solo registro y sale en las dos.
+     */
+    public const array PAPELES = [
+        'clientes' => ['nombre' => 'Clientes y entidades', 'roles' => ['cliente', 'entidad'], 'icono' => 'heroicon-o-building-office', 'descripcion' => 'Los clientes privados y las entidades públicas, con su cuenta comercial'],
+        'proveedores' => ['nombre' => 'Proveedores y colaboradores', 'roles' => ['proveedor', 'colaborador'], 'icono' => 'heroicon-o-truck', 'descripcion' => 'A quién le compramos y con quién trabajamos'],
+    ];
+
+    /** clientes | proveedores | null (las dos cajas) */
+    #[Url]
+    public ?string $papel = null;
+
+    public function getTitle(): string
+    {
+        return self::PAPELES[$this->papel ?? '']['nombre'] ?? 'Personas y empresas';
+    }
+
     public function mount(): void
     {
+        if (! isset(self::PAPELES[$this->papel ?? ''])) {
+            $this->papel = null;
+        }
+
         parent::mount();
         $this->calcularAvisos();
     }
@@ -68,9 +91,11 @@ final class ListarParties extends ListRecords
     public function getTabs(): array
     {
         $hoy = Calendario::hoy();
-        $pestanas = ['todos' => Tab::make('Todos')->badge(Party::query()->where('es_activo', true)->count())];
+        $roles = self::PAPELES[$this->papel ?? '']['roles'] ?? null;
+        $delPapel = fn (Builder $query): Builder => $roles === null ? $query : $query->where(fn (Builder $q) => collect($roles)->each(fn (string $r) => $q->orWhere(fn (Builder $o) => $o->scopes(['conRolVigente' => [$r, $hoy]]))));
+        $pestanas = ['todos' => Tab::make('Todos')->badge($delPapel(Party::query()->where('es_activo', true))->count())->modifyQueryUsing($delPapel)];
 
-        foreach (RolParty::query()->where('es_activo', true)->orderBy('nombre')->get(['codigo', 'nombre']) as $tipo) {
+        foreach (RolParty::query()->where('es_activo', true)->when($roles !== null, fn ($q) => $q->whereIn('codigo', $roles))->orderBy('nombre')->get(['codigo', 'nombre']) as $tipo) {
             $codigo = (string) $tipo->codigo;
             $pestanas[$codigo] = Tab::make($tipo->nombre)
                 ->badge(Party::query()->where('es_activo', true)->scopes(['conRolVigente' => [$codigo, $hoy]])->count())
@@ -82,7 +107,14 @@ final class ListarParties extends ListRecords
 
     public function content(Schema $schema): Schema
     {
+        if ($this->papel === null) {
+            return $schema->components([
+                View::make('nucleo::filament.parties.papeles')->viewData(fn (): array => ['papeles' => self::PAPELES]),
+            ]);
+        }
+
         return $schema->components([
+            View::make('nucleo::filament.parties.papeles-pestanas')->viewData(fn (): array => ['papeles' => self::PAPELES, 'actual' => $this->papel]),
             $this->getTabsContentComponent(),
             View::make('nucleo::filament.parties.avisos')->viewData(fn (): array => [...$this->avisos, 'filtroCalidad' => $this->filtroCalidad()]),
             EmbeddedTable::make(),

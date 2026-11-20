@@ -72,6 +72,24 @@ final readonly class ActividadesService
         });
     }
 
+    /**
+     * MV-022: la actividad de una cuenta para la ficha de su persona o empresa: las pendientes primero y lo último hecho.
+     *
+     * @return list<array{tipo: string, asunto: string, fecha: CarbonImmutable, hecha: bool, resultado: ?string, quien: string, oportunidad: ?string}>
+     */
+    public function deCuenta(int $cuentaId, int $limite = 8): array
+    {
+        return Actividad::query()->where('actividades.cuenta_id', $cuentaId)
+            ->leftJoin('users', 'users.id', '=', 'actividades.responsable_user_id')
+            ->leftJoin('oportunidades', 'oportunidades.id', '=', 'actividades.oportunidad_id')
+            ->orderBy('actividades.es_realizada')->orderByDesc('actividades.fecha')->limit($limite)
+            ->get(['actividades.tipo', 'actividades.asunto', 'actividades.fecha', 'actividades.es_realizada', 'actividades.resultado', 'users.name as quien', 'oportunidades.numero as oportunidad'])
+            ->map(fn (Actividad $a): array => [
+                'tipo' => Actividad::TIPOS[$a->tipo] ?? $a->tipo, 'asunto' => $a->asunto, 'fecha' => CarbonImmutable::parse($a->fecha),
+                'hecha' => (bool) $a->es_realizada, 'resultado' => $a->resultado, 'quien' => (string) $a->getAttribute('quien'), 'oportunidad' => $a->getAttribute('oportunidad'),
+            ])->all();
+    }
+
     /** Marca hecha una pendiente, con lo que pasó. */
     public function cumplir(int $actividadId, ?string $resultado): Actividad
     {

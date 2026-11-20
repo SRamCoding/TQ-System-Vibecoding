@@ -273,3 +273,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Ronda 1 · paso 2: partir Comprobantes»
+
+### MV-022 · 2026-11-20 · Cuentas vive dentro de Personas y empresas
+
+- **Ficha:** `fichas/r1-personas-empresas.md`
+- **Dijo Sebastián:** «Desaparece la caja Cuentas. Lo que tenía su ficha (quién atiende, contactos, actividad,
+  oportunidades abiertas, histórico de precios de la entidad) se ve en la ficha de la persona o empresa. Al entrar a
+  Personas y empresas hay dos cajas internas: "Clientes y entidades" y "Proveedores y colaboradores". Una empresa con
+  los dos papeles es un solo registro que aparece en las dos. La coherencia de datos se trabaja después».
+- **Decisión:** lo dicho. La coherencia de datos entre los dos papeles queda para después.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Ronda 1 · paso 3: Cuentas dentro de Personas y empresas»

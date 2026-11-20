@@ -95,6 +95,16 @@ final class CuentasServiceProvider extends ServiceProvider
             'cuenta-comercial', 'Cuenta comercial', self::PERMISO_VER, CuentaComercialDeFicha::class, 'heroicon-o-building-storefront', orden: 10, tiposDocumento: [Catalogo::RUC],
         ));
 
+        // MV-022: las pestañas de la cuenta (Oportunidades, Cotizaciones…), también en la ficha de su persona o empresa.
+        // Después de que todos los módulos registraron las suyas.
+        $this->app->booted(function (): void {
+            foreach ($this->app->make(RegistroPestanasCuenta::class)->todas() as $i => $pestana) {
+                $this->app->make(RegistroPestanasFicha::class)->registrar(new PestanaFicha(
+                    'cuenta-'.$pestana->clave, $pestana->titulo, $pestana->permiso, Filament\PestanaCuentaEnFicha::class, $pestana->icono, orden: 11 + $i, tiposDocumento: [Catalogo::RUC],
+                ));
+            }
+        });
+
         $permisos = $this->app->make(RegistroPermisos::class);
         $permisos->declarar(self::PERMISO_VER, 'Ver cuentas');
         $permisos->declarar(CuentasService::PERMISO_ATENDER, 'Atender cuentas (ser su ejecutivo)');

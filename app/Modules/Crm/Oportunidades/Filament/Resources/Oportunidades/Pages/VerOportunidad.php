@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages;
 
+use App\Modules\Crm\Cuentas\Services\CuentasService;
 use App\Modules\Crm\Oportunidades\Estados\DefinicionOportunidad;
 use App\Modules\Crm\Oportunidades\Estados\SobreLoPropio;
 use App\Modules\Crm\Oportunidades\Filament\CumpleRequisitos;
@@ -58,7 +59,7 @@ final class VerOportunidad extends ViewRecord
         $portada = app(PortadaOportunidades::class);
         $partes = [
             e($oportunidad->numero),
-            '<a href="'.e(url("/cuentas/{$oportunidad->cuenta_id}")).'" style="text-decoration: underline">'.e(OportunidadResource::cuenta($oportunidad->cuenta_id)).'</a>',
+            '<a href="'.e(url('/personas/'.app(CuentasService::class)->resumen($oportunidad->cuenta_id)->partyId)).'" style="text-decoration: underline">'.e(OportunidadResource::cuenta($oportunidad->cuenta_id)).'</a>',
             e(OportunidadResource::monto($oportunidad)),
             e(OportunidadResource::etapa($oportunidad)),
         ];

@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Cuentas\Filament;
 
+use App\Modules\Crm\Actividades\Services\ActividadesService;
 use App\Modules\Crm\Cuentas\Filament\Resources\Cuentas\CuentaResource;
 use App\Modules\Crm\Cuentas\Filament\Resources\Cuentas\Pages\NuevaCuenta;
 use App\Modules\Crm\Cuentas\Filament\Resources\Cuentas\Pages\VerCuenta;
 use App\Modules\Crm\Cuentas\Models\Cuenta;
 use App\Modules\Crm\Cuentas\Services\CuentasService;
+use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
 use App\Modules\Nucleo\Models\Party;
 use App\Modules\Nucleo\Parties\ComponentePestanaFicha;
 use Illuminate\Contracts\View\View;
 
 /**
- * Pestaña «Cuenta comercial» de la ficha de una empresa con RUC (plan 2.20, D13): si es cuenta del CRM, quién la
- * atiende, si es cliente o prospecto, pública o privada y si está inactiva; si no, «Crear cuenta» con el RUC puesto. El
+ * Pestaña «Cuenta comercial» de la ficha de una empresa con RUC (plan 2.20, D13; MV-022 le suma la actividad y el
+ * histórico de precios de la entidad): si es cuenta del CRM, quién la atiende, si es cliente o prospecto, pública o privada y si está inactiva; si no, «Crear cuenta» con el RUC puesto. El
  * alta vuelve a comprobar todo al guardar.
  */
 final class CuentaComercialDeFicha extends ComponentePestanaFicha
@@ -35,6 +37,9 @@ final class CuentaComercialDeFicha extends ComponentePestanaFicha
                 ? NuevaCuenta::getUrl(['ruc' => $ficha->numero_documento])
                 : null,
             'fichaActiva' => $ficha?->es_activo === true,
+            // MV-022: lo que tenía la ficha de la cuenta: su actividad y el histórico de precios de la entidad.
+            'actividades' => $cuenta === null ? [] : app(ActividadesService::class)->deCuenta($cuenta->id),
+            'historico' => $cuenta === null ? null : app(LicitacionesService::class)->historico($cuenta->id),
         ]);
     }
 }

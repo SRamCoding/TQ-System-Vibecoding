@@ -256,7 +256,7 @@ final class OportunidadResource extends Resource
                     Section::make('Datos')->columns(3)->schema([
                         TextEntry::make('cuenta_id')->label('Cuenta')->columnSpan(2)
                             ->formatStateUsing(fn (Oportunidad $record): string => self::cuenta($record->cuenta_id))
-                            ->url(fn (Oportunidad $record): string => url("/cuentas/{$record->cuenta_id}")),
+                            ->url(fn (Oportunidad $record): string => url('/personas/'.app(CuentasService::class)->resumen($record->cuenta_id)->partyId)),
                         TextEntry::make('ejecutivo.name')->label('Ejecutivo'),
                         TextEntry::make('monto_estimado')->label('Monto estimado')
                             ->formatStateUsing(fn (Oportunidad $record): string => self::monto($record)),
