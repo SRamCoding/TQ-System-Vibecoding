@@ -8,14 +8,17 @@ use App\Modules\Erp\Compras\Filament\Compras;
 use App\Modules\Erp\Finanzas\Models\Fondo;
 use App\Modules\Erp\Finanzas\Models\FondoGasto;
 use App\Modules\Erp\Finanzas\Services\FinanzasService;
+use App\Modules\Erp\Finanzas\Services\LectorDeNotas;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use BackedEnum;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -101,6 +104,25 @@ final class Rendiciones extends Base implements HasTable
                     Toggle::make('ia')->label('Leído de la foto por IA'),
                 ])
                 ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->registrarGasto((int) $data['fondo'], CarbonImmutable::parse($data['fecha']), $data['descripcion'], $data['comprobante'] ?? null, (string) $data['monto'], (int) $data['partida'], (bool) ($data['ia'] ?? false)), 'Gasto registrado.')),
+            Action::make('foto')->label('Leer nota por foto')->icon('heroicon-o-sparkles')->color('gray')->visible(fn (): bool => Fondo::query()->where('estado', 'abierto')->exists())
+                ->modalDescription('La IA lee la foto y deja el gasto por aprobar, marcado para revisar: la IA sugiere y una persona confirma. Sin la IA configurada, se escribe a mano.')
+                ->schema([
+                    Select::make('fondo')->label('Fondo')->required()->live()->options(fn (): array => Fondo::query()->where('estado', 'abierto')->get()->mapWithKeys(fn (Fondo $f): array => [$f->id => "{$f->codigo} · {$f->responsable}"])->all()),
+                    Select::make('partida')->label('Partida')->required()->options(fn ($get): array => Compras::partidasDe(is_numeric($get('fondo')) ? (int) Fondo::query()->whereKey((int) $get('fondo'))->value('proyecto_id') : null)),
+                    FileUpload::make('foto')->label('Foto de la nota')->image()->required()->storeFiles(false),
+                ])
+                ->action(function (array $data): void {
+                    $leido = app(LectorDeNotas::class)->leer($data['foto']->getMimeType(), $data['foto']->get());
+
+                    if ($leido === null || $leido['monto'] === null) {
+                        Notification::make()->warning()->title('La IA no está configurada o no pudo leer la nota: regístrala con «Registrar gasto».')->send();
+
+                        return;
+                    }
+
+                    $this->hacer(fn () => app(FinanzasService::class)->registrarGasto((int) $data['fondo'], CarbonImmutable::parse($leido['fecha'] ?? Calendario::hoy()), $leido['descripcion'] ?? 'Gasto leído de la foto',
+                        $leido['comprobante'], (string) (float) str_replace(',', '.', $leido['monto']), (int) $data['partida'], true), 'Leído por IA: revísalo y apruébalo.');
+                }),
             Action::make('rendir')->label('Rendir fondo')->icon('heroicon-o-check-badge')->color('success')->visible(fn (): bool => Fondo::query()->where('estado', 'abierto')->exists())
                 ->schema([Select::make('fondo')->label('Fondo')->required()->options(fn (): array => Fondo::query()->where('estado', 'abierto')->pluck('codigo', 'id')->all())])
                 ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->rendir((int) $data['fondo'], CarbonImmutable::parse(Calendario::hoy())), 'Rendido: el saldo volvió a caja.')),

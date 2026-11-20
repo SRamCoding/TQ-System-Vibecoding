@@ -147,6 +147,10 @@ final class ContratoResource extends Resource
                 TextEntry::make('fin')->label('Fin (con adendas)')->state(fn (Contrato $record): string => $s()->fin($record)->format('d/m/Y')),
                 TextEntry::make('forma_pago')->label('Forma de pago')->placeholder('—'),
                 TextEntry::make('garantia_meses')->label('Garantía técnica')->formatStateUsing(fn ($state): string => $state === null ? '—' : "{$state} meses")->placeholder('—'),
+                TextEntry::make('consorcio')->label('Consorcio')->placeholder('Sin consorcio')
+                    ->formatStateUsing(fn (?string $state, Contrato $record): string => "{$state} · Techquk {$record->participacion_pct} % · ".($record->modo_consorcio === 'todo' ? 'todo el contrato' : 'solo su participación')),
+                TextEntry::make('saldo_liquidacion')->label('Liquidación')->placeholder('Sin liquidar')
+                    ->formatStateUsing(fn ($state, Contrato $record): string => 'saldo '.self::soles($state).' · '.$record->liquidado_el),
                 TextEntry::make('proyecto')->label('Proyecto')->state(fn (Contrato $record): string => (string) DB::table('proyectos')->where('id', $record->proyecto_id)->value('codigo'))
                     ->url(fn (Contrato $record): string => VerProyecto::getUrl(['record' => $record->proyecto_id]))->color('primary'),
             ]),

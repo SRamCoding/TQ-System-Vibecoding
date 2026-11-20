@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Erp\Finanzas\Services;
 
 use App\Modules\Erp\Compras\Models\Orden;
+use App\Modules\Erp\Compras\Services\ComprasService;
 use App\Modules\Erp\Finanzas\Models\Comprobante;
 use App\Modules\Erp\Finanzas\Models\Fondo;
 use App\Modules\Erp\Finanzas\Models\FondoGasto;
@@ -12,10 +13,12 @@ use App\Modules\Erp\Finanzas\Models\MovimientoCaja;
 use App\Modules\Erp\Presupuestos\Services\DineroDelProyecto;
 use App\Modules\Erp\Presupuestos\Services\PartidasService;
 use App\Modules\Nucleo\Imputacion\MomentoImputacion;
+use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Numeracion\FormatoNumeracion;
 use App\Modules\Nucleo\Numeracion\ReinicioNumeracion;
 use App\Modules\Nucleo\Services\ImputacionService;
 use App\Modules\Nucleo\Services\NumeracionService;
+use App\Modules\Nucleo\Services\TipoCambioService;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -115,9 +118,9 @@ final readonly class FinanzasService
      * La factura del proveedor contra su orden: el cruce de tres vías compara lo facturado con lo recibido a precio de
      * la orden (tolerancia S/ 0.10). Queda por programar el pago.
      */
-    public function registrarCompra(int $ordenId, string $serieNumero, ?string $ruc, CarbonImmutable $emision, int $diasCredito, ?string $subtotal = null, string $origen = 'xml'): Comprobante
+    public function registrarCompra(int $ordenId, string $serieNumero, ?string $ruc, CarbonImmutable $emision, int $diasCredito, ?string $subtotal = null, string $origen = 'xml', string $moneda = 'PEN', string $tipoCambio = '1'): Comprobante
     {
-        return DB::transaction(function () use ($ordenId, $serieNumero, $ruc, $emision, $diasCredito, $subtotal, $origen): Comprobante {
+        return DB::transaction(function () use ($ordenId, $serieNumero, $ruc, $emision, $diasCredito, $subtotal, $origen, $moneda, $tipoCambio): Comprobante {
             $o = Orden::query()->with('lineas')->findOrFail($ordenId);
             $recibido = $o->lineas->reduce(fn (string $s, $l): string => bcadd($s, bcadd(bcmul((string) $l->cantidad_recibida, (string) $l->precio_unitario, 4), '0.005', 2), 2), '0');
             $facturado = $subtotal ?? $recibido;
@@ -126,16 +129,31 @@ final readonly class FinanzasService
                 throw new RuntimeException('No hay nada recibido que facturar en esa orden.');
             }
 
-            $igv = $this->igv($facturado);
+            // Una factura del extranjero no lleva IGV peruano (se paga en la importación).
+            $igv = $moneda === 'PEN' ? $this->igv($facturado) : '0.00';
             $total = bcadd($facturado, $igv, 2);
+            // En moneda extranjera, el cruce compara su equivalente en soles al tipo de cambio del registro.
+            $enSoles = bcadd(bcmul($facturado, $tipoCambio, 6), '0.005', 2);
+            $sunat = app(ValidadorSunat::class)->validar((string) $ruc, 'factura', $serieNumero, $emision->toDateString(), $total);
 
             return Comprobante::query()->create([
+                'moneda' => $moneda, 'tipo_cambio' => $tipoCambio, 'sunat_detalle' => $sunat['detalle'],
                 'clase' => 'compra', 'serie_numero' => $serieNumero, 'ruc' => $ruc, 'razon_social' => $o->proveedor_nombre, 'emision' => $emision->toDateString(),
                 'vencimiento' => $emision->addDays($diasCredito)->toDateString(), 'subtotal' => $facturado, 'igv' => $igv, 'total' => $total, 'proyecto_id' => $o->proyecto_id,
-                'orden_id' => $o->id, 'origen' => $origen, 'sunat' => 'valido', 'cruce' => abs((float) bcsub($facturado, $recibido, 2)) > 0.10 ? 'diferencia' : 'ok',
+                'orden_id' => $o->id, 'origen' => $origen, 'sunat' => $sunat['estado'], 'cruce' => abs((float) bcsub($enSoles, $recibido, 2)) > 0.10 ? 'diferencia' : 'ok',
                 'estado' => 'por_programar', 'saldo' => $total,
             ]);
         });
+    }
+
+    /** La factura del proveedor desde su XML: nada se vuelve a escribir. En dólares, al tipo de cambio de su emisión. */
+    public function registrarCompraXml(int $ordenId, string $xml, int $diasCredito): Comprobante
+    {
+        $f = app(LectorXmlFactura::class)->leer($xml);
+        $emision = CarbonImmutable::parse($f['emision'] ?: Calendario::hoy());
+        $tc = $f['moneda'] === 'PEN' ? '1' : (string) app(TipoCambioService::class)->del($f['moneda'], $emision)->venta;
+
+        return $this->registrarCompra($ordenId, $f['serie_numero'], $f['ruc'], $emision, $diasCredito, $f['subtotal'], 'xml', $f['moneda'], $tc);
     }
 
     public function programar(int $comprobanteId, CarbonImmutable $fecha): void
@@ -144,9 +162,9 @@ final readonly class FinanzasService
     }
 
     /** Paga: sale del banco y pasa a «pagado» en las partidas de su orden (sin IGV). */
-    public function pagar(int $comprobanteId, CarbonImmutable $fecha, string $cuenta = self::CUENTAS[0]): void
+    public function pagar(int $comprobanteId, CarbonImmutable $fecha, string $cuenta = self::CUENTAS[0], ?string $tipoCambioPago = null): void
     {
-        DB::transaction(function () use ($comprobanteId, $fecha, $cuenta): void {
+        DB::transaction(function () use ($comprobanteId, $fecha, $cuenta, $tipoCambioPago): void {
             $c = Comprobante::query()->lockForUpdate()->findOrFail($comprobanteId);
 
             if ($c->clase !== 'compra' || ! in_array($c->estado, ['por_programar', 'programado'], true)) {
@@ -157,8 +175,12 @@ final readonly class FinanzasService
                 throw new RuntimeException('El cruce de tres vías tiene diferencia: no se paga hasta resolverla.');
             }
 
-            $this->movimiento($fecha, 'egreso', $cuenta, (string) $c->saldo, "Pago {$c->serie_numero} · {$c->razon_social}", $c->id, $c->proyecto_id);
-            $restante = (string) $c->subtotal;
+            // En moneda extranjera sale del banco al tipo de cambio del pago; la diferencia con el del registro es su propio asiento.
+            $tcPago = $c->moneda === 'PEN' ? '1' : ($tipoCambioPago ?? (string) app(TipoCambioService::class)->del($c->moneda, $fecha)->venta);
+            $enSoles = bcadd(bcmul((string) $c->saldo, $tcPago, 6), '0.005', 2);
+            $diferencia = bcadd(bcmul((string) $c->saldo, bcsub($tcPago, (string) $c->tipo_cambio, 6), 6), '0.005', 2);
+            $this->movimiento($fecha, 'egreso', $cuenta, $enSoles, "Pago {$c->serie_numero} · {$c->razon_social}".($c->moneda === 'PEN' ? '' : " · {$c->moneda} {$c->saldo} a {$tcPago}"), $c->id, $c->proyecto_id);
+            $restante = bcadd(bcmul((string) $c->subtotal, (string) $c->tipo_cambio, 6), '0.005', 2);
             $imputaciones = app(ImputacionService::class);
 
             foreach ($c->orden_id === null ? [] : Orden::query()->findOrFail($c->orden_id)->lineas as $l) {
@@ -172,7 +194,7 @@ final readonly class FinanzasService
                 }
             }
 
-            $c->update(['estado' => 'pagado', 'saldo' => 0]);
+            $c->update(['estado' => 'pagado', 'saldo' => 0, 'tipo_cambio_pago' => $tcPago, 'diferencia_cambio' => $c->moneda === 'PEN' ? 0 : $diferencia]);
         });
     }
 
@@ -305,5 +327,31 @@ final readonly class FinanzasService
     {
         MovimientoCaja::query()->create(['fecha' => $fecha->toDateString(), 'tipo' => $tipo, 'cuenta' => $cuenta, 'monto' => $monto, 'concepto' => mb_substr($concepto, 0, 250),
             'comprobante_id' => $comprobanteId, 'proyecto_id' => $proyectoId, 'fondo_id' => $fondoId]);
+    }
+
+    /** Un servicio con vigencia (SCTR, pólizas, alquileres, licencias): avisa antes de vencer y genera la orden del periodo. */
+    public function crearServicio(string $tipo, string $proveedor, string $descripcion, ?int $proyectoId, ?int $centroCostoId, string $periodicidad, string $monto, string $desde, string $hasta): int
+    {
+        return (int) DB::table('servicios_vigencia')->insertGetId(['tipo' => $tipo, 'proveedor' => $proveedor, 'descripcion' => $descripcion, 'proyecto_id' => $proyectoId,
+            'centro_costo_id' => $centroCostoId, 'periodicidad' => $periodicidad, 'monto_periodo' => $monto, 'desde' => $desde, 'hasta' => $hasta, 'created_at' => now()]);
+    }
+
+    /** La orden de servicio del periodo, aprobada y conforme: en los gastos generales del proyecto o en su centro de costo. */
+    public function ordenDelPeriodo(int $servicioId, CarbonImmutable $fecha): Orden
+    {
+        return DB::transaction(function () use ($servicioId, $fecha): Orden {
+            $sv = DB::table('servicios_vigencia')->lockForUpdate()->find($servicioId);
+            $gg = $sv->proyecto_id === null ? null : DB::table('partidas_control')->where('proyecto_id', $sv->proyecto_id)->where('es_gastos_generales', true)->where('es_hoja', true)->value('id');
+            $compras = app(ComprasService::class);
+            $o = $compras->ordenDirecta('servicio_vigencia', null, $sv->proveedor, $sv->proyecto_id, '30 días', [[
+                'descripcion' => "{$sv->descripcion} · ".$fecha->translatedFormat('F Y'), 'unidad_medida_id' => (int) DB::table('unidades_medida')->where('codigo', 'GLB')->value('id'),
+                'cantidad' => '1', 'precio_unitario' => (string) $sv->monto_periodo, 'partida_control_id' => $gg, 'centro_costo_id' => $gg === null ? ($sv->centro_costo_id ?? (int) DB::table('centros_costo')->where('codigo', 'ADM')->value('id')) : null,
+            ]], $fecha);
+            $compras->aprobarOrden($o->id, $compras->excesos($o->load('lineas')) === [] ? null : 'Servicio con vigencia contratado.', auth()->user() ?? User::query()->findOrFail(2));
+            $compras->recibir($o->id, [$o->lineas()->value('id') => '1'], $fecha, null);
+            DB::table('servicios_vigencia')->where('id', $servicioId)->update(['ultima_orden' => $fecha->toDateString(), 'updated_at' => now()]);
+
+            return $o;
+        });
     }
 }

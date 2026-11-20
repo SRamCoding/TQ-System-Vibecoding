@@ -37,4 +37,11 @@ return [
         ],
     ],
 
+    // MVP rápido (t5-finanzas v3): la consulta de validez de comprobantes de SUNAT; sin estas, la validación es simulada.
+    'sunat' => [
+        'client_id' => env('SUNAT_CLIENT_ID'),
+        'client_secret' => env('SUNAT_CLIENT_SECRET'),
+        'ruc' => env('SUNAT_RUC'),
+    ],
+
 ];

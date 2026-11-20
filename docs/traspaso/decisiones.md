@@ -175,3 +175,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Transición del cielo»
+
+### MV-014 · 2026-11-20 · Todo lo pendiente entra al MVP
+
+- **Ficha:** general
+- **Dijo Sebastián:** «todas de una vez», sobre las partes simuladas (XML, SUNAT, notas por foto con IA), lo que faltaba
+  del tramo 5 (moneda extranjera, servicios con vigencia, liquidación, consorcios) y los opcionales (gran momento,
+  asistente de ayuda con IA, solicitudes de permiso).
+- **Decisión:** se construyen todas antes de cerrar el MVP. La validación con SUNAT queda lista para activarse con las
+  credenciales de la empresa; mientras, simulada.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** los de «Cierre del tramo 5» y «Opcionales»

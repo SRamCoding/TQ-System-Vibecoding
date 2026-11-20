@@ -26,14 +26,14 @@ class Contrato extends Model
 {
     use ConAuditoria;
 
-    public const array ESTADOS = ['borrador' => 'Borrador', 'vigente' => 'Vigente', 'culminado' => 'Culminado', 'resuelto' => 'Resuelto', 'anulado' => 'Anulado'];
+    public const array ESTADOS = ['borrador' => 'Borrador', 'vigente' => 'Vigente', 'culminado' => 'Culminado', 'liquidado' => 'Liquidado', 'resuelto' => 'Resuelto', 'anulado' => 'Anulado'];
 
-    public const array COLORES = ['borrador' => 'gray', 'vigente' => 'success', 'culminado' => 'info', 'resuelto' => 'danger', 'anulado' => 'gray'];
+    public const array COLORES = ['borrador' => 'gray', 'vigente' => 'success', 'culminado' => 'info', 'liquidado' => 'primary', 'resuelto' => 'danger', 'anulado' => 'gray'];
 
     protected $table = 'contratos';
 
     protected $fillable = ['codigo', 'numero_entidad', 'proyecto_id', 'oportunidad_id', 'cliente_party_id', 'objeto', 'es_publico', 'monto', 'igv_pct', 'fecha_firma',
-        'fecha_inicio', 'plazo_dias', 'forma_pago', 'garantia_meses', 'penalidad_factor', 'penalidad_tope_pct', 'estado'];
+        'fecha_inicio', 'plazo_dias', 'forma_pago', 'garantia_meses', 'penalidad_factor', 'penalidad_tope_pct', 'estado', 'consorcio', 'participacion_pct', 'modo_consorcio', 'saldo_liquidacion', 'liquidado_el'];
 
     protected function casts(): array
     {

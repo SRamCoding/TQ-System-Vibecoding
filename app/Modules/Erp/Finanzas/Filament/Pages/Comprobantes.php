@@ -11,6 +11,7 @@ use BackedEnum;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\EmbeddedTable;
@@ -59,11 +60,13 @@ final class Comprobantes extends Base implements HasTable
                 TextColumn::make('razon_social')->label('Cliente o proveedor')->wrap()->searchable()->description(fn (Comprobante $record): ?string => $record->ruc),
                 TextColumn::make('proyecto')->label('Proyecto')->state(fn (Comprobante $record): string => $record->proyecto_id === null ? '—' : (string) DB::table('proyectos')->where('id', $record->proyecto_id)->value('codigo')),
                 TextColumn::make('emision')->label('Emisión')->date('d/m/Y')->description(fn (Comprobante $record): string => 'vence '.$record->vencimiento->format('d/m/Y')),
-                TextColumn::make('total')->label('Total')->alignEnd()->fontFamily('mono')->formatStateUsing(fn ($state): string => self::s($state))
-                    ->description(fn (Comprobante $record): ?string => (float) $record->detraccion > 0 ? 'detracción '.self::s($record->detraccion) : null),
+                TextColumn::make('total')->label('Total')->alignEnd()->fontFamily('mono')->formatStateUsing(fn ($state, Comprobante $record): string => ($record->moneda === 'PEN' ? '' : $record->moneda.' ').self::s($state))
+                    ->description(fn (Comprobante $record): ?string => (float) $record->detraccion > 0 ? 'detracción '.self::s($record->detraccion)
+                        : ($record->moneda === 'PEN' ? null : 'TC '.$record->tipo_cambio.((float) $record->diferencia_cambio !== 0.0 ? ' · dif. de cambio '.self::s($record->diferencia_cambio) : ''))),
                 TextColumn::make('cruce')->label('Cruce / SUNAT')->badge()->placeholder('—')
                     ->formatStateUsing(fn (?string $state): string => $state === 'diferencia' ? 'Diferencia con la recepción' : 'Orden ✓ recepción ✓ factura ✓')
-                    ->color(fn (?string $state): string => $state === 'diferencia' ? 'danger' : 'success'),
+                    ->color(fn (?string $state): string => $state === 'diferencia' ? 'danger' : 'success')
+                    ->description(fn (Comprobante $record): ?string => $record->sunat_detalle),
                 TextColumn::make('estado')->label('Estado')->badge()->formatStateUsing(fn (string $state): string => self::ESTADOS[$state])
                     ->color(fn (string $state): string => match ($state) {
                         'cobrado', 'pagado' => 'success', 'por_cobrar', 'programado' => 'info', 'por_programar' => 'warning', default => 'gray'
@@ -93,6 +96,17 @@ final class Comprobantes extends Base implements HasTable
                     DatePicker::make('emision')->label('Emisión')->required()->format('Y-m-d'),
                 ])
                 ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->facturarValorizacion((int) $data['valorizacion'], CarbonImmutable::parse($data['emision'])), 'Factura emitida por el neto.')),
+            Action::make('xml')->label('Subir XML de factura')->icon('heroicon-o-code-bracket')->visible(fn (): bool => self::puede(FinanzasService::PERMISO_PAGAR))
+                ->modalDescription('Se lee del XML: número, emisión, RUC, moneda, base, IGV y total; se valida con SUNAT y se cruza con la orden y lo recibido.')
+                ->fillForm(fn (): array => ['dias' => 30])
+                ->schema([
+                    FileUpload::make('archivo')->label('XML de la factura')->required()->storeFiles(false)->acceptedFileTypes(['text/xml', 'application/xml']),
+                    Select::make('orden')->label('Orden')->required()->searchable()
+                        ->options(fn (): array => DB::table('ordenes')->whereIn('estado', ['recibida', 'recibida_parcial'])->whereNotExists(fn ($q) => $q->from('comprobantes')->whereColumn('comprobantes.orden_id', 'ordenes.id'))
+                            ->orderByDesc('id')->selectRaw("id, codigo || ' · ' || proveedor_nombre AS t")->limit(200)->pluck('t', 'id')->all()),
+                    TextInput::make('dias')->label('Días de crédito')->numeric()->integer()->required(),
+                ])
+                ->action(fn (array $data) => $this->hacer(fn () => app(FinanzasService::class)->registrarCompraXml((int) $data['orden'], $data['archivo']->get(), (int) $data['dias']), 'Factura leída del XML y registrada.')),
             Action::make('compra')->label('Registrar factura de proveedor')->icon('heroicon-o-arrow-up-tray')->color('gray')->visible(fn (): bool => self::puede(FinanzasService::PERMISO_PAGAR))
                 ->modalDescription('En el MVP se escriben los datos del XML; la validación con SUNAT y la lectura del archivo son simuladas. Se cruza con la orden y lo recibido.')
                 ->fillForm(fn (): array => ['emision' => Calendario::hoy(), 'dias' => 30])

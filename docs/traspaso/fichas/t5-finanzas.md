@@ -1,8 +1,9 @@
 # Ficha · El ciclo del dinero: facturación, pagos, caja, rendiciones y resultado real (flujos 4 a 7)
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v2
+- **Versión:** v3
 - **Tramo de la ruta:** T5
+- **Aprobada (v3):** 2026-11-20 · etiqueta `aprobado/t5-finanzas-v3`
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t5-finanzas-v2`
 - **Aprobada (v1):** 2026-11-20 · etiqueta `aprobado/t5-finanzas-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-4-flujo-04.md` a `flujo-07.md`; `docs/vibe/ruta-mvp.md` (tramo 5).
@@ -81,12 +82,14 @@ concepto, comprobante, fondo, proyecto, conciliado), `fondos` y `fondo_gastos` (
 
 ## Supuestos sin confirmar
 
-- La lectura del XML, su validación con SUNAT y la lectura de notas por foto con IA son simuladas (se escriben los
-  datos; la marca «leído por IA» queda para revisar).
+- La validación con SUNAT es real pero se activa con las credenciales de la empresa (`SUNAT_CLIENT_ID`,
+  `SUNAT_CLIENT_SECRET`, `SUNAT_RUC`); sin ellas queda «Simulado». La lectura de notas por foto llama a la IA solo con
+  `IA_CLAVE_ANTHROPIC`; sin ella, el gasto se escribe a mano.
 - Detracción fija del 4 % para contratos públicos; sin retenciones del IGV ni percepciones.
 - El tablero de pagos mueve tarjetas con botones (el v4 pide arrastrarlas).
-- No hay moneda extranjera, servicios con vigencia, notas de
-  crédito, liquidación formal del contrato, consorcios ni conciliación contra un extracto importado.
+- No hay notas de crédito ni conciliación contra un extracto importado. La liquidación compara monto final y facturado
+  (sin recálculo de mayores gastos generales ni intereses). En consorcio «todo el contrato», no se separan los costos de
+  los socios.
 - La comisión de la carta fianza (OS) se paga sin factura ni movimiento de banco.
 
 ## Atajos tomados
@@ -107,3 +110,23 @@ v2 (2026-11-20): **Exportar para el contador** (`/exportar-contador`, caja «Par
 Excel (punto y coma, UTF-8 con BOM), el registro de ventas, el de compras y caja y bancos, cada fila con las cuentas
 de su plantilla de asiento (ventas 12121 / 40111 / 70321; compras 60xx-63xx / 40111 / 42121; caja 10411 / 1013). La
 plantilla es fija en el código (atajo); el v4 la quiere configurable.
+
+v3 (2026-11-20, MV-014):
+- **Subir XML de factura** (`/comprobantes`): se lee número, emisión, RUC, razón social, moneda, base, IGV y total del
+  XML UBL 2.1 de SUNAT y se registra contra la orden (cruce de tres vías). La **validación con SUNAT** usa la API de
+  consulta integrada (token y `validarcomprobante`) con las credenciales del `.env`; sin ellas, «Simulado». La columna
+  Cruce / SUNAT muestra el detalle.
+- **Leer nota por foto** (`/rendiciones`): la IA lee fecha, comprobante, descripción y monto, y deja el gasto por
+  aprobar marcado para revisar. Atajo: llama al cliente del modelo directo, sin el proceso registrado ni la cola.
+- **Moneda extranjera:** el comprobante guarda moneda y tipo de cambio; una factura del extranjero no lleva IGV; el
+  cruce compara su equivalente en soles; el pago sale al tipo de cambio del día del pago y guarda la **diferencia de
+  cambio**. Demo (v4 F10): USD 6,000.00 a 3.740 = 22,440.00, pagada a 3.752 = 22,512.00 → diferencia **72.00**.
+- **Servicios con vigencia** (`/servicios-vigencia`, caja propia): tipo (SCTR, póliza, alquiler, licencia,
+  suscripción), proveedor, proyecto o empresa, monto por periodo, vigencia (rojo a 15 días, ámbar a 30, azul a 60) y
+  «Orden del periodo» (OS aprobada y conforme, en los gastos generales del proyecto o en un centro de costo). Demo: 5
+  servicios; el SCTR de P8 vence el 05/12/2026.
+- **Liquidación del contrato** (botón «Liquidar»): monto final (vendido neto + reajustes) − facturado = saldo a favor
+  de Techquk o de la entidad; no se liquida con una valorización en borrador; el contrato pasa a «Liquidado». Demo:
+  CT-2024-0002 y CT-2025-0004 liquidados con saldo 0.00.
+- **Consorcios** (botón «Consorcio»): nombre, participación de Techquk y modo (solo su participación, o todo el
+  contrato). En «participación», lo vendido es su porcentaje. Demo: P9 en el Consorcio Salud Digital Norte al 40 %.

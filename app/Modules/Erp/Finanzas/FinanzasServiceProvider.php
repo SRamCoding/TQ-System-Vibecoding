@@ -25,7 +25,7 @@ final class FinanzasServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [Comprobantes::class, TableroPagos::class, FlujoCaja::class, Rendiciones::class, Resultados::class, Filament\Pages\ExportarContador::class]);
+        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [Comprobantes::class, TableroPagos::class, FlujoCaja::class, Rendiciones::class, Resultados::class, Filament\Pages\ExportarContador::class, Filament\Pages\ServiciosVigencia::class]);
     }
 
     public function boot(): void
@@ -45,6 +45,7 @@ final class FinanzasServiceProvider extends ServiceProvider
             ['tablero-pagos', 'Tablero de pagos', '/tablero-pagos', 'heroicon-o-view-columns', 'Tesorería ordena y paga las facturas de proveedores', ['¿Qué pagamos este viernes?', '¿Qué está vencido?']],
             ['flujo-caja', 'Flujo de caja', '/flujo-caja', 'heroicon-o-arrows-up-down', 'Lo que entra y sale por mes, real y proyectado, y la conciliación', ['¿Nos alcanza la caja el próximo mes?', '¿Qué falta conciliar?']],
             ['exportar-contador', 'Para el contador', '/exportar-contador', 'heroicon-o-arrow-down-tray', 'Registros de ventas y compras y caja y bancos del mes, para Excel', ['¿Qué le mando al contador este mes?']],
+            ['servicios-vigencia', 'Servicios con vigencia', '/servicios-vigencia', 'heroicon-o-shield-check', 'SCTR, pólizas, alquileres y licencias con su vencimiento', ['¿Qué póliza vence este mes?']],
             ['rendiciones', 'Rendiciones', '/rendiciones', 'heroicon-o-receipt-percent', 'Fondos por proyecto y su rendición con comprobantes', ['¿Quién tiene fondos sin rendir?']],
         ] as [$clave, $nombre, $url, $icono, $desc, $preguntas]) {
             $m->registrar(new CajaModulo($clave, $nombre, $url, permiso: FinanzasService::PERMISO_VER, area: AreaModulo::Erp, icono: $icono, descripcion: $desc, preguntas: $preguntas));

@@ -232,7 +232,44 @@ final readonly class ContratosService
         }
 
         $sinIgv = bcadd(bcdiv($this->montoVigente($c), bcadd('1', bcdiv((string) $c->igv_pct, '100', 6), 6), 6), '0.005', 2);
+        $neto = bcsub($sinIgv, $this->penalidadAplicada($c), 2);
 
-        return bcsub($sinIgv, $this->penalidadAplicada($c), 2);
+        // MV-014: en consorcio por participación, lo vendido de Techquk es su porcentaje.
+        return $c->modo_consorcio === 'participacion' ? bcadd(bcdiv(bcmul($neto, (string) $c->participacion_pct, 6), '100', 6), '0.005', 2) : $neto;
+    }
+
+    /**
+     * MVP rápido (MV-014): la liquidación del contrato: monto final (vendido neto más reajustes) contra lo facturado. No se
+     * presenta si queda una valorización en borrador.
+     *
+     * @return array{monto_final: string, reajustes: string, facturado: string, saldo: string, bloqueo: ?string}
+     */
+    public function liquidacion(Contrato $c): array
+    {
+        $reajustes = (string) (DB::table('valorizaciones')->where('contrato_id', $c->id)->whereIn('estado', ['aprobada', 'facturada'])->sum('reajuste') ?: '0');
+        $final = bcadd((string) $this->ventaNeta($c->proyecto_id), $reajustes, 2);
+        $facturado = (string) (DB::table('comprobantes')->where('contrato_id', $c->id)->where('clase', 'venta')->where('estado', '!=', 'anulado')->sum('subtotal') ?: '0');
+
+        return ['monto_final' => $final, 'reajustes' => bcadd($reajustes, '0', 2), 'facturado' => bcadd($facturado, '0', 2), 'saldo' => bcsub($final, $facturado, 2),
+            'bloqueo' => DB::table('valorizaciones')->where('contrato_id', $c->id)->where('estado', 'borrador')->exists() ? 'Hay una valorización en borrador: apruébala antes de liquidar.' : null];
+    }
+
+    public function liquidar(int $contratoId, CarbonImmutable $fecha): array
+    {
+        $c = Contrato::query()->findOrFail($contratoId);
+
+        if (! in_array($c->estado, ['vigente', 'culminado'], true)) {
+            throw new RuntimeException('Solo se liquida un contrato vigente o culminado.');
+        }
+
+        $l = $this->liquidacion($c);
+
+        if ($l['bloqueo'] !== null) {
+            throw new RuntimeException($l['bloqueo']);
+        }
+
+        $c->update(['estado' => 'liquidado', 'saldo_liquidacion' => $l['saldo'], 'liquidado_el' => $fecha->toDateString()]);
+
+        return $l;
     }
 }

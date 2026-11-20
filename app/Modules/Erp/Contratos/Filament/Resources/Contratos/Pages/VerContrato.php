@@ -81,6 +81,24 @@ final class VerContrato extends ViewRecord
                 ->action(fn (array $data) => $this->hacer(fn () => app(ContratosService::class)->aplicarPenalidad($this->contrato()->id, (int) $data['dias'], CarbonImmutable::parse($data['fecha']), $data['motivo']), 'Penalidad aplicada: baja lo vendido del proyecto.')),
             Action::make('culminar')->label('Culminar')->icon('heroicon-o-flag')->color('gray')->visible($gestiona('vigente'))->requiresConfirmation()
                 ->action(fn () => $this->hacer(fn () => app(ContratosService::class)->culminar($this->contrato()->id), 'Contrato culminado.')),
+            Action::make('liquidar')->label('Liquidar')->icon('heroicon-o-calculator')->color('primary')->visible($gestiona('vigente', 'culminado'))
+                ->modalDescription(function (): string {
+                    $l = app(ContratosService::class)->liquidacion($this->contrato());
+
+                    return 'Monto final '.ContratoResource::soles($l['monto_final']).' (vendido neto más reajustes '.ContratoResource::soles($l['reajustes']).') − facturado '.ContratoResource::soles($l['facturado'])
+                        .' = saldo '.(bccomp($l['saldo'], '0', 2) >= 0 ? 'a favor de Techquk ' : 'a favor de la entidad ').ContratoResource::soles(ltrim($l['saldo'], '-')).'.'.($l['bloqueo'] === null ? '' : ' '.$l['bloqueo']);
+                })
+                ->requiresConfirmation()
+                ->action(fn () => $this->hacer(fn () => app(ContratosService::class)->liquidar($this->contrato()->id, CarbonImmutable::parse(Calendario::hoy())), 'Contrato liquidado.')),
+            Action::make('consorcio')->label('Consorcio')->icon('heroicon-o-users')->color('gray')->visible($gestiona('borrador', 'vigente'))
+                ->fillForm(fn (): array => ['consorcio' => $this->contrato()->consorcio, 'participacion' => $this->contrato()->participacion_pct, 'modo' => $this->contrato()->modo_consorcio ?? 'participacion'])
+                ->schema([
+                    TextInput::make('consorcio')->label('Nombre del consorcio (vacío: sin consorcio)')->maxLength(150),
+                    TextInput::make('participacion')->label('Participación de Techquk (%)')->numeric()->required(),
+                    Select::make('modo')->label('Modo de registro')->options(['participacion' => 'Solo la participación de Techquk', 'todo' => 'Todo el contrato con porcentajes (Techquk es el operador)'])->required(),
+                ])
+                ->action(fn (array $data) => $this->hacer(fn () => $this->contrato()->update(['consorcio' => $data['consorcio'] ?: null, 'participacion_pct' => $data['consorcio'] ? $data['participacion'] : 100,
+                    'modo_consorcio' => $data['consorcio'] ? $data['modo'] : null]), 'Guardado: lo vendido se calcula con la participación.')),
             Action::make('proyecto')->label('Abrir proyecto')->icon('heroicon-o-arrow-top-right-on-square')->color('gray')
                 ->url(fn (): string => VerProyecto::getUrl(['record' => $this->contrato()->proyecto_id])),
         ];

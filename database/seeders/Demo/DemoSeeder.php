@@ -1178,6 +1178,61 @@ final class DemoSeeder extends Seeder
             $fin->rendir($f->id, CarbonImmutable::parse('2026-10-31'));
         });
 
+        // MV-014. Moneda extranjera (v4 F10): importación por USD 6,000 a 3.740 (22,440.00), pagada a 3.752 → diferencia 72.00.
+        $p6 = (int) DB::table('proyectos')->where('nombre', 'like', 'Sistema de información hospitalaria%')->value('id');
+        $srv = (int) DB::table('partidas_control')->where('proyecto_id', $p6)->where('es_hoja', true)->where('nombre', 'like', '%Servidor%')->value('id');
+        $compras = app(ComprasService::class);
+        $imp = $this->en('2026-10-05', function () use ($compras, $p6, $srv): Orden {
+            $o = $compras->ordenDirecta('importacion', null, 'Dataserv Inc. (Miami)', $p6, '30 días', [['descripcion' => 'Switch de núcleo importado (2 unidades)', 'unidad_medida_id' => $this->unidad('NIU'),
+                'cantidad' => '2', 'precio_unitario' => '11220.00', 'partida_control_id' => $srv]], CarbonImmutable::parse('2026-10-20'));
+            $compras->aprobarOrden($o->id, 'Importación para reemplazar los switches del servidor.', $this->dev);
+            $compras->recibir($o->id, [$o->lineas()->value('id') => '2'], CarbonImmutable::parse('2026-10-20'), 'DUA 118-2026-10-004512', 'obra');
+
+            return $o;
+        });
+        $usd = $this->en('2026-10-21', fn () => $fin->registrarCompra($imp->id, 'INV-2026-0918', null, CarbonImmutable::parse('2026-10-21'), 30, '6000.00', 'manual', 'USD', '3.7400'));
+        $this->en('2026-11-12', fn () => $fin->pagar($usd->id, CarbonImmutable::parse('2026-11-12'), FinanzasService::CUENTAS[0], '3.7520'));
+
+        // Una factura de proveedor leída de su XML (P8).
+        $orden8 = DB::table('ordenes')->where('proyecto_id', $p8)->where('estado', 'recibida')->whereNotExists(fn ($q) => $q->from('comprobantes')->whereColumn('comprobantes.orden_id', 'ordenes.id'))->first();
+
+        if ($orden8 === null) {
+            $o = $compras->ordenDirecta('servicio_puntual', null, 'Redes y Fibra del Pacífico S.A.C.', $p8, '30 días', [['descripcion' => 'Certificación de puntos de red (lote 3)', 'unidad_medida_id' => $this->unidad('GLB'), 'cantidad' => '1', 'precio_unitario' => '3200.00', 'partida_control_id' => $hojasP8 = (int) DB::table('partidas_control')->where('proyecto_id', $p8)->where('es_hoja', true)->where('es_no_presupuestado', false)->orderBy('codigo')->value('id')]], CarbonImmutable::parse('2026-11-15'));
+            $compras->aprobarOrden($o->id, 'Certificación.', $this->dev);
+            $compras->recibir($o->id, [$o->lineas()->value('id') => '1'], CarbonImmutable::parse('2026-11-15'), null);
+            $orden8 = DB::table('ordenes')->find($o->id);
+        }
+
+        $base = DB::table('orden_lineas')->where('orden_id', $orden8->id)->selectRaw('SUM(ROUND(cantidad_recibida * precio_unitario, 2)) AS b')->value('b');
+        $igv = bcadd(bcmul((string) $base, '0.18', 4), '0.005', 2);
+        $xml = '<?xml version="1.0" encoding="UTF-8"?><Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">'
+            .'<cbc:ID>F007-00012874</cbc:ID><cbc:IssueDate>2026-11-17</cbc:IssueDate><cbc:DocumentCurrencyCode>PEN</cbc:DocumentCurrencyCode>'
+            .'<cac:AccountingSupplierParty><cac:Party><cac:PartyIdentification><cbc:ID schemeID="6">20699600016</cbc:ID></cac:PartyIdentification><cac:PartyLegalEntity><cbc:RegistrationName>'.htmlspecialchars($orden8->proveedor_nombre).'</cbc:RegistrationName></cac:PartyLegalEntity></cac:Party></cac:AccountingSupplierParty>'
+            .'<cac:TaxTotal><cbc:TaxAmount currencyID="PEN">'.$igv.'</cbc:TaxAmount></cac:TaxTotal><cac:LegalMonetaryTotal><cbc:LineExtensionAmount currencyID="PEN">'.bcadd((string) $base, '0', 2).'</cbc:LineExtensionAmount><cbc:PayableAmount currencyID="PEN">'.bcadd((string) $base, $igv, 2).'</cbc:PayableAmount></cac:LegalMonetaryTotal></Invoice>';
+        $this->en('2026-11-18', fn () => $fin->registrarCompraXml((int) $orden8->id, $xml, 30));
+
+        // Servicios con vigencia; la orden de noviembre del SCTR de P8.
+        foreach ([['sctr', 'Seguros Andinos S.A.', 'SCTR del personal de obra de la red del GORE', $p8, 'mensual', '850.00', '2026-06-01', '2026-12-05'],
+            ['poliza', 'Seguros Andinos S.A.', 'Póliza todo riesgo de equipos y herramientas', null, 'anual', '4800.00', '2025-12-18', '2026-12-18'],
+            ['alquiler', 'Inmobiliaria Las Begonias S.A.C.', 'Alquiler de la Oficina Lima', null, 'mensual', '4800.00', '2026-03-01', '2027-02-28'],
+            ['licencia', 'Distribuidora de Software Andina S.A.C.', 'Licencias de presupuestos (5 usuarios)', null, 'anual', '6200.00', '2026-02-01', '2027-01-31'],
+            ['suscripcion', 'Nube Andina S.A.C.', 'Servidor en la nube de la telemetría de clientes', null, 'mensual', '420.00', '2026-01-01', '2027-06-30']] as [$tipo, $prov, $desc, $pry, $per, $monto, $desde, $hasta]) {
+            $id = $fin->crearServicio($tipo, $prov, $desc, $pry, null, $per, $monto, $desde, $hasta);
+
+            if ($tipo === 'sctr') {
+                $this->en('2026-11-03', fn () => $fin->ordenDelPeriodo($id, CarbonImmutable::parse('2026-11-03')));
+            }
+        }
+
+        // Liquidación de dos contratos ya culminados, y un consorcio (P9: Techquk 40 %).
+        foreach (['Cableado estructurado', 'Telemetría de pozos'] as $nombre) {
+            $ct = Contrato::query()->where('proyecto_id', (int) DB::table('proyectos')->where('nombre', 'like', $nombre.'%')->value('id'))->firstOrFail();
+            $contratos->liquidar($ct->id, CarbonImmutable::parse('2026-02-15'));
+        }
+
+        Contrato::query()->where('proyecto_id', (int) DB::table('proyectos')->where('nombre', 'like', 'Historia clínica%')->value('id'))
+            ->update(['consorcio' => 'Consorcio Salud Digital Norte', 'participacion_pct' => 40, 'modo_consorcio' => 'participacion']);
+
         // Conciliado todo lo que pasó hasta octubre.
         DB::table('movimientos_caja')->where('fecha', '<', '2026-11-01')->update(['conciliado' => true]);
     }
