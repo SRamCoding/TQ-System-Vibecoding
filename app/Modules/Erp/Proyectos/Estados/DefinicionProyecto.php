@@ -69,7 +69,7 @@ final class DefinicionProyecto extends DefinicionDocumento
     {
         return [
             new TransicionDefinida('iniciar_ejecucion', 'Iniciar ejecución', self::EN_PREPARACION, self::EN_EJECUCION, esDelSistema: true),
-            new TransicionDefinida('cerrar', 'Cerrar', self::EN_EJECUCION, self::CERRADO, efectos: ['erp.proyectos.avisar-cierre']),
+            new TransicionDefinida('cerrar', 'Cerrar', self::EN_EJECUCION, self::CERRADO, condiciones: [\App\Modules\Erp\Proyectos\Condiciones\ProyectoSinPendientes::class], efectos: ['erp.proyectos.avisar-cierre']),
             new TransicionDefinida('anular', 'Anular', self::EN_PREPARACION, self::ANULADO, requiereMotivo: true, condiciones: [ProyectoSinImputaciones::class]),
         ];
     }

@@ -28,6 +28,7 @@ use App\Modules\Crm\Oportunidades\Models\Oportunidad;
 use App\Modules\Crm\Oportunidades\Services\DatosDelProyectoAlGanar;
 use App\Modules\Crm\Oportunidades\Services\DatosOportunidad;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
+use App\Modules\Erp\Cierre\Services\CierreService;
 use App\Modules\Erp\Compras\Models\Orden;
 use App\Modules\Erp\Compras\Services\ComprasService;
 use App\Modules\Erp\Contratos\Models\Contrato;
@@ -173,6 +174,9 @@ final class DemoSeeder extends Seeder
 
             $this->command?->info('Demo: postventa');
             $this->postventa();
+
+            $this->command?->info('Demo: cierre de proyectos');
+            $this->cierres();
 
             $this->command?->info('Demo: agenda');
             $this->en('2026-11-19', fn () => $this->actividades());
@@ -1194,6 +1198,32 @@ final class DemoSeeder extends Seeder
         // Planillas: octubre cerrada, noviembre en cálculo.
         $this->en('2026-10-31', fn () => $ps->cerrarPlanilla($ps->calcularPlanilla('2026-10')));
         $this->en('2026-11-19', fn () => $ps->calcularPlanilla('2026-11'));
+    }
+
+    /** Flujo 6 (ficha t9-cierre): los cerrados se congelan de nuevo con su facturación ya cargada, y lo aprendido. */
+    private function cierres(): void
+    {
+        $c = app(CierreService::class);
+        $lecciones = [
+            'Videovigilancia y centro de monitoreo%' => "El plazo de 241 días no alcanzó: la importación de las cámaras tardó 70 días más y se aplicó el tope de la penalidad.\nPara el próximo: pedir los equipos importados antes de firmar o pactar entregas parciales; la penalidad se come el margen.",
+            'Cableado estructurado%' => "El cableado salió casi exacto; el desperdicio de cable fue del 4 % y no del 8 % que pusimos.\nPara el próximo: 5 % de desperdicio en cableado horizontal de colegios.",
+            'Telemetría de pozos%' => "Los equipos de radio llegaron con otro firmware y hubo que volver al campo dos veces.\nPara el próximo: probar un equipo en la oficina antes de llevar el lote a campo; sumar una visita técnica más al presupuesto.",
+        ];
+
+        foreach (DB::table('proyectos as p')->join('estados as e', 'e.id', '=', 'p.estado_id')->where('e.codigo', 'cerrado')->pluck('p.id') as $id) {
+            $c->congelar((int) $id);
+        }
+
+        foreach ($lecciones as $nombre => $texto) {
+            $id = (int) DB::table('proyectos')->where('nombre', 'like', $nombre)->value('id');
+            $c->lecciones($id, $texto);
+        }
+
+        // Una carta fianza ya liberada por el banco, esperando que se registre su devolución.
+        $g = DB::table('contrato_garantias as g')->join('contratos as k', 'k.id', '=', 'g.contrato_id')->join('proyectos as p', 'p.id', '=', 'k.proyecto_id')->where('p.nombre', 'like', 'Cableado estructurado%')->value('g.id');
+        if ($g !== null) {
+            DB::table('contrato_garantias')->where('id', $g)->update(['estado' => 'liberada']);
+        }
     }
 
     /** Tramo 5 (ficha t5-finanzas): lo que cada proyecto facturó y cobró, la factura del cable, y fondos con su rendición. */

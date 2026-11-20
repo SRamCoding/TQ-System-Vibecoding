@@ -25,6 +25,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t6-postventa](fichas/t6-postventa.md) | Flujo 8 | aprobada | v1 | `aprobado/t6-postventa-v1` |
 | [t7-personas](fichas/t7-personas.md) | Flujo 9 | aprobada | v1 | `aprobado/t7-personas-v1` |
 | [t8-tableros](fichas/t8-tableros.md) | Parte 5 | aprobada | v1 | `aprobado/t8-tableros-v1` |
+| [t9-cierre](fichas/t9-cierre.md) | Flujo 6 | aprobada | v1 | `aprobado/t9-cierre-v1` |
 
 ## Registro del repositorio
 

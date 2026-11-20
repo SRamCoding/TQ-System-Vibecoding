@@ -34,6 +34,7 @@ return [
     FinanzasServiceProvider::class,
     PostventaServiceProvider::class,
     App\Modules\Erp\Tableros\TablerosServiceProvider::class,
+    App\Modules\Erp\Cierre\CierreServiceProvider::class,
     CuentasServiceProvider::class,
     ActividadesServiceProvider::class,
     OportunidadesServiceProvider::class,

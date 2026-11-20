@@ -49,6 +49,7 @@ final class ProyectosServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        $this->app->singleton(Condiciones\VerificacionesCierre::class);
         $this->app->bind(ProyectosService::class, ProyectosEnBase::class);
         // Plan 2.10, D3: donde los demás módulos suman sus pestañas a la ficha. Uno por aplicación.
         $this->app->singleton(RegistroPestanasProyecto::class);
