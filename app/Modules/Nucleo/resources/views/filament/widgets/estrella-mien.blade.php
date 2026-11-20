@@ -39,7 +39,7 @@
         html.tq-sin-animaciones .tq-mien-halo, html.tq-sin-animaciones .tq-mien-destello { animation: none; }
         html.tq-sin-animaciones .tq-mien-svg { transition: none; }
     </style>
-    <a href="{{ $caja->url }}" @class(['tq-mien-estrella', 'tq-al-dia' => $alDia]) data-modulo="mien" aria-label="{{ $aria }}">
+    <a href="{{ $caja->url }}" wire:navigate @class(['tq-mien-estrella', 'tq-al-dia' => $alDia]) data-modulo="mien" aria-label="{{ $aria }}">
         <span class="tq-mien-dibujo" aria-hidden="true">
             @unless ($alDia)
                 <span class="tq-mien-halo"></span>

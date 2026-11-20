@@ -8,5 +8,5 @@
             {{ $cuantas === 1 ? 'documento espera tu firma.' : 'documentos esperan tu firma.' }}
         </p>
     @endif
-    <p class="mt-2 text-sm"><a href="{{ $enlace }}" class="fi-link">Ver mis aprobaciones</a></p>
+    <p class="mt-2 text-sm"><a href="{{ $enlace }}" wire:navigate class="fi-link">Ver mis aprobaciones</a></p>
 </div>

@@ -46,7 +46,7 @@ final class ActividadesServiceProvider extends ServiceProvider
         // MV-025: la agenda sale del inicio y es una herramienta del muelle; Mien muestra «Mi agenda».
         Livewire::component('agenda-muelle', Filament\Muelle\AgendaMuelle::class);
         FilamentView::registerRenderHook(PanelsRenderHook::BODY_END,
-            fn (): string => auth()->user()?->can(ActividadesService::PERMISO_VER) === true ? Livewire::mount('agenda-muelle') : '');
+            fn (): string => auth()->user()?->can(ActividadesService::PERMISO_VER) === true ? '<div x-persist="tq-agenda">'.Livewire::mount('agenda-muelle').'</div>' : ''); // MV-037: sigue viva al cambiar de pantalla
         // MV-032: lo de hoy y lo vencido cuenta para la estrella de Mien.
         $this->app->make(RegistroPendientesMien::class)->registrar('agenda', function (User $u): array {
             if (! $u->can(ActividadesService::PERMISO_VER)) {

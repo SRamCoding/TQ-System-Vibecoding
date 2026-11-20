@@ -36,7 +36,7 @@ final class PortadaProceso extends Page
         $this->proceso = $proceso;
         $datos = $this->datos();
         abort_if($datos === null, 404);
-        $this->redirect(NavegacionService::cajaDelMedio($datos['internas'])->url);
+        $this->redirect(NavegacionService::cajaDelMedio($datos['internas'])->url, navigate: true);
     }
 
     public function getTitle(): string

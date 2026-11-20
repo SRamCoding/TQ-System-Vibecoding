@@ -33,7 +33,7 @@
                         @foreach ($l['items'] as $i)
                             <li class="py-2">
                                 @if (isset($i['url']))
-                                    <a href="{{ $i['url'] }}" @class(['font-medium hover:underline', $tonos[$i['tono'] ?? ''] ?? 'text-gray-950 dark:text-white'])>{{ $i['texto'] }}</a>
+                                    <a href="{{ $i['url'] }}" wire:navigate @class(['font-medium hover:underline', $tonos[$i['tono'] ?? ''] ?? 'text-gray-950 dark:text-white'])>{{ $i['texto'] }}</a>
                                 @else
                                     <span @class(['font-medium', $tonos[$i['tono'] ?? ''] ?? ''])>{{ $i['texto'] }}</span>
                                 @endif

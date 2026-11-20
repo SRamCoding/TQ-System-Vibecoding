@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v5
+- **Versión:** v6
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-037** (cruza módulos) · Cambiar de pantalla sin recargar: solo cambia el contenido; el marco queda quieto.
 - **MV-036** (ficha) · La frase debajo de las cajas, chica y apagada; reordenar con una copia que sigue al puntero
   y las demás corriéndose en vivo, como en el muelle.
 - **MV-035** (cruza módulos) · Cada proceso: frase en el color de su franja y sus cajas centradas como un solo cuerpo
@@ -119,6 +120,12 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   miden 9 × 7,5 rem; con preguntas, la caja activa crece a 11,5 × 8,75. El nombre más largo, «Flujo de caja y
   conciliación», entra en dos líneas («Flujo de caja y» / «conciliación»); ninguno necesita una tercera.
 
+- **Sin recargar (MV-037):** el panel navega sin recargar la página (modo SPA de Filament y `wire:navigate` en los
+  enlaces propios: barra de cajas del proceso, estrella de Mien, tarjetas y tablero de Mien). La barra lateral, el
+  encabezado y el marco se quedan; el muelle, la agenda, el asistente, el cielo, la ambientación y el guardado del tema
+  se conservan vivos entre pantallas (`x-persist`). Mientras carga, la barra fina de progreso de Livewire. Las cajas del
+  inicio, en escritorio, siguen abriendo su proceso en otra pestaña (plan 1.4f, D10); en el celular, sin recargar.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -162,9 +169,8 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Atajos tomados
 
-- **«El contenido aparece debajo, sin ir a otra página»** se logra con una navegación normal entre páginas y la
-  transición de vista del navegador (`@view-transition`), con la barra fija en su lugar: técnicamente cada caja sigue
-  siendo su propia página. El repo original (Vue) lo hace como rutas hijas dentro de la vista del proceso.
+- **«El contenido aparece debajo, sin ir a otra página»** se logra con la navegación sin recarga de Livewire (MV-037):
+  técnicamente cada caja sigue siendo su propia página, que reemplaza solo el contenido. El repo original (Vue) lo hace como rutas hijas dentro de la vista del proceso.
 - **El orden se guarda** por una ruta propia (`POST /procesos/{proceso}/orden`), no por una acción registrada, y no
   aparece en Mis preferencias.
 
@@ -184,6 +190,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v6** (MV-037): navegación sin recarga en todo el panel; lo vivo se conserva entre pantallas.
 
 - **v5** (MV-036): la frase pasa debajo de las cajas, chica y apagada; el reordenamiento deja el arrastre del navegador
   y usa el del muelle (copia que sigue al puntero y cajas que se corren en vivo).

@@ -97,6 +97,9 @@ final class AppPanelProvider extends PanelProvider
             // Plan 1.4f, D5: la barra lateral se arma con las cajas permitidas; apagada u oculta, la esconde el CSS.
             ->navigation(fn (): NavigationBuilder|false => BarraModulos::navegacion($this->usuario()))
             // Plan 1.3d, D5 y D6: el ancho que guardó cada persona; plegada, solo íconos (el plegado de Filament).
+            // MV-037: cambiar de pantalla sin recargar la página entera (Livewire navigate); lo que debe seguir vivo
+            // (el muelle, el asistente, el cielo, la ambientación) se conserva con `x-persist`.
+            ->spa()
             ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth(fn (): string => $this->anchoBarraLateral().'px')
             ->renderHook(PanelsRenderHook::SIDEBAR_START, fn (): string => Livewire::mount(BordeBarraLateral::class))
@@ -104,14 +107,14 @@ final class AppPanelProvider extends PanelProvider
             // el selector de Filament se guarda en la base.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.apariencia')->render())
             // MVP rápido (MV-012): en el tema «Sistema», la pantalla sigue el cielo (en curso).
-            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => view('nucleo::filament.cielo')->render())
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => self::persistir('tq-cielo', view('nucleo::filament.cielo')->render()))
             // MVP rápido (op-asistente): el asistente de ayuda «n_n».
-            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => view('nucleo::filament.asistente')->render())
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => self::persistir('tq-asistente', view('nucleo::filament.asistente')->render()))
             // MVP rápido (op-gran-momento): la ambientación de pantalla completa de Navidad y Año Nuevo.
-            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => view('nucleo::filament.ambientacion-festiva')->render())
-            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? Livewire::mount(GuardarTema::class) : '')
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => self::persistir('tq-ambientacion', view('nucleo::filament.ambientacion-festiva')->render()))
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? self::persistir('tq-guardar-tema', Livewire::mount(GuardarTema::class)) : '')
             // El panel de aplicaciones, en todas las pantallas (plan 1.4p, D1). Si falla, la pantalla sale igual, sin él.
-            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? rescue(fn (): string => Livewire::mount(PanelAplicaciones::class), '') : '')
+            ->renderHook(PanelsRenderHook::BODY_END, fn (): string => Filament::auth()->check() ? self::persistir('tq-muelle', rescue(fn (): string => Livewire::mount(PanelAplicaciones::class), '')) : '')
             // Plan 1.4d, D5: el gran momento de la fecha, solo si a la persona le toca uno. Es decoración: si falla, nada.
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => rescue(fn (): string => $this->granMomento(), ''))
             // Plan 1.13b, D6: la bienvenida de la configuración inicial, en la primera pantalla tras iniciar sesión. Si
@@ -121,7 +124,7 @@ final class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => ModoDesarrollo::activo() ? Livewire::mount(BarraDesarrollo::class) : '')
             // Plan 1.3d: fondo propio de la barra superior y estado guardado de la barra lateral.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.navegacion')->render())
-            // MV-020: dentro de una pantalla de un proceso, la miga a su portada y pestañas con sus hermanas.
+            // MV-035: arriba de cada pantalla de un proceso, su barra de cajas y su frase.
             ->renderHook(PanelsRenderHook::PAGE_START, fn (): string => rescue(fn (): string => ($u = $this->usuario()) !== null && ($datos = app(NavegacionService::class)->procesoDeRuta($u, BarraModulos::rutaActual())) !== null ? view('nucleo::filament.procesos.pestanas', ['datos' => $datos])->render() : '', ''))
             // Plan 1.4ab: la escala de letra del prototipo de Proyectos y la línea fina bajo la barra superior.
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.tipografia')->render())
@@ -293,5 +296,11 @@ final class AppPanelProvider extends PanelProvider
         $usuario = Filament::auth()->user();
 
         return $usuario instanceof User ? $usuario : null;
+    }
+
+    /** MV-037: lo que sigue vivo al cambiar de pantalla sin recargar (Livewire `x-persist`). */
+    private static function persistir(string $nombre, string $html): string
+    {
+        return $html === '' ? '' : '<div x-persist="'.$nombre.'">'.$html.'</div>';
     }
 }

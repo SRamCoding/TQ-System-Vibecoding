@@ -124,11 +124,10 @@
         },
         original() {
             fetch(@js('/procesos/'.$proceso->value.'/orden'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': @js(csrf_token()), 'Accept': 'application/json' }, body: JSON.stringify({ claves: [] }) })
-                .then(() => window.location.reload())
+                .then(() => Livewire.navigate(window.location.href))
         },
     }">
     <style>
-        @view-transition { navigation: auto; }
         .tq-proceso { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 1.25rem; view-transition-name: tq-proceso; }
         .tq-proceso[data-area="personal"] { --tq-f: var(--dorado-600); --tq-f-texto: var(--dorado-600); }
         .tq-proceso[data-area="nucleo"] { --tq-f: {{ $C::AZUL_NOCHE }}; --tq-f-texto: {{ $C::AZUL_NOCHE }}; }
@@ -164,7 +163,7 @@
     </style>
     <div class="tq-proceso-cuerpo" x-ref="cuerpo" role="list">
         @foreach ($datos['internas'] as $interna)
-            <a href="{{ $interna->url }}" class="tq-proceso-caja" role="listitem" data-caja="{{ $interna->clave }}"
+            <a href="{{ $interna->url }}" wire:navigate class="tq-proceso-caja" role="listitem" data-caja="{{ $interna->clave }}"
                 @if ($interna->clave === $datos['actual']->clave) aria-current="page" @endif
                 draggable="false"
                 x-on:dragstart.prevent

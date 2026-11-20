@@ -471,3 +471,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «La frase debajo y sutil; reordenar como en el muelle»
+
+### MV-037 · 2026-11-20 · Cambiar de pantalla sin recargar toda la página
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/observaciones-de-navegacion.md`, punto 1) «Que al cambiar de opción solo
+  cambie el contenido, sin recargar la página entera. La barra lateral, el encabezado, el muelle y el resto del marco se
+  quedan quietos. Vale para toda la navegación del sistema. La dirección se actualiza igual y el botón "atrás" funciona.
+  Mientras carga, una señal discreta».
+- **Decisión:** toda la navegación cambia solo el contenido; lo que debe seguir vivo (muelle, agenda, asistente,
+  cielo, ambientación) se conserva entre pantallas; mientras carga, una barra fina arriba.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 1: cambiar de pantalla sin recargar»
