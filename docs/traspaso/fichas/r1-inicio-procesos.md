@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v16
+- **Versión:** v17
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-049** (cruza módulos) · Nadie elige qué módulos ver; se quedan solo los permisos del rol (y el orden de las cajas).
 - **MV-048** (cruza módulos) · Tampoco hay título grande en las opciones de una barra lateral interna.
 - **MV-047** (cruza módulos) · Dentro de un módulo (cajas del proceso, barra lateral interna) no se enciende el haz; si
   tarda más de 1 s, una señal discreta en el contenido.
@@ -87,8 +88,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
     persona y cambia la caja del medio. **«Volver al orden original»** aparece debajo cuando hay un orden propio.
   - Ya no hay título de portada, descripción, etiqueta de franja, pestañas ni miga.
 - **Barra lateral:** un grupo por franja con las cajas de proceso (Mien en «Personal»). Un proceso queda marcado en cualquiera
-  de sus pantallas. «Elegir módulos» y «Pantalla al entrar» (preferencias) eligen entre
-  procesos.
+  de sus pantallas. **MV-049:** ya no existe «Elegir módulos» ni la preferencia «Módulos de la barra»: la barra muestra
+  siempre todos los procesos que el rol permite. «Pantalla al entrar» sigue (elige adónde se llega, no qué se ve).
 - **Mien** `/mien`: sus tarjetas de siempre y, debajo, «El tablero de tu rol» con las pestañas de los roles que la
   persona puede ver (`/mien?rol=jefatura|almacen|tesoreria|comercial|gerencia`). `/mi-tablero` lleva a Mien.
 - **Lo que salió de Configuración:**
@@ -205,7 +206,6 @@ Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas
 
 | Operación | Campos | Valida | Qué produce |
 |---|---|---|---|
-| Elegir procesos de la barra | procesos ocultos (lista de claves de proceso) | cada clave es un proceso que la persona ve; queda al menos uno | guarda los ocultos de la barra |
 | Ordenar las cajas de un proceso | proceso; claves en el nuevo orden (lista; vacía = original) | solo claves de ese proceso | guarda el orden de la persona |
 | Pantalla al entrar | «El inicio» o un proceso | el proceso es uno que la persona ve | al iniciar sesión llega a la portada de ese proceso |
 
@@ -250,6 +250,9 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Atajos tomados
 
+- **Tabla y acción sin uso:** `modulos_ocultos` y la acción `nucleo.elegir-modulos` quedan en el código, vacías y sin
+  pantalla; el repo original no las construye.
+
 - **La barra lateral interna** la dibuja Filament en cada pantalla: no se conserva entre pantallas, se vuelve a dibujar
   igual y el script le devuelve su desplazamiento y desliza la marca desde donde estaba (se ve quieta).
 
@@ -278,6 +281,9 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v17** (MV-049): se quita «Elegir módulos» y lo que guardaba (`modulos_ocultos` y la preferencia
+  `navegacion.modulos_barra` se borran).
 
 - **v16** (MV-048): sin título grande en las pantallas con barra lateral interna.
 

@@ -151,7 +151,6 @@ final class AppPanelProvider extends PanelProvider
             ->userMenuItems([
                 // Plan 1.4f, D6: la barra se prende, se apaga y se elige al instante, sin recargar.
                 'barra-modulos' => fn (): Action => BarraModulos::accionMostrar(),
-                'elegir-modulos' => fn (): Action => BarraModulos::accionElegir(),
                 // Plan 1.4h, D4: los datos de la cuenta (cumpleaños, teléfono, contraseña); reemplaza a «Mi cumpleaños».
                 'mis-datos' => fn (): Action => Action::make('misDatos')->label('Mis datos')
                     ->icon('heroicon-o-identification')->url(fn (): string => MisDatos::getUrl()),

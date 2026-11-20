@@ -45,6 +45,9 @@ final class NavegacionService
      */
     public function ocultos(User $usuario): array
     {
+        // MV-049: nadie oculta módulos; cada persona ve siempre lo que su rol le permite.
+        return [];
+
         // Una sola lectura por pedido (plan 1.12, prueba de carga: se leía 5 veces).
         $guardados = app(OcultosDelPedido::class)->de($usuario->id);
         $permitidos = array_map(fn (CajaModulo $caja): string => $caja->clave, $this->cajasDeProceso($usuario));

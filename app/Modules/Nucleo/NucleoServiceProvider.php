@@ -1055,8 +1055,7 @@ final class NucleoServiceProvider extends ServiceProvider
                 'inicio', fn (User $usuario): array => ['inicio' => 'El inicio', ...app(ModulosDeLaBarra::class)->opciones($usuario)]),
             DefinicionPreferencia::siNo(GrupoPreferencia::Navegacion, 'barra_modulos', 'Mostrar barra de módulos',
                 'Una barra a la izquierda con tus módulos, para cambiar de uno a otro sin volver al inicio.', false)->soloEnEscritorio(),
-            DefinicionPreferencia::lista(GrupoPreferencia::Navegacion, 'modulos_barra', 'Módulos de la barra',
-                'Los que quieres ver en la barra. Ocultar uno no te quita el acceso: sigue en el inicio.', ModulosDeLaBarra::class)->soloEnEscritorio(),
+            // MV-049: ya no se elige qué módulos ver («Módulos de la barra» se quitó).
             // Se cambia arrastrando el borde de la barra (plan 1.3d); «Restablecer» la devuelve al ancho inicial.
             DefinicionPreferencia::numero(GrupoPreferencia::Navegacion, 'ancho_barra', 'Ancho de la barra',
                 'En píxeles; 0 la deja solo con íconos.', BarraLateral::ANCHO_INICIAL, BarraLateral::PLEGADA, BarraLateral::ANCHO_MAXIMO)

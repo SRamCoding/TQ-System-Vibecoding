@@ -629,3 +629,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 3.2: sin título en las pantallas con barra lateral interna»
+
+### MV-049 · 2026-11-20 · Nadie elige qué módulos ver: cada persona ve lo que su rol permite
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/observaciones-4.md`, punto 1) «Que no exista ninguna opción para que la
+  persona elija qué módulos o cajas ver. Cada persona ve siempre y solo lo que su rol le permite. Se queda el cambio de
+  orden de las cajas dentro de la barra de cada proceso. Lo que ve cada rol lo define quien administra, en Sistema».
+- **Decisión:** se quitan «Elegir módulos» (menú del avatar y al prender la barra) y la preferencia «Módulos de la
+  barra», y se borra lo que habían guardado. Reemplaza lo que el repo original decidió en el plan 1.4f (D4) y 1.4g
+  sobre ocultar módulos.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 4.1: sin elegir qué módulos ver»

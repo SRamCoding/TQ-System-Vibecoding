@@ -4,22 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Nucleo\Filament;
 
-use App\Modules\Nucleo\Excepciones\ErrorDeNegocio;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Navegacion\CajaModulo;
-use App\Modules\Nucleo\Navegacion\EleccionDeModulos;
-use App\Modules\Nucleo\RegistroAcciones\EjecutorAcciones;
 use App\Modules\Nucleo\Services\NavegacionService;
-use Closure;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Hidden;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
-use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Utilities\Get;
 use Livewire\Component;
 use Livewire\Livewire;
 
@@ -72,33 +64,14 @@ final class BarraModulos
     {
         $prendida = self::barraVisible();
 
-        if ($prendida || app(EleccionDeModulos::class)->yaSeAcepto()) {
-            return AccionFilament::desde('nucleo.mostrar-barra-modulos', fn (): array => ['visible' => ! $prendida])
-                ->label(self::ETIQUETA)
-                ->extraAttributes(['class' => 'tq-solo-escritorio tq-interruptor'.($prendida ? ' tq-interruptor-prendido' : '')])
-                ->icon($prendida ? 'tq-interruptor-prendido' : 'tq-interruptor-apagado')
-                ->hidden(fn (): bool => ! self::hayModulos())
-                ->after(fn (Component $livewire) => self::avisar($livewire));
-        }
-
-        return self::ventanaElegir(alAceptar: fn () => self::prender())
-            ->name('prenderBarraModulos')
+        // MV-049: nadie elige qué módulos ver; la barra muestra siempre lo que su rol permite. Prenderla ya no abre
+        // «Elegir módulos».
+        return AccionFilament::desde('nucleo.mostrar-barra-modulos', fn (): array => ['visible' => ! $prendida])
             ->label(self::ETIQUETA)
-            ->extraAttributes(['class' => 'tq-solo-escritorio tq-interruptor'])
-            ->icon('tq-interruptor-apagado')
-            ->modalHeading('Elegir módulos')
-            ->modalSubmitActionLabel('Aceptar');
-    }
-
-    /** «Elegir módulos…» (D6), con la barra prendida: aplica al instante. */
-    public static function accionElegir(): Action
-    {
-        return self::ventanaElegir()
-            ->label('Elegir módulos…')
-            ->extraAttributes(['class' => 'tq-solo-escritorio'])
-            ->icon('heroicon-o-adjustments-horizontal')
-            ->modalHeading('Elegir módulos')
-            ->hidden(fn (): bool => ! self::barraVisible() || ! self::hayModulos());
+            ->extraAttributes(['class' => 'tq-solo-escritorio tq-interruptor'.($prendida ? ' tq-interruptor-prendido' : '')])
+            ->icon($prendida ? 'tq-interruptor-prendido' : 'tq-interruptor-apagado')
+            ->hidden(fn (): bool => ! self::hayModulos())
+            ->after(fn (Component $livewire) => self::avisar($livewire));
     }
 
     private static function item(CajaModulo $caja, bool $oculto, User $usuario): NavigationItem
@@ -116,57 +89,6 @@ final class BarraModulos
                 'data-tq-barra' => true,
                 'class' => $oculto ? 'tq-oculto' : null,
             ]));
-    }
-
-    /**
-     * La ventana con los permitidos marcados salvo los ocultos. La acción guarda lo oculto (D4): lo desmarcado de lo que
-     * se mostró **al abrir** (`mostrados`), no de lo permitido al guardar: un módulo que se permite con la ventana
-     * abierta no se oculta por accidente. Cancelar o cerrarla no guarda nada.
-     */
-    private static function ventanaElegir(?Closure $alAceptar = null): Action
-    {
-        return AccionFilament::desde('nucleo.elegir-modulos', alTerminar: $alAceptar, controles: [
-            'ocultos' => fn (): CheckboxList => CheckboxList::make('ocultos')
-                ->hiddenLabel()
-                ->options(fn (Get $get): array => array_column(array_map(
-                    fn (CajaModulo $caja): array => [$caja->clave, $caja->nombre],
-                    array_values(array_filter(self::permitidos(), fn (CajaModulo $caja): bool => in_array($caja->clave, self::lista($get('mostrados')), true))),
-                ), 1, 0))
-                // En pantalla, lo marcado es lo que se ve; a la acción le llega lo desmarcado.
-                ->formatStateUsing(fn (mixed $state): array => array_values(array_diff(self::clavesPermitidas(), self::lista($state))))
-                ->dehydrateStateUsing(fn (mixed $state, Get $get): array => array_values(array_diff(self::lista($get('mostrados')), self::lista($state)))),
-        ], deApoyo: [fn (): Hidden => Hidden::make('mostrados')])
-            ->fillForm(fn (): array => [
-                'ocultos' => ($usuario = self::usuario()) === null ? [] : app(NavegacionService::class)->ocultos($usuario),
-                'mostrados' => self::clavesPermitidas(),
-            ])
-            ->hidden(fn (): bool => ! self::hayModulos())
-            ->after(fn (Component $livewire) => self::avisar($livewire));
-    }
-
-    /**
-     * Segunda mitad de la ventana al prender: ya guardada la elección, prende la barra. Solo entonces cuenta como
-     * aceptada en este inicio de sesión: cancelar, cerrar o un rechazo la dejan para la próxima vez. Son dos acciones
-     * registradas, cada una en su transacción (D6): si esta fallara, la elección queda guardada y la barra apagada, y se
-     * avisa. Aceptado: son preferencias propias, no un documento, y prenderla otra vez lo completa.
-     */
-    private static function prender(): void
-    {
-        $usuario = self::usuario();
-
-        if ($usuario === null) {
-            return;
-        }
-
-        try {
-            app(EjecutorAcciones::class)->ejecutar('nucleo.mostrar-barra-modulos', ['visible' => true], $usuario);
-        } catch (ErrorDeNegocio $e) {
-            Notification::make()->danger()->title($e->getMessage())->send();
-
-            return;
-        }
-
-        app(EleccionDeModulos::class)->marcarAceptada();
     }
 
     /** Le dice al navegador lo que quedó guardado, para mostrarlo sin recargar. */
