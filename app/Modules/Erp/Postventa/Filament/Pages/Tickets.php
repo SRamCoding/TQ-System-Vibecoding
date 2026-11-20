@@ -39,7 +39,7 @@ final class Tickets extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-wrench';
 
-    public const array ESTADOS = ['abierto' => 'Abierto', 'en_atencion' => 'En atención', 'con_fabricante' => 'Con fabricante', 'por_cotizar' => 'Por cotizar (fuera de garantía)', 'resuelto' => 'Resuelto', 'cerrado' => 'Cerrado'];
+    public const array ESTADOS = ['abierto' => 'Sin atender', 'en_atencion' => 'En atención', 'con_fabricante' => 'Con fabricante', 'por_cotizar' => 'Por cotizar (fuera de garantía)', 'resuelto' => 'Resuelto', 'cerrado' => 'Cerrado'];
 
     public static function canAccess(): bool
     {

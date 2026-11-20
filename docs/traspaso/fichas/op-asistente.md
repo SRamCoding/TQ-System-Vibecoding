@@ -1,7 +1,7 @@
 # Ficha · Asistente de ayuda «n_n» (opcional, plan 1.14)
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v2
 - **Tramo de la ruta:** opcionales (MV-014)
 - **Aprobada:** 2026-11-20 · etiqueta `aprobado/op-asistente-v1`
 - **Fuentes del diseño:** `docs/planes/activos/2026-10-29-ayuda-asistente.md` (D1 a D9).
@@ -17,6 +17,8 @@ abre si la persona lo confirma. Clic derecho: descansar o callar por un rato. Nu
 
 ## Decisiones de Sebastián
 
+- **MV-040** (ficha) · Franja fija de filtros en Tickets de ayuda; «abierto» pasa a «Sin atender».
+- **MV-038** (ficha) · Ícono propio de Tickets de ayuda.
 - **MV-014** (ficha) · Entra al MVP.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema.
 - Del plan del repo original (aprobadas allá): D1 a D9 en su versión base (ver supuestos).
@@ -65,3 +67,25 @@ abre si la persona lo confirma. Clic derecho: descansar o callar por un rato. Nu
 `app/Modules/Nucleo/resources/views/filament/asistente.blade.php` (personaje, iniciativa, chat y menú; al final del
 cuerpo en `AppPanelProvider`), `Nucleo/Services/AsistenteService.php`, `Nucleo/Filament/Pages/TicketsAyuda.php`,
 `routes/web.php`, migración `2026_11_20_700001_crear_tickets_ayuda.php`.
+
+## Cambios desde la versión anterior
+
+- **v2** (MV-038, MV-039, MV-040): ícono propio; sin el texto que explicaba la pantalla; **franja fija de filtros**
+  arriba de la lista:
+  - **Estado como pestañas con contador:** Pendientes (sin atender + en curso; se abre al entrar), Sin atender, En curso,
+    Resueltos, Todos.
+  - **Buscador** (código, resumen y conversación, sin esperar a Enter) y **filtros en botones**: Proceso (el de la
+    pantalla donde pasó, entre las 11 cajas), Quién lo abrió (solo soporte), Fecha (hoy, esta semana, este mes o un
+    rango), Esperando más de (2 o 7 días). Activo: lleno en el azul de resaltado con su valor y «✕» para quitarlo;
+    inactivo: borde punteado y «+». «Limpiar filtros» cuando hay alguno.
+  - **Lista:** código (con fecha y hora), problema, proceso y pantalla, quién lo abrió, estado (Sin atender ámbar, En
+    curso azul, Resuelto verde) y esperando (días; ámbar desde 2). **Orden:** pendientes del más antiguo al más nuevo;
+    resueltos del más nuevo al más antiguo.
+  - **Se recuerdan** los filtros de cada persona al salir y volver (en su sesión).
+  - **Estado:** el código `abierto` pasa a `sin_atender` (migración que cambia los existentes y el valor por defecto).
+    En los tickets de postventa, el estado `abierto` se muestra «Sin atender».
+  - **Demo:** 12 tickets en 8 procesos: 6 sin atender, 3 en curso, 3 resueltos, con esperas de 0 a 15 días.
+- **Supuestos:** «se recuerdan» dura la sesión (no se guarda en la base); el proceso se deduce de la dirección de la
+  pantalla sin mirar permisos.
+- **Atajos:** la lista se filtra en PHP sobre todos los tickets (sin consulta paginada); el código de estado de los
+  tickets de postventa no cambió, solo su nombre.

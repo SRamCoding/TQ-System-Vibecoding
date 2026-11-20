@@ -40,6 +40,7 @@ final class DatabaseSeeder extends Seeder
         $this->call(Demo\DemoSeeder::class);
         // MV-028: las herramientas de la demo.
         $this->call(Demo\HerramientasSeeder::class);
+        $this->call(Demo\TicketsAyudaSeeder::class);
     }
 
     /**

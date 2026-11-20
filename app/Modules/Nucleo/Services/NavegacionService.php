@@ -239,6 +239,39 @@ final class NavegacionService
     }
 
     /**
+     * MV-040: el proceso de una ruta sin mirar permisos (para saber en qué proceso pasó lo que cuenta un ticket).
+     */
+    public function procesoDeRutaGeneral(string $ruta): ?Proceso
+    {
+        $ruta = '/'.trim((string) parse_url($ruta, PHP_URL_PATH), '/').'/';
+        $urls = [];
+
+        foreach ($this->modulos->todas() as $caja) {
+            $urls[$caja->clave] = '/'.trim((string) parse_url($caja->url, PHP_URL_PATH), '/').'/';
+        }
+
+        foreach (Proceso::rutasDentroDe() as $prefijo => $clave) {
+            $urls[$clave.'@'.$prefijo] = $prefijo.'/';
+        }
+
+        $mejor = null;
+        $largo = 0;
+
+        foreach (Proceso::cases() as $proceso) {
+            foreach (array_keys($proceso->cajas()) as $clave) {
+                foreach ($urls as $k => $url) {
+                    if (($k === $clave || str_starts_with($k, $clave.'@')) && str_starts_with($ruta, $url) && strlen($url) > $largo) {
+                        $mejor = $proceso;
+                        $largo = strlen($url);
+                    }
+                }
+            }
+        }
+
+        return $mejor;
+    }
+
+    /**
      * Cajas de proceso agrupadas por franja, en el orden de `Franja`; solo las franjas con alguna caja (MV-016: una franja
      * vacía desaparece con su título).
      *

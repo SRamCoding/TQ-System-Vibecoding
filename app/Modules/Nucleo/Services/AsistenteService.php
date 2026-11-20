@@ -92,7 +92,7 @@ final readonly class AsistenteService
         return DB::transaction(function () use ($usuario, $resumen, $pantalla, $conversacion): string {
             $codigo = app(NumeracionService::class)->siguiente('ticket_ayuda', new FormatoNumeracion('TK'), Calendario::ahora());
             DB::table('tickets_ayuda')->insert(['codigo' => $codigo, 'user_id' => $usuario->id, 'pantalla' => mb_substr($pantalla, 0, 200), 'resumen' => mb_substr($resumen, 0, 300),
-                'conversacion' => mb_substr($conversacion, 0, 5000), 'estado' => 'abierto', 'created_at' => now(), 'updated_at' => now()]);
+                'conversacion' => mb_substr($conversacion, 0, 5000), 'estado' => 'sin_atender', 'created_at' => now(), 'updated_at' => now()]);
 
             return $codigo;
         });

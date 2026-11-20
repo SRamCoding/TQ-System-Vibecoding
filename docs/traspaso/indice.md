@@ -20,7 +20,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t4-valorizaciones](fichas/t4-valorizaciones.md) | T4 | aprobada | v1 | `aprobado/t4-valorizaciones-v1` |
 | [t5-finanzas](fichas/t5-finanzas.md) | T5 | en curso (v3 aprobada) | v4 | `aprobado/t5-finanzas-v3` |
 | [op-solicitudes-permiso](fichas/op-solicitudes-permiso.md) | Opcional | aprobada | v1 | `aprobado/op-solicitudes-permiso-v1` |
-| [op-asistente](fichas/op-asistente.md) | Opcional | aprobada | v1 | `aprobado/op-asistente-v1` |
+| [op-asistente](fichas/op-asistente.md) | Opcional | en curso (v1 aprobada) | v2 | `aprobado/op-asistente-v1` |
 | [op-gran-momento](fichas/op-gran-momento.md) | Opcional | aprobada | v1 | `aprobado/op-gran-momento-v1` |
 | [t6-postventa](fichas/t6-postventa.md) | Flujo 8 | aprobada | v1 | `aprobado/t6-postventa-v1` |
 | [t7-personas](fichas/t7-personas.md) | Flujo 9 | en curso (v1 aprobada) | v2 | `aprobado/t7-personas-v1` |

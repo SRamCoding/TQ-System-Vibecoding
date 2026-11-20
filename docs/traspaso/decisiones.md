@@ -509,3 +509,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 3: sin textos explicativos»
+
+### MV-040 · 2026-11-20 · Filtros de Tickets de ayuda y el estado «Sin atender»
+
+- **Ficha:** `fichas/op-asistente.md`
+- **Dijo Sebastián:** (observaciones, punto 4; propuesta en el lienzo https://claude.ai/artifact/MuDxcC3mfv47874foW8KFk)
+  «En una franja fija arriba de la lista, siempre a la vista: el estado como pestañas con contador, Pendientes (se abre
+  al entrar), Sin atender, En curso, Resueltos, Todos. El estado "abierto" pasa a llamarse "Sin atender" en todo el
+  sistema. Buscador. Filtros en botones pequeños: proceso, quién lo abrió, fecha, esperando más de… Se recuerdan los
+  filtros de cada persona».
+- **Decisión:** lo dicho; los pendientes se ordenan del más antiguo al más nuevo y los resueltos al revés. Prioridad y
+  quién lo atiende quedan fuera por ahora.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 4: filtros de Tickets de ayuda»
