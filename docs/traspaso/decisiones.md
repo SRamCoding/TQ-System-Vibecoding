@@ -703,3 +703,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 4.6: ícono de Gerencia de proyectos»
+
+### MV-055 · 2026-11-21 · El ícono de la agenda, estilo aplicación: la hoja del día
+
+- **Ficha:** `fichas/t1-agenda.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/observaciones-5.md`, punto 1; opción A del lienzo
+  https://claude.ai/artifact/HjBp8UWVJRA7wrserWntJL) «Un ícono estilo aplicación, a todo color: la hoja del día. Banda
+  turquesa con el día de la semana abreviado, el número del día grande y un relojito dorado. Cambia solo cada día, en la
+  hora de Lima, en español. En modo claro, un borde fino gris cálido. 32 px en el muelle. No toma el color de ninguna
+  franja ni del tema».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 5.1: la hoja del día de la agenda»

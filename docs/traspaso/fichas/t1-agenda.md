@@ -1,7 +1,7 @@
 # Ficha · Agenda y actividades (CRM-05)
 
 - **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v2
+- **Versión:** v3
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-agenda-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-2-crm.md` (paso 6: «Mi agenda», registro rápido, próxima acción);
@@ -17,6 +17,7 @@ Oportunidades su columna «Próxima acción» y el punto ámbar de las que no ti
 
 ## Decisiones de Sebastián
 
+- **MV-055** (ficha) · El ícono de la agenda en el muelle es la hoja del día, estilo aplicación.
 - **MV-025** (cruza módulos) · La agenda es una herramienta del muelle; Mien muestra «Mi agenda».
 - **MV-026** (ficha) · Botón «Año»; desde las descripciones se marca hecha y se registra.
 - **MV-005** (ficha) · Va después de licitaciones, en el tramo 1.
@@ -106,3 +107,9 @@ polimórfica (`actividable_type`) para cuentas, oportunidades, proyectos y ticke
   sin caja.
 - **Atajos:** las listas de clientes y oportunidades del formulario se leen en el componente; el reparto del año se
   calcula en PHP en cada apertura.
+- **v3** (MV-055): el ícono de la agenda en el muelle pasa a ser **la hoja del día**, de 32 px como las demás
+  aplicaciones: hoja blanca de esquinas redondeadas, banda turquesa (`#00B8D9` → `#00DAFF`) con el día abreviado en
+  blanco y negrita (LUN, MAR, MIÉ, JUE, VIE, SÁB, DOM), el número del día grande en tinta (`#1F2328`, peso 800 para que
+  se lea a 32 px) y un relojito dorado (`#F2C14E`, borde blanco, agujas `#5A3E00`) abajo a la derecha. Muestra hoy en la
+  hora de Lima y se pone al día solo cada minuto (sin recargar). En modo claro, la hoja con borde de 1 px `#D9D4C9`. No
+  toma franja, tema ni estación. `aria-label` «Agenda: sábado 21».

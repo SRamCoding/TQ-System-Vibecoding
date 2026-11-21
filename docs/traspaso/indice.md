@@ -8,7 +8,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t0-datos-demo](fichas/t0-datos-demo.md) | T0 | aprobada | v4 | `aprobado/t0-datos-demo-v4` |
 | [t1-puente-erp](fichas/t1-puente-erp.md) | T1 | aprobada | v2 | `aprobado/t1-puente-erp-v2` |
 | [t1-licitaciones](fichas/t1-licitaciones.md) | T1 | en curso (v2 aprobada) | v3 | `aprobado/t1-licitaciones-v2` |
-| [t1-agenda](fichas/t1-agenda.md) | T1 | en curso (v1 aprobada) | v2 | `aprobado/t1-agenda-v1` |
+| [t1-agenda](fichas/t1-agenda.md) | T1 | en curso (v1 aprobada) | v3 | `aprobado/t1-agenda-v1` |
 | [t1-catalogo](fichas/t1-catalogo.md) | T1 | aprobada | v1 | `aprobado/t1-catalogo-v1` |
 | [t1-campanias](fichas/t1-campanias.md) | T1 | en curso (v1 aprobada) | v2 | `aprobado/t1-campanias-v1` |
 | [t2-contratos](fichas/t2-contratos.md) | T2 | aprobada | v2 | `aprobado/t2-contratos-v2` |

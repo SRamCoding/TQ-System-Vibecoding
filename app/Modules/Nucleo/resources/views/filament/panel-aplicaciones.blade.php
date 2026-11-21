@@ -33,6 +33,11 @@
         .tq-apps-muelle hr { width: 60%; border: 0; border-top: 1px solid var(--tq-apps-linea); margin: 0; }
         .tq-apps-control { width: 1.6rem; height: 1.6rem; border-radius: 0.4rem; display: grid; place-items: center; color: var(--tq-apps-suave); cursor: pointer; }
         .tq-apps-control:hover { background: var(--tq-apps-hover); color: inherit; }
+        /* MV-055: la agenda, un ícono de aplicación de 32 px; en modo claro, la hoja con un borde fino gris cálido. */
+        .tq-apps-agenda { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 0.55rem; cursor: pointer; }
+        .tq-apps-agenda:hover { background: var(--tq-apps-hover); }
+        .tq-apps-agenda:focus-visible { outline: 2px solid var(--primary-600); outline-offset: 2px; }
+        html:not(.dark) .tq-icono-agenda-hoja { stroke: #D9D4C9; stroke-width: 1; x: 3.5px; y: 3.5px; width: 41px; height: 41px; rx: 9.5px; }
         .tq-apps-control:focus-visible, .tq-apps a:focus-visible, .tq-apps-boton:focus-visible { outline: 2px solid var(--primary-600); outline-offset: 2px; }
         /* D1: de 3 a 3,5 de cada 10 partes del ancho; de alto, de bajo la barra superior hasta encima del chat. */
         .tq-apps-cuadricula { top: 5rem; width: 30vw; min-width: 17rem; max-width: 35vw; border-radius: 0.9rem; display: flex; flex-direction: column; overflow: hidden; }
@@ -358,9 +363,10 @@
             @endforeach
             <hr>
             {{-- MV-025: la agenda, arriba de Recortes. La pone el módulo de actividades (si la persona la ve, el ícono aparece). --}}
-            <button type="button" class="tq-apps-control" x-data x-init="Alpine.store('tqAgenda') ?? Alpine.store('tqAgenda', { lista: false })" x-show="$store.tqAgenda?.lista" x-cloak
+            {{-- MV-055: estilo aplicación, la hoja del día, a 32 px como las demás aplicaciones. --}}
+            <button type="button" class="tq-apps-agenda" x-data x-init="Alpine.store('tqAgenda') ?? Alpine.store('tqAgenda', { lista: false })" x-show="$store.tqAgenda?.lista" x-cloak
                 x-on:click="window.dispatchEvent(new CustomEvent('tq-agenda-abrir'))" data-nombre="Agenda" aria-label="Agenda" title="Agenda" data-tq-apps="agenda">
-                <x-filament::icon icon="tq-calendario-reloj" class="h-4 w-4" />
+                @include('nucleo::filament.icono-agenda', ['tamano' => 32])
             </button>
             {{-- Plan 1.4z, D8: recortar pantalla, fijo; no es una aplicación (no se arrastra ni se oculta). Solo en Windows. --}}
             <a href="ms-screenclip:" class="tq-apps-control" x-show="windows" x-cloak data-nombre="Recortar pantalla (Windows + Mayús + S)" aria-label="Recortar pantalla (Windows + Mayús + S)" data-tq-apps="recortar">
