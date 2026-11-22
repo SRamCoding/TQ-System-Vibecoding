@@ -769,3 +769,18 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 5.5: los colores siguen al ambiente»
+
+### MV-060 · 2026-11-22 · La Línea de tiempo: el cronograma refinado, con orden y filtros
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-5, punto 6; propuesta A «Cronograma refinado», copia en
+  `docs/vibe/pedidos/lienzos/linea-de-tiempo/Main.dc.html`) «Una fila por oportunidad con su gema, nombre, cliente y
+  monto; tramos redondeados por cada etapa, línea punteada desde hoy hasta un rombo dorado, coral y "venció" si ya
+  pasó; línea "Hoy". Orden por defecto "Por urgencia" (vencidas, por vencer, a igual día mayor monto, sin fecha al
+  final; sin ganadas ni perdidas) con un separador "3 vencidas"; otros órdenes; filtros en chips (buscador,
+  vencimiento, etapa con su gema y Cerradas, responsable con Mías por defecto, rango del eje); las filas se deslizan al
+  reordenarse».
+- **Decisión:** lo dicho; reemplaza el estilo de la vista del plan 2.21d (D11).
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 5.6: la Línea de tiempo con orden y filtros»

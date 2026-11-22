@@ -14,9 +14,8 @@ use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
-use Livewire\WithPagination;
 
 /**
  * La vista «Línea de tiempo» de Oportunidades como la propone el prototipo aprobado (plan 2.21d, D11; reemplaza la de
@@ -29,21 +28,49 @@ final class LineaDeTiempoOportunidades extends Page
 {
     use MuestraLaFicha;
     use MuestraLasVistas;
-    use WithPagination;
 
-    /** El buscador (pedido del desarrollador, 2026-11-16): lo que coincide sube arriba mientras se escribe. */
+    /** MV-060: orden («Por urgencia» por defecto) y filtros de la Línea de tiempo, en la dirección. */
+    #[Url(as: 'orden', except: 'urgencia')]
+    public string $orden = 'urgencia';
+
     #[Url(as: 'q', except: '')]
     public string $buscar = '';
 
-    /** Al escribir, se vuelve a la página 1: ahí está la que mejor coincide. */
-    public function updatedBuscar(): void
+    #[Url(as: 'vence')]
+    public ?string $vencimiento = null;
+
+    #[Url(as: 'etapa')]
+    public ?string $etapa = null;
+
+    #[Url(as: 'de', except: 'mias')]
+    public string $responsable = 'mias';
+
+    #[Url(as: 'rango', except: 'semestre')]
+    public string $rango = 'semestre';
+
+    /** Un clic pone el filtro; otro clic en el mismo, lo quita. */
+    public function poner(string $filtro, ?string $valor): void
     {
-        $this->resetPage();
+        match ($filtro) {
+            'vencimiento' => $this->vencimiento = $this->vencimiento === $valor ? null : $valor,
+            'etapa' => $this->etapa = $this->etapa === $valor ? null : $valor,
+            'responsable' => $this->responsable = (string) ($valor ?? 'mias'),
+            'rango' => $this->rango = array_key_exists((string) $valor, DibujoDelCronograma::RANGOS) ? (string) $valor : 'semestre',
+            'orden' => $this->orden = array_key_exists((string) $valor, DibujoDelCronograma::ORDENES) ? (string) $valor : 'urgencia',
+            default => null,
+        };
+    }
+
+    public function quitarFiltros(): void
+    {
+        $this->buscar = '';
+        $this->vencimiento = $this->etapa = null;
+        $this->responsable = 'todas';
     }
 
     protected static string $resource = OportunidadResource::class;
 
-    protected static ?string $title = 'Línea de tiempo de oportunidades';
+    protected static ?string $title = 'Línea de tiempo';
 
     protected static ?string $breadcrumb = 'Línea de tiempo';
 
@@ -72,18 +99,12 @@ final class LineaDeTiempoOportunidades extends Page
     {
         return $schema->components([
             $this->cabeceraDeVistas(),
-            // Plan 2.21d (D11, arreglo): una fila por oportunidad con sus etapas en el tiempo, como el prototipo.
-            // Plan 2.21d (D11, arreglo): una fila por oportunidad con sus etapas en el tiempo, como el prototipo; de
-            // 10 en 10 y con el buscador que sube arriba lo que coincide mientras se escribe.
-            View::make('oportunidades::linea.cronograma')->viewData(function (): array {
-                $datos = app(DibujoDelCronograma::class)->datos($this->buscar);
-                $pagina = new LengthAwarePaginator(
-                    array_slice($datos['filas'], ($this->getPage() - 1) * DibujoDelCronograma::POR_PAGINA, DibujoDelCronograma::POR_PAGINA),
-                    count($datos['filas']), DibujoDelCronograma::POR_PAGINA, $this->getPage(),
-                );
-
-                return [...$datos, 'filas' => $pagina->items(), 'pagina' => $pagina, 'buscar' => $this->buscar, 'fichaAbierta' => $this->ficha];
-            }),
+            // MV-060: el Cronograma refinado, con su orden y sus filtros.
+            View::make('oportunidades::linea.cronograma')->viewData(fn (): array => [
+                ...app(DibujoDelCronograma::class)->datos(['orden' => $this->orden, 'buscar' => $this->buscar, 'vencimiento' => $this->vencimiento, 'etapa' => $this->etapa, 'responsable' => $this->responsable, 'rango' => $this->rango], (int) auth()->id()),
+                'personas' => DB::table('oportunidades as o')->join('users as u', 'u.id', '=', 'o.ejecutivo_user_id')->distinct()->orderBy('u.name')->pluck('u.name', 'u.id')->all(),
+                'fichaAbierta' => $this->ficha,
+            ]),
             $this->fichaDeOportunidad(),
         ]);
     }

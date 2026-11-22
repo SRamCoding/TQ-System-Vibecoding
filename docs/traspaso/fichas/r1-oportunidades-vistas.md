@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v2
+- **Versión:** v3
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -14,6 +14,7 @@ Licitaciones) y la fila de cifras de siempre.
 
 ## Decisiones de Sebastián
 
+- **MV-060** (ficha) · La Línea de tiempo es el cronograma refinado, con «Por urgencia» por defecto, otros órdenes y filtros.
 - **MV-058** (ficha) · El Embudo es el embudo clásico con sus gemas (lienzo «A refinada»); las gemas, con el dibujo nuevo.
 - **MV-057** (ficha) · Mis oportunidades por defecto; Embudo de oportunidades; sin Lista ni Faja 3D.
 
@@ -43,12 +44,37 @@ Licitaciones) y la fila de cifras de siempre.
   irregular gris azulada con vetas), desbastada (turquesa apagado con primeras caras), tallada (diamante con degradado
   turquesa), pulida (más claro, con reflejo blanco), brillante (casi blanco, destellos y halo verde) y fisurada (coral
   apagado con una grieta). Ya no varían por oportunidad (la «semilla» no cambia el dibujo).
-- **Línea de tiempo** `/oportunidades/linea-de-tiempo`.
+- **Línea de tiempo** `/oportunidades/linea-de-tiempo` (MV-060):
+  - **Filas:** a la izquierda (330 px; 200 en pantallas angostas) la gema (26 px), el nombre y «cliente · monto» (y
+    «venció hace N días» en coral o «sin fecha»); a la derecha, un tramo de 14 px de alto y esquinas de 7 px por cada
+    etapa recorrida, del color de su etapa (`#A6F2FF`, `#7FE9FF`, `#4DDDF5`, `#1FCDEB`: más oscuro al avanzar), la línea
+    punteada desde hoy hasta el cierre y el rombo dorado (`#F2C14E`) con «cierre» debajo; si ya pasó, sin punteado y el
+    rombo coral con «venció». La línea «Hoy · 22 nov» atraviesa todo. Arriba, los meses del eje y la leyenda. Cada fila
+    abre la ficha deslizante.
+  - **Orden «Por urgencia»** (por defecto): vencidas (la más vencida primero), por vencer (la más próxima primero), a
+    igual día la de mayor monto, al final las sin fecha de mayor a menor monto; un separador «↑ 2 vencidas» donde
+    termina lo atrasado. Las ganadas y perdidas no aparecen (se ven con «Cerradas»).
+  - **Ordenar por:** monto, valor esperado (monto × probabilidad de la etapa), etapa (de Negociación a Prospecto), días
+    estancada, cliente (A a Z); el empate, por el cierre más próximo. En estos órdenes las vencidas no suben solas pero
+    siguen en coral.
+  - **Filtros** (chips; el activo en el azul de resaltado, otro clic lo quita): buscador (nombre o cliente);
+    vencimiento (Vencidas, Esta semana, Este mes, Sin fecha); etapa (un chip por etapa con su gema, y Cerradas);
+    responsable (Mías por defecto, Todas, o una persona del menú); rango del eje (Mes, Trimestre, Semestre). Sin
+    coincidencias: «Ninguna oportunidad coincide.» y «Quitar filtros». El orden y los filtros quedan en la dirección.
+  - **Animación:** al cambiar el orden o un filtro, cada fila se desliza de su lugar viejo al nuevo (350 ms, 25 ms de
+    escalonado entre filas), con sus tramos y su rombo; las que salen se desvanecen y se recogen, las que entran suben.
+    La línea «Hoy», el eje y los filtros no se mueven. Sin animación con «reducir movimiento».
+  - **Demo:** dos oportunidades abiertas vencidas hace 12 y 4 días.
 - **Direcciones viejas:** `/oportunidades/lista`, `/faja` y `/tarjetas` llevan a Mis oportunidades; `/tablero`, al
   Embudo. Un aviso que antes abría la Lista con su filtro ahora abre Mis oportunidades.
 - Entrar al proceso Conseguir el negocio abre Mis oportunidades (su caja del medio).
 
 ## Supuestos sin confirmar
+
+- **Rango del eje (MV-060):** Mes abarca 45 días, Trimestre 90 y Semestre 180, con hoy a un tercio (como en el lienzo);
+  por defecto, Semestre (el lienzo muestra unos cinco meses).
+- **«Sin fecha»** nunca coincide hoy: la fecha de cierre esperada es obligatoria en la base.
+- **«Quitar filtros»** deja el responsable en «Todas» (si no, «Mías» vacía seguiría vacía).
 
 - **«N % avanza»** se calcula con lo que hay hoy: las oportunidades que están más adelante (y las ganadas) sobre las que
   llegaron a esa etapa o más allá; no hay historial de conversión por etapa.
@@ -84,5 +110,7 @@ Licitaciones) y la fila de cifras de siempre.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v3** (MV-060): la Línea de tiempo con el cronograma refinado, su orden y sus filtros; sin paginación.
 
 - **v2** (MV-058): el Embudo con sus gemas y el dibujo nuevo de las gemas.

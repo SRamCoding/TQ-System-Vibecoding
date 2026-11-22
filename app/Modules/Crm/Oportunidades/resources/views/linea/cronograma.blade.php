@@ -1,104 +1,148 @@
 {{--
-    La vista «Línea de tiempo» de Oportunidades como el prototipo aprobado (plan 2.21d, D11): una fila por oportunidad
-    con una barra por etapa (del color de la etapa, de la entrada a la salida), lo que falta hasta el cierre esperado en
-    rayado, el rombo del cierre esperado o ✓ / ✕ en el cierre, los meses arriba, la línea de «hoy» y la leyenda. Al pasar
-    el mouse por una barra, su etapa y sus fechas; tocar una fila abre la ficha en el panel (`abrirFicha`). Recibe lo de
-    `DibujoDelCronograma::datos()`, `$pagina` (de 10 en 10), `$buscar` y `$fichaAbierta`. Colores de la paleta morada del
-    CRM, por nombre. El buscador (pedido del desarrollador, 2026-11-16): mientras se escribe, la que mejor coincide queda
-    primera y las coincidencias se marcan; al escribir se vuelve a la página 1.
+    MV-060: la Línea de tiempo como el «Cronograma refinado» del lienzo (`docs/vibe/pedidos/lienzos/linea-de-tiempo/`):
+    una fila por oportunidad con su gema, nombre, cliente y monto; a la derecha, un tramo redondeado por cada etapa que
+    recorrió (más oscuro al avanzar), la línea punteada desde hoy hasta el rombo dorado del cierre esperado (coral y
+    «venció» si ya pasó) y la línea «Hoy». Arriba, los filtros en chips y «Ordenar por». En «Por urgencia», un separador
+    con la cuenta de vencidas. Al cambiar el orden o un filtro, las filas se deslizan a su nuevo lugar (escalonadas) y las
+    que salen se recogen (`data-tq-fila` dentro de `data-tq-escalonar`, del script de animación de filas). Recibe lo de
+    `DibujoDelCronograma::datos()`, `$personas` y `$fichaAbierta`.
 --}}
-<div @class(['tq-crono', 'tq-tablero-detras' => $fichaAbierta !== null]) data-cronograma>
+@php
+    use App\Modules\Crm\Oportunidades\Filament\DibujoDelCronograma as D;
+    $etapas = ['prospecto' => ['Prospecto', 'en_bruto'], 'calificada' => ['Calificada', 'desbastada'], 'propuesta_enviada' => ['Propuesta enviada', 'tallada'], 'negociacion' => ['Negociación', 'pulida']];
+    $hayFiltros = $this->buscar !== '' || $this->vencimiento !== null || $this->etapa !== null || $this->responsable !== 'mias';
+    $separadorPuesto = false;
+@endphp
+<div class="tq-linea" data-cronograma>
     <style>
-        .tq-crono { --tq-e-prospecto: var(--morado-300); --tq-e-calificada: var(--morado-400); --tq-e-propuesta_enviada: var(--morado-500); --tq-e-negociacion: var(--morado-700);
-            overflow-x: auto; padding: 0.875rem 1rem; border-radius: 0.75rem; background: white; outline: 1px solid rgb(3 7 18 / 0.06); }
-        .dark .tq-crono { background: var(--gray-900); outline-color: rgb(255 255 255 / 0.08); }
-        .tq-crono-tabla { position: relative; min-width: 48rem; }
-        .tq-crono-fila { display: grid; grid-template-columns: 16rem minmax(0, 1fr); align-items: center; min-height: 2.25rem; border-bottom: 1px solid var(--gray-100); width: 100%; text-align: start; }
-        .dark .tq-crono-fila { border-bottom-color: var(--gray-800); }
-        button.tq-crono-fila:hover, button.tq-crono-fila:focus-visible { background: var(--gray-50); }
-        .dark button.tq-crono-fila:hover, .dark button.tq-crono-fila:focus-visible { background: rgb(255 255 255 / 0.04); }
-        .tq-crono-quien { font-size: 0.8125rem; line-height: 1.25; padding-inline-end: 0.6rem; overflow: hidden; }
-        .tq-crono-quien small { display: block; font-size: 0.6875rem; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .tq-crono-pista { position: relative; height: 2.25rem; }
-        .tq-crono-tramo { position: absolute; top: 0.7rem; height: 0.75rem; border-radius: 3px; }
-        .tq-crono-tramo:first-child { border-radius: 6px 3px 3px 6px; }
-        .tq-crono-falta { position: absolute; top: 0.7rem; height: 0.75rem; background: repeating-linear-gradient(90deg, var(--morado-200) 0 4px, transparent 4px 7px); }
-        .tq-crono-hito { position: absolute; top: 0.65rem; width: 0.875rem; height: 0.875rem; transform: translateX(-50%); }
-        .tq-crono-mes { position: absolute; top: 0; bottom: 0; border-inline-start: 1px dashed var(--gray-200); font-size: 0.6875rem; color: var(--gray-500); padding-inline-start: 0.25rem; }
-        .dark .tq-crono-mes { border-inline-start-color: var(--gray-700); }
-        .tq-crono-hoy { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--danger-600); opacity: 0.7; pointer-events: none; }
-        .tq-crono-ley { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; font-size: 0.75rem; color: var(--gray-500); }
-        .tq-crono-ley span { display: inline-flex; align-items: center; gap: 0.3rem; }
-        .tq-crono-punto { width: 0.6rem; height: 0.6rem; border-radius: 9999px; display: inline-block; }
-        .tq-crono-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; }
-        .tq-crono-barra .tq-crono-buscar { flex: 1 1 18rem; max-width: 28rem; }
-        .tq-crono-fila[data-coincide] .tq-crono-quien b { color: var(--morado-700); }
-        .dark .tq-crono-fila[data-coincide] .tq-crono-quien b { color: var(--morado-300); }
-        .tq-crono-fila[data-primera] { background: color-mix(in oklab, var(--morado-500) 8%, transparent); }
+        .tq-linea { --tq-l-izq: 330px; --tq-l-sup: var(--tq-superficie, #fff); --tq-l-borde: var(--tq-borde, var(--gray-200)); --tq-l-suave: var(--tq-texto-suave, var(--gray-500)); --tq-l-cab: var(--tq-superficie-elevada, var(--gray-50));
+            --tq-l-acento: #0790A8; --tq-l-coral: #C2532F; --tq-l-oro: #F2C14E; --tq-l-oro-texto: #9A7000; --tq-l-hoy: rgba(31, 35, 40, .55); --tq-l-hoy-fondo: #1F2328; --tq-l-hoy-texto: #FFFFFF;
+            display: flex; flex-direction: column; gap: 14px; margin-top: 0.5rem; }
+        .dark .tq-linea { --tq-l-sup: var(--tq-superficie, #33302B); --tq-l-borde: var(--tq-borde, #45413A); --tq-l-suave: var(--tq-texto-suave, #A8ADB4); --tq-l-cab: var(--tq-superficie-elevada, #2F2C28);
+            --tq-l-acento: #7FE9FF; --tq-l-coral: #F2A58C; --tq-l-oro-texto: #E8C46A; --tq-l-hoy: rgba(236, 237, 239, .6); --tq-l-hoy-fondo: #ECEDEF; --tq-l-hoy-texto: #1E1F22; }
+        .tq-linea-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .tq-linea-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid var(--tq-l-borde); background: var(--tq-l-sup); color: inherit; cursor: pointer; }
+        .tq-linea-chip[aria-pressed="true"] { background: var(--primary-600); border-color: var(--primary-600); color: #fff; }
+        .dark .tq-linea-chip[aria-pressed="true"] { background: var(--primary-400); border-color: var(--primary-400); color: var(--gray-950); }
+        .tq-linea-sep { width: 1px; height: 20px; background: var(--tq-l-borde); margin: 0 4px; }
+        .tq-linea-sel { padding: 4px 8px; border-radius: 8px; font-size: 12px; font-weight: 600; border: 1px solid var(--tq-l-borde); background: var(--tq-l-sup); color: inherit; }
+        .tq-linea-leyenda { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: var(--tq-l-suave); }
+        .tq-linea-leyenda > span { display: inline-flex; align-items: center; gap: 6px; }
+        .tq-linea-tabla { position: relative; border-radius: 16px; background: var(--tq-l-sup); border: 1px solid var(--tq-l-borde); overflow: hidden; }
+        .tq-linea-cab { display: grid; grid-template-columns: var(--tq-l-izq) 1fr; border-bottom: 1px solid var(--tq-l-borde); background: var(--tq-l-cab); }
+        @media (max-width: 900px) { .tq-linea { --tq-l-izq: 200px; } }
+        .tq-linea-mes { position: absolute; top: 0; bottom: 0; padding: 12px 10px; font-size: 12px; font-weight: 600; color: var(--tq-l-suave); border-left: 1px solid var(--tq-l-borde); white-space: nowrap; }
+        .tq-linea-fila { display: grid; grid-template-columns: var(--tq-l-izq) 1fr; align-items: center; width: 100%; border-bottom: 1px solid var(--tq-l-borde); min-height: 66px; text-align: left; background: transparent; }
+        .tq-linea-fila:hover, .tq-linea-fila:focus-visible { background: color-mix(in oklab, var(--primary-600) 5%, transparent); }
+        .tq-linea-corta { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tq-linea-pista { position: relative; height: 66px; overflow: hidden; }
+        .tq-linea-tramo { position: absolute; top: 26px; height: 14px; border-radius: 7px; }
+        .tq-linea-falta { position: absolute; top: 32px; height: 0; border-top: 2px dashed var(--tq-l-acento); opacity: .7; }
+        .tq-linea-rombo { position: absolute; top: 27px; width: 12px; height: 12px; margin-left: -6px; transform: rotate(45deg); background: var(--tq-l-oro); box-shadow: 0 0 0 3px var(--tq-l-sup); }
+        .tq-linea-rombo[data-vencido] { background: var(--tq-l-coral); }
+        .tq-linea-hito { position: absolute; top: 44px; width: 80px; margin-left: -40px; text-align: center; font-size: 11px; font-weight: 600; color: var(--tq-l-oro-texto); }
+        .tq-linea-hito[data-vencido] { color: var(--tq-l-coral); }
+        .tq-linea-hoy { position: absolute; top: 40px; bottom: 0; width: 2px; background: var(--tq-l-hoy); pointer-events: none; z-index: 2; }
+        .tq-linea-hoy-texto { position: absolute; top: 44px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--tq-l-hoy-fondo); color: var(--tq-l-hoy-texto); pointer-events: none; z-index: 3; white-space: nowrap; }
+        .tq-linea-separador { display: flex; align-items: center; gap: 10px; padding: 6px 18px; font-size: 12px; font-weight: 700; color: var(--tq-l-coral); border-bottom: 1px solid var(--tq-l-borde); }
+        .tq-linea-separador::after { content: ''; flex: 1; height: 1px; background: color-mix(in oklab, var(--tq-l-coral) 40%, transparent); }
     </style>
 
-    <div class="tq-crono-barra">
-        <div class="tq-crono-buscar">
-            <x-filament::input.wrapper prefix-icon="heroicon-o-magnifying-glass">
-                <x-filament::input type="search" wire:model.live.debounce.250ms="buscar" placeholder="Buscar por nombre, código o entidad…" aria-label="Buscar en la línea de tiempo" />
-            </x-filament::input.wrapper>
-        </div>
-        @if ($buscar !== '')
-            <span class="text-sm text-gray-500" role="status">{{ $coinciden === 0 ? 'Ninguna coincide' : ($coinciden === 1 ? '1 coincide' : $coinciden.' coinciden') }}</span>
-        @endif
+    {{-- Filtros (como los de Tickets de ayuda, sin textos explicativos) y «Ordenar por». --}}
+    <div class="tq-linea-barra">
+        <x-filament::input.wrapper prefix-icon="heroicon-o-magnifying-glass" style="min-width: 15rem">
+            <x-filament::input type="search" wire:model.live.debounce.300ms="buscar" placeholder="Buscar oportunidad o cliente" aria-label="Buscar oportunidad o cliente" />
+        </x-filament::input.wrapper>
+        <span class="tq-linea-sep" aria-hidden="true"></span>
+        @foreach (D::VENCIMIENTOS as $clave => $texto)
+            <button type="button" class="tq-linea-chip" aria-pressed="{{ $this->vencimiento === $clave ? 'true' : 'false' }}" wire:click="poner('vencimiento', '{{ $clave }}')">{{ $texto }}</button>
+        @endforeach
+        <span class="tq-linea-sep" aria-hidden="true"></span>
+        @foreach ($etapas as $clave => [$texto, $talla])
+            <button type="button" class="tq-linea-chip" aria-pressed="{{ $this->etapa === $clave ? 'true' : 'false' }}" wire:click="poner('etapa', '{{ $clave }}')"><x-oportunidades::gema :talla="$talla" :tamano="16" decorativa />{{ $texto }}</button>
+        @endforeach
+        <button type="button" class="tq-linea-chip" aria-pressed="{{ $this->etapa === 'cerradas' ? 'true' : 'false' }}" wire:click="poner('etapa', 'cerradas')">Cerradas</button>
+        <span class="tq-linea-sep" aria-hidden="true"></span>
+        <button type="button" class="tq-linea-chip" aria-pressed="{{ $this->responsable === 'mias' ? 'true' : 'false' }}" wire:click="poner('responsable', 'mias')">Mías</button>
+        <button type="button" class="tq-linea-chip" aria-pressed="{{ $this->responsable === 'todas' ? 'true' : 'false' }}" wire:click="poner('responsable', 'todas')">Todas</button>
+        <select class="tq-linea-sel" aria-label="Responsable" wire:change="poner('responsable', $event.target.value || 'todas')">
+            <option value="">Una persona…</option>
+            @foreach ($personas as $id => $nombre)
+                <option value="{{ $id }}" @selected((string) $id === $this->responsable)>{{ $nombre }}</option>
+            @endforeach
+        </select>
+        <span class="tq-linea-sep" aria-hidden="true"></span>
+        @foreach (D::RANGOS as $clave => [$texto])
+            <button type="button" class="tq-linea-chip" aria-pressed="{{ $this->rango === $clave ? 'true' : 'false' }}" wire:click="poner('rango', '{{ $clave }}')">{{ $texto }}</button>
+        @endforeach
+        <span class="tq-linea-sep" aria-hidden="true"></span>
+        <label class="tq-linea-chip" style="cursor: default">Ordenar por
+            <select class="tq-linea-sel" style="border: 0; padding: 0 4px" wire:change="poner('orden', $event.target.value)">
+                @foreach (D::ORDENES as $clave => $texto)
+                    <option value="{{ $clave }}" @selected($this->orden === $clave)>{{ $texto }}</option>
+                @endforeach
+            </select>
+        </label>
     </div>
 
-    <div class="tq-crono-tabla">
-        <div class="tq-crono-fila" style="min-height: 1.4rem">
-            <div></div>
-            <div class="tq-crono-pista" style="height: 1.4rem">
-                @foreach ($meses as $mes)
-                    <span class="tq-crono-mes" style="inset-inline-start: {{ $mes['x'] }}%">{{ $mes['texto'] }}</span>
+    <div class="tq-linea-leyenda" aria-hidden="true">
+        <span><span style="width: 18px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #A6F2FF, #1FCDEB)"></span>etapas recorridas</span>
+        <span><span style="width: 18px; height: 0; border-top: 2px dashed var(--tq-l-acento)"></span>lo que falta hasta el cierre</span>
+        <span><span style="width: 10px; height: 10px; transform: rotate(45deg); background: var(--tq-l-oro)"></span>cierre esperado</span>
+        <span><span style="width: 18px; height: 0; border-top: 2px dashed var(--tq-l-coral)"></span>cierre vencido</span>
+    </div>
+
+    <div class="tq-linea-tabla">
+        <div class="tq-linea-cab">
+            <span style="padding: 12px 18px; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: var(--tq-l-suave)">OPORTUNIDAD</span>
+            <div style="position: relative; height: 40px">
+                @foreach ($meses as $m)
+                    <span class="tq-linea-mes" style="left: {{ $m['x'] }}%">{{ $m['texto'] }}</span>
                 @endforeach
             </div>
         </div>
 
-        <div style="position: relative">
+        <div data-tq-escalonar>
             @forelse ($filas as $f)
-                <button type="button" class="tq-crono-fila" @if ($f['coincide'] ?? false) data-coincide @if ($loop->first && $pagina->currentPage() === 1) data-primera @endif @endif wire:click="abrirFicha({{ $f['id'] }})" wire:key="crono-{{ $f['id'] }}" data-oportunidad="{{ $f['id'] }}" data-ficha-origen="{{ $f['id'] }}" aria-label="{{ $f['nombre'] }} · {{ $f['detalle'] }} · {{ $f['hito']['titulo'] }}">
-                    <span class="tq-crono-quien"><b>{{ $f['nombre'] }}</b><small>{{ $f['detalle'] }} · {{ $f['entidad'] }}</small></span>
-                    <span class="tq-crono-pista">
+                @if ($vencidas > 0 && ! $f['vencida'] && ! $separadorPuesto)
+                    {{-- Donde termina lo atrasado: un separador fino con la cuenta de vencidas. --}}
+                    @php $separadorPuesto = true; @endphp
+                    <div class="tq-linea-separador" data-tq-fila="sep-vencidas">↑ {{ $vencidas === 1 ? '1 vencida' : $vencidas.' vencidas' }}</div>
+                @endif
+                <button type="button" class="tq-linea-fila" wire:key="linea-{{ $f['id'] }}" data-tq-fila="linea-{{ $f['id'] }}" wire:click="abrirFicha({{ $f['id'] }})">
+                    <span style="display: flex; align-items: center; gap: 12px; padding: 10px 18px; min-width: 0">
+                        <x-oportunidades::gema :talla="$f['talla']" :tamano="26" decorativa />
+                        <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+                            <span class="tq-linea-corta" style="font-size: 14px; font-weight: 600">{{ $f['nombre'] }}</span>
+                            <span class="tq-linea-corta" style="font-size: 12px; color: var(--tq-l-suave)">{{ $f['cliente'] }} · <b style="font-weight: 600; color: var(--tq-texto, inherit)">{{ $f['monto'] }}</b>
+                                @if ($f['vencida'])<b style="font-weight: 600; color: var(--tq-l-coral)"> · venció hace {{ $f['diasVencida'] === 1 ? '1 día' : $f['diasVencida'].' días' }}</b>@endif
+                                @if ($f['cierre'] === null)<span style="opacity: .8"> · sin fecha</span>@endif
+                            </span>
+                        </span>
+                    </span>
+                    <span class="tq-linea-pista">
                         @foreach ($f['tramos'] as $t)
-                            <span class="tq-crono-tramo" data-etapa="{{ $t['etapa'] }}" title="{{ $t['titulo'] }}" style="inset-inline-start: {{ $t['x'] }}%; width: {{ $t['ancho'] }}%; background: var(--tq-e-{{ $t['etapa'] }})"></span>
+                            <span class="tq-linea-tramo" style="left: {{ $t['x'] }}%; width: calc({{ $t['ancho'] }}% - 2px); background: {{ $t['color'] }}" title="{{ $t['titulo'] }}"></span>
                         @endforeach
-                        @if ($f['falta'] !== null)
-                            <span class="tq-crono-falta" data-falta style="inset-inline-start: {{ $f['falta']['x'] }}%; width: {{ $f['falta']['ancho'] }}%"></span>
+                        @if ($f['falta'])
+                            <span class="tq-linea-falta" style="left: {{ $f['falta']['x'] }}%; width: {{ $f['falta']['ancho'] }}%"></span>
                         @endif
-                        <svg class="tq-crono-hito" data-hito="{{ $f['hito']['tipo'] }}" style="inset-inline-start: {{ $f['hito']['x'] }}%" viewBox="0 0 14 14" aria-hidden="true"><title>{{ $f['hito']['titulo'] }}</title>
-                            @if ($f['hito']['tipo'] === 'esperado')
-                                <rect x="3" y="3" width="8" height="8" transform="rotate(45 7 7)" fill="white" stroke="var(--morado-700)" stroke-width="2"/>
-                            @else
-                                <circle cx="7" cy="7" r="6" fill="{{ $f['hito']['tipo'] === 'ganada' ? 'var(--success-600)' : 'var(--danger-600)' }}"/>
-                                <text x="7" y="10.5" text-anchor="middle" font-size="9" fill="white">{{ $f['hito']['tipo'] === 'ganada' ? '✓' : '✕' }}</text>
-                            @endif
-                        </svg>
+                        @if ($f['hito'] && $f['hito']['visible'])
+                            <span class="tq-linea-rombo" style="left: {{ $f['hito']['x'] }}%" @if ($f['vencida']) data-vencido @endif title="{{ $f['hito']['titulo'] }}"></span>
+                            <span class="tq-linea-hito" style="left: {{ $f['hito']['x'] }}%" @if ($f['vencida']) data-vencido @endif>{{ $f['hito']['texto'] }}</span>
+                        @endif
                     </span>
                 </button>
             @empty
-                <p class="text-sm text-gray-500" style="padding: 1rem 0">No hay oportunidades en este rango.</p>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px; font-size: 14px; color: var(--tq-l-suave)">
+                    <span>Ninguna oportunidad coincide.</span>
+                    <x-filament::button size="sm" color="gray" wire:click="quitarFiltros">Quitar filtros</x-filament::button>
+                </div>
             @endforelse
-            <div style="position: absolute; top: 0; bottom: 0; inset-inline-start: 16rem; inset-inline-end: 0; pointer-events: none">
-                <div class="tq-crono-hoy" style="inset-inline-start: {{ $hoy }}%" data-hoy></div>
-            </div>
         </div>
-    </div>
 
-    @if ($pagina->hasPages())
-        <div style="margin-top: 0.75rem"><x-filament::pagination :paginator="$pagina" /></div>
-    @endif
-
-    <div class="tq-crono-ley">
-        @foreach ($etapas as $e)
-            <span><span class="tq-crono-punto" style="background: var(--tq-e-{{ $e['clave'] }})"></span>{{ $e['nombre'] }}</span>
-        @endforeach
-        <span><span class="tq-crono-punto" style="background: repeating-linear-gradient(90deg, var(--morado-200) 0 3px, transparent 3px 5px)"></span>Lo que falta hasta el cierre esperado</span>
-        <span><span class="tq-crono-punto" style="background: var(--success-600)"></span>Ganada</span>
-        <span><span class="tq-crono-punto" style="background: var(--danger-600)"></span>Perdida</span>
-        <span style="color: var(--danger-600)">│ Hoy</span>
+        {{-- La línea «Hoy» (siempre visible) atraviesa todas las filas. --}}
+        <span class="tq-linea-hoy" style="left: calc(var(--tq-l-izq) + (100% - var(--tq-l-izq)) * {{ $hoy / 100 }})"></span>
+        <span class="tq-linea-hoy-texto" style="left: calc(var(--tq-l-izq) + (100% - var(--tq-l-izq)) * {{ $hoy / 100 }} + 6px)">{{ $textoHoy }}</span>
     </div>
 </div>

@@ -28,12 +28,14 @@
         const animar = (raiz, antes) => {
             const ahora = new Map()
             raiz.querySelectorAll(FILAS).forEach((el) => { const k = clave(el); if (k) ahora.set(k, el) })
-            let entrada = 0
+            let entrada = 0, movida = 0
             ahora.forEach((el, k) => {
                 const previa = antes.get(k)
+                // MV-060: en una lista con `data-tq-escalonar` (la Línea de tiempo), 350 ms y un pequeño escalonado de fila en fila.
+                const escalonar = !! el.closest('[data-tq-escalonar]')
                 if (previa) {
                     const r = el.getBoundingClientRect(), dx = previa.rect.left - r.left, dy = previa.rect.top - r.top
-                    if (dx || dy) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: DURACION, easing: 'cubic-bezier(.2, .7, .2, 1)' })
+                    if (dx || dy) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: escalonar ? 350 : DURACION, delay: escalonar ? Math.min(movida++, 12) * 25 : 0, easing: 'cubic-bezier(.2, .7, .2, 1)', fill: 'backwards' })
                 } else {
                     el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: DURACION - 60, delay: Math.min(entrada++, 8) * 40, easing: 'cubic-bezier(.2, .7, .2, 1)', fill: 'backwards' })
                 }
