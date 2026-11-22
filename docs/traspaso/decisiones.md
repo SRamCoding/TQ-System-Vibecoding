@@ -834,3 +834,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.4: la Gota de miel»
+
+### MV-065 · 2026-11-22 · Doble clic en la estrella de Mien de la barra lateral abre la página de Mien
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-6, punto 5) «Un clic sigue abriendo el globo y Ctrl + clic Mien en otra pestaña.
+  Doble clic lleva a la página de Mien, en la misma pestaña y sin recargar. El primer clic del doble clic no debe dejar el
+  globo abierto ni hacerlo parpadear».
+- **Decisión:** lo dicho; precisa MV-052.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.5: doble clic en la estrella de Mien»

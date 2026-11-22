@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v25
+- **Versión:** v26
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-065** (ficha) · Doble clic en la estrella de Mien de la barra lateral lleva a la página de Mien.
 - **MV-062** (ficha) · El muelle se arrastra, se pega al borde más cercano y recuerda su lugar; por defecto, sobre el asistente.
 - **MV-059** (cruza módulos) · Todos los colores siguen al ambiente: superficies del fondo, franjas con temperatura, vidrio.
 - **MV-056** (ficha) · El logo de la caja Techquk y de la barra lateral va siempre en el azul de Estratégicos.
@@ -234,7 +235,9 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   punto del color de su estado (rojo, ámbar, azul), es un enlace a donde se resuelve (la firma a su documento; la
   actividad a su oportunidad o a la ficha del cliente) y al saltar el globo se cierra. Un grupo de más de 5 muestra 5 y
   «Ver los N». Abajo, «Abrir Mien completo». Se cierra con clic afuera, Esc u otro clic en la estrella; Ctrl, Cmd, Shift
-  o la rueda abren `/mien` en otra pestaña. No se aprueba ni se rechaza desde el globo. Se pide de nuevo cada vez que se
+  o la rueda abren `/mien` en otra pestaña; **doble clic (MV-065)** lleva a `/mien` en la misma pestaña, sin recargar
+  (el primer clic espera 260 ms por si viene el segundo: el globo no llega a abrirse). No se aprueba ni se rechaza desde
+  el globo. Se pide de nuevo cada vez que se
   abre.
 
 - **Colores que siguen al ambiente (MV-059):** un solo lugar (`nucleo::filament.colores-ambiente`) define, sobre el fondo
@@ -361,6 +364,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v26** (MV-065): doble clic en la estrella de Mien abre su página.
 
 - **v25** (MV-062): el muelle se mueve y se pega al borde.
 

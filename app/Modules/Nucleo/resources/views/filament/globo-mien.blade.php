@@ -20,6 +20,7 @@
         cerrar() { this.abierto = false; document.documentElement.classList.remove('tq-globo-mien-abierto') },
     }"
     x-on:tq-globo-mien.window="abierto ? cerrar() : abrir($event.detail.rect)"
+    x-on:tq-globo-mien-cerrar.window="abierto && cerrar()"
     x-on:keydown.escape.window="abierto && cerrar()"
     x-on:livewire:navigate.window="abierto && cerrar()"
 >

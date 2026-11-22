@@ -136,12 +136,21 @@
         for (const tipo of ['mousedown', 'mouseup', 'pointerdown', 'pointerup']) {
             document.addEventListener(tipo, (e) => { if (estrellaMien(e) && ! conModificador(e)) e.stopImmediatePropagation() }, true)
         }
+        // MV-065: un clic abre el globo; doble clic lleva a la página de Mien (sin recargar). El primer clic espera un instante
+        // por si viene el segundo, así el globo no se abre ni parpadea.
+        let relojEstrella = null
         document.addEventListener('click', (e) => {
             const enlace = estrellaMien(e)
             if (! enlace || conModificador(e)) return
             e.preventDefault()
             e.stopImmediatePropagation()
-            abrirGlobo(enlace)
+            clearTimeout(relojEstrella)
+            if (e.detail >= 2) {
+                window.dispatchEvent(new CustomEvent('tq-globo-mien-cerrar'))
+                window.Livewire ? window.Livewire.navigate('/mien') : (location.href = '/mien')
+                return
+            }
+            relojEstrella = setTimeout(() => abrirGlobo(enlace), 260)
         }, true)
         document.addEventListener('keydown', (e) => {
             const enlace = estrellaMien(e)
