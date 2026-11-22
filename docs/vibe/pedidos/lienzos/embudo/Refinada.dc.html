@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Embudo de oportunidades con gemas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif}
+a{color:#7FE9FF}a:hover{color:#B8F4FF}
+button{font-family:inherit}
+@keyframes tqPanel{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.tq-panel{animation:none !important}}
+</style>
+</helmet>
+<div style="width: 1440px; height: 860px; box-sizing: border-box; background: #2B2925; color: #ECEDEF; padding: 28px 48px 32px; display: flex; flex-direction: column; gap: 22px">
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+    <sc-for list="{{cifras}}" as="k" hint-placeholder-count="4">
+      <div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 18px; border-radius: 14px; background: #33302B; border: 1px solid #45413A">
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #A8ADB4">{{k.etiqueta}}</span>
+        <span style="font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums">{{k.valor}}</span>
+        <span style="font-size: 12px; color: #A8ADB4">{{k.nota}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 9fr); gap: 36px; flex: 1; min-height: 0">
+
+    <div style="display: flex; flex-direction: column; align-items: center">
+      <sc-for list="{{etapas}}" as="e" hint-placeholder-count="4">
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%">
+          <button type="button" onClick="{{e.elegir}}" aria-pressed="{{e.presionado}}" style="{{e.envoltura}}">
+            <span style="{{e.franja}}">
+              <dc-import name="Gema" talla="{{e.talla}}" tam="{{e.tamGema}}" hint-size="40px,40px"></dc-import>
+              <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 1px; flex: 1; min-width: 0">
+                <span style="font-size: 16px; font-weight: 700; color: #06262D">{{e.nombre}}</span>
+                <span style="font-size: 12px; font-weight: 600; color: #0E4651">Gema {{e.tallaTexto}} · {{e.prob}}</span>
+              </span>
+              <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px">
+                <span style="font-size: 18px; font-weight: 800; color: #06262D; font-variant-numeric: tabular-nums">{{e.monto}}</span>
+                <span style="font-size: 12px; font-weight: 600; color: #0E4651">{{e.cantidad}} oportunidades</span>
+              </span>
+            </span>
+          </button>
+          <sc-if value="{{e.tienePaso}}" hint-placeholder-val="{{true}}">
+            <span style="margin: 7px 0; display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: #33302B; border: 1px solid #45413A; font-size: 12px; font-weight: 600; color: #C7CBD1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7FE9FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"></path></svg>
+              {{e.paso}} avanza
+            </span>
+          </sc-if>
+        </div>
+      </sc-for>
+
+      <div style="margin-top: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; width: 62%">
+        <button type="button" onClick="{{elegirGanadas}}" style="{{estiloGanadas}}">
+          <dc-import name="Gema" talla="brillante" tam="36" hint-size="36px,36px"></dc-import>
+          <span style="display: flex; flex-direction: column; align-items: flex-start"><span style="font-size: 14px; font-weight: 700; color: #9ED3A4">Ganadas</span><span style="font-size: 12px; color: #C7CBD1">9 · S/ 720,000 · este año</span></span>
+        </button>
+        <button type="button" onClick="{{elegirPerdidas}}" style="{{estiloPerdidas}}">
+          <dc-import name="Gema" talla="fisurada" tam="36" hint-size="36px,36px"></dc-import>
+          <span style="display: flex; flex-direction: column; align-items: flex-start"><span style="font-size: 14px; font-weight: 700; color: #F2A58C">Perdidas</span><span style="font-size: 12px; color: #C7CBD1">6 · S/ 410,000 · este año</span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="tq-panel" style="{{estiloPanel}}">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-bottom: 1px solid #45413A">
+        <dc-import name="Gema" talla="{{sel.talla}}" tam="48" hint-size="48px,48px"></dc-import>
+        <div style="display: flex; flex-direction: column; gap: 2px; flex: 1">
+          <span style="font-size: 18px; font-weight: 700">{{sel.nombre}}</span>
+          <span style="font-size: 13px; color: #A8ADB4">{{sel.resumen}}</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <sc-for list="{{sel.filas}}" as="f" hint-placeholder-count="4">
+          <a href="#" style="display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 13px 20px; border-bottom: 1px solid #3A3631; text-decoration: none; color: #ECEDEF">
+            <dc-import name="Gema" talla="{{sel.talla}}" tam="22" hint-size="22px,22px"></dc-import>
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+              <span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.nombre}}</span>
+              <span style="font-size: 12px; color: #A8ADB4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.cliente}}</span>
+              <span style="{{f.estiloAccion}}">{{f.accion}}</span>
+            </span>
+            <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px">
+              <span style="font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums">{{f.monto}}</span>
+              <span style="font-size: 12px; color: #A8ADB4">{{f.dias}}</span>
+            </span>
+          </a>
+        </sc-for>
+      </div>
+      <a href="#" style="margin-top: auto; padding: 14px 20px; font-size: 13px; font-weight: 600; text-decoration: none">Ver todas en Mis oportunidades →</a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":860}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sel: 'propuesta' }; }
+  renderVals() {
+    const f = (nombre, cliente, monto, dias, accion, vencida) => ({ nombre, cliente, monto, dias, accion,
+      estiloAccion: 'font-size: 12px; font-weight: 600; margin-top: 2px; color: ' + (vencida ? '#F2A58C' : '#7FE9FF') });
+    const etapas = {
+      prospecto: { nombre: 'Prospecto', talla: 'en_bruto', tallaTexto: 'en bruto', prob: '10 %', cantidad: 18, monto: 'S/ 1,240,000', ancho: 100, color1: '#A6F2FF', color2: '#7FE9FF', paso: '61 %', resumen: '18 oportunidades · S/ 1,240,000 · ponderado S/ 124,000',
+        filas: [f('Cámaras en el mercado modelo', 'Municipalidad Provincial de Chiclayo', 'S/ 98,000', '3 días', 'Llamar el lunes 23', false), f('Wifi de la biblioteca', 'Universidad del Norte Peruano', 'S/ 22,500', '9 días', 'Sin próxima acción', true), f('Red del almacén central', 'Distribuidora Andina S.A.C.', 'S/ 41,000', '5 días', 'Visita el miércoles 25', false)] },
+      calificada: { nombre: 'Calificada', talla: 'desbastada', tallaTexto: 'desbastada', prob: '25 %', cantidad: 11, monto: 'S/ 860,000', ancho: 86, color1: '#7FE9FF', color2: '#4DDDF5', paso: '64 %', resumen: '11 oportunidades · S/ 860,000 · ponderado S/ 215,000',
+        filas: [f('Datacenter municipal', 'Municipalidad Distrital de La Victoria', 'S/ 312,000', '14 días', 'Enviar propuesta el viernes 27', false), f('Alarmas de agencias', 'Caja Rural Señor de Sipán', 'S/ 55,800', '21 días', 'Venció el lunes 16', true)] },
+      propuesta: { nombre: 'Propuesta enviada', talla: 'tallada', tallaTexto: 'tallada', prob: '50 %', cantidad: 7, monto: 'S/ 540,000', ancho: 72, color1: '#4DDDF5', color2: '#1FCDEB', paso: '57 %', resumen: '7 oportunidades · S/ 540,000 · ponderado S/ 270,000',
+        filas: [f('Videovigilancia del malecón', 'Municipalidad Distrital de Puerto Eten', 'S/ 236,400', '12 días', 'Llamar hoy', false), f('Red de datos del hospital', 'Red de Salud Lambayeque Norte', 'S/ 128,900', '6 días', 'Reunión el martes 24', false), f('Control de acceso en planta', 'Agroindustrial Valle Verde S.A.C.', 'S/ 74,300', '18 días', 'Venció ayer', true), f('Cableado del colegio emblemático', 'UGEL Ferreñafe Sur', 'S/ 61,200', '4 días', 'Esperar consultas', false)] },
+      negociacion: { nombre: 'Negociación', talla: 'pulida', tallaTexto: 'pulida', prob: '75 %', cantidad: 4, monto: 'S/ 310,000', ancho: 58, color1: '#1FCDEB', color2: '#00B8D9', paso: '', resumen: '4 oportunidades · S/ 310,000 · ponderado S/ 232,500',
+        filas: [f('Cámaras del terminal terrestre', 'Terminal Terrestre Epsel S.A.', 'S/ 148,000', '7 días', 'Cerrar precio el jueves 26', false), f('Renovación de switches', 'Clínica Santa Rosa del Norte', 'S/ 92,000', '10 días', 'Llamar hoy', false)] },
+      ganadas: { nombre: 'Ganadas', talla: 'brillante', resumen: '9 este año · S/ 720,000', filas: [f('Cableado de la sede regional', 'Gobierno Regional de Lambayeque', 'S/ 186,000', 'ganada el 12/11', 'Pasó a Gerencia de proyectos', false)] },
+      perdidas: { nombre: 'Perdidas', talla: 'fisurada', resumen: '6 este año · S/ 410,000', filas: [f('Fibra óptica provincial', 'Municipalidad Provincial de Ferreñafe', 'S/ 188,000', 'perdida el 05/11', 'Ganó Redes del Norte E.I.R.L. a 92 % del referencial', true)] }
+    };
+    const orden = ['prospecto', 'calificada', 'propuesta', 'negociacion'];
+    const s = this.state.sel;
+    const lista = orden.map((k) => {
+      const e = etapas[k];
+      const sel = s === k;
+      return { ...e, tienePaso: !!e.paso, tamGema: 40, presionado: sel ? 'true' : 'false',
+        elegir: () => this.setState({ sel: k }),
+        envoltura: 'width: ' + e.ancho + '%; padding: 0; border: 0; background: transparent; cursor: pointer; transition: filter .2s ease, transform .2s ease;' + (sel ? ' filter: drop-shadow(0 0 0 #ECEDEF) drop-shadow(0 6px 18px rgba(0,218,255,.35)); transform: scale(1.015);' : ' filter: saturate(.9);'),
+        franja: 'display: flex; align-items: center; gap: 14px; height: 82px; padding: 0 9% 0 8%; box-sizing: border-box; background: linear-gradient(180deg, ' + e.color1 + ', ' + e.color2 + '); clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%); border-radius: 6px;' + (sel ? ' box-shadow: inset 0 0 0 3px rgba(255,255,255,.75);' : ' box-shadow: inset 0 1px 0 rgba(255,255,255,.45);') };
+    });
+    const actual = etapas[s];
+    const boton = (activo, borde, fondo) => 'display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; cursor: pointer; text-align: left; background: ' + fondo + '; border: ' + (activo ? '2px' : '1px') + ' solid ' + borde + ';';
+    return {
+      cifras: [
+        { etiqueta: 'EMBUDO ABIERTO', valor: 'S/ 2,950,000', nota: '40 oportunidades' },
+        { etiqueta: 'PONDERADO', valor: 'S/ 841,500', nota: 'según la probabilidad de cada etapa' },
+        { etiqueta: 'CIERRAN ESTE MES', valor: 'S/ 412,000', nota: '3 oportunidades' },
+        { etiqueta: 'ATASCADAS', valor: '5', nota: 'más de 15 días sin moverse' }
+      ],
+      etapas: lista,
+      sel: actual,
+      estiloPanel: 'display: flex; flex-direction: column; border-radius: 16px; background: #33302B; border: 1px solid #45413A; overflow: hidden; animation: ' + (s.length % 2 ? 'tqPanel' : 'tqPanel') + ' .28s ease both;',
+      elegirGanadas: () => this.setState({ sel: 'ganadas' }),
+      elegirPerdidas: () => this.setState({ sel: 'perdidas' }),
+      estiloGanadas: boton(s === 'ganadas', '#7DB582', 'rgba(125,181,130,.12)'),
+      estiloPerdidas: boton(s === 'perdidas', '#C9715A', 'rgba(255,138,101,.10)')
+    };
+  }
+}
+</script>
+</body>
+</html>

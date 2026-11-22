@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ícono de la agenda: propuestas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap">
+<style>
+body{margin:0;font-family:Inter,system-ui,sans-serif}
+a{color:#9DA5AE}a:hover{color:#D4D8DD}
+</style>
+</helmet>
+<div style="width: 1280px; height: 720px; box-sizing: border-box; background: #2B2925; color: #ECEDEF; padding: 44px 56px; display: flex; flex-direction: column; gap: 28px">
+  <div>
+    <h1 style="margin: 0; font-size: 26px; font-weight: 700">El ícono de la agenda, estilo aplicación</h1>
+    <p style="margin: 6px 0 0; font-size: 15px; color: #A8ADB4">Arriba, grande; abajo, al tamaño real del muelle (32 px) junto a otras aplicaciones.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px">
+
+    <!-- A · Hoja del día -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px 16px; border-radius: 18px; background: #33302B; border: 1px solid #45413A">
+      <svg width="120" height="120" viewBox="0 0 48 48" role="img" aria-label="Opción A: hoja del día">
+        <defs><linearGradient id="aBanda" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#00B8D9"></stop><stop offset="1" stop-color="#00DAFF"></stop></linearGradient></defs>
+        <rect x="3" y="3" width="42" height="42" rx="10" fill="#FFFFFF"></rect>
+        <path d="M3 13a10 10 0 0 1 10-10h22a10 10 0 0 1 10 10v2H3z" fill="url(#aBanda)"></path>
+        <text x="24" y="12.6" text-anchor="middle" font-family="Inter, sans-serif" font-size="7" font-weight="800" fill="#FFFFFF" letter-spacing=".6">VIE</text>
+        <text x="24" y="36" text-anchor="middle" font-family="Inter, sans-serif" font-size="19" font-weight="700" fill="#1F2328">20</text>
+        <circle cx="38" cy="38" r="7.5" fill="#F2C14E" stroke="#FFFFFF" stroke-width="1.6"></circle>
+        <path d="M38 34.6V38l2.2 1.4" stroke="#5A3E00" stroke-width="1.5" stroke-linecap="round" fill="none"></path>
+      </svg>
+      <div style="text-align: center">
+        <div style="font-size: 16px; font-weight: 700">A · Hoja del día</div>
+        <div style="margin-top: 4px; font-size: 13px; color: #A8ADB4">Muestra el día y la fecha de hoy, y cambia sola cada día</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 14px; background: #24221F; border: 1px solid #3F3B35" aria-hidden="true">
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #4A453E"></span>
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #4A453E"></span>
+        <svg width="32" height="32" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="42" rx="10" fill="#FFFFFF"></rect><path d="M3 13a10 10 0 0 1 10-10h22a10 10 0 0 1 10 10v2H3z" fill="#00CDEB"></path><text x="24" y="12.6" text-anchor="middle" font-family="Inter, sans-serif" font-size="7" font-weight="800" fill="#FFFFFF">VIE</text><text x="24" y="36" text-anchor="middle" font-family="Inter, sans-serif" font-size="19" font-weight="700" fill="#1F2328">20</text><circle cx="38" cy="38" r="7.5" fill="#F2C14E" stroke="#FFFFFF" stroke-width="1.6"></circle></svg>
+      </div>
+    </div>
+
+    <!-- B · Degradado Techquk -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px 16px; border-radius: 18px; background: #33302B; border: 1px solid #45413A">
+      <svg width="120" height="120" viewBox="0 0 48 48" role="img" aria-label="Opción B: degradado Techquk">
+        <defs><linearGradient id="bFondo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#01006F"></stop><stop offset="1" stop-color="#00B8D9"></stop></linearGradient></defs>
+        <rect x="3" y="3" width="42" height="42" rx="10" fill="url(#bFondo)"></rect>
+        <g fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="11" y="13" width="22" height="20" rx="3"></rect>
+          <path d="M11 19h22M16 10.5v5M28 10.5v5"></path>
+          <path d="M16 24h2M21 24h2M26 24h2M16 28.5h2M21 28.5h2"></path>
+        </g>
+        <circle cx="35" cy="35" r="8" fill="#F2C14E"></circle>
+        <path d="M35 31.3V35l2.4 1.6" stroke="#5A3E00" stroke-width="1.7" stroke-linecap="round" fill="none"></path>
+      </svg>
+      <div style="text-align: center">
+        <div style="font-size: 16px; font-weight: 700">B · Degradado Techquk</div>
+        <div style="margin-top: 4px; font-size: 13px; color: #A8ADB4">Los colores de la marca, con el reloj en oro</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 14px; background: #24221F; border: 1px solid #3F3B35" aria-hidden="true">
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #4A453E"></span>
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #4A453E"></span>
+        <svg width="32" height="32" viewBox="0 0 48 48"><defs><linearGradient id="bMini" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#01006F"></stop><stop offset="1" stop-color="#00B8D9"></stop></linearGradient></defs><rect x="3" y="3" width="42" height="42" rx="10" fill="url(#bMini)"></rect><g fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="13" width="22" height="20" rx="3"></rect><path d="M11 19h22M16 10.5v5M28 10.5v5"></path></g><circle cx="35" cy="35" r="8" fill="#F2C14E"></circle></svg>
+      </div>
+    </div>
+
+    <!-- C · Calendario con reloj -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px 16px; border-radius: 18px; background: #33302B; border: 1px solid #45413A">
+      <svg width="120" height="120" viewBox="0 0 48 48" role="img" aria-label="Opción C: calendario con reloj">
+        <defs><linearGradient id="cFondo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9D8BFF"></stop><stop offset="1" stop-color="#6A55F0"></stop></linearGradient></defs>
+        <rect x="3" y="3" width="42" height="42" rx="10" fill="url(#cFondo)"></rect>
+        <rect x="9.5" y="12" width="25" height="24" rx="3.5" fill="#FFFFFF"></rect>
+        <path d="M9.5 15.5a3.5 3.5 0 0 1 3.5-3.5h18a3.5 3.5 0 0 1 3.5 3.5V19h-25z" fill="#00CDEB"></path>
+        <rect x="14.5" y="9" width="2.6" height="6" rx="1.3" fill="#1F2328"></rect>
+        <rect x="27" y="9" width="2.6" height="6" rx="1.3" fill="#1F2328"></rect>
+        <g fill="#C9C3F7"><rect x="13" y="22" width="4" height="3" rx="1"></rect><rect x="19.5" y="22" width="4" height="3" rx="1"></rect><rect x="26" y="22" width="4" height="3" rx="1"></rect><rect x="13" y="27.5" width="4" height="3" rx="1"></rect></g>
+        <rect x="19.5" y="27.5" width="4" height="3" rx="1" fill="#6A55F0"></rect>
+        <circle cx="35" cy="34" r="8.5" fill="#F2C14E" stroke="#FFFFFF" stroke-width="1.6"></circle>
+        <path d="M35 30v4l2.6 1.7" stroke="#5A3E00" stroke-width="1.7" stroke-linecap="round" fill="none"></path>
+      </svg>
+      <div style="text-align: center">
+        <div style="font-size: 16px; font-weight: 700">C · Calendario con reloj</div>
+        <div style="margin-top: 4px; font-size: 13px; color: #A8ADB4">La hoja del calendario sobre morado, con el reloj encima</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 14px; background: #24221F; border: 1px solid #3F3B35" aria-hidden="true">
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #4A453E"></span>
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #4A453E"></span>
+        <svg width="32" height="32" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="42" rx="10" fill="#7F6CF7"></rect><rect x="9.5" y="12" width="25" height="24" rx="3.5" fill="#FFFFFF"></rect><path d="M9.5 15.5a3.5 3.5 0 0 1 3.5-3.5h18a3.5 3.5 0 0 1 3.5 3.5V19h-25z" fill="#00CDEB"></path><circle cx="35" cy="34" r="8.5" fill="#F2C14E" stroke="#FFFFFF" stroke-width="1.6"></circle></svg>
+      </div>
+    </div>
+
+    <!-- D · Cuadrícula del mes -->
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 24px 16px; border-radius: 18px; background: #33302B; border: 1px solid #45413A">
+      <svg width="120" height="120" viewBox="0 0 48 48" role="img" aria-label="Opción D: cuadrícula del mes">
+        <rect x="3" y="3" width="42" height="42" rx="10" fill="#1F2A44"></rect>
+        <path d="M3 13a10 10 0 0 1 10-10h22a10 10 0 0 1 10 10v.5H3z" fill="#00CDEB"></path>
+        <g fill="#5C6B8A">
+          <circle cx="12" cy="20" r="1.8"></circle><circle cx="18" cy="20" r="1.8"></circle><circle cx="24" cy="20" r="1.8"></circle><circle cx="30" cy="20" r="1.8"></circle><circle cx="36" cy="20" r="1.8"></circle>
+          <circle cx="12" cy="26.5" r="1.8"></circle><circle cx="18" cy="26.5" r="1.8"></circle><circle cx="30" cy="26.5" r="1.8"></circle><circle cx="36" cy="26.5" r="1.8"></circle>
+          <circle cx="12" cy="33" r="1.8"></circle><circle cx="18" cy="33" r="1.8"></circle><circle cx="24" cy="33" r="1.8"></circle><circle cx="30" cy="33" r="1.8"></circle>
+          <circle cx="12" cy="39.5" r="1.8"></circle><circle cx="18" cy="39.5" r="1.8"></circle>
+        </g>
+        <circle cx="30" cy="33" r="1.8" fill="#FF8A65"></circle>
+        <circle cx="36" cy="33" r="1.8" fill="#FF8A65"></circle>
+        <circle cx="24" cy="26.5" r="4.4" fill="#F2C14E"></circle>
+        <circle cx="24" cy="26.5" r="6.2" fill="none" stroke="#F2C14E" stroke-width="1" opacity=".55"></circle>
+      </svg>
+      <div style="text-align: center">
+        <div style="font-size: 16px; font-weight: 700">D · Cuadrícula del mes</div>
+        <div style="margin-top: 4px; font-size: 13px; color: #A8ADB4">Hoy brilla en oro; lo vencido, en coral</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 14px; background: #24221F; border: 1px solid #3F3B35" aria-hidden="true">
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #4A453E"></span>
+        <span style="width: 32px; height: 32px; border-radius: 8px; background: #4A453E"></span>
+        <svg width="32" height="32" viewBox="0 0 48 48"><rect x="3" y="3" width="42" height="42" rx="10" fill="#1F2A44"></rect><path d="M3 13a10 10 0 0 1 10-10h22a10 10 0 0 1 10 10v.5H3z" fill="#00CDEB"></path><g fill="#5C6B8A"><circle cx="12" cy="21" r="2.4"></circle><circle cx="24" cy="21" r="2.4"></circle><circle cx="36" cy="21" r="2.4"></circle><circle cx="12" cy="31" r="2.4"></circle><circle cx="36" cy="31" r="2.4"></circle><circle cx="12" cy="39" r="2.4"></circle><circle cx="24" cy="39" r="2.4"></circle></g><circle cx="24" cy="31" r="5" fill="#F2C14E"></circle></svg>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Escena del ambiente</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="{{raiz}}">
+  <span style="{{etiqueta}}">{{titulo}}</span>
+  <div style="display: flex; justify-content: center; margin-top: 18px">
+    <div style="{{barra}}">
+      <sc-for list="{{cajas}}" as="c" hint-placeholder-count="4">
+        <span style="{{c.estilo}}">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"></rect><path d="M9 4V2.8h6V4M9 10h6M9 14h6M9 18h4"></path></svg>
+          <span style="font-size: 13px; font-weight: 600">{{c.nombre}}</span>
+        </span>
+      </sc-for>
+    </div>
+  </div>
+  <p style="{{frase}}">Lo que la obra necesita, a tiempo.</p>
+  <div style="display: flex; gap: 12px; margin-top: 18px; padding: 0 36px">
+    <div style="{{tarjeta}}"><span style="font-size: 12px; opacity: .75">REQ-2026-0002</span><span style="font-size: 14px; font-weight: 600">Cable para el tendido de la plaza</span></div>
+    <div style="{{tarjeta}}"><span style="font-size: 12px; opacity: .75">REQ-2026-0001</span><span style="font-size: 14px; font-weight: 600">Instalación de postes</span></div>
+    <div style="{{muelle}}">
+      <span style="{{ico}}"></span><span style="{{ico}}"></span><span style="{{ico}}"></span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"fondo":{"editor":"color","default":"#2F271F"},"tinte":{"editor":"color","default":"#FFB36B"},"modo":{"editor":"enum","options":["hoy","propuesta"],"default":"propuesta"},"titulo":{"editor":"text","default":"Cálido · propuesta"},"$preview":{"width":700,"height":400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const f = this.props.fondo ?? '#2F271F';
+    const t = this.props.tinte ?? '#FFB36B';
+    const nuevo = (this.props.modo ?? 'propuesta') === 'propuesta';
+    const mix = (a, b, p) => 'color-mix(in oklch, ' + a + ' ' + (100 - p) + '%, ' + b + ' ' + p + '%)';
+    const turq = nuevo ? mix('#00DAFF', t, 14) : '#00DAFF';
+    const sup = nuevo ? mix(f, '#FFFFFF', 7) : '#2E3136';
+    const borde = nuevo ? mix(f, '#FFFFFF', 14) : '#44474D';
+    const texto = nuevo ? mix('#F3F1EC', t, 6) : '#ECEDEF';
+    const suave = nuevo ? mix(f, '#FFFFFF', 55) : '#A8ADB4';
+    const nombres = ['Requerimientos', 'Órdenes', 'Almacén', 'Herramientas'];
+    const cajas = nombres.map((n, i) => ({ nombre: n,
+      estilo: 'display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 118px; height: 88px; color: ' + (i === 0 ? turq : texto) + '; background: ' + (i === 0 ? mix(sup, turq, 16) : sup) + ';' + (i === 0 ? ' box-shadow: inset 0 -3px 0 ' + turq + ';' : '') + (i < 3 ? ' border-right: 1px solid ' + borde + ';' : '') }));
+    return {
+      titulo: this.props.titulo ?? '',
+      raiz: 'width: 700px; height: 400px; box-sizing: border-box; padding: 22px 0; background: ' + f + '; color: ' + texto + '; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; border-radius: 18px; overflow: hidden',
+      etiqueta: 'align-self: flex-start; margin-left: 24px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; letter-spacing: .04em; background: ' + (nuevo ? mix(f, '#FFFFFF', 12) : '#3A3D43') + '; color: ' + texto,
+      barra: 'display: flex; border-radius: 14px; overflow: hidden; border: 1px solid ' + borde,
+      cajas,
+      frase: 'margin: 10px 0 0; text-align: center; font-size: 14px; font-style: italic; color: ' + turq,
+      tarjeta: 'flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 12px; background: ' + sup + '; border: 1px solid ' + borde,
+      muelle: 'width: 56px; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px 0; border-radius: 14px; ' + (nuevo ? 'background: color-mix(in oklch, ' + f + ' 55%, transparent); backdrop-filter: blur(12px); border: 1px solid ' + borde : 'background: #2E3136; border: 1px solid #44474D'),
+      ico: 'width: 26px; height: 26px; border-radius: 7px; background: ' + (nuevo ? mix(f, '#FFFFFF', 22) : '#4A4D53')
+    };
+  }
+}
+</script>
+</body>
+</html>

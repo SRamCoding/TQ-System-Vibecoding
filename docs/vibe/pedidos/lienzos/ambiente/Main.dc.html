@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Colores que siguen al ambiente</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&amp;display=swap">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1480px; height: 980px; box-sizing: border-box; padding: 32px 30px; background: #1B1B1D; color: #ECEDEF; font-family: Inter, system-ui, sans-serif; display: flex; flex-direction: column; gap: 18px">
+  <div style="display: grid; grid-template-columns: 120px repeat(2, minmax(0, 1fr)); gap: 20px; align-items: end">
+    <span></span>
+    <span style="font-size: 18px; font-weight: 700; text-align: center">Hoy: colores fijos</span>
+    <span style="font-size: 18px; font-weight: 700; text-align: center">Propuesta: siguen al ambiente</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 120px repeat(2, minmax(0, 1fr)); gap: 20px; align-items: center">
+    <span style="font-size: 15px; font-weight: 700; color: #A9C1FF">Ambiente frío<br><span style="font-size: 12px; font-weight: 400; color: #A8ADB4">mañana, invierno</span></span>
+    <dc-import name="Escena" fondo="#1D242B" tinte="#8FB8FF" modo="hoy" titulo="FRÍO · HOY" hint-size="700px,400px"></dc-import>
+    <dc-import name="Escena" fondo="#1D242B" tinte="#8FB8FF" modo="propuesta" titulo="FRÍO · PROPUESTA" hint-size="700px,400px"></dc-import>
+  </div>
+  <div style="display: grid; grid-template-columns: 120px repeat(2, minmax(0, 1fr)); gap: 20px; align-items: center">
+    <span style="font-size: 15px; font-weight: 700; color: #FFC38A">Ambiente cálido<br><span style="font-size: 12px; font-weight: 400; color: #A8ADB4">atardecer, verano</span></span>
+    <dc-import name="Escena" fondo="#33281E" tinte="#FFB36B" modo="hoy" titulo="CÁLIDO · HOY" hint-size="700px,400px"></dc-import>
+    <dc-import name="Escena" fondo="#33281E" tinte="#FFB36B" modo="propuesta" titulo="CÁLIDO · PROPUESTA" hint-size="700px,400px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1480,"height":980}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

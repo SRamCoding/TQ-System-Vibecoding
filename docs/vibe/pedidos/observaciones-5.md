@@ -4,6 +4,9 @@ Pedido de Sebastián (20 de noviembre de 2026). Cada observación es una decisi�
 `docs/traspaso/decisiones.md` con su alcance y anótala en la ficha que corresponda (sube su versión). Hazlas en
 orden, un commit por observación. Si algo choca con lo ya construido, pregúntame antes.
 
+> **Lienzos:** los enlaces a claude.ai pueden no abrir desde otra cuenta. Hay copia de cada lienzo en
+> `docs/vibe/pedidos/lienzos/` (ver su `README.md`): esa copia manda.
+
 ## 1. El ícono de la agenda, estilo aplicación: la hoja del día
 
 **Qué pasa hoy.** El ícono de la agenda en el muelle es de línea y neutro, mientras que a su lado hay íconos de

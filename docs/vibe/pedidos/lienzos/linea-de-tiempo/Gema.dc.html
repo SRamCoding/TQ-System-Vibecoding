@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Gema de una etapa</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<span style="display: inline-flex; width: {{tam}}px; height: {{tam}}px; align-items: center; justify-content: center">
+  <svg width="{{tam}}" height="{{tam}}" viewBox="0 0 32 32" role="img" aria-label="{{texto}}">
+    <defs>
+      <linearGradient id="gTall" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9CF1FF"></stop><stop offset="1" stop-color="#0FA9C6"></stop></linearGradient>
+      <linearGradient id="gPul" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E4FBFF"></stop><stop offset=".45" stop-color="#5FE3F7"></stop><stop offset="1" stop-color="#0B97B3"></stop></linearGradient>
+      <linearGradient id="gBri" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset=".5" stop-color="#B9F6FF"></stop><stop offset="1" stop-color="#36C9E4"></stop></linearGradient>
+      <radialGradient id="gHalo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#9ED3A4" stop-opacity=".55"></stop><stop offset="1" stop-color="#9ED3A4" stop-opacity="0"></stop></radialGradient>
+    </defs>
+
+    <sc-if value="{{esBruto}}" hint-placeholder-val="{{false}}">
+      <path d="M7 13.5 11.5 6.5 20 5.5 26.5 11.5 25 22 15.5 27 6 21z" fill="#4E6B72" stroke="#86A9B1" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M11.5 6.5 14 14 7 13.5M14 14l11 -2.5M14 14l1.5 13M14 14l-8 7" stroke="#86A9B1" stroke-width=".8" opacity=".55" fill="none"></path>
+    </sc-if>
+
+    <sc-if value="{{esDesbastada}}" hint-placeholder-val="{{false}}">
+      <path d="M8 11 12.5 6 19.5 6 24 11 23 21 16 27 9 21z" fill="#2E97A8" stroke="#7FD9E6" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M8 11h16M12.5 6 14 11M19.5 6 18 11M14 11l2 16M18 11l-2 16" stroke="#BFF1F8" stroke-width=".8" opacity=".55" fill="none"></path>
+    </sc-if>
+
+    <sc-if value="{{esTallada}}" hint-placeholder-val="{{false}}">
+      <path d="M5 12 10 6h12l5 6-11 15z" fill="url(#gTall)" stroke="#E4FBFF" stroke-width="1" stroke-linejoin="round"></path>
+      <path d="M5 12h22M10 6l3 6 3-6 3 6 3-6M13 12l3 15 3-15" stroke="#E4FBFF" stroke-width=".8" opacity=".75" fill="none"></path>
+    </sc-if>
+
+    <sc-if value="{{esPulida}}" hint-placeholder-val="{{false}}">
+      <path d="M5 12 10 6h12l5 6-11 15z" fill="url(#gPul)" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round"></path>
+      <path d="M5 12h22M10 6l3 6 3-6 3 6 3-6M13 12l3 15 3-15" stroke="#FFFFFF" stroke-width=".8" opacity=".85" fill="none"></path>
+      <path d="M11.5 8.2 13 7.2" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round"></path>
+    </sc-if>
+
+    <sc-if value="{{esBrillante}}" hint-placeholder-val="{{false}}">
+      <circle cx="16" cy="16" r="15.5" fill="url(#gHalo)"></circle>
+      <path d="M5 12 10 6h12l5 6-11 15z" fill="url(#gBri)" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round"></path>
+      <path d="M5 12h22M10 6l3 6 3-6 3 6 3-6M13 12l3 15 3-15" stroke="#FFFFFF" stroke-width=".8" opacity=".9" fill="none"></path>
+      <path d="M26.5 3.5v3.4M24.8 5.2h3.4M4.5 21.5v2.6M3.2 22.8h2.6" stroke="#FFFFFF" stroke-width="1.1" stroke-linecap="round"></path>
+    </sc-if>
+
+    <sc-if value="{{esFisurada}}" hint-placeholder-val="{{false}}">
+      <path d="M5 12 10 6h12l5 6-11 15z" fill="#6B5A57" stroke="#B89089" stroke-width="1" stroke-linejoin="round"></path>
+      <path d="M5 12h22M13 12l3 15 3-15" stroke="#B89089" stroke-width=".8" opacity=".6" fill="none"></path>
+      <path d="M18.5 6.5 16.5 11l2.5 2.5-3 4 1.5 3" stroke="#F2A58C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+    </sc-if>
+  </svg>
+</span>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"talla":{"editor":"enum","options":["en_bruto","desbastada","tallada","pulida","brillante","fisurada"],"default":"tallada"},"tam":{"editor":"int","default":64},"$preview":{"width":64,"height":64}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const t = this.props.talla ?? 'tallada';
+    const nombres = { en_bruto: 'en bruto', desbastada: 'desbastada', tallada: 'tallada', pulida: 'pulida', brillante: 'brillante', fisurada: 'fisurada' };
+    return {
+      tam: this.props.tam ?? 64,
+      texto: 'Gema ' + (nombres[t] || 'tallada'),
+      esBruto: t === 'en_bruto', esDesbastada: t === 'desbastada', esTallada: t === 'tallada',
+      esPulida: t === 'pulida', esBrillante: t === 'brillante', esFisurada: t === 'fisurada'
+    };
+  }
+}
+</script>
+</body>
+</html>

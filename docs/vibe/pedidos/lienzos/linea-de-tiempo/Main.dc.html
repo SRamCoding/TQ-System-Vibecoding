@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Cronograma refinado</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>body{margin:0;font-family:Inter,system-ui,sans-serif}a{color:#7FE9FF}a:hover{color:#B8F4FF}</style>
+</helmet>
+<div style="width: 1440px; height: 820px; box-sizing: border-box; background: #2B2925; color: #ECEDEF; padding: 30px 40px; display: flex; flex-direction: column; gap: 14px">
+  <div style="display: flex; align-items: baseline; justify-content: space-between">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 700">Línea de tiempo</h2>
+    <span style="display: flex; gap: 16px; font-size: 12px; color: #A8ADB4">
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 8px; border-radius: 4px; background: linear-gradient(90deg,#A6F2FF,#1FCDEB)"></span>etapas recorridas</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 0; border-top: 2px dashed #7FE9FF"></span>lo que falta hasta el cierre</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; transform: rotate(45deg); background: #F2C14E"></span>cierre esperado</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 0; border-top: 2px dashed #F2A58C"></span>cierre vencido</span>
+    </span>
+  </div>
+
+  <div style="position: relative; border-radius: 16px; background: #33302B; border: 1px solid #45413A; overflow: hidden">
+    <div style="display: grid; grid-template-columns: 330px 1fr; border-bottom: 1px solid #45413A; background: #2F2C28">
+      <span style="padding: 12px 18px; font-size: 12px; font-weight: 600; letter-spacing: .06em; color: #A8ADB4">OPORTUNIDAD</span>
+      <div style="position: relative; height: 40px">
+        <sc-for list="{{meses}}" as="m" hint-placeholder-count="5">
+          <span style="{{m.estilo}}">{{m.nombre}}</span>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-for list="{{filas}}" as="f" hint-placeholder-count="8">
+      <a href="#" style="display: grid; grid-template-columns: 330px 1fr; align-items: center; border-bottom: 1px solid #3A3631; text-decoration: none; color: #ECEDEF; min-height: 66px">
+        <span style="display: flex; align-items: center; gap: 12px; padding: 10px 18px; min-width: 0">
+          <dc-import name="Gema" talla="{{f.talla}}" tam="26" hint-size="26px,26px"></dc-import>
+          <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+            <span style="font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.nombre}}</span>
+            <span style="font-size: 12px; color: #A8ADB4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.cliente}} · <b style="color: #ECEDEF; font-weight: 600">{{f.monto}}</b></span>
+          </span>
+        </span>
+        <span style="position: relative; height: 66px">
+          <sc-for list="{{f.tramos}}" as="t" hint-placeholder-count="3">
+            <span style="{{t.estilo}}" title="{{t.nombre}}"></span>
+          </sc-for>
+          <span style="{{f.falta}}"></span>
+          <span style="{{f.hito}}"></span>
+          <span style="{{f.etiquetaHito}}">{{f.textoHito}}</span>
+        </span>
+      </a>
+    </sc-for>
+
+    <span style="{{lineaHoy}}"></span>
+    <span style="{{etiquetaHoy}}">Hoy · 21 nov</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ancho = 1030, total = 151, x = (d) => (d / total) * ancho;
+    const izq = 330;
+    const hoy = 51;
+    const colores = ['#A6F2FF', '#7FE9FF', '#4DDDF5', '#1FCDEB'];
+    const nombres = ['Prospecto', 'Calificada', 'Propuesta enviada', 'Negociación'];
+    const tallas = ['en_bruto', 'desbastada', 'tallada', 'pulida'];
+    const meses = [['Octubre', 0], ['Noviembre', 31], ['Diciembre', 61], ['Enero', 92], ['Febrero', 123]].map(([n, d]) => ({ nombre: n,
+      estilo: 'position: absolute; top: 0; bottom: 0; left: ' + x(d) + 'px; padding: 12px 10px; font-size: 12px; font-weight: 600; color: #C7CBD1; border-left: 1px solid #45413A' }));
+    const datos = [
+      ['Videovigilancia del malecón', 'Mun. Distrital de Puerto Eten', 'S/ 236,400', [3, 18, 40], 70],
+      ['Red de datos del hospital', 'Red de Salud Lambayeque Norte', 'S/ 128,900', [10, 24, 45], 62],
+      ['Cámaras del terminal terrestre', 'Terminal Terrestre Epsel S.A.', 'S/ 148,000', [0, 12, 28, 44], 58],
+      ['Control de acceso en planta', 'Agroindustrial Valle Verde S.A.C.', 'S/ 74,300', [8, 20, 33], 48],
+      ['Datacenter municipal', 'Mun. Distrital de La Victoria', 'S/ 312,000', [22, 37], 104],
+      ['Alarmas de agencias', 'Caja Rural Señor de Sipán', 'S/ 55,800', [15, 30], 46],
+      ['Cámaras en el mercado modelo', 'Mun. Provincial de Chiclayo', 'S/ 98,000', [48], 120],
+      ['Renovación de switches', 'Clínica Santa Rosa del Norte', 'S/ 92,000', [5, 19, 30, 41], 66]
+    ];
+    const filas = datos.map(([nombre, cliente, monto, inicios, cierre]) => {
+      const etapa = inicios.length - 1;
+      const tramos = inicios.map((d, i) => {
+        const fin = i < inicios.length - 1 ? inicios[i + 1] : hoy;
+        return { nombre: nombres[i], estilo: 'position: absolute; top: 26px; height: 14px; left: ' + x(d) + 'px; width: ' + Math.max(2, x(fin) - x(d) - 2) + 'px; background: ' + colores[i] + '; border-radius: 7px;' };
+      });
+      const vencido = cierre < hoy;
+      const desde = hoy, hasta = Math.max(cierre, hoy);
+      return { nombre, cliente, monto, talla: tallas[etapa], tramos,
+        falta: vencido ? 'display: none' : 'position: absolute; top: 32px; height: 0; left: ' + x(desde) + 'px; width: ' + (x(hasta) - x(desde)) + 'px; border-top: 2px dashed #7FE9FF; opacity: .7',
+        hito: 'position: absolute; top: 27px; width: 12px; height: 12px; transform: rotate(45deg); left: ' + (x(cierre) - 6) + 'px; background: ' + (vencido ? '#F2A58C' : '#F2C14E') + '; box-shadow: 0 0 0 3px #33302B',
+        etiquetaHito: 'position: absolute; top: 44px; left: ' + (x(cierre) - 40) + 'px; width: 80px; text-align: center; font-size: 11px; font-weight: 600; color: ' + (vencido ? '#F2A58C' : '#E8C46A'),
+        textoHito: vencido ? 'venció' : 'cierre' };
+    });
+    return { meses, filas,
+      lineaHoy: 'position: absolute; top: 40px; bottom: 0; left: ' + (izq + x(hoy)) + 'px; width: 2px; background: rgba(236,237,239,.6)',
+      etiquetaHoy: 'position: absolute; top: 44px; left: ' + (izq + x(hoy) + 6) + 'px; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: #ECEDEF; color: #1E1F22' };
+  }
+}
+</script>
+</body>
+</html>
