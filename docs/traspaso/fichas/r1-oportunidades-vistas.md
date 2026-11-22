@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v3
+- **Versión:** v4
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -14,6 +14,7 @@ Licitaciones) y la fila de cifras de siempre.
 
 ## Decisiones de Sebastián
 
+- **MV-061** (ficha) · El Embudo muestra solo la fila de cinco cifras de la cabecera.
 - **MV-060** (ficha) · La Línea de tiempo es el cronograma refinado, con «Por urgencia» por defecto, otros órdenes y filtros.
 - **MV-058** (ficha) · El Embudo es el embudo clásico con sus gemas (lienzo «A refinada»); las gemas, con el dibujo nuevo.
 - **MV-057** (ficha) · Mis oportunidades por defecto; Embudo de oportunidades; sin Lista ni Faja 3D.
@@ -22,8 +23,8 @@ Licitaciones) y la fila de cifras de siempre.
 
 - **Mis oportunidades** `/oportunidades` (antes «Tarjetas», en `/oportunidades/tarjetas`): las tarjetas de siempre.
 - **Embudo de oportunidades** `/oportunidades/embudo` (antes «Tablero», que era la de entrada en `/oportunidades`). MV-058:
-  - **Cuatro cifras** en tarjetas: Embudo abierto, Ponderado, Cierran este mes, Atascadas (las mismas cuentas de la fila
-    de cifras de las vistas).
+  - **Cifras (MV-061):** solo la fila de cinco de la cabecera de las vistas (Embudo abierto, Ponderado, Cierran este
+    mes, Atascadas, Cierre estimado vencido); la fila propia de cuatro del lienzo se quitó.
   - **El embudo**, a la izquierda (11 de 20 columnas): cuatro franjas de 82 px de alto en trapecio (recorte 5 % por
     lado abajo, esquinas de 6 px) de 100 %, 86 %, 72 % y 58 % del ancho, con degradado vertical: Prospecto `#A6F2FF` →
     `#7FE9FF`, Calificada `#7FE9FF` → `#4DDDF5`, Propuesta enviada `#4DDDF5` → `#1FCDEB`, Negociación `#1FCDEB` →
@@ -110,6 +111,8 @@ Licitaciones) y la fila de cifras de siempre.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v4** (MV-061): sin la segunda fila de cifras en el Embudo.
 
 - **v3** (MV-060): la Línea de tiempo con el cronograma refinado, su orden y sus filtros; sin paginación.
 

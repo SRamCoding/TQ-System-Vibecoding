@@ -1,6 +1,6 @@
 {{--
     MV-058: el Embudo de oportunidades, como el tablero «A refinada · el embudo con sus gemas» del lienzo
-    (`docs/vibe/pedidos/lienzos/embudo/Refinada.dc.html`). Arriba, cuatro cifras; a la izquierda, el embudo clásico de
+    (`docs/vibe/pedidos/lienzos/embudo/Refinada.dc.html`). MV-061: sin fila propia de cifras (las cinco de la cabecera de las vistas bastan). A la izquierda, el embudo clásico de
     cuatro franjas que se angostan, con su gema, nombre, talla y probabilidad, monto y cantidad, y entre franjas «N %
     avanza»; debajo, Ganadas y Perdidas; a la derecha, el panel de la etapa elegida con su lista. Las franjas son botones;
     cada oportunidad abre su ficha deslizante. Recibe lo que arma `TableroOportunidades::datosEmbudo()`.
@@ -10,12 +10,6 @@
         .tq-embudo { --tq-e-sup: var(--tq-superficie, #fff); --tq-e-borde: var(--tq-borde, var(--gray-200)); --tq-e-suave: var(--tq-texto-suave, var(--gray-500)); --tq-e-acento: #0790A8; --tq-e-coral: #C2532F;
             display: flex; flex-direction: column; gap: 22px; margin-top: 0.5rem; }
         .dark .tq-embudo { --tq-e-sup: var(--tq-superficie, #33302B); --tq-e-borde: var(--tq-borde, #45413A); --tq-e-suave: var(--tq-texto-suave, #A8ADB4); --tq-e-acento: #7FE9FF; --tq-e-coral: #F2A58C; }
-        .tq-embudo-cifras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-        @media (max-width: 900px) { .tq-embudo-cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-        .tq-embudo-cifra { display: flex; flex-direction: column; gap: 4px; padding: 14px 18px; border-radius: 14px; background: var(--tq-e-sup); border: 1px solid var(--tq-e-borde); }
-        .tq-embudo-cifra-titulo { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--tq-e-suave); }
-        .tq-embudo-cifra-valor { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
-        .tq-embudo-cifra-nota { font-size: 12px; color: var(--tq-e-suave); }
         .tq-embudo-cuerpo { display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 9fr); gap: 36px; }
         @media (max-width: 1100px) { .tq-embudo-cuerpo { grid-template-columns: minmax(0, 1fr); } }
         .tq-embudo-izq { display: flex; flex-direction: column; align-items: center; }
@@ -46,16 +40,6 @@
         .tq-embudo-ver { margin-top: auto; padding: 14px 20px; font-size: 13px; font-weight: 600; color: var(--primary-600); }
         .dark .tq-embudo-ver { color: var(--primary-400); }
     </style>
-
-    <div class="tq-embudo-cifras">
-        @foreach ($cifras as $c)
-            <div class="tq-embudo-cifra">
-                <span class="tq-embudo-cifra-titulo">{{ $c['titulo'] }}</span>
-                <span class="tq-embudo-cifra-valor" @if ($c['valorCompleto']) title="{{ $c['valorCompleto'] }}" @endif>{{ $c['valor'] }}</span>
-                <span class="tq-embudo-cifra-nota">{{ $c['detalle'] }}</span>
-            </div>
-        @endforeach
-    </div>
 
     <div class="tq-embudo-cuerpo">
         <div class="tq-embudo-izq">

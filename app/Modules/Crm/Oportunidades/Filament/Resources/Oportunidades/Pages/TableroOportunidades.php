@@ -161,7 +161,6 @@ final class TableroOportunidades extends Page
         }
 
         return [
-            'cifras' => array_slice(VistasDeOportunidades::cifras(), 0, 4),
             'etapas' => $etapas,
             'ganadas' => ['cantidad' => count($ganadas = $this->delAnio('ganada')), 'monto' => $soles(self::sumar(array_column($ganadas, 'monto')))],
             'perdidas' => ['cantidad' => count($perdidas = $this->delAnio('perdida')), 'monto' => $soles(self::sumar(array_column($perdidas, 'monto')))],

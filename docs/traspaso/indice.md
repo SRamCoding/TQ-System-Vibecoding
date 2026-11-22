@@ -28,7 +28,7 @@ las que puede construir; las que están **en curso** todavía pueden cambiar.
 | [t9-cierre](fichas/t9-cierre.md) | Flujo 6 | aprobada | v1 | `aprobado/t9-cierre-v1` |
 | [r1-inicio-procesos](fichas/r1-inicio-procesos.md) | Ronda 1 | en curso | v24 | — |
 | [r1-personas-empresas](fichas/r1-personas-empresas.md) | Ronda 1 | en curso | v1 | — |
-| [r1-oportunidades-vistas](fichas/r1-oportunidades-vistas.md) | Observaciones 5 | en curso | v3 | — |
+| [r1-oportunidades-vistas](fichas/r1-oportunidades-vistas.md) | Observaciones 5 | en curso | v4 | — |
 
 ## Registro del repositorio
 

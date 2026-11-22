@@ -784,3 +784,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 5.6: la Línea de tiempo con orden y filtros»
+
+### MV-061 · 2026-11-22 · El Embudo muestra sus cifras una sola vez
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (`docs/vibe/pedidos/observaciones-6.md`, punto 1) «Aparecen dos filas de cifras. Se queda solo la
+  fila de arriba, la de cinco; la de abajo se borra. Revisa que las otras vistas no tengan la misma duplicación».
+- **Decisión:** el Embudo usa solo la fila de cinco cifras de la cabecera de las vistas; las otras dos vistas no
+  duplicaban.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.1: las cifras del Embudo, una vez»
