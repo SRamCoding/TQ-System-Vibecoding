@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v24
+- **Versión:** v25
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-062** (ficha) · El muelle se arrastra, se pega al borde más cercano y recuerda su lugar; por defecto, sobre el asistente.
 - **MV-059** (cruza módulos) · Todos los colores siguen al ambiente: superficies del fondo, franjas con temperatura, vidrio.
 - **MV-056** (ficha) · El logo de la caja Techquk y de la barra lateral va siempre en el azul de Estratégicos.
 - **MV-054** (ficha) · Gerencia de proyectos lleva su ícono propio: reloj, moneda y barras.
@@ -253,6 +254,15 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   - **Contraste** revisado en el extremo cálido (el peor para los colores fríos): todos los textos de franja en 4,5:1 o
     más en claro y en oscuro.
 
+- **El muelle se mueve (MV-062):** se agarra por su agarre (dos rayitas arriba) o por cualquier parte que no sea un
+  ícono; al soltarlo (después de moverlo 5 px) se pega al borde más cercano (derecho, izquierdo, arriba o abajo) con un
+  deslizamiento de 240 ms; arriba y abajo se pone horizontal y los nombres de las aplicaciones salen hacia adentro.
+  Nunca tapa el encabezado (queda 8 px bajo él) ni la barra lateral (12 px a su derecha). El lugar (borde y posición a lo
+  largo de él) se guarda en el navegador (`localStorage`, `tq-muelle-lugar`) y se recupera al volver y al cambiar el
+  tamaño de la ventana. Doble clic en el agarre lo devuelve a su lugar de siempre. La cuadrícula de aplicaciones sale
+  hacia el lado con más espacio. **Lugar de siempre:** a la derecha, con su borde de abajo a 7,75 rem del pie de la
+  pantalla, sobre el asistente (que ocupa hasta 110 px desde abajo).
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -351,6 +361,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v25** (MV-062): el muelle se mueve y se pega al borde.
 
 - **v24** (MV-059): los colores siguen al ambiente.
 

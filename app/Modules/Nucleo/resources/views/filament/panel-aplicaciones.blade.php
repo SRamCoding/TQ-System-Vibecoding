@@ -23,6 +23,27 @@
     <style>
         /* El lugar de la burbuja del chat (1.14): todo el panel se alinea a él. La burbuja usará estas mismas medidas. */
         :root { --tq-chat-derecha: 1.5rem; --tq-chat-abajo: 1.5rem; --tq-chat-tamano: 3rem; --tq-apps-sobre-chat: calc(var(--tq-chat-abajo) + var(--tq-chat-tamano) + 0.75rem); }
+        /* MV-062: el muelle, por defecto, un poco más arriba que antes: nunca encima del asistente (que ocupa hasta 110 px
+           desde abajo). */
+        .tq-apps-muelle { bottom: 7.75rem !important; }
+        /* MV-062: el muelle se arrastra desde cualquier parte que no sea un ícono (o su agarre) y se pega al borde más
+           cercano; en los bordes de arriba y abajo se pone horizontal. Su lugar va en variables de <html> (Livewire no las
+           pisa al redibujar el panel). */
+        .tq-muelle-agarre { width: 1.6rem; height: 0.6rem; display: grid; place-items: center; cursor: grab; touch-action: none; color: var(--tq-apps-suave); }
+        .tq-muelle-agarre::before { content: ''; width: 1.1rem; height: 3px; border-radius: 9999px; background: currentColor; opacity: .55; box-shadow: 0 -4px 0 color-mix(in oklab, currentColor 55%, transparent); }
+        html.tq-muelle-movido .tq-apps-muelle { left: var(--tq-muelle-left) !important; top: var(--tq-muelle-top) !important; right: auto !important; bottom: auto !important; }
+        html.tq-muelle-suave .tq-apps-muelle { transition: left 240ms cubic-bezier(.2, .7, .2, 1), top 240ms cubic-bezier(.2, .7, .2, 1); }
+        html.tq-muelle-arrastrando, html.tq-muelle-arrastrando * { cursor: grabbing !important; user-select: none !important; }
+        html.tq-muelle-horizontal .tq-apps-muelle { width: auto; height: 3.6rem; grid-auto-flow: column; align-items: center; padding: 0 0.6rem; }
+        html.tq-muelle-horizontal .tq-apps-muelle hr { width: 0; height: 60%; border-top: 0; border-left: 1px solid var(--tq-apps-linea); }
+        html.tq-muelle-horizontal .tq-muelle-agarre { width: 0.6rem; height: 1.6rem; }
+        html.tq-muelle-horizontal .tq-muelle-agarre::before { width: 3px; height: 1.1rem; box-shadow: -4px 0 0 color-mix(in oklab, currentColor 55%, transparent); }
+        /* Los nombres de las aplicaciones salen hacia el lado con más espacio. */
+        html.tq-muelle-izquierda .tq-apps-muelle a::after { right: auto; left: calc(100% + 0.6rem); }
+        html.tq-muelle-arriba .tq-apps-muelle a::after { right: auto; left: 50%; top: calc(100% + 0.6rem); transform: translateX(-50%); }
+        html.tq-muelle-abajo .tq-apps-muelle a::after { right: auto; left: 50%; top: auto; bottom: calc(100% + 0.6rem); transform: translateX(-50%); }
+        /* Lo que se abre desde el muelle (la cuadrícula), del lado con más espacio. */
+        html.tq-muelle-izquierda .tq-apps-cuadricula { right: auto !important; left: calc(var(--tq-muelle-left) + 4.6rem); }
         .tq-apps { --tq-apps-fondo: #FFFFFF; --tq-apps-linea: var(--gray-200); --tq-apps-suave: var(--gray-500); --tq-apps-hover: var(--gray-100); --tq-apps-sombra: 0 12px 36px rgb(1 0 111 / 0.16), 0 2px 6px rgb(1 0 111 / 0.08); color: var(--gray-950); }
         .dark .tq-apps { --tq-apps-fondo: var(--gray-900); --tq-apps-linea: var(--gray-700); --tq-apps-suave: var(--gray-400); --tq-apps-hover: var(--gray-800); --tq-apps-sombra: 0 12px 36px rgb(0 0 0 / 0.5); color: var(--gray-50); }
         .tq-apps-flota { position: fixed; right: var(--tq-chat-derecha); bottom: var(--tq-apps-sobre-chat); z-index: 30; background: var(--tq-apps-fondo); border: 1px solid var(--tq-apps-linea); box-shadow: var(--tq-apps-sombra); }
@@ -335,6 +356,8 @@
             aria-label="Tus 3 aplicaciones principales"
             data-tq-apps="muelle"
         >
+            {{-- MV-062: el agarre para moverlo; doble clic lo devuelve a su lugar de siempre. --}}
+            <span class="tq-muelle-agarre" data-tq-muelle-agarre title="Arrastra para moverlo · doble clic: a su lugar" aria-hidden="true"></span>
             {{-- Expandir arriba y aminorar abajo (pedido del desarrollador, 2026-10-28). --}}
             <button type="button" class="tq-apps-control" x-on:click="poner('cuadricula')" aria-label="Ver todas" title="Ver todas">
                 <x-filament::icon icon="heroicon-m-arrows-pointing-out" class="h-4 w-4" />
@@ -492,4 +515,82 @@
             </div>
         </section>
     </div>
+    <script>
+        // MV-062: mover el muelle y pegarlo al borde más cercano; se recuerda en este navegador.
+        (() => {
+            if (window.tqMuelleMovible) return
+            window.tqMuelleMovible = true
+            const CLAVE = 'tq-muelle-lugar', raiz = document.documentElement
+            const muelle = () => document.querySelector('[data-tq-apps="muelle"]')
+            const leer = () => { try { return JSON.parse(localStorage.getItem(CLAVE)) } catch (e) { return null } }
+            const limites = () => {
+                const barra = document.querySelector('.fi-topbar')?.getBoundingClientRect().bottom ?? 64
+                const lateral = document.querySelector('.fi-main-sidebar')
+                const izq = lateral && lateral.getBoundingClientRect().width > 0 && innerWidth >= 1024 ? lateral.getBoundingClientRect().right : 0
+                return { arriba: barra + 8, izq: izq + 12, der: innerWidth - 12, abajo: innerHeight - 12 }
+            }
+            const aplicar = (suave = false) => {
+                const lugar = leer(), m = muelle()
+                ;['izquierda', 'derecha', 'arriba', 'abajo'].forEach((b) => raiz.classList.remove('tq-muelle-' + b))
+                raiz.classList.remove('tq-muelle-horizontal')
+                if (! lugar || ! m) { raiz.classList.remove('tq-muelle-movido'); return }
+                raiz.classList.add('tq-muelle-' + lugar.borde)
+                raiz.classList.toggle('tq-muelle-horizontal', lugar.borde === 'arriba' || lugar.borde === 'abajo')
+                raiz.classList.toggle('tq-muelle-suave', suave)
+                const l = limites(), w = m.offsetWidth, h = m.offsetHeight, cl = (v, a, b) => Math.max(a, Math.min(b, v))
+                let x, y
+                if (lugar.borde === 'derecha' || lugar.borde === 'izquierda') {
+                    x = lugar.borde === 'derecha' ? l.der - w : l.izq
+                    y = cl(lugar.t * innerHeight - h / 2, l.arriba, l.abajo - h)
+                } else {
+                    y = lugar.borde === 'arriba' ? l.arriba : l.abajo - h
+                    x = cl(lugar.t * innerWidth - w / 2, l.izq, l.der - w)
+                }
+                raiz.style.setProperty('--tq-muelle-left', Math.round(x) + 'px')
+                raiz.style.setProperty('--tq-muelle-top', Math.round(y) + 'px')
+                raiz.classList.add('tq-muelle-movido')
+                if (suave) setTimeout(() => raiz.classList.remove('tq-muelle-suave'), 300)
+            }
+            let arrastre = null
+            document.addEventListener('pointerdown', (e) => {
+                const m = e.target.closest?.('[data-tq-apps="muelle"]')
+                if (! m || e.button !== 0 || (e.target.closest('a, button') && ! e.target.closest('[data-tq-muelle-agarre]'))) return
+                const r = m.getBoundingClientRect()
+                arrastre = { dx: e.clientX - r.left, dy: e.clientY - r.top, x0: e.clientX, y0: e.clientY, activo: false }
+            })
+            addEventListener('pointermove', (e) => {
+                if (! arrastre) return
+                if (! arrastre.activo && Math.hypot(e.clientX - arrastre.x0, e.clientY - arrastre.y0) < 5) return
+                arrastre.activo = true
+                raiz.classList.add('tq-muelle-movido', 'tq-muelle-arrastrando')
+                raiz.style.setProperty('--tq-muelle-left', (e.clientX - arrastre.dx) + 'px')
+                raiz.style.setProperty('--tq-muelle-top', (e.clientY - arrastre.dy) + 'px')
+            })
+            addEventListener('pointerup', (e) => {
+                if (! arrastre) return
+                const activo = arrastre.activo
+                arrastre = null
+                raiz.classList.remove('tq-muelle-arrastrando')
+                if (! activo) return
+                const m = muelle(), r = m.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, l = limites()
+                // Al borde más cercano: derecho, izquierdo, arriba o abajo.
+                const d = { derecha: l.der - cx, izquierda: cx - l.izq, arriba: cy - l.arriba, abajo: l.abajo - cy }
+                const borde = Object.entries(d).sort((a, b) => a[1] - b[1])[0][0]
+                const t = borde === 'derecha' || borde === 'izquierda' ? cy / innerHeight : cx / innerWidth
+                try { localStorage.setItem(CLAVE, JSON.stringify({ borde, t })) } catch (err) {}
+                aplicar(! matchMedia('(prefers-reduced-motion: reduce)').matches)
+            })
+            document.addEventListener('dblclick', (e) => {
+                if (! e.target.closest?.('[data-tq-apps="muelle"]') || (e.target.closest('a, button') && ! e.target.closest('[data-tq-muelle-agarre]'))) return
+                try { localStorage.removeItem(CLAVE) } catch (err) {}
+                aplicar()
+            })
+            addEventListener('resize', () => aplicar())
+            document.addEventListener('livewire:navigated', () => requestAnimationFrame(() => aplicar()))
+            const empezar = () => requestAnimationFrame(() => aplicar())
+            document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', empezar) : empezar()
+            // El muelle aparece después (Alpine): se vuelve a ubicar cuando ya se ve.
+            setTimeout(() => aplicar(), 600)
+        })()
+    </script>
 </div>

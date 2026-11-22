@@ -795,3 +795,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.1: las cifras del Embudo, una vez»
+
+### MV-062 · 2026-11-22 · El muelle se puede mover y se pega al borde
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-6, punto 2) «El muelle se puede arrastrar a otro lugar de la pantalla. Se agarra
+  desde cualquier parte que no sea un ícono; al soltarlo se pega al borde más cercano; arriba y abajo se pone
+  horizontal; nunca tapa la barra lateral ni el encabezado; recuerda dónde lo dejó cada persona en ese navegador; doble
+  clic en la zona de agarre lo devuelve a su lugar. El asistente se queda donde aparece hoy; el muelle, por defecto, un
+  poco más arriba para que nunca se superpongan».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.2: el muelle se mueve»
