@@ -36,6 +36,9 @@
     /* MV-053: en la barra lateral, Techquk con el nombre del logo: TECHQUK en Audiowide (comprimida, solo el símbolo). */
     .fi-main-sidebar [data-modulo="techquk"] .fi-sidebar-item-label { font-family: 'Audiowide', ui-sans-serif, sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
     .fi-main-sidebar [data-modulo="techquk"] .fi-sidebar-item-icon { transform: scaleY(.85); }
+    /* MV-056: en la barra lateral, el símbolo y TECHQUK en el azul de Estratégicos. */
+    .fi-main-sidebar [data-modulo="techquk"] :is(.fi-sidebar-item-icon, .fi-sidebar-item-label) { color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE }} !important; }
+    .dark .fi-main-sidebar [data-modulo="techquk"] :is(.fi-sidebar-item-icon, .fi-sidebar-item-label) { color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE_OSCURO }} !important; }
     html[data-tq-en-caja] .fi-header-heading { display: none; }
     @font-face { font-family: 'Audiowide'; src: url('{{ asset('fonts/audiowide/audiowide-latin.woff2') }}') format('woff2'); font-display: swap; }
     /* La marca propia de las barras laterales internas reemplaza el fondo de la opción activa de Filament. */

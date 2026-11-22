@@ -716,3 +716,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 5.1: la hoja del día de la agenda»
+
+### MV-056 · 2026-11-22 · El logo de la caja Techquk, en el azul de Estratégicos
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-5, punto 2) «Que vaya en el azul de la franja Estratégicos: `#6F9BFF` en modo
+  oscuro y azul noche en modo claro. El símbolo y el nombre, los dos en ese azul. Solo en la caja y en la barra lateral
+  principal. Al pasar el mouse o elegida, más intenso, sin volverse blanco ni gris».
+- **Decisión:** lo dicho; precisa MV-053.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 5.2: el logo de Techquk en azul»

@@ -281,8 +281,12 @@
         {{-- MV-016 a MV-018: Mien arriba, a lo ancho; debajo, las franjas en dos columnas de alto parecido (en el celular, una). --}}
         <style>
             /* MV-053: el logo de Techquk en su caja, en el color de su franja (Estratégicos), del peso de sus vecinas. */
-            .tq-caja-logo { display: flex; color: var(--tq-area-color); }
-            .tq-inicio-cajas[data-tq-estacion] .tq-caja-logo { color: var(--tq-e-texto); }
+            /* MV-056: siempre en el azul de Estratégicos (azul noche en claro, #6F9BFF en oscuro), también con la apariencia
+               por estación; al pasar el mouse o elegida, más intenso, nunca blanco ni gris. */
+            .tq-caja-logo { display: flex; color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE }} !important; transition: filter 180ms ease; }
+            .dark .tq-caja-logo { color: {{ \App\Modules\Nucleo\Navegacion\ColoresMarca::AZUL_NOCHE_OSCURO }} !important; }
+            .tq-caja-modulo:is(:hover, :focus-visible, .tq-activa) .tq-caja-logo { filter: saturate(1.35) brightness(.92); }
+            .dark .tq-caja-modulo:is(:hover, :focus-visible, .tq-activa) .tq-caja-logo { filter: saturate(1.35) brightness(1.12); }
             .tq-logo-mono { display: inline-flex; flex-direction: column; align-items: center; gap: 0.45rem; }
             .tq-logo-mono-simbolo { width: 2.6rem; height: calc(2.6rem * 0.85 * 119 / 122); }
             .tq-logo-mono-nombre { font-family: 'Audiowide', ui-sans-serif, sans-serif; font-weight: 400; font-size: 1.05rem; line-height: 1; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
