@@ -12,8 +12,8 @@
 <div class="tq-oportunidades-avisos">
     <style>
         .tq-oportunidades-avisos { display: flex; flex-direction: column; gap: 0.5rem; }
-        .tq-oportunidades-aviso { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; padding: 0.625rem 0.875rem; border-radius: 0.625rem; font-size: 0.875rem; border: 1px solid; color: #92400E; background: #FFFBEB; border-color: #FCD34D; }
-        .dark .tq-oportunidades-aviso { color: #FCD34D; background: rgb(146 64 14 / 0.18); border-color: rgb(252 211 77 / 0.35); }
+        .tq-oportunidades-aviso { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; padding: 0.625rem 0.875rem; border-radius: 0.625rem; font-size: 0.875rem; border: 1px solid; color: var(--warning-800); background: color-mix(in oklch, var(--tq-superficie) 85%, var(--warning-500)); border-color: color-mix(in oklch, var(--tq-borde) 50%, var(--warning-500)); }
+        .dark .tq-oportunidades-aviso { color: color-mix(in oklch, var(--tq-borde) 50%, var(--warning-500)); background: color-mix(in oklch, var(--tq-superficie) 82%, var(--warning-500)); border-color: color-mix(in oklch, var(--tq-borde) 60%, var(--warning-400)); }
         .tq-oportunidades-aviso button { font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
     </style>
 

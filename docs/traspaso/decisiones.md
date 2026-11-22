@@ -755,3 +755,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 5.4: el Embudo con sus gemas»
+
+### MV-059 · 2026-11-22 · Todos los colores siguen al ambiente
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-5, punto 5; columna «Propuesta» y componente «Escena» del lienzo, copia en
+  `docs/vibe/pedidos/lienzos/ambiente/`) «Que todos los colores de todos los componentes se adapten al ambiente. Las
+  superficies nacen del fondo con `color-mix(in oklch, …)`; los colores de las franjas mantienen su identidad pero se
+  mezclan con un 12 a 14 % del tinte del ambiente, también el azul de resaltado; vidrio en lo que flota. No cambian los
+  íconos de aplicación del muelle ni el logo del encabezado. Los colores de estado toman un toque leve y siguen
+  distinguiéndose. Busca cada color escrito a mano. El contraste tiene que seguir cumpliendo en todos los ambientes».
+- **Decisión:** lo dicho.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 5.5: los colores siguen al ambiente»

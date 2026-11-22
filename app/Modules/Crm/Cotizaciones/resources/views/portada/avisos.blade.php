@@ -10,8 +10,8 @@
 <div class="tq-cotizaciones-avisos">
     <style>
         .tq-cotizaciones-avisos { display: flex; flex-direction: column; gap: 0.5rem; }
-        .tq-cotizaciones-aviso { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; padding: 0.625rem 0.875rem; border-radius: 0.625rem; font-size: 0.875rem; border: 1px solid; color: #1E3A8A; background: #EFF6FF; border-color: #BFDBFE; }
-        .dark .tq-cotizaciones-aviso { color: #BFDBFE; background: rgb(30 58 138 / 0.25); border-color: rgb(191 219 254 / 0.3); }
+        .tq-cotizaciones-aviso { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; padding: 0.625rem 0.875rem; border-radius: 0.625rem; font-size: 0.875rem; border: 1px solid; color: var(--primary-700); background: color-mix(in oklch, var(--tq-superficie) 90%, var(--primary-500)); border-color: color-mix(in oklch, var(--tq-borde) 60%, var(--primary-400)); }
+        .dark .tq-cotizaciones-aviso { color: color-mix(in oklch, var(--tq-borde) 60%, var(--primary-400)); background: color-mix(in oklch, var(--tq-superficie) 80%, var(--primary-600)); border-color: color-mix(in oklch, var(--tq-borde) 60%, var(--primary-400)); }
         .tq-cotizaciones-aviso button { font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
     </style>
 

@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v23
+- **Versión:** v24
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-059** (cruza módulos) · Todos los colores siguen al ambiente: superficies del fondo, franjas con temperatura, vidrio.
 - **MV-056** (ficha) · El logo de la caja Techquk y de la barra lateral va siempre en el azul de Estratégicos.
 - **MV-054** (ficha) · Gerencia de proyectos lleva su ícono propio: reloj, moneda y barras.
 - **MV-053** (ficha) · La caja Techquk lleva el logo de Techquk con su nombre, en el color de Estratégicos.
@@ -235,6 +236,23 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   o la rueda abren `/mien` en otra pestaña. No se aprueba ni se rechaza desde el globo. Se pide de nuevo cada vez que se
   abre.
 
+- **Colores que siguen al ambiente (MV-059):** un solo lugar (`nucleo::filament.colores-ambiente`) define, sobre el fondo
+  del ambiente (`--tq-luz-fondo`, de la transición del cielo), las variables de toda la interfaz:
+  - **Tinte:** de frío `#8FB8FF` (mañana, invierno, noche) a cálido `#FFB36B` (atardecer, verano), según el calor del
+    ambiente; se mezcla al 13 % (0 % si la persona apagó la apariencia según el día).
+  - **Oscuro** (como el lienzo): superficie = fondo + 7 % de blanco; elevada 12 %; borde 14 %; texto suave 55 %; texto
+    principal `#F3F1EC` con 6 % de tinte. **Claro:** superficie = fondo con 70 % de blanco (casi blanca), elevada 88 %;
+    borde = fondo + 14 % de negro; texto suave 60 % de negro; texto tinta con 6 % de tinte.
+  - **Franjas y resaltado con temperatura:** turquesa, azul, morado, gris, el oro de Mien y el azul de resaltado
+    (`--primary-600`, `--primary-400`) mezclados al 13 % con el tinte. Los de estado de Filament (éxito, aviso,
+    peligro), al 6 %.
+  - **Superficies de Filament** (secciones, tablas, campos, pestañas, cifras) y las propias (barra de cajas, franja de
+    filtros de Tickets, Embudo, avisos de las portadas) toman `--tq-superficie` y `--tq-borde`.
+  - **Vidrio:** el muelle, el globo de Mien, la agenda, las ventanas, los menús y los menús de filtros quedan con el
+    fondo semitransparente (55 % en oscuro, 70 % en claro) y desenfoque de 14 px.
+  - **Contraste** revisado en el extremo cálido (el peor para los colores fríos): todos los textos de franja en 4,5:1 o
+    más en claro y en oscuro.
+
 ## Operaciones
 
 Ninguna nueva: se reubican pantallas. Los permisos de siempre deciden qué cajas internas ve cada persona.
@@ -260,6 +278,20 @@ contar solas, porque no coinciden con ningún proceso).
   motivos, empresa, general) siguen en Configuración.
 
 ## Supuestos sin confirmar
+
+- **Superficies en modo claro (MV-059):** el documento dice «lo mismo pero hacia el negro»; las superficies se
+  llevaron hacia el blanco (si no, las tarjetas quedaban más oscuras que el fondo, como huecos) y bordes y textos hacia
+  el negro.
+- **Bases más oscuras o más claras para el contraste (MV-059):** en claro, el morado (`#8A3FA8`), el gris (`#5E666F`) y
+  el oro (`#7A5500`) de las franjas como texto; en oscuro, el azul de Estratégicos `#7FA8FF` (con `#6F9BFF` y el tinte
+  más cálido quedaba en 4,4:1).
+- **Lo que quedó con colores fijos a propósito (MV-059):** unos 1400 colores en 259 archivos de ilustraciones: la
+  ambientación de fechas y estaciones, el gran momento, el logo y sus detalles, las gemas, la hoja del día, la ventana
+  del saludo, la estrella de Mien, el cielo y el clima; también el PDF de la cotización. Quedan sin pasar al mecanismo
+  (colores de interfaz escritos a mano): el asistente (33), el inicio de cajas (46, casi todos por estación), la barra
+  de desarrollo (19), la ficha deslizante de oportunidades (14), la navegación (18), las carpetas de Cotizaciones (7),
+  la bienvenida de la configuración inicial (7) y algunos sueltos (portadas de Proyectos, tarjetas de oportunidades,
+  cronograma, roles, salud, alertas).
 
 - **Fichas con título (MV-046):** en una ficha (la oportunidad OP-…, el requerimiento) se dejó su título, porque dice qué
   registro es; el título grande se quita solo en la pantalla de cada caja.
@@ -319,6 +351,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v24** (MV-059): los colores siguen al ambiente.
 
 - **v23** (MV-056): el logo de Techquk, en el azul de Estratégicos en su caja y en la barra lateral.
 
