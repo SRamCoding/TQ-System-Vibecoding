@@ -11,3 +11,9 @@ Son ilustrativos: se copian los colores, medidas, formas y la disposición, no e
 | 4. Embudo de oportunidades | `embudo/` | `Refinada.dc.html` (la «A refinada con gemas»; `Gema.dc.html` dibuja cada gema) |
 | 5. Colores que siguen al ambiente | `ambiente/` | `Main.dc.html` (compara «hoy» y «propuesta» en un ambiente frío y uno cálido; cada escena es `Escena.dc.html`) |
 | 6. Línea de tiempo | `linea-de-tiempo/` | `Main.dc.html` (la «A · Cronograma refinado»; orden, filtros y animación están solo en el documento) |
+
+## Sexta tanda
+
+| Observación | Carpeta | Archivo que manda |
+|---|---|---|
+| 6.4 La carita del asistente | `asistente/` | `A.dc.html` (la «Gota de miel» elegida); `C.dc.html` es el ámbar al que se va tornando con el trabajo seguido |
