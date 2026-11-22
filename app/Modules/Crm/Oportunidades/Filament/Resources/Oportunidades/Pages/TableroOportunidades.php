@@ -5,20 +5,24 @@ declare(strict_types=1);
 namespace App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages;
 
 use App\Modules\Crm\Oportunidades\Enums\LugarFaja;
-use App\Modules\Crm\Oportunidades\Filament\DibujoDeLaBotonera;
-use App\Modules\Crm\Oportunidades\Filament\MovimientoDeOportunidad;
+use App\Modules\Crm\Oportunidades\Enums\TallaDeGema;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLaFicha;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLasVistas;
 use App\Modules\Crm\Oportunidades\Filament\PanelesOportunidad;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\OportunidadResource;
 use App\Modules\Crm\Oportunidades\Filament\VistasDeOportunidades;
 use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
+use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
+use App\Modules\Crm\Oportunidades\Services\ProximaAccionDeOportunidades;
 use App\Modules\Crm\Oportunidades\Services\ResumenOportunidad;
 use App\Modules\Crm\Oportunidades\Services\TableroDeBotonera;
+use App\Modules\Crm\Oportunidades\Services\TableroDeGemas;
 use App\Modules\Nucleo\Excepciones\ErrorDeNegocio;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\RegistroAcciones\EjecutorAcciones;
+use App\Modules\Nucleo\Tiempo\Calendario;
+use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -27,24 +31,15 @@ use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Url;
 
 /**
- * La vista «Tablero» de Oportunidades, la de entrada (plan 2.21c, D1, D2 y D12): la entrada del menú y la caja del
- * inicio abren aquí, también en el celular. Arriba, las pestañas de vista y la fila de cifras (`MuestraLasVistas`).
- * `?aviso=` (los enlaces a la portada de la lista) lleva a la Lista ya filtrada.
- *
- * Plan 2.21d (D3–D7), que reemplaza el tablero de gemas de la 2.21c: cada columna con su gema solo en el título, la
- * botonera con la cantidad que despliega la tabla de la etapa (`abrirEtapa`), los códigos que la persona puso (hasta 5,
- * `alternarEnTablero` por las acciones `crm.oportunidades.fijar-en-tablero` / `soltar-del-tablero`) y «Avanzar a …»
- * con una sola puesta (D6). Arrastrar un código y ese botón van por `tq-oportunidad-mover` →
- * `MueveOportunidades::abrirMovimiento` con el diálogo de la acción y `moverOportunidad` con la versión tomada: el mismo
- * camino que la faja y los botones de la ficha (2.21c, D5). Vista `oportunidades::tablero.botonera`
- * (`DibujoDeLaBotonera`).
- *
- * Tocar un código (doble clic) o una fila abre su ficha en el panel deslizante (`MuestraLaFicha`); `?ficha=<id>` la abre
- * directo.
+ * El Embudo de oportunidades (MV-057, MV-058; antes «Tablero»): las cuatro cifras, el embudo clásico con sus gemas, Ganadas
+ * y Perdidas del año y el panel de la etapa elegida (`elegirEtapa`), cuya lista abre la ficha deslizante. Vista
+ * `oportunidades::embudo.pantalla`.
  */
 final class TableroOportunidades extends Page
 {
@@ -94,6 +89,113 @@ final class TableroOportunidades extends Page
         $this->etapaAbierta = $this->etapaAbierta === $lugar || LugarFaja::tryFrom($lugar) === null ? null : $lugar;
     }
 
+    /** MV-058: elegir una franja del embudo (o Ganadas o Perdidas) cambia el panel de la derecha. */
+    public function elegirEtapa(string $lugar): void
+    {
+        if (LugarFaja::tryFrom($lugar) !== null) {
+            $this->etapaAbierta = $lugar;
+        }
+    }
+
+    /**
+     * MV-058: los datos del embudo: las cuatro cifras, las cuatro etapas abiertas (con su gema, probabilidad, monto,
+     * cantidad y cuántas avanzan a la siguiente), Ganadas y Perdidas, y la lista de la etapa elegida.
+     *
+     * @return array<string, mixed>
+     */
+    private function datosEmbudo(): array
+    {
+        $columnas = app(TableroDeGemas::class)->columnas();
+        $abiertas = [LugarFaja::Prospecto, LugarFaja::Calificada, LugarFaja::PropuestaEnviada, LugarFaja::Negociacion];
+        $estilo = [
+            'prospecto' => [100, '#A6F2FF', '#7FE9FF'], 'calificada' => [86, '#7FE9FF', '#4DDDF5'],
+            'propuesta_enviada' => [72, '#4DDDF5', '#1FCDEB'], 'negociacion' => [58, '#1FCDEB', '#00B8D9'],
+        ];
+        $soles = fn (string $m): string => 'S/ '.number_format((float) $m, 0);
+        // Cuántas pasan a la siguiente: las que están más adelante (y las ganadas) sobre las que llegaron a esta o más allá.
+        $adelante = fn (int $i): int => array_sum(array_map(fn (LugarFaja $l): int => $columnas[$l->value]->cantidad, array_slice($abiertas, $i))) + $columnas['ganadas']->cantidad;
+        $etapas = [];
+
+        foreach ($abiertas as $i => $lugar) {
+            $c = $columnas[$lugar->value];
+            $talla = TallaDeGema::desdeEtapa($lugar->etapa()?->value ?? $lugar->value);
+            $siguiente = $i < 3 ? $adelante($i + 1) : null;
+            $etapas[] = [
+                'lugar' => $lugar->value, 'nombre' => $lugar->etiqueta(), 'talla' => $talla, 'prob' => ($c->probabilidad ?? 0).' %',
+                'monto' => $soles($c->totalEnSoles), 'cantidad' => $c->cantidad, 'ancho' => $estilo[$lugar->value][0],
+                'color1' => $estilo[$lugar->value][1], 'color2' => $estilo[$lugar->value][2],
+                'avanza' => $siguiente === null || $adelante($i) === 0 ? null : (int) round($siguiente * 100 / $adelante($i)).' %',
+                'atascadas' => count(array_filter($c->visibles, fn ($f) => $f->atascada)),
+            ];
+        }
+
+        if ($this->etapaAbierta === null || LugarFaja::tryFrom($this->etapaAbierta) === null) {
+            $masAtascada = collect($etapas)->sortByDesc('atascadas')->first();
+            $this->etapaAbierta = ($masAtascada['atascadas'] ?? 0) > 0 ? $masAtascada['lugar'] : LugarFaja::PropuestaEnviada->value;
+        }
+
+        $elegida = LugarFaja::from($this->etapaAbierta);
+        $col = $columnas[$elegida->value];
+        $filas = $elegida->esSala() ? [] : app(OportunidadesService::class)->destacadasDeLaFaja($elegida, 50);
+        $proximas = app(ProximaAccionDeOportunidades::class)->deLote(array_map(fn ($f) => $f->id, $filas));
+        $tallaElegida = match ($elegida) {
+            LugarFaja::Ganadas => TallaDeGema::Brillante,
+            LugarFaja::Perdidas => TallaDeGema::Fisurada,
+            default => TallaDeGema::desdeEtapa($elegida->etapa()?->value ?? $elegida->value),
+        };
+
+        $filasPanel = array_map(fn ($f): array => [
+            'id' => $f->id, 'nombre' => $f->nombre, 'cliente' => Str::before($f->cuenta, ' · '),
+            'monto' => $f->montoEnSoles !== null ? $soles($f->montoEnSoles) : $f->simbolo.' '.number_format((float) $f->monto, 0),
+            'dias' => $f->diasEnEtapa === 1 ? '1 día' : $f->diasEnEtapa.' días',
+            'accion' => $proximas[$f->id]['texto'] ?? 'Sin próxima acción',
+            'vencida' => ! isset($proximas[$f->id]) || ($proximas[$f->id]['vencida'] ?? false),
+        ], $filas);
+        $resumen = $col->cantidad.' oportunidades · '.$soles($col->totalEnSoles).($col->ponderadoEnSoles !== null ? ' · ponderado '.$soles($col->ponderadoEnSoles) : '');
+
+        if ($elegida->esSala()) {
+            $sala = $this->delAnio($elegida === LugarFaja::Ganadas ? 'ganada' : 'perdida');
+            $filasPanel = array_map(fn (array $o): array => ['id' => $o['id'], 'nombre' => $o['nombre'], 'cliente' => $o['cliente'], 'monto' => $soles($o['monto']),
+                'dias' => ($elegida === LugarFaja::Ganadas ? 'ganada el ' : 'perdida el ').$o['fecha'], 'accion' => '', 'vencida' => $elegida === LugarFaja::Perdidas], $sala);
+            $resumen = count($sala).' este año · '.$soles(self::sumar(array_column($sala, 'monto')));
+        }
+
+        return [
+            'cifras' => array_slice(VistasDeOportunidades::cifras(), 0, 4),
+            'etapas' => $etapas,
+            'ganadas' => ['cantidad' => count($ganadas = $this->delAnio('ganada')), 'monto' => $soles(self::sumar(array_column($ganadas, 'monto')))],
+            'perdidas' => ['cantidad' => count($perdidas = $this->delAnio('perdida')), 'monto' => $soles(self::sumar(array_column($perdidas, 'monto')))],
+            'elegida' => [
+                'lugar' => $elegida->value, 'nombre' => $elegida->etiqueta(), 'talla' => $tallaElegida,
+                'resumen' => $resumen,
+                'filas' => $filasPanel,
+            ],
+            'urlMias' => TarjetasOportunidades::getUrl(),
+        ];
+    }
+
+    /**
+     * MV-058: las ganadas o perdidas de este año (por su fecha de cierre real), con su cliente y monto, para Ganadas y
+     * Perdidas del embudo. Atajo del MVP: consulta directa y el monto estimado como está (sin convertir monedas).
+     *
+     * @return list<array{id: int, nombre: string, cliente: string, monto: string, fecha: string}>
+     */
+    private function delAnio(string $estado): array
+    {
+        return DB::table('oportunidades as o')->join('estados as e', 'e.id', '=', 'o.estado_id')
+            ->join('cuentas as c', 'c.id', '=', 'o.cuenta_id')->join('parties as p', 'p.id', '=', 'c.party_id')
+            ->where('e.codigo', $estado)->whereYear('o.fecha_cierre_real', Calendario::ahora()->year)
+            ->orderByDesc('o.fecha_cierre_real')->get(['o.id', 'o.nombre', 'p.razon_social', 'o.monto_estimado', 'o.fecha_cierre_real'])
+            ->map(fn (object $o): array => ['id' => (int) $o->id, 'nombre' => $o->nombre, 'cliente' => $o->razon_social, 'monto' => (string) $o->monto_estimado,
+                'fecha' => CarbonImmutable::parse($o->fecha_cierre_real)->format('d/m')])->all();
+    }
+
+    /** @param  list<string>  $montos */
+    private static function sumar(array $montos): string
+    {
+        return array_reduce($montos, fn (string $t, string $m): string => bcadd($t, $m, 2), '0');
+    }
+
     /** Marcar en la tabla (D5): la pone en el tablero (hasta 5 por etapa) o la quita. Por la acción registrada. */
     public function alternarEnTablero(int $oportunidadId, bool $poner): void
     {
@@ -136,19 +238,8 @@ final class TableroOportunidades extends Page
     {
         return $schema->components([
             $this->cabeceraDeVistas(),
-            // Plan 2.21d (D3–D6): la gema en el título, la botonera con la cantidad, los códigos puestos y la tabla.
-            View::make('oportunidades::tablero.botonera')->viewData(fn (): array => [
-                'columnas' => app(DibujoDeLaBotonera::class)->columnas(self::usuario(), $this->etapaAbierta),
-                'maximo' => TableroDeBotonera::MAXIMO,
-                'fichaAbierta' => $this->ficha,
-                'textos' => [
-                    'salto' => MovimientoDeOportunidad::NO_SE_SALTA,
-                    'atras' => MovimientoDeOportunidad::NO_SE_RETROCEDE,
-                    'fuera' => self::SUELTALA_EN,
-                    'ganada' => MovimientoDeOportunidad::GANADA,
-                    'perdida' => MovimientoDeOportunidad::PERDIDA,
-                ],
-            ]),
+            // MV-058: el embudo clásico con sus gemas (lienzo «A refinada»), en lugar de la botonera.
+            View::make('oportunidades::embudo.pantalla')->viewData(fn (): array => $this->datosEmbudo()),
             $this->fichaDeOportunidad(),
         ]);
     }

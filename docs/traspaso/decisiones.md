@@ -740,3 +740,18 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 5.3: Mis oportunidades y el Embudo»
+
+### MV-058 · 2026-11-22 · El Embudo de oportunidades: el embudo clásico con sus gemas
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-5, punto 4; tablero «A refinada · el embudo con sus gemas», copia en
+  `docs/vibe/pedidos/lienzos/embudo/Refinada.dc.html` y `Gema.dc.html`) «Cuatro cifras; a la izquierda, el embudo
+  clásico con cuatro franjas que se angostan, cada una con su gema, nombre, talla y probabilidad, monto y cantidad, y
+  entre franjas "61 % avanza"; debajo, Ganadas y Perdidas del año; a la derecha, el panel de la etapa elegida con su
+  lista. Las gemas, con dibujo profesional, cada una más trabajada que la anterior; solo cambia su dibujo y se usan
+  también donde ya aparecen».
+- **Decisión:** lo dicho; reemplaza la botonera del Tablero (plan 2.21d, D3 a D6) y el dibujo de las gemas del plan 2.21c
+  (D3).
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 5.4: el Embudo con sus gemas»
