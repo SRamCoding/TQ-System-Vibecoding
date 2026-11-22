@@ -1,7 +1,7 @@
 # Ficha · Asistente de ayuda «n_n» (opcional, plan 1.14)
 
 - **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v3
+- **Versión:** v4
 - **Tramo de la ruta:** opcionales (MV-014)
 - **Aprobada:** 2026-11-20 · etiqueta `aprobado/op-asistente-v1`
 - **Fuentes del diseño:** `docs/planes/activos/2026-10-29-ayuda-asistente.md` (D1 a D9).
@@ -17,6 +17,7 @@ abre si la persona lo confirma. Clic derecho: descansar o callar por un rato. Nu
 
 ## Decisiones de Sebastián
 
+- **MV-064** (ficha) · La carita es la «Gota de miel», con gestos naturales; se vuelve ámbar con 2 h de trabajo seguido.
 - **MV-063** (ficha) · El asistente vuelve a funcionar; una frase se fuerza con `tqAsistente.probarFrase()`.
 - **MV-040** (ficha) · Franja fija de filtros en Tickets de ayuda; «abierto» pasa a «Sin atender».
 - **MV-038** (ficha) · Ícono propio de Tickets de ayuda.
@@ -99,3 +100,17 @@ cuerpo en `AppPanelProvider`), `Nucleo/Services/AsistenteService.php`, `Nucleo/F
   navegar a otra pantalla sin recargar y al volver: el clic abre el chat, el clic derecho abre el menú con sus 8
   opciones, el personaje cambia de meta y los globos salen. **Para probar los globos** sin esperar sus reglas:
   `tqAsistente.probarFrase()` en la consola del navegador.
+- **v4** (MV-064): **la Gota de miel** (lienzo A), 64 × 72 px: esfera con degradado radial (luz arriba a la izquierda,
+  `#FFF1B0` → `#FFD23F` → `#E8A800` → `#B97F00`), brillo especular, sombra en el piso, brazos, mejillas leves y la
+  estrellita que se mece. **Cinco caras** que se cruzan con un fundido de 260 ms: tranquilo (la «n_n»: ojos en arco y
+  sonrisa), saluda (sonrisa abierta y la mano que se mueve; al aparecer y al despertarlo, 2,2 s), habla (cejas, ojos con
+  punto de luz y la boca que se mueve; mientras dice un globo, de 1,2 a 6 s según el largo), escucha o duda (cejas más
+  arriba, boca en «o»; mientras se escribe en su chat) y duerme (ojos entrecerrados y «z z»). **Parpadea** a ratos, cada
+  2,5 a 7 s y a veces doble; **los ojos siguen el puntero**. Quieta con «reducir movimiento». **El ámbar:** el navegador
+  guarda desde cuándo hay actividad seguida; desde las 2 h, la miel se mezcla de forma continua hacia el ámbar del
+  lienzo C (`#FFE7A0` → `#FFAE1A` → `#E06A00` → `#8E3A00`, rasgos `#3D1600`, unas facetas claras) hasta completarse a las
+  2 h 30 min; 15 min sin teclado ni mouse, o con la pestaña oculta, la devuelven a miel. Con el ámbar completo, en la
+  mitad de sus iniciativas (con sus reglas de cuándo habla) dice «Llevas más de dos horas seguidas. ¿Una pausa de cinco
+  minutos?». Comprobada en Chromium sin pantalla: las cinco caras en miel y ámbar, en claro y oscuro.
+- **Supuesto:** el saludo dura 2,2 s y la boca habla mientras dura un globo; la invitación a la pausa no tiene respuesta
+  propia.

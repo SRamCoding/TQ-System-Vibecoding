@@ -15,8 +15,31 @@
     #tq-asis { position: fixed; z-index: 2147482000; width: 64px; height: 72px; left: calc(100vw - 96px); top: calc(100vh - 110px); transition: left 1.6s cubic-bezier(.4,.1,.3,1), top 1.6s cubic-bezier(.4,.1,.3,1); cursor: pointer; touch-action: none; }
     #tq-asis svg { width: 100%; height: 100%; overflow: visible; animation: tq-flota 3.2s ease-in-out infinite; filter: drop-shadow(0 4px 6px rgb(0 0 0 / .18)); }
     #tq-asis.dormido svg { animation: tq-respira 4s ease-in-out infinite; }
-    #tq-asis .zzz { display: none; position: absolute; top: -14px; right: -4px; font: 600 12px ui-sans-serif; color: #b88a00; }
-    #tq-asis.dormido .zzz { display: block; }
+    /* MV-064: la «Gota de miel». Cada gesto es una cara; pasa de una a otra con un fundido corto. */
+    #tq-asis .cara { opacity: 0; transition: opacity 260ms ease; }
+    #tq-asis:not(.dormido):not(.cara-saluda):not(.cara-habla):not(.cara-escucha) .cara-tranquilo,
+    #tq-asis.cara-saluda:not(.dormido) .cara-saluda, #tq-asis.cara-habla:not(.dormido) .cara-habla,
+    #tq-asis.cara-escucha:not(.dormido) .cara-escucha, #tq-asis.dormido .cara-duerme { opacity: 1; }
+    #tq-asis .mano-saluda { opacity: 0; transition: opacity 260ms ease; }
+    #tq-asis.cara-saluda:not(.dormido) .mano-saluda { opacity: 1; }
+    #tq-asis.cara-saluda:not(.dormido) .brazo-d { opacity: 0; }
+    #tq-asis .ojos, #tq-asis .parpado, #tq-asis .saluda, #tq-asis .habla, #tq-asis .estrella, #tq-asis .z { transform-box: fill-box; transform-origin: center; }
+    #tq-asis .ojos { transition: transform 300ms ease-out; }
+    #tq-asis .parpado { transition: transform 90ms ease-in; }
+    #tq-asis.parpadea .parpado { transform: scaleY(.08); }
+    #tq-asis .saluda { transform-origin: 0% 100%; animation: tq-asis-saluda 1.6s ease-in-out infinite; }
+    @keyframes tq-asis-saluda { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 50% { transform: rotate(4deg); } 75% { transform: rotate(-10deg); } }
+    #tq-asis .habla { animation: tq-asis-habla 1.1s ease-in-out infinite; }
+    @keyframes tq-asis-habla { 0%, 100% { transform: scaleY(.35); } 15% { transform: scaleY(1); } 30% { transform: scaleY(.5); } 42% { transform: scaleY(.95); } 58% { transform: scaleY(.3); } 72% { transform: scaleY(.8); } 86% { transform: scaleY(.45); } }
+    #tq-asis .estrella { animation: tq-asis-estrella 5s ease-in-out infinite; }
+    @keyframes tq-asis-estrella { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(8deg); } }
+    #tq-asis .z { animation: tq-asis-z 2.6s ease-out infinite; }
+    #tq-asis .z.b { animation-delay: 1.3s; }
+    @keyframes tq-asis-z { 0% { opacity: 0; transform: translate(0, 4px); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(4px, -8px); } }
+    /* El ámbar: facetas que aparecen con el trabajo seguido. */
+    #tq-asis .facetas { opacity: calc(var(--tq-ambar, 0) * .55); }
+    html.tq-sin-animaciones #tq-asis *, html.tq-sin-animaciones #tq-asis .cara { animation: none !important; transition: none !important; }
+    @media (prefers-reduced-motion: reduce) { #tq-asis * { animation: none !important; transition: none !important; } }
     @keyframes tq-flota { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
     @keyframes tq-respira { 0%, 100% { transform: scale(1); } 50% { transform: scale(.96); } }
     html.tq-sin-animaciones #tq-asis, html.tq-sin-animaciones #tq-asis svg { transition: none; animation: none; }
@@ -36,16 +59,30 @@
     #tq-asis-menu button:hover { background: rgb(0 0 0 / .06); }
 </style>
 <div id="tq-asis" title="Asistente · clic: conversar · clic derecho: descansar o callar" role="button" aria-label="Asistente de ayuda">
-    <span class="zzz">z z z</span>
-    <svg viewBox="0 0 64 72" aria-hidden="true">
-        <path d="M10 46 Q2 40 4 32" stroke="#e0a800" stroke-width="4" fill="none" stroke-linecap="round" class="brazo-i"/>
-        <path d="M54 46 Q62 40 60 32" stroke="#e0a800" stroke-width="4" fill="none" stroke-linecap="round" class="brazo-d"/>
-        <ellipse cx="32" cy="40" rx="24" ry="26" fill="#f5c518"/>
-        <ellipse cx="32" cy="34" rx="18" ry="15" fill="#ffe27a" opacity=".55"/>
-        <g class="ojos" fill="#3b2f00" font-family="ui-sans-serif" font-weight="700" font-size="15" text-anchor="middle">
-            <text class="ojo-i" x="24" y="40">n</text><text class="boca" x="32" y="42" font-size="11">_</text><text class="ojo-d" x="40" y="40">n</text>
-        </g>
-        <path d="M32 6 l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4-3.9-3.8 5.4-.8z" fill="#ffd84a" stroke="#e0a800" stroke-width=".8"/>
+    <svg viewBox="0 0 120 130" aria-hidden="true" style="--tq-a-rasgo: color-mix(in oklch, #2E1F00 calc((1 - var(--tq-ambar, 0)) * 100%), #3D1600)">
+        {{-- MV-064: la «Gota de miel» (lienzo A): esfera dorada con luz arriba a la izquierda, brillo, sombra en el piso, ojos
+             con punto de luz, mejillas y la estrellita. Sus colores van de miel a ámbar (lienzo C) con `--tq-ambar` (0 a 1). --}}
+        <defs>
+            <radialGradient id="tq-asis-cuerpo" cx="38%" cy="30%" r="75%"><stop offset="0" style="stop-color: color-mix(in oklch, #FFF1B0 calc((1 - var(--tq-ambar, 0)) * 100%), #FFE7A0)"/><stop offset=".35" style="stop-color: color-mix(in oklch, #FFD23F calc((1 - var(--tq-ambar, 0)) * 100%), #FFAE1A)"/><stop offset=".8" style="stop-color: color-mix(in oklch, #E8A800 calc((1 - var(--tq-ambar, 0)) * 100%), #E06A00)"/><stop offset="1" style="stop-color: color-mix(in oklch, #B97F00 calc((1 - var(--tq-ambar, 0)) * 100%), #8E3A00)"/></radialGradient>
+            <radialGradient id="tq-asis-brazo" cx="50%" cy="30%" r="70%"><stop offset="0" style="stop-color: color-mix(in oklch, #FFD84A calc((1 - var(--tq-ambar, 0)) * 100%), #FFC93C)"/><stop offset="1" style="stop-color: color-mix(in oklch, #C98E00 calc((1 - var(--tq-ambar, 0)) * 100%), #B86A00)"/></radialGradient>
+            <radialGradient id="tq-asis-sombra" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#3B2A00" stop-opacity=".35"/><stop offset="1" stop-color="#3B2A00" stop-opacity="0"/></radialGradient>
+            <radialGradient id="tq-asis-estrella" cx="50%" cy="40%" r="60%"><stop offset="0" style="stop-color: color-mix(in oklch, #FFE680 calc((1 - var(--tq-ambar, 0)) * 100%), #FFFBE6)"/><stop offset=".6" style="stop-color: color-mix(in oklch, #F7C21A calc((1 - var(--tq-ambar, 0)) * 100%), #FFD54F)"/><stop offset="1" style="stop-color: color-mix(in oklch, #D49500 calc((1 - var(--tq-ambar, 0)) * 100%), #E89B00)"/></radialGradient>
+        </defs>
+        <ellipse cx="60" cy="124" rx="34" ry="5" fill="url(#tq-asis-sombra)"/>
+        <path class="brazo-i" d="M20 86 Q8 78 11 66" stroke="url(#tq-asis-brazo)" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <path class="brazo-d" d="M100 86 Q112 78 109 66" stroke="url(#tq-asis-brazo)" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <path class="mano-saluda saluda" d="M100 86 Q114 70 110 54" stroke="url(#tq-asis-brazo)" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <ellipse cx="60" cy="76" rx="44" ry="46" fill="url(#tq-asis-cuerpo)"/>
+        <g class="facetas" stroke="#FFF1B8" stroke-width="1.2" fill="none"><path d="M30 60 L48 44 L72 44 L90 60 M48 44 L44 70 M72 44 L76 70 M30 60 L44 70 L76 70 L90 60"/></g>
+        <ellipse cx="44" cy="50" rx="15" ry="9" fill="#FFFFFF" opacity=".55" transform="rotate(-25 44 50)"/>
+        <ellipse cx="38" cy="46" rx="4" ry="2.5" fill="#FFFFFF" opacity=".9" transform="rotate(-25 38 46)"/>
+        <path d="M24 96 Q60 130 96 96" stroke="#B97F00" stroke-width="2" fill="none" opacity=".25"/>
+        <g class="estrella"><path d="M60 6 l3.6 7.4 8.1 1.2-5.9 5.7 1.4 8.1-7.2-3.9-7.2 3.9 1.4-8.1-5.9-5.7 8.1-1.2z" fill="url(#tq-asis-estrella)" stroke="#C98E00" stroke-width=".8" stroke-linejoin="round"/></g>
+        <g class="cara cara-tranquilo"><g class="ojos"><path d="M38 73 Q45 61 52 73 M68 73 Q75 61 82 73" style="stroke: var(--tq-a-rasgo)" stroke-width="4.2" fill="none" stroke-linecap="round"/></g><ellipse cx="34" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><ellipse cx="86" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><path d="M54 84 Q60 89 66 84" style="stroke: var(--tq-a-rasgo)" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>
+        <g class="cara cara-saluda"><g class="ojos"><path d="M38 73 Q45 61 52 73 M68 73 Q75 61 82 73" style="stroke: var(--tq-a-rasgo)" stroke-width="4.2" fill="none" stroke-linecap="round"/></g><ellipse cx="34" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><ellipse cx="86" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><path d="M50 82 Q60 97 70 82 Q60 86 50 82Z" style="fill: var(--tq-a-rasgo)"/><path d="M55 89 Q60 93 65 89 Q60 90.5 55 89Z" fill="#E8604F"/></g>
+        <g class="cara cara-habla"><path d="M38 61 Q45 56 52 59 M68 59 Q75 56 82 61" style="stroke: var(--tq-a-rasgo)" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/><g class="ojos"><g class="parpado"><ellipse cx="45" cy="70" rx="5.4" ry="7.2" style="fill: var(--tq-a-rasgo)"/><ellipse cx="43.2" cy="66.8" rx="2" ry="2.4" fill="#FFFFFF"/><circle cx="47" cy="73.5" r=".9" fill="#FFFFFF" opacity=".7"/><ellipse cx="75" cy="70" rx="5.4" ry="7.2" style="fill: var(--tq-a-rasgo)"/><ellipse cx="73.2" cy="66.8" rx="2" ry="2.4" fill="#FFFFFF"/><circle cx="77" cy="73.5" r=".9" fill="#FFFFFF" opacity=".7"/></g></g><ellipse cx="34" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><ellipse cx="86" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><ellipse class="habla" cx="60" cy="86" rx="5.5" ry="4" style="fill: var(--tq-a-rasgo)"/><ellipse class="habla" cx="60" cy="88" rx="3" ry="1.6" fill="#E8604F"/></g>
+        <g class="cara cara-escucha"><path d="M38 57 Q45 52 52 55 M68 55 Q75 52 82 57" style="stroke: var(--tq-a-rasgo)" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".8"/><g class="ojos"><g class="parpado"><ellipse cx="45" cy="70" rx="5.4" ry="7.2" style="fill: var(--tq-a-rasgo)"/><ellipse cx="43.2" cy="66.8" rx="2" ry="2.4" fill="#FFFFFF"/><circle cx="47" cy="73.5" r=".9" fill="#FFFFFF" opacity=".7"/><ellipse cx="75" cy="70" rx="5.4" ry="7.2" style="fill: var(--tq-a-rasgo)"/><ellipse cx="73.2" cy="66.8" rx="2" ry="2.4" fill="#FFFFFF"/><circle cx="77" cy="73.5" r=".9" fill="#FFFFFF" opacity=".7"/></g></g><ellipse cx="34" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><ellipse cx="86" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><ellipse cx="60" cy="86" rx="3.2" ry="3.8" style="fill: var(--tq-a-rasgo)"/></g>
+        <g class="cara cara-duerme"><path d="M38 71 Q45 76 52 71 M68 71 Q75 76 82 71" style="stroke: var(--tq-a-rasgo)" stroke-width="3.4" fill="none" stroke-linecap="round"/><ellipse cx="34" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><ellipse cx="86" cy="82" rx="6" ry="3.6" fill="#FF8A7A" opacity=".35"/><path d="M56 85 Q60 87 64 85" style="stroke: var(--tq-a-rasgo)" stroke-width="2.2" fill="none" stroke-linecap="round"/><g fill="#8A6A1F" font-family="Inter, sans-serif" font-weight="700"><text class="z" x="96" y="40" font-size="12">z</text><text class="z b" x="104" y="28" font-size="9">z</text></g></g>
     </svg>
 </div>
 <div id="tq-asis-menu" role="menu"></div>
@@ -86,6 +123,42 @@
     }
 
     const cerrarGlobo = () => { globo?.remove(); globo = null }
+
+    // MV-064: los gestos (tranquilo, saluda, habla, escucha, duerme) y el parpadeo a ratos, nunca a ritmo fijo.
+    let relojCara = null
+    const cara = (nombre, ms = 0) => {
+        clearTimeout(relojCara)
+        el.classList.remove('cara-saluda', 'cara-habla', 'cara-escucha')
+        if (nombre !== 'tranquilo') el.classList.add('cara-' + nombre)
+        if (ms) relojCara = setTimeout(() => cara(document.activeElement && chat.contains(document.activeElement) ? 'escucha' : 'tranquilo'), ms)
+    }
+    const parpadear = () => {
+        if (! reducido()) { el.classList.add('parpadea'); setTimeout(() => el.classList.remove('parpadea'), 130) }
+        // A veces un doble parpadeo; el próximo, entre 2,5 y 7 s.
+        if (Math.random() < 0.18) setTimeout(() => { el.classList.add('parpadea'); setTimeout(() => el.classList.remove('parpadea'), 120) }, 260)
+        setTimeout(parpadear, 2500 + Math.random() * 4500)
+    }
+    setTimeout(parpadear, 1800)
+    chat.addEventListener('focusin', () => cara('escucha'))
+    chat.addEventListener('focusout', () => cara('tranquilo'))
+
+    // MV-064: con 2 h de actividad sin pausa, la miel se va haciendo ámbar en 30 min; 15 min sin actividad (o con la
+    // pestaña oculta) la devuelven a miel. Se guarda en el navegador para que siga igual al navegar o recargar.
+    const DOS_HORAS = 2 * 3600000, MEDIA_HORA = 30 * 60000, PAUSA = 15 * 60000
+    const trabajo = () => { const t = leer('trabajo', null); return t && Date.now() - t.ultima < PAUSA ? t : { inicio: Date.now(), ultima: Date.now() } }
+    const anotarActividad = () => { const t = trabajo(); t.ultima = Date.now(); guardar('trabajo', t) }
+    const ambar = () => { const t = trabajo(); return Math.max(0, Math.min(1, (Date.now() - t.inicio - DOS_HORAS) / MEDIA_HORA)) }
+    const pintarAmbar = () => el.style.setProperty('--tq-ambar', ambar().toFixed(3))
+    let ocultaDesde = null
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { ocultaDesde = Date.now(); return }
+        if (ocultaDesde && Date.now() - ocultaDesde >= PAUSA) guardar('trabajo', null)
+        ocultaDesde = null
+        pintarAmbar()
+    })
+    ;['pointermove', 'keydown', 'pointerdown'].forEach((t) => addEventListener(t, () => { if (! document.hidden) anotarActividad() }, { passive: true }))
+    setInterval(pintarAmbar, 30000)
+    pintarAmbar()
     const decir = (texto, botones = []) => {
         cerrarGlobo()
         globo = document.createElement('div')
@@ -106,6 +179,7 @@
         globo.style.left = Math.max(8, Math.min(innerWidth - 300, r.left - 200)) + 'px'
         globo.style.top = Math.max(60, r.top - 90) + 'px'
         document.body.appendChild(globo)
+        cara('habla', Math.min(6000, 1200 + texto.length * 55))
         setTimeout(() => globo?.textContent.startsWith(texto) && cerrarGlobo(), 14000)
     }
 
@@ -121,7 +195,11 @@
         const ruta = Object.keys(frases.pantallas).find((p) => location.pathname.startsWith(p))
         const vistas = leer('vistas-' + location.pathname, [])
         let texto, botones = []
-        if (ruta && Math.random() > 0.2) {
+        if (ambar() >= 1 && Math.random() < 0.5) {
+            // MV-064: con el ámbar completo, a veces invita a una pausa (respetando cuándo habla).
+            texto = 'Llevas más de dos horas seguidas. ¿Una pausa de cinco minutos?'
+            botones = ['Ahora voy']
+        } else if (ruta && Math.random() > 0.2) {
             texto = frases.pantallas[ruta].find((f) => ! vistas.includes(f))
         } else {
             [texto, botones] = frases.vida[Math.floor(Math.random() * frases.vida.length)]
@@ -184,8 +262,6 @@
 
     const aplicarModo = () => {
         el.classList.toggle('dormido', modo() === 'descansar' || Date.now() - ultimaActividad > 20 * 60000)
-        el.querySelector('.ojo-i').textContent = el.classList.contains('dormido') ? '–' : 'n'
-        el.querySelector('.ojo-d').textContent = el.classList.contains('dormido') ? '–' : 'n'
         if (modo() === 'descansar') esquina()
     }
 
@@ -201,7 +277,7 @@
     addEventListener('pointerup', () => {
         if (! inicio) return
         if (arrastrando) { el.style.transition = ''; setTimeout(() => { arrastrando = false }, 60000) }
-        else if (modo() !== 'normal' || el.classList.contains('dormido')) { guardar('modo', null); ultimaActividad = Date.now(); aplicarModo(); decir('¡Aquí estoy!') }
+        else if (modo() !== 'normal' || el.classList.contains('dormido')) { guardar('modo', null); ultimaActividad = Date.now(); aplicarModo(); decir('¡Aquí estoy!'); cara('saluda', 2200) }
         else abrirChat()
         inicio = null
     })
@@ -211,7 +287,8 @@
         ultimaActividad = Date.now()
         if (el.classList.contains('dormido') && modo() !== 'descansar') aplicarModo()
         const r = el.getBoundingClientRect(), dx = Math.max(-1.5, Math.min(1.5, (e.clientX - r.left - 32) / 200)), dy = Math.max(-1, Math.min(1, (e.clientY - r.top - 36) / 200))
-        el.querySelector('.ojos').setAttribute('transform', `translate(${dx} ${dy})`)
+        // MV-064: los ojos siguen el puntero (en la escala de la carita, unos px).
+        el.querySelectorAll('.ojos').forEach((o) => { o.style.transform = `translate(${dx * 2.2}px, ${dy * 1.6}px)` })
     }, { passive: true })
     addEventListener('keydown', (e) => {
         if (chat.contains(e.target)) return
@@ -227,11 +304,14 @@
         decir(texto, botones)
     }
 
+    // Al aparecer, saluda un momento.
+    setTimeout(() => cara('saluda', 2200), 900)
+
     const ciclo = () => { aplicarModo(); if (! el.classList.contains('dormido')) meta(); setTimeout(ciclo, 7000 + Math.random() * 9000) }
     setTimeout(ciclo, 1200)
     setInterval(iniciativa, 20000)
     document.addEventListener('livewire:navigated', () => setTimeout(meta, 600))
-    window.tqAsistente = { decir, abrirChat, meta, iniciativa, probarFrase }
+    window.tqAsistente = { decir, abrirChat, meta, iniciativa, probarFrase, cara, ambar }
 })()
 </script>
 @endif

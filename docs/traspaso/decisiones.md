@@ -820,3 +820,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.3: el asistente vuelve a funcionar»
+
+### MV-064 · 2026-11-22 · La carita del asistente: «Gota de miel», que se vuelve ámbar con el trabajo seguido
+
+- **Ficha:** `fichas/op-asistente.md`
+- **Dijo Sebastián:** (observaciones-6, punto 4; lienzos `docs/vibe/pedidos/lienzos/asistente/A.dc.html` y `C.dc.html`)
+  «Más realista: volumen, luz y sombra, ojos con brillo, cejas y boca, y que cambie sus facciones de forma natural:
+  parpadea a ratos, los ojos siguen el puntero, sonríe al saludar, mueve la boca al hablar, levanta las cejas al
+  escuchar, entrecierra los ojos al dormir; cada cambio pasa suave. Diseño "A · Gota de miel". Después de 2 horas de
+  actividad sin pausa, la miel se va oscureciendo hacia el ámbar de la propuesta C en unos 30 minutos; 15 minutos de
+  ausencia la devuelven a miel; el cambio es continuo; con el ámbar completo, a veces invita a una pausa».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.4: la Gota de miel»
