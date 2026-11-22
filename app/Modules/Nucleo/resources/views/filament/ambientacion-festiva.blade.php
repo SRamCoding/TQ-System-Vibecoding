@@ -42,7 +42,7 @@
         setTimeout(() => capa.remove(), 10500)
     }
 
-    const tipo = @js($tipo), minutos = @js((int) app(\App\Modules\Nucleo\Services\ParametrosService::class)->entero('interfaz.ambientacion_minutos'))
+    const tipo = @js($tipo), minutos = @js((int) app(\App\Modules\Nucleo\Services\ParametrosService::class)->entero('interfaz.ambientacion_minutos'));
     if (! tipo) return
     let ultima = 0
     try { ultima = Number(localStorage.getItem('tq-amb-festiva') || 0) } catch (e) {}

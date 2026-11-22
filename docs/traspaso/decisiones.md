@@ -808,3 +808,15 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.2: el muelle se mueve»
+
+### MV-063 · 2026-11-22 · El asistente vuelve a funcionar
+
+- **Ficha:** `fichas/op-asistente.md`
+- **Dijo Sebastián:** (observaciones-6, punto 3) «Hoy el personaje aparece, pero nada de su comportamiento funciona.
+  Revísalo, arréglalo y comprueba cada punto: clic → chat; paseo con intención; globos (deja una forma de forzar una
+  frase sin esperar las reglas); clic derecho → menú; y que siga funcionando después de navegar sin recargar. El
+  comportamiento esperado es el de su ficha, que no cambia».
+- **Decisión:** arreglado (la causa está en la ficha); se puede forzar una frase con `tqAsistente.probarFrase()`.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.3: el asistente vuelve a funcionar»

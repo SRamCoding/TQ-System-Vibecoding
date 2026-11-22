@@ -63,8 +63,8 @@
 (() => {
     if (window.tqAsistente) return
     const el = document.getElementById('tq-asis'), menu = document.getElementById('tq-asis-menu'), chat = document.getElementById('tq-asis-chat')
-    const frases = @js(\App\Modules\Nucleo\Services\AsistenteService::frases())
-    const csrf = @js(csrf_token()), rutaChat = @js(route('asistente.chat')), rutaTicket = @js(route('asistente.ticket'))
+    const frases = @js(\App\Modules\Nucleo\Services\AsistenteService::frases());
+    const csrf = @js(csrf_token()), rutaChat = @js(route('asistente.chat')), rutaTicket = @js(route('asistente.ticket'));
     const leer = (k, d) => { try { return JSON.parse(localStorage.getItem('tq-asis-' + k)) ?? d } catch (e) { return d } }
     const guardar = (k, v) => { try { localStorage.setItem('tq-asis-' + k, JSON.stringify(v)) } catch (e) {} }
     const reducido = () => matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('tq-sin-animaciones')
@@ -219,11 +219,19 @@
         if (! reducido() && e.target.getBoundingClientRect) { const r = e.target.getBoundingClientRect(); if (Math.abs(r.left - el.getBoundingClientRect().left) < 300) ir(r.left > innerWidth / 2 ? 24 : innerWidth - 110, el.getBoundingClientRect().top) }
     })
 
+    // MV-063: una frase ahora mismo, sin las reglas de cuándo habla, para probarlo: `tqAsistente.probarFrase()` en la consola.
+    const probarFrase = () => {
+        const ruta = Object.keys(frases.pantallas).find((p) => location.pathname.startsWith(p))
+        if (ruta) return decir(frases.pantallas[ruta][Math.floor(Math.random() * frases.pantallas[ruta].length)])
+        const [texto, botones] = frases.vida[Math.floor(Math.random() * frases.vida.length)]
+        decir(texto, botones)
+    }
+
     const ciclo = () => { aplicarModo(); if (! el.classList.contains('dormido')) meta(); setTimeout(ciclo, 7000 + Math.random() * 9000) }
     setTimeout(ciclo, 1200)
     setInterval(iniciativa, 20000)
     document.addEventListener('livewire:navigated', () => setTimeout(meta, 600))
-    window.tqAsistente = { decir, abrirChat, meta, iniciativa }
+    window.tqAsistente = { decir, abrirChat, meta, iniciativa, probarFrase }
 })()
 </script>
 @endif

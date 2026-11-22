@@ -37,7 +37,7 @@
 <script>
     (() => {
         const raiz = document.documentElement
-        const sede = @js($sede)
+        const sede = @js($sede);
         let ubicacion = sede
 
         // La altura del sol en grados (aproximación de la NOAA).

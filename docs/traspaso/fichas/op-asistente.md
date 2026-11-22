@@ -1,7 +1,7 @@
 # Ficha · Asistente de ayuda «n_n» (opcional, plan 1.14)
 
 - **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v2
+- **Versión:** v3
 - **Tramo de la ruta:** opcionales (MV-014)
 - **Aprobada:** 2026-11-20 · etiqueta `aprobado/op-asistente-v1`
 - **Fuentes del diseño:** `docs/planes/activos/2026-10-29-ayuda-asistente.md` (D1 a D9).
@@ -17,6 +17,7 @@ abre si la persona lo confirma. Clic derecho: descansar o callar por un rato. Nu
 
 ## Decisiones de Sebastián
 
+- **MV-063** (ficha) · El asistente vuelve a funcionar; una frase se fuerza con `tqAsistente.probarFrase()`.
 - **MV-040** (ficha) · Franja fija de filtros en Tickets de ayuda; «abierto» pasa a «Sin atender».
 - **MV-038** (ficha) · Ícono propio de Tickets de ayuda.
 - **MV-014** (ficha) · Entra al MVP.
@@ -89,3 +90,12 @@ cuerpo en `AppPanelProvider`), `Nucleo/Services/AsistenteService.php`, `Nucleo/F
   pantalla sin mirar permisos.
 - **Atajos:** la lista se filtra en PHP sobre todos los tickets (sin consulta paginada); el código de estado de los
   tickets de postventa no cambió, solo su nombre.
+- **v3** (MV-063): **el asistente no corría**. Causa: en las plantillas Blade, una línea que termina en `@js(...)`
+  pierde su salto de línea (PHP descarta el salto que sigue a `?>`), y el script, escrito sin punto y coma, quedaba con
+  dos sentencias pegadas: error de sintaxis y nada se ejecutaba (ni el clic, ni el paseo, ni los globos, ni el menú). Lo
+  mismo rompía el script del cielo (la ubicación de la sede) y el de la ambientación de fechas. Arreglo: punto y coma al
+  final de esas cuatro líneas. **Regla para el repo original:** en un script de una plantilla, nunca terminar una línea
+  en una directiva sin punto y coma. **Comprobado** en un navegador sin pantalla (Chromium), al cargar, después de
+  navegar a otra pantalla sin recargar y al volver: el clic abre el chat, el clic derecho abre el menú con sus 8
+  opciones, el personaje cambia de meta y los globos salen. **Para probar los globos** sin esperar sus reglas:
+  `tqAsistente.probarFrase()` en la consola del navegador.
