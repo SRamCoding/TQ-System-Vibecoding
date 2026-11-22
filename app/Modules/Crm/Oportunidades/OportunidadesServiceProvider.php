@@ -87,6 +87,7 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -115,6 +116,10 @@ final class OportunidadesServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        // MV-057: las direcciones de las vistas que ya no existen (Lista, Faja 3D) y la vieja de Tarjetas llevan a Mis
+        // oportunidades; la del Tablero, al Embudo. Antes que las del panel, para que `/oportunidades/{record}` no las tome.
+        $this->app->booting(fn () => Route::middleware('web')->get('oportunidades/{vista}', fn (string $vista) => redirect($vista === 'tablero' ? '/oportunidades/embudo' : '/oportunidades'))->whereIn('vista', ['lista', 'faja', 'tarjetas', 'tablero']));
+
         // Registros donde los demás módulos se enchufan (D9, D12): uno por aplicación.
         $this->app->singleton(RequisitosDeEtapa::class);
         $this->app->singleton(ImpedimentosDeOportunidad::class);

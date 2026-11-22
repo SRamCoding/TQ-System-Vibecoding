@@ -727,3 +727,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 5.2: el logo de Techquk en azul»
+
+### MV-057 · 2026-11-22 · Oportunidades: «Mis oportunidades» por defecto, «Embudo de oportunidades» y sin Lista ni Faja 3D
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-5, punto 3) «La vista Tarjetas pasa a llamarse "Mis oportunidades" y es siempre la
+  que se abre por defecto. La vista Tablero pasa a llamarse "Embudo de oportunidades". Se eliminan las vistas "Lista" y
+  "Faja 3D": sus pestañas, pantallas, rutas y el código que solo usaban ellas. Los enlaces que llevaban a esas vistas
+  pasan a "Mis oportunidades". Quedan tres vistas: Mis oportunidades · Embudo de oportunidades · Línea de tiempo».
+- **Decisión:** lo dicho. Reemplaza la D1 y la D11 de los planes 2.21c y 2.21d del repo original (Tablero de entrada;
+  Lista y Faja 3D como vistas extra).
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 5.3: Mis oportunidades y el Embudo»

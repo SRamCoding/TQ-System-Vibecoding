@@ -53,7 +53,7 @@ final class TableroOportunidades extends Page
 
     protected static string $resource = OportunidadResource::class;
 
-    protected static ?string $title = 'Tablero de oportunidades';
+    protected static ?string $title = 'Embudo de oportunidades';
 
     protected static ?string $breadcrumb = 'Tablero';
 
@@ -75,7 +75,7 @@ final class TableroOportunidades extends Page
         $aviso = request()->query('aviso');
 
         if (is_string($aviso) && in_array($aviso, PortadaOportunidades::AVISOS, true)) {
-            $this->redirect(ListarOportunidades::getUrl(['aviso' => $aviso]));
+            $this->redirect(TarjetasOportunidades::getUrl(['aviso' => $aviso]));
 
             return;
         }

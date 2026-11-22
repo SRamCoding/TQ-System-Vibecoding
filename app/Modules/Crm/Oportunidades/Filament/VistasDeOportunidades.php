@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Oportunidades\Filament;
 
-use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\FajaOportunidades;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\LineaDeTiempoOportunidades;
-use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\ListarOportunidades;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TableroOportunidades;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TarjetasOportunidades;
 use App\Modules\Crm\Oportunidades\Services\EmbudoEnSoles;
@@ -15,21 +13,17 @@ use App\Modules\Nucleo\Models\Moneda;
 use App\Modules\Nucleo\Services\ParametrosService;
 
 /**
- * Lo común de las vistas de Oportunidades (plan 2.21c, D1; 2.21d, D11): las pestañas (Tarjetas · Tablero, por defecto ·
- * Línea de tiempo · Lista · Faja 3D) y la fila de cifras de arriba, de `TableroDeGemas::cifras()`. Solo da forma al texto: las cuentas son
+ * Lo común de las vistas de Oportunidades (plan 2.21c, D1; 2.21d, D11): las pestañas (MV-057: Mis oportunidades, por
+ * defecto · Embudo de oportunidades · Línea de tiempo) y la fila de cifras de arriba, de `TableroDeGemas::cifras()`. Solo da forma al texto: las cuentas son
  * del servicio. La dibuja la vista `oportunidades::vistas.cabecera`.
  */
 final class VistasDeOportunidades
 {
     public const string TARJETAS = 'tarjetas';
 
-    public const string TABLERO = 'tablero';
+    public const string TABLERO = 'embudo';
 
     public const string LINEA_DE_TIEMPO = 'linea-de-tiempo';
-
-    public const string LISTA = 'lista';
-
-    public const string FAJA = 'faja';
 
     /**
      * Las pestañas, en su orden, con la activa marcada.
@@ -39,12 +33,10 @@ final class VistasDeOportunidades
     public static function pestanas(string $activa): array
     {
         $vistas = [
-            // Plan 2.21d, D11: Tarjetas, Tablero y Línea de tiempo; la Lista y la Faja 3D siguen como vistas extra.
-            self::TARJETAS => ['Tarjetas', TarjetasOportunidades::class],
-            self::TABLERO => ['Tablero', TableroOportunidades::class],
+            // MV-057: Mis oportunidades (por defecto) · Embudo de oportunidades · Línea de tiempo. Sin Lista ni Faja 3D.
+            self::TARJETAS => ['Mis oportunidades', TarjetasOportunidades::class],
+            self::TABLERO => ['Embudo de oportunidades', TableroOportunidades::class],
             self::LINEA_DE_TIEMPO => ['Línea de tiempo', LineaDeTiempoOportunidades::class],
-            self::LISTA => ['Lista', ListarOportunidades::class],
-            self::FAJA => ['Faja 3D', FajaOportunidades::class],
         ];
         $pestanas = [];
 

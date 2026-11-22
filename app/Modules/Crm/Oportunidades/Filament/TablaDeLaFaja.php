@@ -11,6 +11,7 @@ use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
 use App\Modules\Crm\Oportunidades\Services\ContratosDeOportunidad;
 use App\Modules\Crm\Oportunidades\Services\FilaFaja;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
+use App\Modules\Crm\Oportunidades\Services\ProximaAccionDeOportunidades;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Facades\Filament;
@@ -32,7 +33,7 @@ use Livewire\Component;
  * blanca y páginas. Tocar una fila abre su caja en la faja (`tq-faja-abrir-fila`; la faja la abre con `tq-faja-abrir`).
  *
  * Columnas que esperan datos que todavía no existen no se muestran (como la D11 de Cuentas): la próxima acción hasta
- * CRM-05 (`FajaDeVidrio::conProximaAccion`) y el contrato mientras `ContratosDeOportunidad` sea la de fábrica
+ * CRM-05 (`ProximaAccionDeOportunidades::existe`; MV-057: la Faja de vidrio ya no existe) y el contrato mientras `ContratosDeOportunidad` sea la de fábrica
  * (`tieneDatos`). Aparecen solas cuando llegan sus módulos.
  */
 final class TablaDeLaFaja extends Component implements HasActions, HasSchemas, HasTable
@@ -166,7 +167,7 @@ final class TablaDeLaFaja extends Component implements HasActions, HasSchemas, H
             // CRM-05 la llena (D5); ámbar si está vencida o sin programar. Hasta entonces no se muestra.
             TextColumn::make('proxima')->label('Próxima acción')->placeholder('Sin programar')
                 ->color('warning')
-                ->hidden(fn (): bool => ! FajaDeVidrio::conProximaAccion()),
+                ->hidden(fn (): bool => ! app(ProximaAccionDeOportunidades::class)->existe()),
             TextColumn::make('cierre')->label('Cierre estimado')->sortable(),
         ];
     }

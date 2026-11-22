@@ -9,10 +9,7 @@ use App\Modules\Crm\Oportunidades\Enums\EtapaAbierta;
 use App\Modules\Crm\Oportunidades\Estados\DefinicionOportunidad;
 use App\Modules\Crm\Oportunidades\Estados\SobreLoPropio;
 use App\Modules\Crm\Oportunidades\Filament\PanelesOportunidad;
-use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\FajaOportunidades;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\LineaDeTiempoOportunidades;
-use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\ListarOportunidades;
-use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TableroAnterior;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TableroOportunidades;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TarjetasOportunidades;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\VerOportunidad;
@@ -302,14 +299,10 @@ final class OportunidadResource extends Resource
     public static function getPages(): array
     {
         return [
-            // Las cuatro vistas (plan 2.21c, D1): el Tablero es la de entrada, también en el celular (D12).
-            'index' => TableroOportunidades::route('/'),
-            'tarjetas' => TarjetasOportunidades::route('/tarjetas'),
+            // MV-057: tres vistas: Mis oportunidades (la de entrada), Embudo de oportunidades y Línea de tiempo.
+            'index' => TarjetasOportunidades::route('/'),
+            'embudo' => TableroOportunidades::route('/embudo'),
             'linea-de-tiempo' => LineaDeTiempoOportunidades::route('/linea-de-tiempo'),
-            'lista' => ListarOportunidades::route('/lista'),
-            'faja' => FajaOportunidades::route('/faja'),
-            // La dirección de la faja hasta la 2.21b: lleva al Tablero.
-            'tablero' => TableroAnterior::route('/tablero'),
             'view' => VerOportunidad::route('/{record}'),
         ];
     }

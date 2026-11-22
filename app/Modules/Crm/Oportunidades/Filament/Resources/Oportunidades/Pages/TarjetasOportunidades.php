@@ -43,7 +43,7 @@ final class TarjetasOportunidades extends Page
 
     protected static string $resource = OportunidadResource::class;
 
-    protected static ?string $title = 'Oportunidades';
+    protected static ?string $title = 'Mis oportunidades';
 
     protected static ?string $breadcrumb = 'Tarjetas';
 
