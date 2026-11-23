@@ -17,3 +17,11 @@ Son ilustrativos: se copian los colores, medidas, formas y la disposición, no e
 | Observación | Carpeta | Archivo que manda |
 |---|---|---|
 | 6.4 La carita del asistente | `asistente/` | `A.dc.html` (la «Gota de miel» elegida); `C.dc.html` es el ámbar al que se va tornando con el trabajo seguido |
+
+## Séptima tanda
+
+| Observación | Carpeta | Archivo que manda |
+|---|---|---|
+| 7.3 Postulación (ruta por pasos) | `postulacion/` | `Main.dc.html` (la «A · Ruta por pasos»); `Oferta.dc.html`, la oferta desde el presupuesto |
+| 7.5 Bandeja de Convocatorias del SEACE | `convocatorias/` | `Main.dc.html` (la «B · Bandeja con detalle»); `Configuracion.dc.html`, la configuración de la búsqueda |
+| 7.6 Campañas | `campanias/` | `Main.dc.html` (campañas con su retorno), `Clientes.dc.html` (Mis clientes), `Pac.dc.html` (Radar del PAC, primero investigar) |
