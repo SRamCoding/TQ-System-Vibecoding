@@ -16,6 +16,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 
 ## Decisiones de Sebastián
 
+- **MV-088** (cruza módulos) · El asistente siempre encima de todo (única excepción): ni oscurecido, ni desenfocado, ni escondido; con un panel del costado se corre al otro lado.
 - **MV-086** (cruza módulos) · Paneles y ventanas sólidos; costado oscurece (42 %, 58 % en oscuro), medio desenfoca; el asistente se aparta o se esconde.
 
 - **MV-085** (cruza módulos) · La caja queda elegida en cualquier pantalla de su módulo (lista, vistas, crear, editar, ficha, paneles).
@@ -311,7 +312,7 @@ contar solas, porque no coinciden con ningún proceso).
 ## Supuestos sin confirmar
 
 - **v31 · Colores de las líneas** de negocio en la configuración: turquesa, azul, morado, coral, verde y oro, por orden.
-- **v31 · Con un panel del costado abierto** el globo del asistente se oculta y el asistente se corre a la izquierda; vuelve solo al cerrarlo.
+- **v31 · Con un panel del costado abierto** el asistente se corre a la izquierda y vuelve al cerrarlo (MV-088: nunca se esconde).
 
 - **v29 · La causa** era que el enlace de la caja arrastrada recibía el «soltar» del puntero (por la captura del puntero) y Livewire navegaba; se corta en la barra durante el arrastre y 400 ms después.
 

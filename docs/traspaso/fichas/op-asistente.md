@@ -17,6 +17,7 @@ abre si la persona lo confirma. Clic derecho: descansar o callar por un rato. Nu
 
 ## Decisiones de Sebastián
 
+- **MV-088** (cruza módulos) · Siempre encima de todo, también de paneles, ventanas, la agenda y el velo del cielo; con un panel del costado se corre al otro lado.
 - **MV-064** (ficha) · La carita es la «Gota de miel», con gestos naturales; se vuelve ámbar con 2 h de trabajo seguido.
 - **MV-063** (ficha) · El asistente vuelve a funcionar; una frase se fuerza con `tqAsistente.probarFrase()`.
 - **MV-040** (ficha) · Franja fija de filtros en Tickets de ayuda; «abierto» pasa a «Sin atender».

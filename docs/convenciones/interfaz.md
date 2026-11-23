@@ -79,7 +79,8 @@ debe comparar con el tema anterior.
   separa; el vidrio (`--tq-vidrio`) queda para lo pequeño que flota: muelle, globos, menús.
 - Lo de atrás: un **panel del costado** lo **oscurece** con negro parejo al 42 % (58 % en oscuro); una **ventana al
   medio** (modal, agenda, confirmación) lo **desenfoca** y aclara un poco, sin oscurecer.
-- El **asistente** no tapa: con un panel del costado se aparta al otro lado; con una ventana al medio se esconde.
+- El **asistente** está **siempre encima de todo** (única excepción, MV-088): nunca se oscurece, desenfoca ni esconde;
+  con un panel del costado abierto se corre al otro lado.
 - Dentro de un panel, los campos con borde y fondo de campo y texto normal (el gris suave solo para la ayuda); los montos
   en soles (`S/ 20,000.00`); lo desactivado legible (4.5:1) con su etiqueta («más adelante»).
 

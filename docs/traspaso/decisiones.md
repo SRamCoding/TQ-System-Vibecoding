@@ -1099,7 +1099,7 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Dijo Sebastián:** (observaciones-8, punto 7) «Paneles deslizantes con fondo sólido, no vidrio … la agenda también pasa a fondo sólido … los paneles que salen de un costado la oscurecen con una capa oscura pareja (negro al 40-45 %, sin el gris que lava todo de hoy); las ventanas que salen al medio … la desenfocan (blur) y la aclaran un poco, sin oscurecer … Cada línea de negocio en una caja con borde visible … Campos visibles … montos con formato de soles … Fuentes desactivadas legibles … El asistente no tapa los paneles».
 - **Decisión:** lo dicho, para todo el sistema.
 - **Alcance:** cruza módulos (todos los paneles deslizantes y ventanas; asistente; Convocatorias)
-- **Estado:** vigente
+- **Estado:** reemplazada en parte por MV-088 (lo del asistente: ya no se esconde)
 - **Commit:** el de «Observación 8.7: paneles sólidos y legibles»
 
 ### MV-087 · 2026-11-23 · La agenda nueva: «Mes con actividades», sólida sobre la pantalla desenfocada
@@ -1110,3 +1110,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.8: la agenda nueva»
+
+### MV-088 · 2026-11-23 · El asistente, siempre encima de todo
+
+- **Ficha:** `fichas/r1-inicio-procesos.md` (toca `t1-agenda.md` y `op-asistente.md`)
+- **Dijo Sebastián:** «el asistente siempre encima de todo es la única excepción».
+- **Decisión:** el asistente queda siempre encima de todo: no se oscurece, no se desenfoca ni se esconde con paneles,
+  ventanas o la agenda, y va incluso sobre el velo del cielo. Con un panel del costado se sigue corriendo al otro lado.
+  Reemplaza la parte de MV-086 que lo escondía con las ventanas al medio.
+- **Alcance:** cruza módulos (asistente; paneles y ventanas)
+- **Estado:** vigente
+- **Commit:** el de «Asistente siempre encima de todo»

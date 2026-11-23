@@ -28,7 +28,7 @@
         init() {
             Alpine.store('tqAgenda') ?? Alpine.store('tqAgenda', { lista: false })
             Alpine.store('tqAgenda').lista = true
-            // Observación 8.7: como toda ventana al medio, el asistente se esconde mientras está abierta.
+            // Marca que hay una ventana al medio abierta (MV-088: el asistente igual queda encima).
             this.$watch('abierto', (v) => document.documentElement.classList.toggle('tq-ventana-abierta', v))
         },
         abrir() {
