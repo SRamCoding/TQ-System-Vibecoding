@@ -9,7 +9,6 @@ use App\Modules\Crm\Licitaciones\Services\ConvocatoriasSeaceService;
 use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
 use App\Modules\Nucleo\Models\User;
 use BackedEnum;
-use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
@@ -17,6 +16,7 @@ use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\EmbeddedTable;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -46,22 +46,36 @@ final class BandejaConvocatorias extends Page implements HasTable
 
     public function getSubheading(): string
     {
-        $nuevas = DB::table('convocatorias_seace')->where('estado', 'nueva')->count();
-        $ultima = DB::table('convocatorias_seace')->max('created_at');
+        $nuevas = DB::table('convocatorias_seace')->where('en_bandeja', true)->where('estado', 'nueva')->count();
+        $e = app(ConvocatoriasSeaceService::class)->estadoLectura();
 
         return "{$nuevas} nuevas"
-            .($ultima === null ? '' : ' · última lectura '.CarbonImmutable::parse($ultima)->format('d/m/Y H:i'));
+            .($e['ok'] === null ? '' : ' · Leído '.$e['ok']->locale('es')->diffForHumans())
+            .($e['fallo'] === null ? '' : ' · El OECE no respondió a las '.$e['falloEn']?->format('H:i').': se muestra lo guardado');
+    }
+
+    /**
+     * Observación 7.4: la pantalla abre al instante con lo guardado; después (`wire:init`), si la última lectura tiene
+     * más de 15 minutos, se lee otra y lo nuevo aparece solo en la lista, sin recargar.
+     */
+    public function leerAlEntrar(): void
+    {
+        $r = app(ConvocatoriasSeaceService::class)->leerSiHaceFalta();
+
+        if ($r !== null && $r['a_bandeja'] > 0) {
+            Notification::make()->success()->title($r['a_bandeja'] === 1 ? 'Llegó 1 convocatoria nueva.' : "Llegaron {$r['a_bandeja']} convocatorias nuevas.")->send();
+        }
     }
 
     public function content(Schema $schema): Schema
     {
-        return $schema->components([EmbeddedTable::make()]);
+        return $schema->components([View::make('licitaciones::bandeja.al-entrar'), EmbeddedTable::make()]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->records(fn (?array $filters): array => DB::table('convocatorias_seace')->when(($filters['estado']['value'] ?? 'nueva') !== 'todas', fn ($q) => $q->where('estado', $filters['estado']['value'] ?? 'nueva'))
+            ->records(fn (?array $filters): array => DB::table('convocatorias_seace')->where('en_bandeja', true)->when(($filters['estado']['value'] ?? 'nueva') !== 'todas', fn ($q) => $q->where('estado', $filters['estado']['value'] ?? 'nueva'))
                 ->orderBy('presentacion')->get()->map(fn (object $c): array => ['__key' => (string) $c->id, ...(array) $c,
                     'es_cuenta' => $c->ruc_entidad !== null && DB::table('cuentas')->join('parties', 'parties.id', '=', 'cuentas.party_id')->where('parties.numero_documento', $c->ruc_entidad)->exists()])->all())
             ->paginated(false)
@@ -97,13 +111,13 @@ final class BandejaConvocatorias extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         $puede = fn (): bool => auth()->user()?->can(LicitacionesService::PERMISO_GESTIONAR) ?? false;
-        $avisar = fn (array $r) => Notification::make()->success()->title("Leídas {$r['leidas']}: {$r['nuevas']} nuevas que coinciden; {$r['descartadas_por_filtro']} fuera del filtro.")->send();
+        $avisar = fn (array $r) => Notification::make()->success()->title("Leídas {$r['leidas']}: {$r['a_bandeja']} nuevas para la bandeja; {$r['nuevas']} nuevas guardadas y {$r['actualizadas']} actualizadas.")->send();
 
         return [
-            Action::make('sincronizar')->label('Leer ahora del OECE')->icon('heroicon-o-arrow-path')->visible($puede)
+            Action::make('sincronizar')->label('Leer ahora')->icon('heroicon-o-arrow-path')->visible($puede)
                 ->action(function () use ($avisar): void {
                     try {
-                        $avisar(app(ConvocatoriasSeaceService::class)->sincronizar());
+                        $avisar(app(ConvocatoriasSeaceService::class)->sincronizar('a_mano'));
                     } catch (RuntimeException $e) {
                         Notification::make()->warning()->title($e->getMessage())->send();
                     }

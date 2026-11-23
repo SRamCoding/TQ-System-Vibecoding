@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v5, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v5
+- **Estado:** en curso (v6, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v6
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -23,6 +23,9 @@ perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
 
+- **MV-077** (ficha) · Convocatorias del SEACE: se guarda todo lo liviano del OECE y la bandeja muestra lo filtrado; se
+  lee solo lo nuevo, cada hora y al entrar (si pasaron 15 min), con «Leer ahora»; cada llegada o cambio dispara
+  reacciones separadas (filtrar, priorizar, avisar en Mien).
 - **MV-076** (negocio) · La postulación se gestiona entera desde el sistema; el SEACE solo para el envío final, hecho por
   una persona. Sin robots en el portal ni claves del SEACE guardadas. Diseño «A · Ruta por pasos» en la pestaña
   Licitación de la oportunidad, con la oferta desde el presupuesto.
@@ -84,6 +87,13 @@ perdida con el ganador y su precio.
     «presentada».
   - **8 Subsanación y resultado:** **La entidad pide subsanar** (qué pide y plazo), cada pedido con su plazo en coral y
     **Responder** (texto, fecha, constancia); los participantes y **Registrar resultado** como siempre.
+- **Convocatorias del SEACE (v6, MV-077)** `/convocatorias`: abre al instante con lo guardado; si la última lectura
+  tiene más de 15 minutos, lee otra por detrás y lo nuevo aparece solo en la lista (con un aviso «Llegó 1 convocatoria
+  nueva»). Arriba: «N nuevas · Leído hace 3 minutos» y, si la última lectura falló, «El OECE no respondió a las HH:MM:
+  se muestra lo guardado». **Leer ahora** fuerza la lectura. Solo se listan las que pasan el filtro.
+- **Avisos en Mien (v6):** grupo «Convocatorias del SEACE» con lo de los últimos 3 días: «Nueva convocatoria: objeto ·
+  entidad · S/ …» (lleva a la bandeja) y «La convocatoria de [entidad] cambió su fecha de presentación al dd/mm/aaaa»
+  (coral; lleva a su licitación).
 - **Avisos en Mien (v5):** grupo «Licitaciones: lo que toca»: «Presentar LP-… · en 3 días · falta: expediente» (coral
   a 5 días o menos), el paso actual de cada licitación en preparación, «Pedir "Carta de garantía…"» si falta y vence en
   5 días, y «Subsanar CONV-… · en 2 días». Cada uno lleva a la pestaña.
@@ -135,6 +145,21 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Reglas y números
 
+- **v6 · Lectura del OECE:** `GET /api/v1/releases?format=json&order=desc`, 20 por página, siguiendo `links.next` hasta
+  encontrar un release con fecha igual o anterior al más nuevo guardado; tope de 20 páginas por lectura. Fechas con
+  microsegundos y su desfase. Cada convocatoria por su código OCDS (único): si llega igual no se toca; si llega más nueva
+  se actualiza y se anota qué cambió (presentación, buena pro, fin de consultas, valor, estado, ganador, monto
+  adjudicado, objeto). Prueba real: la primera lectura trajo 400, la siguiente 0.
+- **v6 · Lo liviano que se guarda:** código OCDS, nomenclatura, procedimiento, entidad y su RUC, región, objeto (la
+  descripción; en el OECE el título es la nomenclatura), texto para filtrar (título, descripción e ítems, hasta 2000),
+  valor referencial (0 = no público), moneda, fechas (publicación, fin de consultas, presentación, buena pro), estado,
+  ganador con su RUC y monto adjudicado. Sin el JSON completo ni documentos (las bases se bajan al registrar).
+- **v6 · Filtro:** entra si el texto contiene alguna palabra clave y el valor referencial no está bajo el mínimo (sin
+  valor, entra). Si cambian las palabras o el mínimo, se vuelve a filtrar todo lo guardado en la siguiente lectura o al
+  entrar. **Prioritaria:** valor desde S/ 500,000 (parámetro `crm.seace_valor_prioritaria`) o entidad que ya es cuenta.
+- **v6 · Cuándo se lee:** cada hora (programada), al entrar si la última tiene más de 15 minutos (una sola a la vez) y
+  con «Leer ahora».
+
 - **v5 · Paso hecho:** 1 con fecha de registro; 2 con todas absueltas (o fecha de absolución); 3 con fecha de bases
   integradas; 4 sin documentos que falten (de los que aplican); 5 con monto ofertado; 6 con paquete armado; 7
   presentada; 8 con resultado. Una vez presentada, 1 a 6 cuentan como hechos. El actual es el primero sin hacer; con
@@ -163,6 +188,11 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Supuestos sin confirmar
 
+- **v6 · Las guardadas antes** de esta versión no tienen su texto completo: se quedan en la bandeja como estaban y no
+  se vuelven a filtrar.
+- **v6 · Avisos en Mien** de convocatorias: los de los últimos 3 días, para quien ve licitaciones (no por persona).
+- **v6 · Una registrada que cambia su presentación** solo avisa; no mueve sola el cronograma de su licitación.
+
 - **v5 · La del lienzo** («Valle Verde») se adaptó a la demo como LIC-2026-0005 de la Municipalidad Provincial de Valle
   Norte, con el objeto, el valor referencial, los documentos y la oferta del lienzo; su presupuesto se armó para que el
   margen quede sobre el mínimo. La «presentada con constancia» es LIC-2026-0007 y la «con subsanación» LIC-2026-0008.
@@ -182,6 +212,10 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Atajos tomados
 
+- **v6:** la lectura al entrar corre en la misma petición de la pantalla (después de dibujarla), no en una cola; en
+  local, lo que la demo deja «por publicar» (`storage/app/private/seace/por-publicar.json`) llega en la primera lectura.
+  Los avisos de Mien se guardan en una tabla propia; el estado de la convocatoria es texto.
+
 - **v5:** el paquete es un PDF con índice y una página foliada por documento; los archivos subidos no se incrustan ni se
   firman (se suben aparte). Los estados de documento y consulta son texto con su lista en el modelo. Las consultas
   «sugeridas por IA» son una lista fija. Los archivos van al disco local sin revisar tipo ni tamaño. La pantalla lee la
@@ -200,9 +234,15 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 `Filament/Resources/Licitaciones/` con la lista, la ficha y sus cuatro pestañas); datos en
 `database/seeders/Demo/CarteraDemo.php` (`licitaciones()`, `competidores()`) y `DemoSeeder::licitaciones()`. v5:
 `Services/PostulacionService.php`, `Filament/LicitacionDeOportunidad.php` con `resources/views/oportunidad/licitacion.blade.php`
-y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.php` y `Demo/PostulacionCasosSeeder.php`.
+y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.php` y `Demo/PostulacionCasosSeeder.php`. v6:
+`Services/ConvocatoriasSeaceService.php` (`sincronizar`, `guardar`, `leerSiHaceFalta`, `priorizar`), `Services/FiltroConvocatorias.php`,
+`Events/` y `Listeners/` (filtrar, priorizar, avisar), la migración `2026_11_23_800001_convocatorias_todo_lo_liviano.php`,
+`routes/console.php` (cada hora) y `Demo/ConvocatoriasCasosSeeder.php`.
 
 ## Cambios desde la versión anterior
+
+- **v6** (MV-077): se guarda todo lo liviano del OECE; lectura incremental cada hora y al entrar; eventos «llegó» y
+  «cambió» con sus reacciones (filtrar, priorizar, avisar en Mien).
 
 - **v5** (MV-076): la pestaña Licitación de la oportunidad es la ruta de 8 pasos con la oferta desde el presupuesto, el
   paquete, la presentación con constancia, la subsanación y los avisos en Mien.

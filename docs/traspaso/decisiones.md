@@ -997,3 +997,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** negocio (cómo Techquk postula a licitaciones)
 - **Estado:** vigente
 - **Commit:** el de «Observación 7.3: la postulación por pasos»
+
+### MV-077 · 2026-11-23 · Convocatorias del SEACE: guardar todo lo liviano, leer solo lo nuevo y reaccionar por eventos
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-7, punto 4) «Pasa a guardarse todo lo que publica el OECE, pero solo sus datos
+  livianos … La bandeja muestra solo lo que coincide … Leer solo lo nuevo (lectura incremental) … En segundo plano cada
+  hora … Al entrar … si la última lectura tiene más de 15 minutos, lanza otra por detrás y lo nuevo aparece solo …
+  "Leer ahora" sigue … Si el OECE no responde, la pantalla sigue con lo guardado … Cada convocatoria nueva o actualizada
+  dispara un evento … Filtrar · Priorizar · Avisar en Mien».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 7.4: el SEACE se guarda entero y se lee solo lo nuevo»

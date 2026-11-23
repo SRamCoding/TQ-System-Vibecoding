@@ -7,19 +7,24 @@ namespace App\Modules\Crm\Licitaciones\Services;
 use App\Modules\Crm\Cuentas\Services\CuentasService;
 use App\Modules\Crm\Cuentas\Services\DatosCuenta;
 use App\Modules\Crm\Licitaciones\Enums\TipoProcedimiento;
+use App\Modules\Crm\Licitaciones\Events\ConvocatoriaCambio;
+use App\Modules\Crm\Licitaciones\Events\ConvocatoriaLlego;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Services\ParametrosService;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Throwable;
 
 /**
- * MVP rápido (ficha t1-licitaciones v2): trae las convocatorias del SEACE desde los datos abiertos del OECE (estándar
- * de contrataciones abiertas OCDS: paquetes de «releases»), se queda con las que coinciden con las palabras clave de
- * Techquk y su rango de valor, y las deja en la bandeja. «Registrar» la vuelve licitación (creando la cuenta de la
+ * MVP rápido (ficha t1-licitaciones v2 y observación 7.4): trae las convocatorias del SEACE desde los datos abiertos
+ * del OECE (estándar de contrataciones abiertas OCDS: paquetes de «releases») y guarda todo lo liviano; la bandeja
+ * muestra lo que coincide con las palabras clave de Techquk y su valor mínimo (`FiltroConvocatorias`), y cada llegada o
+ * cambio dispara sus reacciones (filtrar, priorizar, avisar en Mien). «Registrar» la vuelve licitación (creando la cuenta de la
  * entidad si no existe) sin escribir nada.
  */
 final readonly class ConvocatoriasSeaceService
@@ -31,56 +36,120 @@ final readonly class ConvocatoriasSeaceService
 
     public const string PARAMETRO_VALOR_MINIMO = 'crm.seace_valor_minimo';
 
+    /** Observación 7.4: desde este valor referencial (soles) una convocatoria es prioritaria. */
+    public const string PARAMETRO_PRIORIDAD = 'crm.seace_valor_prioritaria';
+
+    /** Observación 7.4: al entrar, se lee otra vez si la última lectura tiene más de estos minutos. */
+    public const int MINUTOS_FRESCA = 15;
+
+    /** Observación 7.4: lo que la demo deja «por publicar» (solo local). */
+    public const string DEMO_POR_PUBLICAR = 'seace/por-publicar.json';
+
     /** @return list<string> */
     public function palabras(): array
     {
         return array_values(array_filter(array_map(fn (string $p): string => mb_strtolower(trim($p)), explode(',', app(ParametrosService::class)->texto(self::PARAMETRO_PALABRAS)))));
     }
 
-    /** Lee de la dirección configurada (OECE_OCDS_URL) los releases publicados desde la fecha dada. */
-    public function sincronizar(?CarbonImmutable $desde = null): array
+    /**
+     * Observación 7.4: lee solo lo nuevo. Pide lo más reciente primero (`order=desc`) y sigue las páginas hasta llegar a
+     * un release que ya tiene (la fecha del más nuevo guardado), con un tope de páginas. Cada convocatoria se guarda
+     * entera en lo liviano (entre o no a la bandeja); las nuevas y las que cambiaron disparan sus eventos. Queda anotada
+     * la lectura (para «Leído hace…» y para decir si el OECE no respondió).
+     *
+     * @return array{leidas: int, nuevas: int, actualizadas: int, a_bandeja: int}
+     */
+    public function sincronizar(string $origen = 'a_mano'): array
     {
-        $url = (string) config('services.oece.ocds_url');
+        $lectura = DB::table('seace_lecturas')->insertGetId(['inicio' => now(), 'origen' => $origen]);
+        $total = ['leidas' => 0, 'nuevas' => 0, 'actualizadas' => 0, 'a_bandeja' => 0];
 
-        if ($url === '') {
-            throw new RuntimeException('Falta la dirección de los datos abiertos del OECE (OECE_OCDS_URL en el .env). Mientras tanto, importa un archivo OCDS descargado del portal.');
-        }
+        try {
+            app(FiltroConvocatorias::class)->reaplicarSiCambio();
+            // En local, lo que la demo dejó «por publicar» llega primero (atajo del MVP para ver la llegada en vivo).
+            $this->sumar($total, $this->pendientesDeDemo());
+            $url = (string) config('services.oece.ocds_url');
 
-        // MV-066: la API del OECE (`/releases`) no acepta «since»: entrega lo más reciente primero, 20 por página, y se
-        // siguen sus páginas (`links.next`) mientras traigan releases más nuevos que «desde», hasta 20 páginas.
-        $desde ??= Calendario::ahora()->subDays(3);
-        // `releasesAfter` ordena por su id interno (salen releases de 2024 primero): se usa `/releases`, que sí va por fecha.
-        $url = (string) preg_replace('#/releasesAfter(?=$|\?)#', '/releases', $url);
-        $siguiente = $url.(str_contains($url, '?') ? '&' : '?').'format=json';
-        $total = ['leidas' => 0, 'nuevas' => 0, 'descartadas_por_filtro' => 0];
+            if ($url === '') {
+                throw new RuntimeException('Falta la dirección de los datos abiertos del OECE (OECE_OCDS_URL en el .env).');
+            }
 
-        for ($pagina = 0; $pagina < self::PAGINAS_MAXIMAS && $siguiente !== null; $pagina++) {
-            try {
-                // La dirección va completa: si se pasaran parámetros aparte, Guzzle reemplazaría los que ya trae.
-                // El OECE rechaza (403) la cabecera por defecto de Guzzle: el cliente se presenta con un nombre genérico.
-                $json = Http::timeout(60)->acceptJson()->withUserAgent('TechQuk-OCDS/1.0')->get($siguiente)->throw()->body();
-            } catch (Throwable $e) {
-                if ($pagina === 0) {
-                    throw new RuntimeException('El OECE no respondió: '.mb_substr($e->getMessage(), 0, 120));
+            $hasta = DB::table('convocatorias_seace')->max('release_fecha');
+            $hasta = $hasta === null ? Calendario::ahora()->subDays(3) : CarbonImmutable::parse($hasta);
+            $url = (string) preg_replace('#/releasesAfter(?=$|\?)#', '/releases', $url);
+            $siguiente = $url.(str_contains($url, '?') ? '&' : '?').'format=json&order=desc';
+
+            for ($pagina = 0; $pagina < self::PAGINAS_MAXIMAS && $siguiente !== null; $pagina++) {
+                try {
+                    // La dirección va completa; el OECE rechaza (403) la cabecera por defecto de Guzzle.
+                    $json = Http::timeout(30)->acceptJson()->withUserAgent('TechQuk-OCDS/1.0')->get($siguiente)->throw()->body();
+                } catch (Throwable $e) {
+                    if ($pagina === 0) {
+                        throw new RuntimeException('El OECE no respondió: '.mb_substr($e->getMessage(), 0, 120));
+                    }
+
+                    break;
                 }
 
-                break;
+                $datos = json_decode($json, true);
+                $releases = is_array($datos) ? self::releasesDe($datos) : [];
+                $nuevos = array_values(array_filter($releases, fn (array $r): bool => ! isset($r['date']) || CarbonImmutable::parse($r['date'])->greaterThan($hasta)));
+                $this->sumar($total, $this->guardarTodos($nuevos));
+                // Llegó a lo que ya tenía: se detiene.
+                $siguiente = count($nuevos) < count($releases) || $releases === [] ? null : ($datos['links']['next'] ?? null);
             }
 
-            $datos = json_decode($json, true);
-            $releases = is_array($datos) ? self::releasesDe($datos) : [];
-            $recientes = array_values(array_filter($releases, fn (array $r): bool => ! isset($r['date']) || CarbonImmutable::parse($r['date'])->greaterThanOrEqualTo($desde)));
-            $parte = $this->importar(json_encode(['releases' => $recientes]) ?: '{}');
+            DB::table('seace_lecturas')->where('id', $lectura)->update(['fin' => now(), 'es_ok' => true, ...$total]);
+        } catch (Throwable $e) {
+            DB::table('seace_lecturas')->where('id', $lectura)->update(['fin' => now(), 'es_ok' => false, 'error' => mb_substr($e->getMessage(), 0, 300), ...$total]);
 
-            foreach ($total as $k => $v) {
-                $total[$k] = $v + $parte[$k];
-            }
-
-            // Si en esta página ya hubo releases más viejos que «desde», no hace falta seguir.
-            $siguiente = count($recientes) < count($releases) ? null : ($datos['links']['next'] ?? null);
+            throw $e instanceof RuntimeException ? $e : new RuntimeException($e->getMessage());
         }
 
         return $total;
+    }
+
+    /**
+     * Observación 7.4: al entrar a la bandeja, si la última lectura tiene más de 15 minutos, lee otra (una sola a la vez).
+     * Nunca lanza: si el OECE no responde, queda anotado y la pantalla sigue con lo guardado.
+     *
+     * @return array{leidas: int, nuevas: int, actualizadas: int, a_bandeja: int}|null nulo si no hacía falta
+     */
+    public function leerSiHaceFalta(): ?array
+    {
+        $ultima = DB::table('seace_lecturas')->max('inicio');
+
+        if ($ultima !== null && CarbonImmutable::parse($ultima)->greaterThan(Calendario::ahora()->subMinutes(self::MINUTOS_FRESCA))) {
+            return null;
+        }
+
+        $candado = Cache::lock('crm.seace.lectura', 120);
+
+        if (! $candado->get()) {
+            return null;
+        }
+
+        try {
+            return $this->sincronizar('al_entrar');
+        } catch (Throwable) {
+            return null;
+        } finally {
+            $candado->release();
+        }
+    }
+
+    /**
+     * La última lectura que terminó bien y, si la última de todas falló, su error.
+     *
+     * @return array{ok: ?CarbonImmutable, fallo: ?string, falloEn: ?CarbonImmutable}
+     */
+    public function estadoLectura(): array
+    {
+        $ok = DB::table('seace_lecturas')->where('es_ok', true)->max('fin');
+        $ultima = DB::table('seace_lecturas')->whereNotNull('fin')->orderByDesc('id')->first();
+
+        return ['ok' => $ok === null ? null : CarbonImmutable::parse($ok), 'fallo' => $ultima !== null && ! $ultima->es_ok ? $ultima->error : null,
+            'falloEn' => $ultima !== null && ! $ultima->es_ok ? CarbonImmutable::parse($ultima->fin) : null];
     }
 
     /**
@@ -93,9 +162,9 @@ final readonly class ConvocatoriasSeaceService
     }
 
     /**
-     * Importa un paquete OCDS (release package, record package o una lista de releases).
+     * Importa un paquete OCDS (release package, record package o una lista de releases): todo se guarda.
      *
-     * @return array{leidas: int, nuevas: int, descartadas_por_filtro: int}
+     * @return array{leidas: int, nuevas: int, actualizadas: int, a_bandeja: int}
      */
     public function importar(string $json): array
     {
@@ -105,42 +174,150 @@ final readonly class ConvocatoriasSeaceService
             throw new RuntimeException('El archivo no es un JSON de contrataciones abiertas (OCDS).');
         }
 
-        $releases = self::releasesDe($datos);
-        $palabras = $this->palabras();
-        $minimo = (float) app(ParametrosService::class)->entero(self::PARAMETRO_VALOR_MINIMO);
-        [$leidas, $nuevas, $fuera] = [0, 0, 0];
+        return $this->guardarTodos(self::releasesDe($datos));
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $releases
+     * @return array{leidas: int, nuevas: int, actualizadas: int, a_bandeja: int}
+     */
+    private function guardarTodos(array $releases): array
+    {
+        $total = ['leidas' => 0, 'nuevas' => 0, 'actualizadas' => 0, 'a_bandeja' => 0];
 
         foreach ($releases as $r) {
-            $leidas++;
-            $t = $r['tender'] ?? [];
-            $texto = mb_strtolower(($t['title'] ?? '').' '.($t['description'] ?? '').' '.implode(' ', array_map(fn ($i): string => (string) ($i['description'] ?? ''), $t['items'] ?? [])));
-            $coinciden = array_values(array_filter($palabras, fn (string $p): bool => str_contains($texto, $p)));
-            $valor = $t['value']['amount'] ?? null;
-            $valor = $valor !== null && (float) $valor > 0 ? $valor : null; // el OECE manda 0 cuando el valor no es público
+            $total['leidas']++;
+            $hecho = $this->guardar($r);
 
-            if ($coinciden === [] || ($valor !== null && (float) $valor < $minimo) || ! isset($r['ocid'])) {
-                $fuera++;
-
+            if ($hecho === null) {
                 continue;
             }
 
-            $comprador = collect($r['parties'] ?? [])->firstWhere('id', $r['buyer']['id'] ?? null) ?? [];
-            $ruc = preg_replace('/\D/', '', (string) ($comprador['identifier']['id'] ?? ''));
-            $fecha = fn (?string $f): ?string => $f === null ? null : substr($f, 0, 10);
-
-            $hecho = DB::table('convocatorias_seace')->insertOrIgnore([
-                'ocid' => $r['ocid'], 'nomenclatura' => mb_substr((string) ($t['id'] ?? $r['ocid']), 0, 120), 'entidad' => mb_substr((string) ($r['buyer']['name'] ?? $comprador['name'] ?? 'Entidad'), 0, 250),
-                'ruc_entidad' => strlen($ruc) === 11 ? $ruc : null, 'region' => $comprador['address']['region'] ?? null,
-                'objeto' => mb_substr((string) ($t['title'] ?? $t['description'] ?? ''), 0, 600), 'tipo' => mb_substr((string) ($t['procurementMethodDetails'] ?? 'Por definir'), 0, 30),
-                'valor_referencial' => $valor, 'moneda' => $t['value']['currency'] ?? 'PEN', 'publicada' => $fecha($r['date'] ?? null),
-                'presentacion' => $fecha($t['tenderPeriod']['endDate'] ?? null), 'buena_pro' => $fecha($t['awardPeriod']['startDate'] ?? null),
-                'url' => mb_substr((string) (collect($t['documents'] ?? [])->first()['url'] ?? ''), 0, 500) ?: null,
-                'coincide' => mb_substr(implode(', ', $coinciden), 0, 200), 'estado' => 'nueva', 'created_at' => now(), 'updated_at' => now(),
-            ]);
-            $nuevas += $hecho;
+            $total[$hecho['nueva'] ? 'nuevas' : 'actualizadas']++;
+            $total['a_bandeja'] += $hecho['nueva'] && DB::table('convocatorias_seace')->where('id', $hecho['id'])->value('en_bandeja') ? 1 : 0;
         }
 
-        return ['leidas' => $leidas, 'nuevas' => $nuevas, 'descartadas_por_filtro' => $fuera];
+        return $total;
+    }
+
+    /**
+     * Guarda lo liviano de un release por su código OCDS (único): si no estaba, la crea y avisa «llegó»; si llega una
+     * versión más nueva, la actualiza, anota qué cambió y avisa «cambió». Si llega dos veces la misma, no hace nada.
+     *
+     * @param  array<string, mixed>  $r
+     * @return array{id: int, nueva: bool}|null
+     */
+    public function guardar(array $r): ?array
+    {
+        if (! isset($r['ocid'])) {
+            return null;
+        }
+
+        $t = $r['tender'] ?? [];
+        $comprador = collect($r['parties'] ?? [])->firstWhere('id', $r['buyer']['id'] ?? null) ?? [];
+        $ruc = preg_replace('/\D/', '', (string) ($comprador['identifier']['id'] ?? ''));
+        $fecha = fn (?string $f): ?string => $f === null ? null : substr($f, 0, 10);
+        $valor = $t['value']['amount'] ?? null;
+        $award = collect($r['awards'] ?? [])->first(fn (array $a): bool => ($a['status'] ?? 'active') === 'active') ?? ($r['awards'][0] ?? null);
+        $proveedor = $award['suppliers'][0] ?? null;
+        $titulo = trim((string) ($t['title'] ?? ''));
+        $descripcion = trim((string) ($t['description'] ?? ''));
+        $datos = [
+            'nomenclatura' => mb_substr((string) ($t['id'] ?? $r['ocid']), 0, 120), 'entidad' => mb_substr((string) ($r['buyer']['name'] ?? $comprador['name'] ?? 'Entidad'), 0, 250),
+            'ruc_entidad' => strlen($ruc) === 11 ? $ruc : null, 'region' => $comprador['address']['region'] ?? null,
+            // En el OECE el título suele ser la nomenclatura: el objeto es la descripción si la hay.
+            'objeto' => mb_substr($descripcion !== '' ? $descripcion : $titulo, 0, 600),
+            'texto' => mb_substr(trim($titulo.' '.$descripcion.' '.implode(' ', array_map(fn ($i): string => (string) ($i['description'] ?? ''), $t['items'] ?? []))), 0, 2000),
+            'tipo' => mb_substr((string) ($t['procurementMethodDetails'] ?? 'Por definir'), 0, 30),
+            // El OECE manda 0 cuando el valor no es público.
+            'valor_referencial' => $valor !== null && (float) $valor > 0 ? $valor : null, 'moneda' => $t['value']['currency'] ?? 'PEN', 'publicada' => $fecha($t['datePublished'] ?? $r['date'] ?? null),
+            'consultas_hasta' => $fecha($t['enquiryPeriod']['endDate'] ?? null), 'presentacion' => $fecha($t['tenderPeriod']['endDate'] ?? null), 'buena_pro' => $fecha($t['awardPeriod']['startDate'] ?? null),
+            'url' => mb_substr((string) (collect($t['documents'] ?? [])->first()['url'] ?? ''), 0, 500) ?: null,
+            'estado_ocds' => isset($t['status']) ? mb_substr((string) $t['status'], 0, 30) : null,
+            'ganador' => $proveedor === null ? null : mb_substr((string) ($proveedor['name'] ?? ''), 0, 250),
+            'ganador_ruc' => $proveedor === null ? null : (strlen($g = preg_replace('/\D/', '', (string) ($proveedor['id'] ?? ''))) === 11 ? $g : null),
+            'monto_adjudicado' => isset($award['value']['amount']) && (float) $award['value']['amount'] > 0 ? $award['value']['amount'] : null,
+            // Con su desfase: así Postgres no la corre de zona horaria y «hasta dónde se leyó» compara bien.
+            'release_fecha' => (isset($r['date']) ? CarbonImmutable::parse($r['date']) : CarbonImmutable::now())->format('Y-m-d\TH:i:s.uP'),
+        ];
+        $guardada = DB::table('convocatorias_seace')->where('ocid', $r['ocid'])->first();
+
+        if ($guardada === null) {
+            $id = (int) DB::table('convocatorias_seace')->insertGetId(['ocid' => $r['ocid'], ...$datos, 'estado' => 'nueva', 'created_at' => now(), 'updated_at' => now()]);
+            event(new ConvocatoriaLlego($id));
+
+            return ['id' => $id, 'nueva' => true];
+        }
+
+        if ($guardada->release_fecha !== null && ! CarbonImmutable::parse($datos['release_fecha'])->greaterThan(CarbonImmutable::parse($guardada->release_fecha))) {
+            return null;
+        }
+
+        $cambios = [];
+
+        foreach (['presentacion', 'buena_pro', 'consultas_hasta', 'valor_referencial', 'estado_ocds', 'ganador', 'monto_adjudicado', 'objeto'] as $campo) {
+            $antes = $guardada->{$campo} === null ? null : (string) $guardada->{$campo};
+            $despues = $datos[$campo] === null ? null : (string) $datos[$campo];
+
+            if (is_numeric($antes) && is_numeric($despues) ? bccomp($antes, $despues, 2) !== 0 : $antes !== $despues) {
+                $cambios[$campo] = [$antes, $despues];
+            }
+        }
+
+        DB::table('convocatorias_seace')->where('id', $guardada->id)->update([...$datos, 'updated_at' => now(),
+            ...($cambios === [] ? [] : ['cambios' => json_encode($cambios, JSON_UNESCAPED_UNICODE), 'cambiada_at' => now()])]);
+
+        if ($cambios !== []) {
+            event(new ConvocatoriaCambio((int) $guardada->id, $cambios));
+        }
+
+        return ['id' => (int) $guardada->id, 'nueva' => false];
+    }
+
+    /** Observación 7.4, reacción «Priorizar»: valor alto (parámetro) o entidad que ya es cuenta. */
+    public function priorizar(int $id): void
+    {
+        $c = DB::table('convocatorias_seace')->find($id);
+
+        if ($c === null) {
+            return;
+        }
+
+        $umbral = app(ParametrosService::class)->entero(self::PARAMETRO_PRIORIDAD);
+        $esCuenta = $c->ruc_entidad !== null && DB::table('cuentas')->join('parties', 'parties.id', '=', 'cuentas.party_id')->where('parties.numero_documento', $c->ruc_entidad)->exists();
+        $alto = $c->valor_referencial !== null && (float) $c->valor_referencial >= $umbral;
+        DB::table('convocatorias_seace')->where('id', $id)->update([
+            'prioritaria' => $alto || $esCuenta,
+            'motivo_prioridad' => $alto && $esCuenta ? 'Valor alto y ya es cliente' : ($alto ? 'Valor desde S/ '.number_format($umbral, 0) : ($esCuenta ? 'La entidad ya es cuenta' : null)),
+        ]);
+    }
+
+    /**
+     * Atajo del MVP (solo en local): releases que la demo dejó «por publicar» en `storage/app/seace/por-publicar.json`;
+     * la primera lectura los trae (así se ve una convocatoria llegar sola) y el archivo se borra.
+     *
+     * @return array{leidas: int, nuevas: int, actualizadas: int, a_bandeja: int}
+     */
+    private function pendientesDeDemo(): array
+    {
+        $disco = Storage::disk('local');
+
+        if (! app()->environment('local') || ! $disco->exists(self::DEMO_POR_PUBLICAR)) {
+            return ['leidas' => 0, 'nuevas' => 0, 'actualizadas' => 0, 'a_bandeja' => 0];
+        }
+
+        $json = (string) $disco->get(self::DEMO_POR_PUBLICAR);
+        $disco->delete(self::DEMO_POR_PUBLICAR);
+
+        return $this->importar($json);
+    }
+
+    /** @param  array<string, int>  $total @param  array<string, int>  $parte */
+    private function sumar(array &$total, array $parte): void
+    {
+        foreach ($total as $k => $v) {
+            $total[$k] = $v + ($parte[$k] ?? 0);
+        }
     }
 
     /** La vuelve licitación «por decidir», con su cronograma, creando la cuenta de la entidad si no existe. */
