@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v8
+- **Versión:** v9
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -14,6 +14,8 @@ pestañas de portada: los leads y las licitaciones por decidir son la primera et
 misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Decisiones de Sebastián
+
+- **MV-083** (ficha) · Sin título de página en las tres vistas; «+ Nueva oportunidad» a la derecha en la fila de las pestañas.
 
 - **MV-082** (ficha) · Panel de filtros con desplazamiento propio, grupos plegables recordados, buscador en Cliente y Ejecutivo y «Quitar filtros» arriba.
 
@@ -29,6 +31,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 - **MV-057** (ficha) · Mis oportunidades por defecto; Embudo de oportunidades; sin Lista ni Faja 3D.
 
 ## Pantallas y navegación
+
+- **v9 · Cabecera de las vistas** (MV-083): ninguna de las tres vistas muestra título de página (tampoco al entrar por enlace ni al navegar sin recargar). Los botones de la página («+ Nueva oportunidad» y, en Mis oportunidades, «Por calificar») van a la derecha en la fila de las pestañas de vistas; la Línea de tiempo también tiene «+ Nueva oportunidad». En pantallas angostas, arriba de las pestañas.
 
 - **v8 · Panel de filtros de Mis oportunidades** (MV-082): alto máximo la pantalla bajo el encabezado y su propia barra (invisible hasta pasar el puntero; sin arrastrar la página). «Quitar filtros» arriba si hay alguno. Cada grupo con su título como botón plegable y «· N» filtros activos; por defecto abiertos Atención y Etapa; lo que la persona abre o pliega se guarda para ella. Cliente y Ejecutivo con más de 6 opciones: buscador pequeño, las 6 con más oportunidades (y las marcadas) y «Ver todos (N)».
 
@@ -143,6 +147,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Atajos tomados
 
+- **v9:** los botones de la página se llevan a la fila de pestañas con CSS (la cabecera de Filament queda encima, alineada a la derecha).
+
 - **v7:** las acciones de calificar viven en un rasgo (`DecideLoPorCalificar`) que usan Mis oportunidades y el Embudo.
 
 - **v5:** la página de Oportunidades arma las acciones de leads y licitaciones con las de sus pantallas
@@ -167,6 +173,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v9** (MV-083): sin título de página; botones en la fila de las pestañas.
 
 - **v8** (MV-082): panel de filtros con desplazamiento propio y grupos plegables.
 

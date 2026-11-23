@@ -1065,3 +1065,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.3: el panel de filtros baja por su cuenta»
+
+### MV-083 · 2026-11-23 · Oportunidades sin título de página en sus vistas
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-8, punto 4) «Al pasar a la vista «Embudo de oportunidades» aparece el título de página … No debe salir … Revisa que tampoco salga en «Mis oportunidades» ni en «Línea de tiempo» … El botón «+ Nueva oportunidad» se queda, alineado a la derecha en la misma fila de las pestañas de vistas, y sin que lo tape el muelle».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.4: sin título en las vistas de Oportunidades»

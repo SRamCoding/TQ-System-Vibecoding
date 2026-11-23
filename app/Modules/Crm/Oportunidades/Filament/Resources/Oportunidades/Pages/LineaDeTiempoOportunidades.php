@@ -7,9 +7,12 @@ namespace App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages;
 use App\Modules\Crm\Oportunidades\Filament\DibujoDelCronograma;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLaFicha;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLasVistas;
+use App\Modules\Crm\Oportunidades\Filament\PanelesOportunidad;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\OportunidadResource;
 use App\Modules\Crm\Oportunidades\Filament\VistasDeOportunidades;
 use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
+use App\Modules\Crm\Oportunidades\Services\ResumenOportunidad;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
@@ -93,6 +96,20 @@ final class LineaDeTiempoOportunidades extends Page
     public function getMaxContentWidth(): Width
     {
         return Width::Full;
+    }
+
+    /** Observación 8.4: «+ Nueva oportunidad» también aquí, en la fila de las pestañas. */
+    protected function getHeaderActions(): array
+    {
+        return [
+            PanelesOportunidad::nueva(null, function (mixed $resultado): void {
+                Notification::make()->success()->title('Oportunidad creada.')->send();
+
+                if ($resultado instanceof ResumenOportunidad) {
+                    $this->redirect(VerOportunidad::getUrl(['record' => $resultado->id]), navigate: true);
+                }
+            }),
+        ];
     }
 
     public function content(Schema $schema): Schema

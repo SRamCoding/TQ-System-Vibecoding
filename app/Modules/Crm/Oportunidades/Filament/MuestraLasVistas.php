@@ -38,6 +38,12 @@ trait MuestraLasVistas
         $this->calcularCifras();
     }
 
+    /** Observación 8.4: sin título de página; el proceso y la pestaña elegida ya dicen dónde se está. */
+    public function getHeading(): string
+    {
+        return '';
+    }
+
     protected function cabeceraDeVistas(): View
     {
         return View::make('oportunidades::vistas.cabecera')->viewData(fn (): array => [

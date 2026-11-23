@@ -23,6 +23,7 @@ use App\Modules\Crm\Oportunidades\Services\FotoOportunidadService;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
 use App\Modules\Crm\Oportunidades\Services\ResumenOportunidad;
 use App\Modules\Nucleo\Models\LineaSolucion;
+use App\Modules\Nucleo\Services\EstadoInterfazService;
 use Carbon\CarbonImmutable;
 use Filament\Actions\ActionGroup;
 use Filament\Notifications\Notification;
@@ -112,12 +113,12 @@ final class TarjetasOportunidades extends Page
     public function plegar(string $grupo): void
     {
         $this->abiertos = in_array($grupo, $this->abiertos, true) ? array_values(array_diff($this->abiertos, [$grupo])) : [...$this->abiertos, $grupo];
-        app(\App\Modules\Nucleo\Services\EstadoInterfazService::class)->guardar((int) auth()->id(), self::CLAVE_ABIERTOS, $this->abiertos);
+        app(EstadoInterfazService::class)->guardar((int) auth()->id(), self::CLAVE_ABIERTOS, $this->abiertos);
     }
 
     public function mount(): void
     {
-        $this->abiertos = (array) app(\App\Modules\Nucleo\Services\EstadoInterfazService::class)->leer((int) auth()->id(), self::CLAVE_ABIERTOS, self::ABIERTOS);
+        $this->abiertos = (array) app(EstadoInterfazService::class)->leer((int) auth()->id(), self::CLAVE_ABIERTOS, self::ABIERTOS);
         $this->calcularCifras();
         $this->abrirFichaDeLaDireccion();
     }
