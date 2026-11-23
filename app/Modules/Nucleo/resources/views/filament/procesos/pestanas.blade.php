@@ -125,6 +125,11 @@
     }">
     <style>
         .tq-proceso { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 1.25rem; view-transition-name: tq-proceso; }
+        /* Observación 7.2: el contenido de la caja empieza justo bajo el nombre del proceso, con el respiro de siempre entre
+           secciones (1.5rem): sin el relleno de 2rem de la cabecera de Filament encima, y con su separación achicada. */
+        .fi-page:has(> * > .tq-proceso) .fi-page-header-main-ctn { padding-top: 0; row-gap: 1.5rem; }
+        /* Una cabecera sin botones (su título y su miga ya los dice la barra del proceso) no ocupa lugar. */
+        .fi-page:has(> * > .tq-proceso) .fi-header:not(:has(.fi-header-actions-ctn > *)) { display: none; }
         .tq-proceso[data-area="personal"] { --tq-f: var(--dorado-600); --tq-f-texto: var(--dorado-600); }
         .tq-proceso[data-area="nucleo"] { --tq-f: {{ $C::AZUL_NOCHE }}; --tq-f-texto: {{ $C::AZUL_NOCHE }}; }
         .tq-proceso[data-area="crm"] { --tq-f: var(--morado-600); --tq-f-texto: var(--morado-700); }

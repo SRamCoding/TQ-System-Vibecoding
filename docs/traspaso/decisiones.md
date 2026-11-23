@@ -973,3 +973,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (Oportunidades, Campañas y leads, Licitaciones)
 - **Estado:** vigente
 - **Commit:** el de «Observación 7.1: Oportunidades en una sola lista»
+
+### MV-075 · 2026-11-23 · Sin espacio vacío bajo el nombre del proceso
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-7, punto 2) «Entre "¡Vamos por esas oportunidades!" / "CONSEGUIR EL NEGOCIO" y el
+  contenido de la caja queda un espacio vacío grande. El contenido empieza justo debajo del nombre del proceso, con un
+  respiro normal (como entre las demás secciones). Revisa que no pase lo mismo en las portadas de los otros procesos».
+- **Decisión:** lo dicho, en todas las portadas de proceso.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 7.2: sin espacio vacío bajo el nombre del proceso»

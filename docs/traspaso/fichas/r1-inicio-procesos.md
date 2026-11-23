@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v27
+- **Versión:** v28
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -16,6 +16,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 
 ## Decisiones de Sebastián
 
+- **MV-075** (ficha) · El contenido de cada caja empieza justo bajo el nombre del proceso, con el respiro normal entre
+  secciones; sin el espacio vacío grande (en todas las portadas).
 - **MV-016** (cruza módulos) · Cuatro franjas y 11 cajas de proceso con sus cajas internas y nombres exactos;
   Reglas del negocio y Listas salen de Configuración.
 - **MV-017** (cruza módulos) · Mien arriba, a lo ancho, y absorbe «Mi tablero».
@@ -286,6 +288,8 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Reglas y números
 
+- **Bajo el nombre del proceso** (v28, MV-075): 28 px hasta lo primero de la caja (botones de la cabecera o el
+  contenido) y 1.5 rem entre la cabecera y el contenido; vale para todas las portadas de proceso.
 - **Qué procesos ve una persona:** los que tienen al menos una caja interna cuyo permiso tiene. Ejemplo: con solo
   `crm.*` y `catalogos.ver`, ve Conseguir el negocio, Presupuestar y cotizar, Directorio y catálogos y Sistema.
 - **Parámetros del negocio:** los de los grupos `crm`, `presupuestos` y `tributario`, más los sensibles de dinero
@@ -367,6 +371,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 
 ## Cambios desde la versión anterior
 
+- **v28** (MV-075): sin el espacio vacío bajo el nombre del proceso (se quita el relleno de 2 rem de la cabecera de
+  Filament y su separación baja a 1.5 rem, solo en las pantallas con la barra de proceso).
 - **v27** (MV-068): orden original de Gerencia de proyectos Contratos · Subcontratos · Proyectos · Personal asignado ·
   Tareo (Proyectos al centro, la que se abre al entrar); se borró el orden guardado de ese proceso en la base de demo.
   Se quitó «Volver al orden original» en todos los procesos (y el borrado del orden con lista vacía que solo él usaba).
