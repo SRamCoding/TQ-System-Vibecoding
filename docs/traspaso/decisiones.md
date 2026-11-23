@@ -1092,3 +1092,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (navegación de todos los procesos)
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.6: la caja sigue elegida en su módulo»
+
+### MV-086 · 2026-11-23 · Paneles sólidos; lo de atrás oscurecido o desenfocado; el asistente se aparta
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-8, punto 7) «Paneles deslizantes con fondo sólido, no vidrio … la agenda también pasa a fondo sólido … los paneles que salen de un costado la oscurecen con una capa oscura pareja (negro al 40-45 %, sin el gris que lava todo de hoy); las ventanas que salen al medio … la desenfocan (blur) y la aclaran un poco, sin oscurecer … Cada línea de negocio en una caja con borde visible … Campos visibles … montos con formato de soles … Fuentes desactivadas legibles … El asistente no tapa los paneles».
+- **Decisión:** lo dicho, para todo el sistema.
+- **Alcance:** cruza módulos (todos los paneles deslizantes y ventanas; asistente; Convocatorias)
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.7: paneles sólidos y legibles»

@@ -91,11 +91,13 @@
     [data-tq-area="plataforma"] { --tq-area-activo: var(--tq-franja-plataforma) !important; --tq-area-activo-oscuro: var(--tq-franja-plataforma) !important; }
 
     /* 3. Vidrio en lo que flota: deja ver el ambiente. */
-    .tq-apps-flota, .tq-globo, .tq-agenda, .fi-modal-window, .fi-dropdown-panel, .tq-chip-menu {
+    /* Observación 8.7: los paneles, las ventanas y la agenda van sólidos (`paneles.blade.php`); el vidrio, solo en lo pequeño. */
+    .tq-apps-flota, .tq-globo, .fi-dropdown-panel, .tq-chip-menu {
         background-color: var(--tq-vidrio) !important;
         -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
         border-color: var(--tq-borde) !important;
     }
-    .tq-agenda-angosto { background: color-mix(in oklch, var(--tq-vidrio) 60%, transparent) !important; border-color: var(--tq-borde) !important; }
+    .tq-agenda { background-color: var(--tq-superficie-elevada) !important; border-color: var(--tq-borde) !important; }
+    .tq-agenda-angosto { background: var(--tq-superficie) !important; border-color: var(--tq-borde) !important; }
     .tq-globo-punta { background: var(--tq-vidrio) !important; }
 </style>

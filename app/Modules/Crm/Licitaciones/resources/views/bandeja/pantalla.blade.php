@@ -93,7 +93,14 @@
         .tq-band-palabra { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 8px; border-radius: 999px; background: var(--b-gris-fondo); }
         .tq-band-palabra.neg { background: var(--b-coral-fondo); color: var(--b-coral); }
         .tq-band-palabra button { opacity: .7; }
-        .tq-band-agregar { font-size: 12px; border: 1px dashed var(--b-borde); border-radius: 999px; padding: 3px 8px; background: transparent; width: 9rem; }
+        .tq-band-agregar { font-size: 12px; border: 1px solid var(--b-borde); border-radius: 999px; padding: 3px 10px; background: var(--b-sup); color: var(--tq-texto, inherit); width: 9rem; }
+        .tq-band-agregar::placeholder { color: var(--b-suave); opacity: 1; }
+        /* Observación 8.7: cada línea en su caja con borde visible y el cuadrito de su color; montos como campos. */
+        .tq-band-linea { border: 1px solid var(--tq-borde, var(--b-borde)); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; background: var(--b-sup); }
+        .tq-band-cuadrito { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+        .tq-band-monto { width: 10rem; border: 1px solid var(--tq-borde, var(--b-borde)); border-radius: 8px; padding: 4px 8px; background: var(--b-sup); color: var(--tq-texto, inherit); font-variant-numeric: tabular-nums; text-align: right; }
+        .tq-band-fuente-off { color: var(--b-suave); }
+        .tq-band-pronto { font-size: 11px; font-weight: 600; border-radius: 6px; padding: 1px 7px; background: var(--b-gris-fondo); color: var(--b-suave); }
     </style>
 
     {{-- Arriba: buscador con «Buscar en todo el SEACE», «Leído hace…», Leer ahora y Búsqueda. --}}
@@ -249,16 +256,21 @@
         <div class="tq-band-conf" style="display: flex; flex-direction: column; gap: 18px">
             <section style="display: flex; flex-direction: column; gap: 12px">
                 <h4>Líneas de negocio</h4>
+                @php $colores = ['#0E8FAE', '#3E63DD', '#8A3FA8', '#C2532F', '#2F7D4F', '#B07A00']; @endphp
                 @foreach ($this->lineas as $i => $l)
-                    <div style="border: 1px solid var(--b-borde); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px" wire:key="linea-{{ $i }}">
+                    <div class="tq-band-linea" wire:key="linea-{{ $i }}">
                         <div style="display: flex; gap: 8px; align-items: center">
-                            <input type="text" wire:model="lineas.{{ $i }}.nombre" placeholder="Nombre de la línea" style="font-weight: 700; border: 0; background: transparent; font-size: 15px; flex: 1">
-                            <span class="tq-band-sub">desde S/</span><input type="number" min="0" step="1000" wire:model="lineas.{{ $i }}.minimo" style="width: 7rem; border: 1px solid var(--b-borde); border-radius: 6px; padding: 2px 6px; background: transparent">
+                            <span class="tq-band-cuadrito" style="background: {{ $colores[$i % count($colores)] }}" aria-hidden="true"></span>
+                            <input type="text" wire:model="lineas.{{ $i }}.nombre" placeholder="Nombre de la línea" style="font-weight: 700; border: 0; background: transparent; font-size: 15px; flex: 1; color: var(--tq-texto, inherit)">
+                            <span style="font-size: 13px">desde</span>
+                            <input type="text" inputmode="decimal" class="tq-band-monto" aria-label="Valor mínimo de {{ $l['nombre'] }}" x-data="{ foco: false }"
+                                x-bind:value="foco ? ($wire.get('lineas.{{ $i }}.minimo') ?? '') : 'S/ ' + Number($wire.get('lineas.{{ $i }}.minimo') || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })"
+                                x-on:focus="foco = true" x-on:blur="foco = false; $wire.set('lineas.{{ $i }}.minimo', ($event.target.value || '0').replace(/[^0-9.]/g, ''), false)">
                             @if ($puede)<button type="button" wire:click="quitarLinea({{ $i }})" class="tq-band-sub" aria-label="Quitar la línea">×</button>@endif
                         </div>
                         @foreach (['palabras' => 'PALABRAS CLAVE', 'negativas' => 'PALABRAS NEGATIVAS'] as $tipo => $titulo)
                             <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
-                                <span class="tq-band-sub" style="width: 9.5rem; font-size: 11px; font-weight: 600">{{ $titulo }}</span>
+                                <span style="width: 9.5rem; font-size: 11px; font-weight: 700; letter-spacing: .04em">{{ $titulo }}</span>
                                 @foreach ($l[$tipo] as $j => $p)
                                     <span @class(['tq-band-palabra', 'neg' => $tipo === 'negativas'])>{{ $p }}@if ($puede)<button type="button" wire:click="quitarPalabra({{ $i }}, '{{ $tipo }}', {{ $j }})" aria-label="Quitar {{ $p }}">×</button>@endif</span>
                                 @endforeach
@@ -314,12 +326,14 @@
             <section style="display: flex; flex-direction: column; gap: 8px">
                 <h4>Fuentes</h4>
                 <label style="display: flex; gap: 8px; align-items: center"><input type="checkbox" checked disabled> Procedimientos del SEACE (datos abiertos del OECE)</label>
-                <label style="display: flex; gap: 8px; align-items: center; opacity: .6"><input type="checkbox" disabled> Contratos menores <span class="tq-band-sub">(más adelante)</span></label>
-                <label style="display: flex; gap: 8px; align-items: center; opacity: .6"><input type="checkbox" disabled> Plan Anual de Contrataciones <span class="tq-band-sub">(más adelante)</span></label>
+                <label class="tq-band-fuente-off" style="display: flex; gap: 8px; align-items: center"><input type="checkbox" disabled> Contratos menores <span class="tq-band-pronto">más adelante</span></label>
+                <label class="tq-band-fuente-off" style="display: flex; gap: 8px; align-items: center"><input type="checkbox" disabled> Plan Anual de Contrataciones <span class="tq-band-pronto">más adelante</span></label>
                 <div>{{ $this->importarAction }}</div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px">
-                    <span>Prioritaria desde S/</span>
-                    <input type="number" min="0" step="10000" wire:model="umbral" style="width: 9rem; border: 1px solid var(--b-borde); border-radius: 6px; padding: 2px 6px; background: transparent" @disabled(! $puede)>
+                    <span>Prioritaria desde</span>
+                    <input type="text" inputmode="decimal" class="tq-band-monto" aria-label="Valor desde el que es prioritaria" x-data="{ foco: false }" @disabled(! $puede)
+                        x-bind:value="foco ? ($wire.get('umbral') ?? '') : 'S/ ' + Number($wire.get('umbral') || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })"
+                        x-on:focus="foco = true" x-on:blur="foco = false; $wire.set('umbral', ($event.target.value || '0').replace(/[^0-9.]/g, ''), false)">
                     <span>o si la entidad ya es cliente</span>
                 </div>
             </section>

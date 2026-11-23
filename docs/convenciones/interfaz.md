@@ -73,6 +73,16 @@ debe comparar con el tema anterior.
   lienzos son fuente para la **estructura** de cada pantalla (qué campos, qué acciones, qué orden); el
   color sale de esta convención. Las fuentes no se corrigen: la diferencia queda anotada aquí.
 
+## Paneles y ventanas (MVP, observación 8.7)
+
+- Los **paneles deslizantes** y las **ventanas** van con **fondo sólido** (`--tq-superficie-elevada`) y una sombra que los
+  separa; el vidrio (`--tq-vidrio`) queda para lo pequeño que flota: muelle, globos, menús.
+- Lo de atrás: un **panel del costado** lo **oscurece** con negro parejo al 42 % (58 % en oscuro); una **ventana al
+  medio** (modal, agenda, confirmación) lo **desenfoca** y aclara un poco, sin oscurecer.
+- El **asistente** no tapa: con un panel del costado se aparta al otro lado; con una ventana al medio se esconde.
+- Dentro de un panel, los campos con borde y fondo de campo y texto normal (el gris suave solo para la ayuda); los montos
+  en soles (`S/ 20,000.00`); lo desactivado legible (4.5:1) con su etiqueta («más adelante»).
+
 ## Inicio
 
 Un solo modo (plan 1.4f, `docs/planes/completados/2026-10-20-interfaz-modo-unico.md`): el inicio

@@ -146,6 +146,8 @@ final class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => '<style>html.dark { --primary-600: '.ColoresMarca::principalModoOscuro().'; }</style>')
             // MV-059: todos los colores siguen al ambiente (superficies del fondo, franjas con temperatura, vidrio en lo que flota).
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => rescue(fn (): string => view('nucleo::filament.colores-ambiente')->render(), ''))
+            // Observación 8.7: paneles y ventanas sólidos; lo de atrás, oscurecido (costado) o desenfocado (medio).
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.paneles')->render())
             // Ambientación de la fecha (plan 1.4b, D8): estilos y franja bajo la barra superior. El logo cambia en pocas fechas (D9).
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => rescue(fn (): string => view('nucleo::filament.ambientacion.estilos')->render(), ''))
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn (): string => $this->ambientacion('nucleo::filament.ambientacion.franja'))

@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v30
+- **Versión:** v31
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -15,6 +15,8 @@ proceso y sus cajas internas (las pantallas de siempre) como barra de navegació
 elegida. Cada persona ve solo los procesos en que puede abrir al menos una pantalla y ordena sus cajas a su gusto.
 
 ## Decisiones de Sebastián
+
+- **MV-086** (cruza módulos) · Paneles y ventanas sólidos; costado oscurece (42 %, 58 % en oscuro), medio desenfoca; el asistente se aparta o se esconde.
 
 - **MV-085** (cruza módulos) · La caja queda elegida en cualquier pantalla de su módulo (lista, vistas, crear, editar, ficha, paneles).
 
@@ -292,6 +294,8 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Reglas y números
 
+- **Paneles y ventanas** (v31, MV-086): reglas en `docs/convenciones/interfaz.md` («Paneles y ventanas»), aplicadas a todos los de Filament desde `nucleo::filament.paneles`. En la configuración de la búsqueda del SEACE: cada línea en su caja con borde y cuadrito de color, «+ agregar» con borde y fondo de campo, montos como `S/ 20,000.00` (al enfocar se escribe el número), fuentes desactivadas con «más adelante» como etiqueta.
+
 - **Caja elegida** (v30, MV-085): se decide por el prefijo de ruta del módulo (todas las rutas de `/oportunidades…` marcan Oportunidades), en el servidor y al navegar sin recargar. Livewire ya no vuelve a dibujar la barra de cajas en cada actualización de la página (antes, al cerrar un panel o filtrar, se borraba la marca de la elegida).
 
 - **Reordenar cajas** (v29, MV-084): al soltar una caja arrastrada, ni el «soltar» ni el clic llegan a su enlace (antes Livewire navegaba a la lista de esa caja y se perdía la vista). Solo se mueven las cajas y se guarda el orden; la caja elegida sigue elegida en su nuevo lugar. Las vistas de Oportunidades ya viven en la dirección (`/oportunidades/embudo`, `/oportunidades/linea-de-tiempo`, con sus filtros en la consulta), así que también se conservan al recargar o compartir.
@@ -305,6 +309,9 @@ contar solas, porque no coinciden con ningún proceso).
   motivos, empresa, general) siguen en Configuración.
 
 ## Supuestos sin confirmar
+
+- **v31 · Colores de las líneas** de negocio en la configuración: turquesa, azul, morado, coral, verde y oro, por orden.
+- **v31 · Con un panel del costado abierto** el globo del asistente se oculta y el asistente se corre a la izquierda; vuelve solo al cerrarlo.
 
 - **v29 · La causa** era que el enlace de la caja arrastrada recibía el «soltar» del puntero (por la captura del puntero) y Livewire navegaba; se corta en la barra durante el arrastre y 400 ms después.
 
@@ -380,6 +387,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v31** (MV-086): paneles y ventanas sólidos; capa de atrás según de dónde salen; asistente apartado.
 
 - **v30** (MV-085): la caja sigue elegida tras paneles, fichas y «atrás».
 
