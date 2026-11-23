@@ -106,6 +106,8 @@ final class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::SIDEBAR_START, fn (): string => Livewire::mount(BordeBarraLateral::class))
             // Plan 1.4g, D4 y D5: tema, letra, densidad y animaciones de la persona, antes de dibujar; el tema elegido con
             // el selector de Filament se guarda en la base.
+            // En «Sistema» manda el cielo: responde `prefers-color-scheme` antes de que Filament decida (observación 7.7).
+            ->renderHook(PanelsRenderHook::HEAD_START, fn (): string => rescue(fn (): string => view('nucleo::filament.cielo-arranque')->render(), ''))
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('nucleo::filament.apariencia')->render())
             // MVP rápido (MV-012): en el tema «Sistema», la pantalla sigue el cielo (en curso).
             ->renderHook(PanelsRenderHook::BODY_END, fn (): string => self::persistir('tq-cielo', view('nucleo::filament.cielo')->render()))

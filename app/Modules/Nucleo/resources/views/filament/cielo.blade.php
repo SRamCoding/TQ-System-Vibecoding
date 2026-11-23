@@ -9,20 +9,6 @@
     Nubes o lluvia (`data-tq-clima`) adelantan el crepúsculo y apagan los colores. Se recalcula cada 20 s y cada cambio
     se funde en 20 s: no hay saltos.
 --}}
-@php
-    $sede = null;
-    $empresa = app(\App\Modules\Nucleo\Services\EmpresaService::class)->ficha();
-
-    if ($empresa !== null) {
-        $s = \Illuminate\Support\Facades\DB::table('party_sedes')->where('party_id', $empresa->id)->where('es_activa', true)->whereNotNull('latitud')->orderBy('id')->first(['latitud', 'longitud']);
-        $sede = $s === null ? null : [(float) $s->latitud, (float) $s->longitud];
-    }
-
-    if ($sede === null) {
-        [$lat, $lon] = array_map('floatval', explode(',', app(\App\Modules\Nucleo\Services\ParametrosService::class)->texto('interfaz.clima_ubicacion_respaldo')) + [0, 0]);
-        $sede = [$lat, $lon];
-    }
-@endphp
 <style>
     .tq-velo { position: fixed; inset: 0; pointer-events: none; z-index: 2147483000; opacity: 0; transition: opacity 20s linear, background-color 20s linear; }
     #tq-velo-sombra { mix-blend-mode: multiply; }
@@ -37,25 +23,9 @@
 <script>
     (() => {
         const raiz = document.documentElement
-        const sede = @js($sede);
-        let ubicacion = sede
+        const base = window.tqCieloBase
+        let ubicacion = base.ubicacion()
         let anterior = null
-
-        // La altura del sol en grados (aproximación de la NOAA).
-        const alturaDelSol = (lat, lon, fecha) => {
-            const rad = Math.PI / 180
-            const d = (fecha.getTime() - 946728000000) / 86400000
-            const g = ((357.529 + 0.98560028 * d) % 360) * rad
-            const q = (280.459 + 0.98564736 * d) % 360
-            const l = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * rad
-            const e = (23.439 - 0.00000036 * d) * rad
-            const ra = Math.atan2(Math.cos(e) * Math.sin(l), Math.cos(l)) / rad
-            const dec = Math.asin(Math.sin(e) * Math.sin(l))
-            const gmst = (18.697374558 + 24.06570982441908 * d) % 24
-            const h = ((gmst * 15 + lon - ra) % 360) * rad
-
-            return Math.asin(Math.sin(lat * rad) * Math.sin(dec) + Math.cos(lat * rad) * Math.cos(dec) * Math.cos(h)) / rad
-        }
 
         const mezcla = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t))
         // El color del cielo a lo largo del crepúsculo claro (q de 0 a 1): dorado, naranja, rosado, violeta, azul noche.
@@ -70,14 +40,8 @@
             return TONOS[TONOS.length - 1][1]
         }
 
-        // El estado del cielo: p de 0 (día) a 1 (noche) entre +6° y −8° del sol; las nubes lo adelantan 3°, la lluvia 5°.
-        const cielo = () => {
-            const clima = raiz.dataset.tqClima ?? 'despejado'
-            const corrimiento = ['llovizna', 'lluvia', 'tormenta'].includes(clima) ? 5 : (['nublado', 'niebla'].includes(clima) ? 3 : 0)
-            const altura = alturaDelSol(ubicacion[0], ubicacion[1], new Date()) - corrimiento
-
-            return { p: Math.min(1, Math.max(0, (6 - altura) / 14)), gris: corrimiento / 8 }
-        }
+        // El estado del cielo (definido en `cielo-arranque.blade.php`, que también responde a Filament).
+        const cielo = () => base.cielo()
 
         const velo = (id) => document.getElementById(id) ?? (() => {
             const v = document.createElement('div')
@@ -100,11 +64,22 @@
             const sombra = velo('tq-velo-sombra')
             const luz = velo('tq-velo-luz')
 
+            // Filament guarda en su almacén de Alpine si va oscuro y solo toca la clase cuando ese valor cambia: si el
+            // almacén y la clase no dicen lo mismo, elegir «Oscuro» no hacía nada (observación 7.7). Aquí se igualan.
+            const fijar = (oscuro) => {
+                raiz.classList.toggle('dark', oscuro)
+
+                if (window.Alpine?.store && window.Alpine.store('theme') !== (oscuro ? 'dark' : 'light')) {
+                    window.Alpine.store('theme', oscuro ? 'dark' : 'light')
+                }
+            }
+
             if (tema !== 'system') {
                 anterior = null
                 sombra.style.opacity = 0
                 luz.style.opacity = 0
                 raiz.removeAttribute('data-tq-noche')
+                fijar(tema === 'dark')
 
                 return
             }
@@ -123,7 +98,7 @@
 
             anterior = oscuro
 
-            raiz.classList.toggle('dark', oscuro)
+            fijar(oscuro)
             raiz.dataset.tqNoche = p.toFixed(3)
 
             if (! oscuro) {
@@ -143,7 +118,7 @@
         if (navigator.permissions && navigator.geolocation) {
             navigator.permissions.query({ name: 'geolocation' }).then((permiso) => {
                 if (permiso.state === 'granted') {
-                    navigator.geolocation.getCurrentPosition((pos) => { ubicacion = [pos.coords.latitude, pos.coords.longitude]; aplicar() }, () => {}, { maximumAge: 30 * 60000, timeout: 8000 })
+                    navigator.geolocation.getCurrentPosition((pos) => { ubicacion = [pos.coords.latitude, pos.coords.longitude]; try { localStorage.setItem('tq-ubicacion', JSON.stringify(ubicacion)) } catch (e) {} aplicar() }, () => {}, { maximumAge: 30 * 60000, timeout: 8000 })
                 }
             }).catch(() => {})
         }
@@ -152,9 +127,10 @@
         document.addEventListener('DOMContentLoaded', aplicar)
         document.addEventListener('livewire:navigated', aplicar)
         window.addEventListener(@js(\App\Modules\Nucleo\Filament\Apariencia::EVENTO), () => setTimeout(aplicar, 0))
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => setTimeout(aplicar, 0))
+        window.addEventListener('theme-changed', () => setTimeout(aplicar, 0))
+        document.addEventListener('alpine:initialized', aplicar)
         new MutationObserver(aplicar).observe(raiz, { attributes: true, attributeFilter: ['data-tq-clima'] })
         setInterval(aplicar, 20000)
-        window.tqCielo = { aplicar, cielo, alturaDelSol, ubicacion: () => ubicacion }
+        window.tqCielo = { aplicar, cielo, alturaDelSol: base.alturaDelSol, ubicacion: () => ubicacion }
     })()
 </script>

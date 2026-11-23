@@ -946,3 +946,14 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (la alarma lee Valorizaciones y los avisos tocan Mien)
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.12: Subcontratos en tarjetas y la alarma de pagar de más»
+
+### MV-073 · 2026-11-23 · El modo oscuro se activa al elegirlo y «Sistema» sigue al cielo en todo
+
+- **Ficha:** `fichas/t3b-transicion-cielo.md`
+- **Dijo Sebastián:** (observaciones-7, punto 7) «se puede pulsar "oscuro", pero la app no cambia a modo oscuro … Con
+  "Sistema", la app se ve oscura a las 2:30 p. m. en Chiclayo … Haz que en "Sistema" mande el cielo en todos los
+  lugares que deciden la clase dark, también después de navegar sin recargar».
+- **Decisión:** lo dicho; confirma MV-012 y MV-013.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 7.7: el modo oscuro se activa y "Sistema" sigue al cielo»
