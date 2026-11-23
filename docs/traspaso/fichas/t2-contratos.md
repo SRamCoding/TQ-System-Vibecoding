@@ -1,7 +1,7 @@
 # Ficha · Contratos, garantías, penalidad y adendas (flujo 1)
 
-- **Estado:** aprobada (MV-009)
-- **Versión:** v2
+- **Estado:** en curso (v3, observaciones-6; la v2 quedó aprobada)
+- **Versión:** v3
 - **Tramo de la ruta:** T2
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t2-contratos-v2`
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t2-contratos-v1`
@@ -21,15 +21,34 @@ penalidades aplicadas bajan lo vendido. Desde aquí, **lo vendido del proyecto s
 
 ## Decisiones de Sebastián
 
+- **MV-071** (ficha; los avisos tocan Mien) · `/contratos` en tarjetas que avisan antes, con calendario de vencimientos.
 - **MV-006** (cruza módulos) · Al ganar nace todo en un paso; el contrato se suma a ese paso.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
 
 - **Inicio:** caja «Contratos» en el área ERP.
-- **Contratos** `/contratos`: contrato (número de la entidad debajo), objeto (cliente debajo), monto con IGV y
-  adendas, plazo («13 días restantes de 30», en rojo «vencido hace 5 días»), penalidad diaria y estado. No hay «nuevo»:
-  nacen al ganar.
+- **Contratos** `/contratos` (v3, MV-071): pestañas **Contratos · Calendario de vencimientos**; cinco cifras (contratos
+  vigentes, monto vigente, penalidad en riesgo en coral, cartas fianza a 30 días, garantizado con bancos). No hay
+  «nuevo»: nacen al ganar.
+  - Vista Contratos: chips Vigentes, Por completar, Por vencer (30 días), Vencidos, Con penalidad, Culminados (con su
+    cuenta; «Limpiar filtros»), buscador (código, n.° de la entidad, objeto, cliente), cliente y orden (Urgencia por
+    omisión, Monto, Días restantes, Atraso, Cliente). Tarjetas en dos columnas (una en angostas) con borde izquierdo de
+    alerta: cliente, objeto, código y n.° de la entidad; monto vigente con adendas y estado; **barra doble** plazo
+    (% de días pasados, «N días restantes» o «vencido hace N días») y avance (valorizado ÷ monto vigente sin IGV; gris
+    0 % «sin valorizaciones»; coral «atrasado N puntos» si va más de 10 puntos detrás del tiempo); **hitos en
+    miniatura** (firma, entrega, instalación, conformidad) con la marca de hoy, cumplidos llenos y vencidos en coral;
+    penalidad diaria (y aplicada) y el **semáforo de la carta fianza** (verde vigente, ámbar a 60 días o menos, coral a
+    30 o vencida, gris sin carta). Con urgencia, los borradores van arriba en «Por completar · N» con su botón
+    **Completar y activar**; luego vencidos (el más atrasado primero), carta fianza a 30 días, días restantes de menos a
+    más y al final los culminados. Al filtrar u ordenar, las tarjetas se reacomodan con la animación.
+  - **Clic** en una tarjeta: panel deslizante con el resumen («Lo que hay que mirar todos los días»: plazo, monto,
+    penalidad diaria con tope, aplicada y en riesgo, garantía; la barra doble y el próximo hito) y los botones Aplicar
+    penalidad, Registrar adenda, Registrar garantía y Abrir ficha. **Doble clic:** la ficha completa.
+  - Calendario de vencimientos: columnas Vencidos, Esta semana, las siguientes semanas y luego por mes, con chips de fin
+    de plazo (bandera) y de vencimiento de carta fianza (escudo) con su monto; clic abre el mismo panel.
+- **Mien (v3):** «La carta fianza de CT-… vence en N días», «El contrato CT-… vence en N días / venció hace N días» (con
+  la penalidad en riesgo) y «CT-… va atrasado N puntos contra su plazo».
 - **Ficha** `/contratos/{id}`: pestañas Resumen, Hitos, Garantías, Adendas y Penalidades.
   - Resumen: sección «Lo que hay que mirar todos los días» (plazo, penalidad diaria con su fórmula y tope debajo,
     penalidad aplicada en rojo, garantía vigente) y «El contrato» (cliente, número de la entidad, origen, objeto, monto
@@ -95,9 +114,15 @@ monto con IGV, IGV %, firma, inicio, plazo en días, forma de pago, garantía t�
 - Solo las entidades públicas piden carta fianza en la demo.
 - La comisión entra entera como comprometida, ejecutada y pagada el día de la emisión.
 - Las alertas a 60, 30 y 15 días se ven en pantalla; no se envían avisos.
+- (v3) Avance = valorizaciones aprobadas o facturadas ÷ monto vigente sin IGV; «atrasado» desde 10 puntos; penalidad
+  en riesgo = días vencidos × penalidad diaria, recortada a lo que falta del tope; «Contratos por vencer» en Mien a 7
+  días; el calendario muestra 4 semanas y luego meses.
 - Quedan fuera: conformidades como documento, resolución del contrato, consorcios y la pestaña «Documentos».
 
 ## Atajos tomados
+
+- (v3) Las tarjetas, cifras y el calendario se calculan en cada carga en `TableroContratos` (no se guardan); filtro,
+  orden y búsqueda sobre el arreglo en memoria.
 
 - Estados de contrato y garantía como texto, sin el motor de estados; sin acciones registradas.
 - La comisión entra por un gasto de demostración (MV-003), no por una orden de servicio OS-… (llegan en el tramo 3).
@@ -112,6 +137,13 @@ monto con IGV, IGV %, firma, inicio, plazo en días, forma de pago, garantía t�
 `DemoSeeder::contratoDe()`.
 
 ## Cambios desde la versión anterior
+
+- **v3** (observaciones-6, MV-071): `/contratos` pasa de tabla a tarjetas con barra doble, hitos, semáforo, cifras,
+  chips, orden por urgencia, calendario de vencimientos, panel de resumen con acciones y avisos en Mien. Las acciones de
+  adenda, garantía y penalidad se comparten entre la ficha y el panel (`AccionesContrato`). Demo
+  (`Demo\ContratosCasosSeeder`): borrador (historia clínica), vencido con penalidad en riesgo (mantenimiento CCTV,
+  S/ 825.60), al día con dos valorizaciones (sistema hospitalario), atrasado 23 puntos y con carta fianza a ~20 días
+  (red de datos), culminados de 2024 y 2025.
 
 v2 (2026-11-20, por `t3-compras`): la comisión de la carta fianza ya no entra por un gasto de demostración: es una
 orden de servicio de tipo «Garantía financiera», aprobada, conforme y pagada, imputada a la partida de gastos generales

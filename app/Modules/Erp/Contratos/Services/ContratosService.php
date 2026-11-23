@@ -87,6 +87,71 @@ final readonly class ContratosService
         return bcadd((string) ($c->penalidades()->sum('monto') ?: '0'), '0', 2);
     }
 
+    /**
+     * Observación 6.11: lo valorizado del contrato, sin IGV: la suma del avance de sus valorizaciones aprobadas o
+     * facturadas (el mismo «avance» que arma Valorizaciones con el precio contractual de cada partida).
+     */
+    public function valorizado(Contrato $c): string
+    {
+        return bcadd((string) (DB::table('valorizaciones')->where('contrato_id', $c->id)->whereIn('estado', ['aprobada', 'facturada'])->sum('avance') ?: '0'), '0', 2);
+    }
+
+    /**
+     * El avance según lo valorizado: valorizado ÷ monto vigente sin IGV × 100, a un decimal (la misma base que usa
+     * Valorizaciones: monto vigente ÷ 1.18). Null si el contrato no tiene valorizaciones aprobadas.
+     */
+    public function avancePct(Contrato $c): ?string
+    {
+        $valorizado = $this->valorizado($c);
+
+        if (bccomp($valorizado, '0', 2) === 0) {
+            return null;
+        }
+
+        $base = bcdiv($this->montoVigente($c), bcadd('1', bcdiv((string) $c->igv_pct, '100', 6), 6), 6);
+
+        return bccomp($base, '0', 2) === 0 ? null : bcadd(bcdiv(bcmul($valorizado, '100', 6), $base, 6), '0.05', 1);
+    }
+
+    /** Días de hoy al fin vigente: negativos si ya venció. */
+    public function diasRestantes(Contrato $c): int
+    {
+        return (int) CarbonImmutable::parse(Calendario::hoy())->diffInDays($this->fin($c), false);
+    }
+
+    /** El plazo transcurrido: días pasados desde el inicio ÷ plazo vigente × 100, entre 0 y 100, a un decimal. */
+    public function tiempoPct(Contrato $c): string
+    {
+        $plazo = max(1, $this->plazoVigente($c));
+        $pasados = min($plazo, max(0, (int) $c->fecha_inicio->diffInDays(CarbonImmutable::parse(Calendario::hoy()), false)));
+
+        return bcadd(bcdiv((string) ($pasados * 100), (string) $plazo, 6), '0.05', 1);
+    }
+
+    /**
+     * Observación 6.11: lo que costaría el atraso si hoy se aplicara: días vencidos × penalidad diaria, recortado a lo
+     * que falta del tope. Cero si el contrato no está vigente o no ha vencido.
+     */
+    public function penalidadEnRiesgo(Contrato $c): string
+    {
+        $dias = -$this->diasRestantes($c);
+
+        if ($c->estado !== 'vigente' || $dias < 1) {
+            return '0.00';
+        }
+
+        $disponible = bcsub($this->tope($c), $this->penalidadAplicada($c), 2);
+        $monto = bcmul($this->penalidadDiaria($c), (string) $dias, 2);
+
+        return bccomp($disponible, '0', 2) <= 0 ? '0.00' : (bccomp($monto, $disponible, 2) > 0 ? $disponible : $monto);
+    }
+
+    /** La carta fianza que manda: la vigente o renovada que vence primero. */
+    public function fianzaVigente(Contrato $c): ?GarantiaContrato
+    {
+        return $c->garantias()->whereIn('estado', ['vigente', 'renovada'])->orderBy('vencimiento')->first();
+    }
+
     /** Completa lo que la cotización no trae y lo activa. */
     public function activar(int $contratoId, string $numeroEntidad, CarbonImmutable $firma, ?string $formaPago, ?int $garantiaMeses, string $topePct, ?string $factor): Contrato
     {

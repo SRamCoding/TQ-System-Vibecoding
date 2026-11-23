@@ -918,3 +918,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observaciones 6.9 y 6.10: el tareo nuevo»
+
+### MV-071 · 2026-11-23 · Contratos: de tabla a tarjetas que avisan antes
+
+- **Ficha:** `fichas/t2-contratos.md`
+- **Dijo Sebastián:** (observaciones-6, punto 11; «aprobada completa») «Tarjetas en dos columnas, una por contrato …
+  barra doble de plazo contra avance … hitos en miniatura … penalidad diaria y semáforo de la carta fianza. Orden por
+  urgencia (borradores arriba como "Por completar" con "Completar y activar"; vencidos; carta fianza a 30 días; días
+  restantes; culminados) y otros órdenes. Cinco cifras arriba … Filtros en chips … Segunda vista, "Calendario de
+  vencimientos" … Clic: panel deslizante con el resumen y Aplicar penalidad, Registrar adenda y Registrar garantía;
+  doble clic: la ficha completa. Avisos en Mien».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (los avisos tocan Mien)
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.11: Contratos en tarjetas que avisan antes»

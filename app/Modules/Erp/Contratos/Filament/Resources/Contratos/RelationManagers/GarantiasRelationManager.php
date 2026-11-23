@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Erp\Contratos\Filament\Resources\Contratos\RelationManagers;
 
+use App\Modules\Erp\Contratos\Filament\Resources\Contratos\AccionesContrato;
 use App\Modules\Erp\Contratos\Filament\Resources\Contratos\ContratoResource;
+use App\Modules\Erp\Contratos\Models\Contrato;
 use App\Modules\Erp\Contratos\Models\GarantiaContrato;
 use App\Modules\Erp\Contratos\Services\ContratosService;
 use App\Modules\Nucleo\Tiempo\Calendario;
@@ -12,8 +14,6 @@ use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -51,24 +51,7 @@ final class GarantiasRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                Action::make('registrar')->label('Registrar garantía')->icon('heroicon-o-plus')->visible(fn (): bool => ContratoResource::puede(ContratosService::PERMISO_GESTIONAR))
-                    ->fillForm(fn (): array => ['tipo' => 'fiel_cumplimiento', 'monto' => app(ContratosService::class)->tope($this->getOwnerRecord()), 'emision' => Calendario::hoy(),
-                        'vencimiento' => app(ContratosService::class)->fin($this->getOwnerRecord())->addDays(30)->toDateString(), 'estado' => 'vigente'])
-                    ->schema([
-                        Select::make('tipo')->label('Tipo')->options(ContratosService::TIPOS_GARANTIA)->required(),
-                        TextInput::make('banco')->label('Banco')->required()->maxLength(120),
-                        TextInput::make('numero')->label('N.° de carta fianza')->maxLength(60),
-                        TextInput::make('monto')->label('Monto garantizado')->numeric()->required(),
-                        DatePicker::make('emision')->label('Emisión')->required()->format('Y-m-d'),
-                        DatePicker::make('vencimiento')->label('Vencimiento')->required()->format('Y-m-d'),
-                        TextInput::make('comision')->label('Comisión del banco')->numeric()->helperText('Se imputa a los gastos generales del proyecto.'),
-                        Select::make('estado')->label('Estado')->options(ContratosService::ESTADOS_GARANTIA)->required(),
-                    ])
-                    ->action(function (array $data): void {
-                        app(ContratosService::class)->registrarGarantia($this->getOwnerRecord()->getKey(), $data['tipo'], $data['banco'], $data['numero'] ?? null, (string) $data['monto'],
-                            CarbonImmutable::parse($data['emision']), CarbonImmutable::parse($data['vencimiento']), filled($data['comision'] ?? null) ? (string) $data['comision'] : null, $data['estado']);
-                        Notification::make()->success()->title('Garantía registrada.')->send();
-                    }),
+                AccionesContrato::garantia(fn (): Contrato => $this->getOwnerRecord(), nombre: 'registrar')->icon('heroicon-o-plus'),
             ])
             ->recordActions([
                 Action::make('estado')->label('Cambiar estado')->icon('heroicon-o-arrow-path')->visible(fn (): bool => ContratoResource::puede(ContratosService::PERMISO_GESTIONAR))
