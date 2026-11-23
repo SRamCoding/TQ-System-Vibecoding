@@ -47,12 +47,12 @@ final readonly class DineroDelProyecto
         $proyeccion = '0.00';
         $partidas = [];
 
-        foreach ($this->arboles->filas($arbol->id) as $fila) {
-            if (! $fila->esHoja || (! $fila->esActiva && ! $fila->esNoPresupuestado)) {
-                continue;
-            }
+        $hojas = array_values(array_filter($this->arboles->filas($arbol->id), fn ($fila): bool => $fila->esHoja && ($fila->esActiva || $fila->esNoPresupuestado)));
+        // Todos los saldos de una vez: con uno por partida, la portada de Proyectos tardaba segundos.
+        $saldos = $this->partidas->saldos(array_map(fn ($fila): int => $fila->id, $hojas));
 
-            $saldo = $this->partidas->saldo($fila->id);
+        foreach ($hojas as $fila) {
+            $saldo = $saldos[$fila->id];
             $partidas[] = ['id' => $fila->id, 'codigo' => $fila->codigo, 'nombre' => $fila->nombre, 'saldo' => $saldo, 'es_no_presupuestado' => $fila->esNoPresupuestado];
 
             foreach ($sumas as $campo => $suma) {

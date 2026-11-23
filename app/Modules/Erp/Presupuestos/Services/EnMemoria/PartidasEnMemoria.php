@@ -98,6 +98,19 @@ final class PartidasEnMemoria implements PartidasService
         return isset($this->partidas[$partidaId]) ? $this->resumir($partidaId) : null;
     }
 
+    public function saldos(array $partidaIds): array
+    {
+        $saldos = [];
+
+        foreach ($partidaIds as $id) {
+            if (isset($this->partidas[$id])) {
+                $saldos[$id] = $this->saldo($id);
+            }
+        }
+
+        return $saldos;
+    }
+
     /** Sin base no hay filas que bloquear: `$bloquear` no cambia nada. */
     public function saldo(int $partidaId, bool $bloquear = false): SaldoPartida
     {

@@ -21,4 +21,9 @@ para todo, lo agrega aquí.
 - **Datos sensibles:** nadie revisó qué queda en registros o mensajes de error.
 - **Calidad del código:** sin phpstan ni revisión de arquitectura; puede haber cálculos duplicados o un módulo que
   lee los modelos de otro.
-- **Rendimiento:** sin medir; pensado para datos de demo.
+- **Rendimiento:** pensado para datos de demo y medido una sola vez (2026-11-23, servidor de desarrollo): cada cambio
+  de pantalla tarda de 0.8 a 1.2 s, y casi un segundo de eso es armar la barra, el clima, el muelle y las decoraciones
+  de cada página (unos 650 KB). Lo único corregido: el dinero de un proyecto (portada de Proyectos, Resumen) pide los
+  saldos de sus partidas en lote, con los mismos números que una por una (comparado al céntimo en 95 partidas). En el
+  repo original, cualquier pantalla que muestre saldos de muchas partidas los pide en lote. Pendiente: los números de
+  Contratos del inicio todavía se calculan contrato por contrato.

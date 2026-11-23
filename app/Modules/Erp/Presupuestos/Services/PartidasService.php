@@ -38,6 +38,15 @@ interface PartidasService
     public function saldo(int $partidaId, bool $bloquear = false): SaldoPartida;
 
     /**
+     * Los saldos de varias partidas de una vez, sin bloquear: los mismos números que `saldo()` una por una, para las
+     * pantallas que muestran muchas (la portada de Proyectos, el Resumen). Las que no existen no aparecen.
+     *
+     * @param  list<int>  $partidaIds
+     * @return array<int, SaldoPartida> por id de partida
+     */
+    public function saldos(array $partidaIds): array;
+
+    /**
      * El destino para `ImputacionService::destinar()`. Rechaza (con `ImputacionRechazada`) una partida inactiva, que
      * no es hoja, de un proyecto que no acepta costos o de un árbol no aprobado. La PC-99 exige un motivo de «gasto
      * no presupuestado» y un comentario; su centro de costo de referencia es opcional.

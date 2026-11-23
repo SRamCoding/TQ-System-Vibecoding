@@ -117,6 +117,72 @@ final readonly class PartidasEnBase implements PartidasService
         );
     }
 
+    /**
+     * Lo mismo que `saldo()` por cada partida, pero con dos consultas por proyecto en vez de cuatro por partida: cada
+     * partida suma su rama (ella y sus descendientes) con el mismo redondeo, y lo presupuestado sale del último árbol
+     * aprobado de su proyecto, como en `saldo()`.
+     */
+    public function saldos(array $partidaIds): array
+    {
+        $partidaIds = array_values(array_unique(array_map('intval', $partidaIds)));
+
+        if ($partidaIds === []) {
+            return [];
+        }
+
+        $porProyecto = PartidaControl::query()->whereIn('id', $partidaIds)->pluck('proyecto_id', 'id')
+            ->groupBy(fn (mixed $proyectoId): int => (int) $proyectoId, preserveKeys: true);
+        $saldos = [];
+
+        foreach ($porProyecto as $proyectoId => $ids) {
+            $ids = array_map('intval', $ids->keys()->all());
+            $arbolAprobado = ArbolPartidas::query()
+                ->where('proyecto_id', $proyectoId)
+                ->whereHas('estado', fn ($query) => $query->where('codigo', DefinicionArbolPartidas::APROBADO))
+                ->orderByDesc('numero_version')
+                ->value('id');
+            $marcas = implode(',', array_fill(0, count($ids), '?'));
+            $ramas = "WITH RECURSIVE rama AS (
+                    SELECT id AS raiz, id FROM partidas_control WHERE id IN ({$marcas})
+                    UNION ALL
+                    SELECT rama.raiz, hija.id FROM partidas_control hija JOIN rama ON hija.padre_id = rama.id
+                )";
+
+            $presupuestados = $arbolAprobado === null ? [] : collect(DB::select(
+                "{$ramas} SELECT rama.raiz, COALESCE(SUM(pp.monto), 0) AS total
+                FROM rama JOIN partida_presupuestos pp ON pp.partida_id = rama.id AND pp.arbol_id = ?
+                GROUP BY rama.raiz",
+                [...$ids, $arbolAprobado],
+            ))->pluck('total', 'raiz')->all();
+
+            $imputados = collect(DB::select(
+                "{$ramas} SELECT rama.raiz,
+                    COALESCE(ROUND(SUM(i.monto_comprometido * i.tipo_cambio), 2), 0) AS comprometido,
+                    COALESCE(ROUND(SUM(i.monto_ejecutado * i.tipo_cambio), 2), 0) AS ejecutado,
+                    COALESCE(ROUND(SUM(i.monto_pagado * i.tipo_cambio), 2), 0) AS pagado
+                FROM rama JOIN imputaciones i ON i.partida_control_id = rama.id
+                GROUP BY rama.raiz",
+                $ids,
+            ))->keyBy('raiz')->all();
+
+            foreach ($ids as $id) {
+                $presupuestado = bcadd((string) ($presupuestados[$id] ?? '0'), '0', 2);
+                $imputado = $imputados[$id] ?? null;
+                $comprometido = bcadd((string) ($imputado->comprometido ?? '0'), '0', 2);
+
+                $saldos[$id] = new SaldoPartida(
+                    presupuestado: $presupuestado,
+                    comprometido: $comprometido,
+                    ejecutado: bcadd((string) ($imputado->ejecutado ?? '0'), '0', 2),
+                    pagado: bcadd((string) ($imputado->pagado ?? '0'), '0', 2),
+                    disponible: bcsub($presupuestado, $comprometido, 2),
+                );
+            }
+        }
+
+        return $saldos;
+    }
+
     public function destino(int $partidaId, ?int $motivoId = null, ?string $comentario = null, ?int $centroCostoId = null): DestinoImputacion
     {
         return new DestinoPartida($partidaId, $motivoId, $comentario, $centroCostoId, $this->proyectos);
