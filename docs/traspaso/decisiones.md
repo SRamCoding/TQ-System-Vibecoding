@@ -875,3 +875,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (el sexo y la foto cruzan a Personas)
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.7: Personal asignado en tarjetas con foto»
+
+### MV-068 · 2026-11-23 · Gerencia de proyectos con Proyectos al centro, y sin «Volver al orden original»
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-6, punto 8) «Nuevo orden por defecto de las cajas de Gerencia de proyectos:
+  Contratos · Subcontratos · Proyectos · Personal asignado · Tareo. Proyectos queda en el medio y es la que se abre al
+  entrar; a la izquierda lo contractual y a la derecha lo de las personas. Cambia el orden original del sistema … borra el
+  orden guardado de este proceso en la base de demo. Se quita el botón "Volver al orden original" en todos los procesos
+  (y lo que solo él usa). Reordenar arrastrando sigue igual y se sigue guardando por persona».
+- **Decisión:** lo dicho; precisa MV-035.
+- **Alcance:** cruza módulos
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.8: Proyectos al centro y sin volver al orden original»

@@ -3,14 +3,12 @@
     proceso en el color de su franja y sus cajas internas juntas como un solo cuerpo: la navegación del proceso. La caja
     de la pantalla actual va marcada; las demás llevan a su pantalla y la barra se queda en su lugar (transición de vista
     entre páginas). Las cajas se reordenan arrastrando (como en el muelle: una copia sigue al puntero y las demás se corren en vivo) o
-    con Alt + ← / →, y el orden se guarda por persona; «Volver al
-    orden original» lo deshace.
+    con Alt + ← / →, y el orden se guarda por persona (MV-068: sin botón para volver al orden original).
 --}}
 @php
     /** @var array{proceso: \App\Modules\Nucleo\Navegacion\Proceso, caja: \App\Modules\Nucleo\Navegacion\CajaModulo, internas: list<\App\Modules\Nucleo\Navegacion\CajaModulo>, actual: \App\Modules\Nucleo\Navegacion\CajaModulo} $datos */
     $proceso = $datos['proceso'];
     $frase = rescue(fn (): string => app(\App\Modules\Nucleo\Services\ParametrosService::class)->texto($proceso->parametroFrase()), $proceso->frase(), false);
-    $personalizado = auth()->user() !== null && app(\App\Modules\Nucleo\Services\NavegacionService::class)->ordenGuardado(auth()->user(), $proceso) !== null;
     $C = \App\Modules\Nucleo\Navegacion\ColoresMarca::class;
 @endphp
 @if ($proceso !== \App\Modules\Nucleo\Navegacion\Proceso::Mien)
@@ -24,7 +22,6 @@
         sinMovimiento() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('tq-sin-animaciones') },
         guardar() {
             fetch(@js('/procesos/'.$proceso->value.'/orden'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': @js(csrf_token()), 'Accept': 'application/json' }, body: JSON.stringify({ claves: this.claves }) })
-                .then(() => { this.$refs.original && (this.$refs.original.hidden = false) })
         },
         cajas() { return this.claves.map((c) => this.$refs.cuerpo.querySelector(`[data-caja='${c}']`)) },
         // Con el teclado: Alt + flechas la corren un lugar, con el mismo deslizamiento.
@@ -125,10 +122,6 @@
             this.claves.forEach((c) => cuerpo.appendChild(cuerpo.querySelector(`[data-caja='${c}']`)))
             window.tqMarcarProceso?.(false)
         },
-        original() {
-            fetch(@js('/procesos/'.$proceso->value.'/orden'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': @js(csrf_token()), 'Accept': 'application/json' }, body: JSON.stringify({ claves: [] }) })
-                .then(() => Livewire.navigate(window.location.href))
-        },
     }">
     <style>
         .tq-proceso { display: flex; flex-direction: column; align-items: center; gap: 1rem; margin-bottom: 1.25rem; view-transition-name: tq-proceso; }
@@ -176,7 +169,6 @@
         @media (prefers-reduced-motion: reduce) { .tq-proceso-marca { transition: none; } }
         html.tq-sin-animaciones .tq-proceso-marca { transition: none; }
         .tq-proceso-caja.tq-arrastrando { opacity: 0.4; }
-        .tq-proceso-original { font-size: 0.8rem; color: var(--gray-500); text-decoration: underline; }
         @media (prefers-reduced-motion: reduce) { .tq-proceso-caja { transition: none; } }
     </style>
     <div class="tq-proceso-cuerpo" x-ref="cuerpo" role="list">
@@ -201,7 +193,6 @@
     <p class="tq-proceso-frase">{{ $frase }}</p>
     {{-- MV-046: el nombre del módulo, con la letra del logo. --}}
     <p class="tq-proceso-modulo">{{ mb_strtoupper($proceso->nombre()) }}</p>
-    <button type="button" class="tq-proceso-original" x-ref="original" @unless ($personalizado) hidden @endunless x-on:click="original()">Volver al orden original</button>
 </nav>
 </div>
 @endif

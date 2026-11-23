@@ -163,8 +163,8 @@ final class NavegacionService
     }
 
     /**
-     * MV-035: guarda el orden de las cajas de un proceso para la persona; una lista vacía vuelve al orden original. Solo
-     * cuenta lo que la persona puede ver.
+     * MV-035: guarda el orden de las cajas de un proceso para la persona; una lista vacía no cambia nada (MV-068: ya no
+     * hay «Volver al orden original»). Solo cuenta lo que la persona puede ver.
      *
      * @param  list<string>  $claves
      */
@@ -174,8 +174,6 @@ final class NavegacionService
         $claves = array_values(array_unique(array_filter($claves, fn (mixed $c): bool => is_string($c) && in_array($c, $validas, true))));
 
         if ($claves === []) {
-            DB::table('orden_cajas_proceso')->where('user_id', $usuario->id)->where('proceso', $proceso->value)->delete();
-
             return;
         }
 

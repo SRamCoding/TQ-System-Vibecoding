@@ -81,7 +81,7 @@ enum Proceso: string
             self::Mien => 'Cómo va tu trabajo de un vistazo: tus pendientes, tus aprobaciones y el tablero de tu rol.',
             self::Techquk => 'Cuánto se ganó, el presupuesto de la empresa, lo aprendido y las reglas del negocio',
             self::ConseguirNegocio => 'Oportunidades, convocatorias del SEACE y campañas',
-            self::GerenciaProyectos => 'Proyectos, contratos, personal asignado, tareo y subcontratos',
+            self::GerenciaProyectos => 'Contratos, subcontratos, proyectos, personal asignado y tareo',
             self::Abastecer => 'Requerimientos, órdenes, almacén y herramientas',
             self::FacturacionCobranza => 'Valorizaciones, facturas emitidas y cobranzas',
             self::Postventa => 'Tickets, series y suscripciones',
@@ -144,7 +144,8 @@ enum Proceso: string
             self::Techquk => ['resultados' => '¿Cuánto se ganó?', 'presupuesto-empresa' => 'Presupuesto de la empresa', 'lo-aprendido' => 'Lo aprendido', 'reglas-negocio' => 'Reglas del negocio'],
             // MV-035: el orden original, con Oportunidades al centro.
             self::ConseguirNegocio => ['convocatorias' => 'Convocatorias del SEACE', 'oportunidades' => 'Oportunidades', 'campanias' => 'Campañas'],
-            self::GerenciaProyectos => ['proyectos' => 'Proyectos', 'contratos' => 'Contratos', 'asignacion' => 'Personal asignado', 'tareo' => 'Tareo', 'subcontratos' => 'Subcontratos'],
+            // MV-068: Proyectos al centro; a la izquierda lo contractual, a la derecha lo de las personas.
+            self::GerenciaProyectos => ['contratos' => 'Contratos', 'subcontratos' => 'Subcontratos', 'proyectos' => 'Proyectos', 'asignacion' => 'Personal asignado', 'tareo' => 'Tareo'],
             self::Abastecer => ['requerimientos' => 'Requerimientos', 'ordenes' => 'Órdenes', 'almacen' => 'Almacén', 'herramientas' => 'Herramientas'],
             self::FacturacionCobranza => ['valorizaciones' => 'Valorizaciones', 'facturas-emitidas' => 'Facturas emitidas', 'cobranzas' => 'Cobranzas'],
             self::Postventa => ['postventa' => 'Tickets y series', 'suscripciones' => 'Suscripciones'],

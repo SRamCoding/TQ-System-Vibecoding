@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v26
+- **Versión:** v27
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -29,6 +29,7 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
 - **MV-030** (ficha) · Conseguir el negocio lleva su ícono propio: la montaña de dos picos con la bandera en la cima.
 - **MV-029** (cruza módulos) · «Ejecutar proyecto», nunca «Ejecutar la obra»; nombres exactos; cada pantalla se
   titula como su caja; la franja Plataforma tiene una sola caja, Sistema, y las cuatro franjas llevan título.
+- **MV-068** (cruza módulos) · Gerencia de proyectos: Contratos · Subcontratos · Proyectos · Personal asignado · Tareo; sin «Volver al orden original».
 - **MV-065** (ficha) · Doble clic en la estrella de Mien de la barra lateral lleva a la página de Mien.
 - **MV-062** (ficha) · El muelle se arrastra, se pega al borde más cercano y recuerda su lugar; por defecto, sobre el asistente.
 - **MV-059** (cruza módulos) · Todos los colores siguen al ambiente: superficies del fondo, franjas con temperatura, vidrio.
@@ -94,7 +95,8 @@ elegida. Cada persona ve solo los procesos en que puede abrir al menos una panta
   - **Reordenar (MV-036):** se presiona una caja y se mueve (más de 6 px; con mouse o con el dedo): una copia con sombra
     sigue al puntero y las demás se deslizan en vivo (200 ms) al lugar que tendrían; al soltar, la copia se desliza a su
     sitio y el clic no abre la caja. Con el foco en una, **Alt + ← / →** la corre un lugar con el mismo deslizamiento. Se guarda al instante para esa
-    persona y cambia la caja del medio. **«Volver al orden original»** aparece debajo cuando hay un orden propio.
+    persona y cambia la caja del medio. Desde MV-068 no hay botón para volver al orden original (el orden propio se
+    cambia solo arrastrando).
   - Ya no hay título de portada, descripción, etiqueta de franja, pestañas ni miga.
 - **Barra lateral:** un grupo por franja con las cajas de proceso (Mien en «Personal»). Un proceso queda marcado en cualquiera
   de sus pantallas. **MV-049:** ya no existe «Elegir módulos» ni la preferencia «Módulos de la barra»: la barra muestra
@@ -365,6 +367,9 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 
 ## Cambios desde la versión anterior
 
+- **v27** (MV-068): orden original de Gerencia de proyectos Contratos · Subcontratos · Proyectos · Personal asignado ·
+  Tareo (Proyectos al centro, la que se abre al entrar); se borró el orden guardado de ese proceso en la base de demo.
+  Se quitó «Volver al orden original» en todos los procesos (y el borrado del orden con lista vacía que solo él usaba).
 - **v26** (MV-065): doble clic en la estrella de Mien abre su página.
 
 - **v25** (MV-062): el muelle se mueve y se pega al borde.
