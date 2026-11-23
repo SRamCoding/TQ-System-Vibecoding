@@ -6,6 +6,7 @@ namespace App\Modules\Erp\Personal\Filament\Pages;
 
 use App\Modules\Erp\Personal\Models\Colaborador;
 use App\Modules\Erp\Personal\Services\PersonalService;
+use App\Modules\Erp\Personal\Services\TareoService;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use BackedEnum;
@@ -18,6 +19,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Support\Facades\DB;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use RuntimeException;
@@ -81,6 +84,12 @@ final class Asignacion extends Page
             });
     }
 
+    /** MV-069: la jornada, horas de Lu a Do (0 = no trabaja ese día). */
+    public static function campoJornada(): Grid
+    {
+        return Grid::make(7)->schema(collect(TareoService::DIAS)->map(fn (string $e, string $d) => TextInput::make("jornada.{$d}")->label($e)->numeric()->minValue(0)->maxValue(16)->default('0')->suffix('h'))->values()->all());
+    }
+
     public static function campoFoto(): FileUpload
     {
         return FileUpload::make('foto')->label('Foto')->image()->required()->imageEditor()->imageCropAspectRatio('1:1')->automaticallyOpenImageEditorForAspectRatio()
@@ -110,9 +119,15 @@ final class Asignacion extends Page
                     TextInput::make('nombres')->label('Nombres y apellidos')->required()->maxLength(120),
                     TextInput::make('dni')->label('DNI')->required()->length(8),
                     Select::make('categoria_id')->label('Categoría')->required()->options(fn (): array => DB::table('categorias_personal')->pluck('nombre', 'id')->all()),
-                    Select::make('vinculo')->label('Vínculo')->required()->options(['planilla' => 'Planilla', 'eventual' => 'Eventual']),
+                    Select::make('vinculo')->label('Vínculo')->required()->options(['planilla' => 'Planilla', 'eventual' => 'Eventual'])->live()
+                        ->afterStateUpdated(function (?string $state, Set $set): void {
+                            foreach (TareoService::jornadaPropuesta((string) $state) as $d => $h) {
+                                $set("jornada.{$d}", $h);
+                            }
+                        }),
                     Select::make('sexo')->label('Sexo')->required()->options(PersonalService::SEXOS),
                     DatePicker::make('habilitado_hasta')->label('SCTR vigente hasta'),
+                    self::campoJornada(),
                 ])
                 ->action(fn (array $data) => Colaborador::query()->create($data)),
             Action::make('asignar')->label('Asignar')->icon('heroicon-o-plus')->visible($puede)

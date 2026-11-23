@@ -59,6 +59,7 @@
                         <div style="min-width: 0">
                             <div class="tq-pa-nombre">{{ $t['nombres'] }}</div>
                             <div class="tq-pa-sub">{{ $t['categoria'] }} · {{ $t['vinculo'] }}</div>
+                            <div class="tq-pa-sub">{{ $t['jornada'] }}</div>
                         </div>
                         <span class="tq-pa-sctr" @if ($t['sctr_mal']) data-mal @endif>{{ $t['sctr'] }}</span>
                     </div>

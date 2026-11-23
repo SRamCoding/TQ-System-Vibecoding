@@ -87,7 +87,7 @@ final readonly class PersonasService
                 throw new RuntimeException('Ya fue contratado.');
             }
 
-            $id = Colaborador::query()->create(['nombres' => $c->nombres, 'dni' => $c->dni, 'categoria_id' => $v->categoria_id, 'vinculo' => 'planilla', 'sexo' => $sexo, 'remuneracion' => $remuneracion,
+            $id = Colaborador::query()->create(['nombres' => $c->nombres, 'dni' => $c->dni, 'categoria_id' => $v->categoria_id, 'vinculo' => 'planilla', 'sexo' => $sexo, 'jornada' => TareoService::jornadaPropuesta('planilla'), 'remuneracion' => $remuneracion,
                 'regimen' => $regimen, 'ingreso' => $ingreso->toDateString(), 'es_activo' => true])->id;
             DB::table('candidatos')->where('id', $candidatoId)->update(['estado' => 'contratado', 'updated_at' => now()]);
 

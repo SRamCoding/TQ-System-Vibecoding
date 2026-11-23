@@ -6,6 +6,7 @@ namespace App\Modules\Erp\Personal\Filament\Pages;
 
 use App\Modules\Erp\Personal\Services\PersonalService;
 use App\Modules\Erp\Personal\Services\PersonasService;
+use App\Modules\Erp\Personal\Services\TareoService;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use BackedEnum;
@@ -81,6 +82,7 @@ final class Personas extends Page implements HasTable
                 ViewColumn::make('avatar')->label('')->view('personal::avatar-columna')->width('1%'),
                 TextColumn::make('nombres')->label('Persona')->weight('bold')->description(fn (array $record): string => $record['categoria'].' · '.$record['vinculo'].($record['regimen'] ? ' · '.strtoupper($record['regimen']) : '')),
                 TextColumn::make('remuneracion')->label('Remuneración')->alignEnd()->fontFamily('mono')->formatStateUsing(fn ($state): string => $state === null ? '—' : number_format((float) $state, 2))->placeholder('—'),
+                TextColumn::make('jornada_texto')->label('Jornada')->state(fn (array $record): string => TareoService::textoJornada(TareoService::jornadaDe($record)))->wrap(),
                 TextColumn::make('habilitacion')->label('Habilitación de campo')->color(fn (array $record): string => $record['habil_ok'] ? 'success' : 'danger'),
                 TextColumn::make('certificaciones')->label('Certificaciones')->wrap(),
                 TextColumn::make('experiencia')->label('Experiencia')->wrap(),
@@ -96,6 +98,11 @@ final class Personas extends Page implements HasTable
                         DB::table('colaboradores')->where('id', $record['id'])->update(['sexo' => $data['sexo'], 'updated_at' => now()]);
                         Asignacion::guardarFoto((int) $record['id'], $data['foto'] ?? null);
                     }),
+                Action::make('jornada')->label('Jornada')->color('gray')->icon('heroicon-o-clock')->visible(fn (): bool => auth()->user()?->can(PersonalService::PERMISO_TAREAR) ?? false)
+                    ->modalHeading(fn (array $record): string => "Jornada de {$record['nombres']}")
+                    ->fillForm(fn (array $record): array => ['jornada' => TareoService::jornadaDe($record)])
+                    ->schema([Asignacion::campoJornada()])
+                    ->action(fn (array $record, array $data) => app(TareoService::class)->cambiarJornada((int) $record['id'], $data['jornada'] ?? [])),
                 Action::make('documento')->label('Documento')->color('gray')->visible(fn (): bool => auth()->user()?->can(PersonalService::PERMISO_TAREAR) ?? false)
                     ->schema([Select::make('tipo')->label('Tipo')->options(self::TIPOS_DOC)->required(), TextInput::make('nombre')->label('Nombre')->required(), TextInput::make('emisor')->label('Emisor'), DatePicker::make('vence')->label('Vence')->format('Y-m-d')])
                     ->action(fn (array $record, array $data) => app(PersonasService::class)->documento((int) $record['id'], $data['tipo'], $data['nombre'], $data['emisor'] ?? null, $data['vence'] ?? null)),

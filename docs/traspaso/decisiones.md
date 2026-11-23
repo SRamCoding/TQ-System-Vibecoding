@@ -888,3 +888,33 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.8: Proyectos al centro y sin volver al orden original»
+
+### MV-069 · 2026-11-23 · Tareo: la jornada de cada persona y el tareo que se rellena solo
+
+- **Ficha:** `fichas/t4-personal-tareo.md`
+- **Dijo Sebastián:** (observaciones-6, punto 9) «Al registrar o editar un colaborador se define su jornada: qué días
+  trabaja y cuántas horas cada día. Viene propuesta según el vínculo (planilla: Lu a Vi 8 h y Sá 4 h = 48 h, la jornada
+  máxima legal; eventual: vacía) … Al abrir una semana nueva de un proyecto, el sistema ya trae una línea por cada persona
+  asignada a ese proyecto esa semana, con las horas de su jornada multiplicadas por su dedicación, repartidas por igual
+  en sus días, en la partida donde tareó la semana anterior … Los feriados van en 0. A quien tiene el SCTR vencido no se
+  le rellena: aparece en coral. Las líneas rellenadas se ven más suaves, con la marca "de la jornada", hasta que alguien
+  las toca o se cierra la semana. Otros atajos: Copiar la semana anterior, Rellenar con la jornada, Llenar la fila».
+- **Decisión:** lo dicho. Quedan por confirmar (en la ficha): la dedicación en el relleno, la partida de la semana
+  anterior y las 48 h de planilla (los días que dio suman 44 h).
+- **Alcance:** ficha (la jornada es un dato nuevo del colaborador)
+- **Estado:** vigente
+- **Commit:** el de «Observaciones 6.9 y 6.10: el tareo nuevo»
+
+### MV-070 · 2026-11-23 · Tareo: la vista nueva
+
+- **Ficha:** `fichas/t4-personal-tareo.md`
+- **Dijo Sebastián:** (observaciones-6, punto 10; «aprobó todas estas mejoras») «1. Cuadrícula tipo hoja de cálculo …
+  se escribe directo en la celda (Tab y Enter avanzan; Esc deshace la celda) y se guarda sola al salir … El formulario
+  "Agregar horas" se va. 2. Foto o avatar de cada persona. 3. Tira de semanas del mes … el proyecto como chip. 4. Cuatro
+  cifras arriba … 5. Avisos dentro de la cuadrícula: feriados, horas extra, "¿faltó?", SCTR vencido. 6. Ver por persona
+  / por partida. 7. La persona en todos sus proyectos ("44 de 48 h"). 8. Cerrar con resumen. 9. Asistencia rápida desde
+  el celular: Vino / Faltó, con un selector Semana / Hoy».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observaciones 6.9 y 6.10: el tareo nuevo»

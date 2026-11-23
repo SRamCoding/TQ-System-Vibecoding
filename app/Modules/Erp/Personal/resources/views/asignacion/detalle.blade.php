@@ -7,6 +7,7 @@
             @include('personal::avatar', ['a' => $t['avatar'], 'tam' => 72])
             <div>
                 <div style="font-size: 0.9rem">{{ $t['categoria'] }} · {{ $t['vinculo'] }}</div>
+                <div style="font-size: 0.8rem">Jornada: {{ $t['jornada'] }}</div>
                 <div style="font-size: 0.8rem; font-weight: 600; color: {{ $t['sctr_mal'] ? '#C2532F' : 'var(--tq-texto-suave, var(--gray-500))' }}">{{ $t['sctr'] }}</div>
             </div>
         </div>

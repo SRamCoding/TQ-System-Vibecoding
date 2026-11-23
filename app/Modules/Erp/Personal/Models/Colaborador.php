@@ -15,6 +15,6 @@ class Colaborador extends Model
 
     protected function casts(): array
     {
-        return ['habilitado_hasta' => 'immutable_date', 'es_activo' => 'boolean', 'ingreso' => 'immutable_date', 'salida' => 'immutable_date'];
+        return ['habilitado_hasta' => 'immutable_date', 'es_activo' => 'boolean', 'ingreso' => 'immutable_date', 'salida' => 'immutable_date', 'jornada' => 'array'];
     }
 }

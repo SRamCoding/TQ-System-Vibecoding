@@ -15,12 +15,12 @@ class TareoLinea extends Model
 
     protected function casts(): array
     {
-        return ['costo_hora' => 'decimal:2'];
+        return ['costo_hora' => 'decimal:2', 'de_jornada' => 'boolean', 'faltas' => 'array'];
     }
 
     public function horas(): string
     {
-        return array_reduce(['lu', 'ma', 'mi', 'ju', 'vi', 'sa'], fn (string $s, string $d): string => bcadd($s, (string) $this->{$d}, 1), '0');
+        return array_reduce(['lu', 'ma', 'mi', 'ju', 'vi', 'sa', 'do'], fn (string $s, string $d): string => bcadd($s, (string) $this->{$d}, 1), '0');
     }
 
     public function costo(): string

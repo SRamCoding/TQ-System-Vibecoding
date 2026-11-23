@@ -32,7 +32,7 @@ final readonly class PersonalService
 
     public const string PERMISO_CERRAR = 'erp.personal.cerrar';
 
-    public const array DIAS = ['lu' => 'Lu', 'ma' => 'Ma', 'mi' => 'Mi', 'ju' => 'Ju', 'vi' => 'Vi', 'sa' => 'Sá'];
+    public const array DIAS = ['lu' => 'Lu', 'ma' => 'Ma', 'mi' => 'Mi', 'ju' => 'Ju', 'vi' => 'Vi', 'sa' => 'Sá', 'do' => 'Do'];
 
     /** Observación 6.7 (MV-067): el sexo elige el avatar por defecto de quien no tiene foto. */
     public const array SEXOS = ['hombre' => 'Hombre', 'mujer' => 'Mujer'];
@@ -114,7 +114,7 @@ final readonly class PersonalService
 
             $tarjetas[] = ['id' => (int) $c->id, 'nombres' => $c->nombres, 'categoria' => $c->categoria, 'vinculo' => $c->vinculo === 'planilla' ? 'Planilla' : 'Eventual',
                 'sctr' => $habil === null ? 'Sin SCTR' : 'SCTR hasta '.$habil->format('d/m/Y'), 'sctr_mal' => $habil === null || $habil->lt($hoy),
-                'avatar' => self::avatar($c), 'semanas' => $semanas];
+                'avatar' => self::avatar($c), 'jornada' => TareoService::textoJornada(TareoService::jornadaDe($c)), 'semanas' => $semanas];
         }
 
         return $tarjetas;
@@ -142,7 +142,14 @@ final readonly class PersonalService
     /** El tareo de la semana del proyecto (lunes); lo abre si no existe. */
     public function semana(int $proyectoId, CarbonImmutable $lunes): Tareo
     {
-        return Tareo::query()->firstOrCreate(['proyecto_id' => $proyectoId, 'semana' => $lunes->startOfWeek()->toDateString()], ['estado' => 'abierto']);
+        $t = Tareo::query()->firstOrCreate(['proyecto_id' => $proyectoId, 'semana' => $lunes->startOfWeek()->toDateString()], ['estado' => 'abierto']);
+
+        // MV-069: una semana nueva ya trae a la gente asignada con las horas de su jornada.
+        if ($t->wasRecentlyCreated) {
+            app(TareoService::class)->rellenar($t->id);
+        }
+
+        return $t;
     }
 
     /** @param  array<string, string>  $horas  día => horas */
@@ -175,14 +182,29 @@ final readonly class PersonalService
             }
         }
 
-        return TareoLinea::query()->updateOrCreate(['tareo_id' => $t->id, 'colaborador_id' => $c->id, 'partida_control_id' => $partidaId], $fila);
+        return TareoLinea::query()->updateOrCreate(['tareo_id' => $t->id, 'colaborador_id' => $c->id, 'partida_control_id' => $partidaId], [...$fila, 'de_jornada' => false]);
     }
 
     /** Cierra la semana: cada línea pasa a comprometido y ejecutado de su partida a la vez. */
     public function cerrar(int $tareoId, User $quien): Tareo
     {
         return DB::transaction(function () use ($tareoId, $quien): Tareo {
-            $t = Tareo::query()->with('lineas')->lockForUpdate()->findOrFail($tareoId);
+            $t = Tareo::query()->lockForUpdate()->findOrFail($tareoId);
+
+            if ($t->estado !== 'abierto') {
+                throw new RuntimeException('La semana ya está cerrada.');
+            }
+
+            // MV-069: las líneas sin horas se van; una con horas y sin partida no deja cerrar.
+            foreach (TareoLinea::query()->where('tareo_id', $t->id)->get() as $l) {
+                if (bccomp($l->horas(), '0', 1) === 0) {
+                    $l->delete();
+                } elseif ($l->partida_control_id === null) {
+                    throw new RuntimeException('Falta la partida de una línea con horas.');
+                }
+            }
+
+            $t->load('lineas');
 
             if ($t->estado !== 'abierto' || $t->lineas->isEmpty()) {
                 throw new RuntimeException($t->estado !== 'abierto' ? 'La semana ya está cerrada.' : 'La semana no tiene horas.');
@@ -196,6 +218,7 @@ final readonly class PersonalService
                 $imputaciones->mover($l, MomentoImputacion::Ejecutado, $l->costo());
             }
 
+            TareoLinea::query()->where('tareo_id', $t->id)->update(['de_jornada' => false]);
             $t->update(['estado' => 'cerrado', 'cerrado_por' => $quien->id, 'cerrado_at' => Calendario::ahora()]);
 
             return $t->refresh();
