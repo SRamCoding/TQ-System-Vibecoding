@@ -37,7 +37,7 @@ final class BandejaCasosSeeder extends Seeder
         $release = function (string $ocid, string $nom, string $entidad, string $rucE, string $objeto, string $metodo, string $valor, CarbonImmutable $pub, ?array $award = null) {
             $r = [
                 'ocid' => "ocds-dgv273-{$ocid}", 'date' => $pub->setTime(9, 0)->format('Y-m-d\TH:i:s.uP'), 'buyer' => ['id' => "PE-RUC-{$rucE}", 'name' => $entidad],
-                'parties' => [['id' => "PE-RUC-{$rucE}", 'name' => $entidad, 'identifier' => ['scheme' => 'PE-RUC', 'id' => $rucE], 'address' => ['region' => 'Valle Norte'], 'roles' => ['buyer']]],
+                'parties' => [['id' => "PE-RUC-{$rucE}", 'name' => $entidad, 'identifier' => ['scheme' => 'PE-RUC', 'id' => $rucE], 'address' => ['region' => 'Valle Norte', 'department' => 'LAMBAYEQUE'], 'roles' => ['buyer']]],
                 'tender' => ['id' => $nom, 'title' => $nom, 'description' => $objeto, 'procurementMethodDetails' => $metodo, 'status' => $award === null ? 'active' : 'complete',
                     'value' => ['amount' => (float) $valor, 'currency' => 'PEN'], 'datePublished' => $pub->format('Y-m-d').'T09:00:00-05:00',
                     'tenderPeriod' => ['endDate' => $pub->addDays(15)->format('Y-m-d').'T23:59:00-05:00'], 'awardPeriod' => ['startDate' => $pub->addDays(22)->format('Y-m-d').'T10:00:00-05:00'],

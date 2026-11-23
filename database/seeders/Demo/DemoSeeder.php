@@ -1380,7 +1380,7 @@ final class DemoSeeder extends Seeder
         $ruc = fn (string $base): string => $base.DocumentoIdentidad::digitoVerificadorRuc($base);
         $release = fn (string $ocid, string $nom, string $entidad, string $rucE, string $region, string $titulo, string $metodo, ?string $valor, string $pub, string $pres, string $bp) => [
             'ocid' => "ocds-dgv273-{$ocid}", 'date' => "{$pub}T09:00:00-05:00", 'buyer' => ['id' => "PE-RUC-{$rucE}", 'name' => $entidad],
-            'parties' => [['id' => "PE-RUC-{$rucE}", 'name' => $entidad, 'identifier' => ['scheme' => 'PE-RUC', 'id' => $rucE], 'address' => ['region' => $region], 'roles' => ['buyer']]],
+            'parties' => [['id' => "PE-RUC-{$rucE}", 'name' => $entidad, 'identifier' => ['scheme' => 'PE-RUC', 'id' => $rucE], 'address' => ['region' => $region, 'department' => 'LAMBAYEQUE'], 'roles' => ['buyer']]],
             'tender' => ['id' => $nom, 'title' => $titulo, 'procurementMethodDetails' => $metodo, 'value' => $valor === null ? null : ['amount' => (float) $valor, 'currency' => 'PEN'],
                 'tenderPeriod' => ['endDate' => "{$pres}T23:59:00-05:00"], 'awardPeriod' => ['startDate' => "{$bp}T10:00:00-05:00"],
                 'documents' => [['url' => 'https://prod2.seace.gob.pe/seacebus-uiwd-pub/buscadorPublico/buscadorPublico.xhtml', 'documentType' => 'biddingDocuments']]],

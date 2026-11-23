@@ -58,7 +58,7 @@
         @media (max-width: 1023px) { .tq-band-cuerpo { grid-template-columns: minmax(0, 1fr); } }
         .tq-band-lista { background: var(--b-sup); border: 1px solid var(--b-borde); border-radius: 14px; overflow: hidden; max-height: calc(100vh - 8rem); display: flex; flex-direction: column; position: sticky; top: 5rem; }
         .tq-band-lista-cab { padding: 10px 14px; font-size: 12px; color: var(--b-suave); border-bottom: 1px solid var(--b-linea); display: flex; align-items: center; gap: 8px; }
-        .tq-band-lista-cab select { margin-left: auto; border: 0; background: transparent; font-size: 12px; color: var(--b-suave); padding: 0 1.5rem 0 0; }
+        .tq-band-lista-cab select { border: 0; background: transparent; font-size: 12px; color: var(--b-suave); padding: 0 1.5rem 0 0; }
         .tq-band-filas { overflow-y: auto; }
         .tq-band-fila { display: flex; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--b-linea); width: 100%; text-align: start; transition: background-color .3s ease; }
         .tq-band-fila:hover { background: color-mix(in oklab, var(--b-azul) 5%, transparent); }
@@ -100,6 +100,16 @@
         .tq-band-cuadrito { width: 12px; height: 12px; border-radius: 3px; flex: none; }
         .tq-band-monto { width: 10rem; border: 1px solid var(--tq-borde, var(--b-borde)); border-radius: 8px; padding: 4px 8px; background: var(--b-sup); color: var(--tq-texto, inherit); font-variant-numeric: tabular-nums; text-align: right; }
         .tq-band-fuente-off { color: var(--b-suave); }
+        /* Observación 8.9: filtros rápidos con buscador y chips de región. */
+        .tq-band-rapido { position: relative; }
+        .tq-band-rapido > button { font-size: 12px; color: var(--b-suave); display: inline-flex; gap: 4px; align-items: center; }
+        .tq-band-rapido > button[data-activo] { color: var(--b-azul); font-weight: 600; }
+        .tq-band-pop { position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; width: 17rem; max-height: 20rem; overflow: auto; padding: 8px; border-radius: 10px; background: var(--tq-superficie-elevada, #fff); border: 1px solid var(--tq-borde, var(--b-borde)); box-shadow: 0 12px 30px -8px rgb(0 0 0 / .25); }
+        .tq-band-pop input { width: 100%; margin-bottom: 6px; padding: 4px 8px; font-size: 12px; border: 1px solid var(--tq-borde, var(--b-borde)); border-radius: 6px; background: var(--b-sup); color: inherit; }
+        .tq-band-pop button { display: flex; width: 100%; justify-content: space-between; gap: 8px; padding: 5px 6px; border-radius: 6px; font-size: 13px; text-align: start; }
+        .tq-band-pop button:hover, .tq-band-pop button[aria-pressed="true"] { background: var(--b-azul-fondo); color: var(--b-azul); }
+        .tq-band-region { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--tq-borde, var(--b-borde)); background: var(--b-sup); }
+        .tq-band-region[aria-pressed="true"] { background: var(--b-azul-fondo); border-color: var(--b-azul-borde); color: var(--b-azul); font-weight: 600; }
         .tq-band-pronto { font-size: 11px; font-weight: 600; border-radius: 6px; padding: 1px 7px; background: var(--b-gris-fondo); color: var(--b-suave); }
     </style>
 
@@ -138,6 +148,24 @@
         <div class="tq-band-lista">
             <div class="tq-band-lista-cab">
                 {{ count($filas) }} {{ count($filas) === 1 ? 'convocatoria' : 'convocatorias' }}
+                {{-- Observación 8.9: Región y Entidad, con buscador y la cantidad de cada opción. --}}
+                @foreach (['region' => ['Región', collect($regiones)->mapWithKeys(fn ($n, $k) => [$k => ['nombre' => \App\Modules\Crm\Licitaciones\Services\FiltroConvocatorias::nombreRegion($k ?: null), 'n' => $n]])->all()], 'entidad' => ['Entidad', $entidades]] as $campo => [$titulo, $opciones])
+                    <span class="tq-band-rapido" x-data="{ abierto: false, q: '' }" x-on:click.outside="abierto = false" @if ($loop->first) style="margin-left: auto" @endif>
+                        <button type="button" x-on:click="abierto = ! abierto" @if ($this->{$campo}) data-activo @endif>
+                            {{ $this->{$campo} ? \Illuminate\Support\Str::limit($opciones[$this->{$campo}]['nombre'] ?? $titulo, 18) : $titulo }} ▾
+                        </button>
+                        <div class="tq-band-pop" x-show="abierto" x-cloak x-transition.opacity>
+                            <input type="search" x-model="q" placeholder="Buscar {{ mb_strtolower($titulo) }}…" aria-label="Buscar {{ mb_strtolower($titulo) }}">
+                            <button type="button" aria-pressed="{{ $this->{$campo} ? 'false' : 'true' }}" wire:click="$set('{{ $campo }}', null)" x-on:click="abierto = false"><span>Todas</span></button>
+                            @foreach ($opciones as $clave => $op)
+                                <button type="button" aria-pressed="{{ (string) $this->{$campo} === (string) $clave ? 'true' : 'false' }}" wire:click="$set('{{ $campo }}', @js((string) $clave))" x-on:click="abierto = false"
+                                    x-show="q === '' || {{ \Illuminate\Support\Js::from(mb_strtolower($op['nombre'])) }}.includes(q.toLowerCase())">
+                                    <span>{{ $op['nombre'] }}</span><span style="color: var(--b-suave)">{{ $op['n'] }}</span>
+                                </button>
+                            @endforeach
+                        </div>
+                    </span>
+                @endforeach
                 <select wire:model.live="orden" aria-label="Orden">
                     @foreach (B::ORDENES as $clave => $texto)<option value="{{ $clave }}">{{ $texto }}</option>@endforeach
                 </select>
@@ -277,6 +305,32 @@
                                 @if ($puede)<input type="text" class="tq-band-agregar" placeholder="+ agregar" wire:model="nuevaPalabra.{{ $i }}-{{ $tipo }}" wire:keydown.enter="agregarPalabra({{ $i }}, '{{ $tipo }}')">@endif
                             </div>
                         @endforeach
+                        {{-- Observación 8.9: regiones (ninguna marcada = todas) y entidades que nunca entran. --}}
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; align-items: center">
+                            <span style="width: 9.5rem; font-size: 11px; font-weight: 700; letter-spacing: .04em">REGIONES</span>
+                            <button type="button" class="tq-band-region" aria-pressed="{{ ($l['regiones'] ?? []) === [] ? 'true' : 'false' }}" wire:click="alternarRegion({{ $i }}, '*')">Todas</button>
+                            @foreach ($regionesPeru as $r)
+                                <button type="button" class="tq-band-region" aria-pressed="{{ in_array($r, $l['regiones'] ?? [], true) ? 'true' : 'false' }}" wire:click="alternarRegion({{ $i }}, @js($r))">{{ \App\Modules\Crm\Licitaciones\Services\FiltroConvocatorias::nombreRegion($r) }}</button>
+                            @endforeach
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
+                            <span style="width: 9.5rem; font-size: 11px; font-weight: 700; letter-spacing: .04em">ENTIDADES EXCLUIDAS</span>
+                            @foreach ($l['excluidas'] ?? [] as $e)
+                                <span class="tq-band-palabra neg">{{ $e['nombre'] }}@if ($puede)<button type="button" wire:click="incluirEntidad({{ $i }}, @js($e['ruc']))" aria-label="Quitar {{ $e['nombre'] }}">×</button>@endif</span>
+                            @endforeach
+                            @if ($puede)
+                                <span style="position: relative">
+                                    <input type="search" class="tq-band-agregar" style="width: 14rem" placeholder="+ excluir entidad (buscar)" wire:model.live.debounce.300ms="buscarEntidad.{{ $i }}">
+                                    @if (! empty($sugerenciasEntidad[$i]))
+                                        <span class="tq-band-pop" style="display: block">
+                                            @foreach ($sugerenciasEntidad[$i] as $ruc => $nombre)
+                                                <button type="button" wire:click="excluirEntidad({{ $i }}, @js((string) $ruc))"><span>{{ $nombre }}</span></button>
+                                            @endforeach
+                                        </span>
+                                    @endif
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 @endforeach
                 @if ($puede)<div><button type="button" class="tq-band-btn" wire:click="nuevaLinea">+ Nueva línea de negocio</button></div>@endif
@@ -302,8 +356,17 @@
                                 @elseif ($porQueResultado['enBandeja'])
                                     No pasa el filtro ({{ $ev['motivo'] }}), pero alguien la trajo a la bandeja.
                                 @else
-                                    @php $conNeg = collect($ev['detalle'])->first(fn ($x) => $x['coincide'] !== [] && $x['negativas'] !== []); @endphp
-                                    @if ($conNeg)
+                                    @php
+                                        $conNeg = collect($ev['detalle'])->first(fn ($x) => $x['coincide'] !== [] && $x['negativas'] !== []);
+                                        $conRegion = collect($ev['detalle'])->first(fn ($x) => $x['coincide'] !== [] && $x['negativas'] === [] && ($x['fueraRegion'] ?? false));
+                                        $conExcluida = collect($ev['detalle'])->first(fn ($x) => $x['coincide'] !== [] && $x['negativas'] === [] && ($x['excluida'] ?? false));
+                                        $nr = fn ($r) => \App\Modules\Crm\Licitaciones\Services\FiltroConvocatorias::nombreRegion($r);
+                                    @endphp
+                                    @if (! $conNeg && $conExcluida)
+                                        Coincidió con <mark>{{ implode(', ', $conExcluida['coincide']) }}</mark> ({{ $conExcluida['linea'] }}), pero la entidad está entre las excluidas de esa línea.
+                                    @elseif (! $conNeg && $conRegion)
+                                        Coincidió con <mark>{{ implode(', ', $conRegion['coincide']) }}</mark> ({{ $conRegion['linea'] }}), pero es de {{ $nr($conRegion['departamento']) }} y esa línea solo busca en {{ implode(', ', array_map($nr, $conRegion['regiones'])) }}.
+                                    @elseif ($conNeg)
                                         Coincidió con <mark>{{ implode(', ', $conNeg['coincide']) }}</mark> ({{ $conNeg['linea'] }}), pero la descartó la palabra negativa <b style="color: var(--b-coral)">{{ $conNeg['negativas'][0] }}</b>.
                                     @else
                                         {{ $ev['motivo'] }}.
@@ -314,7 +377,10 @@
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap">
                                     <button type="button" class="tq-band-btn p" wire:click="traerIgual({{ $porQueResultado['id'] }})">Traer igual a la bandeja</button>
                                     @isset($conNeg)
-                                        @if ($conNeg)<button type="button" class="tq-band-btn" wire:click="quitarNegativa(@js($conNeg['linea']), @js($conNeg['negativas'][0]))">Quitar la palabra negativa</button>@endif
+                                        @if ($conNeg)<button type="button" class="tq-band-btn" wire:click="quitarNegativa(@js($conNeg['linea']), @js($conNeg['negativas'][0]))">Quitar la palabra negativa</button>
+                                        @elseif ($conExcluida)<button type="button" class="tq-band-btn" wire:click="quitarExcluida(@js($conExcluida['linea']), @js((string) ($porQueResultado['ruc'] ?? '')))">Quitar la entidad de las excluidas</button>
+                                        @elseif ($conRegion && $conRegion['departamento'])<button type="button" class="tq-band-btn" wire:click="agregarRegion(@js($conRegion['linea']), @js($conRegion['departamento']))">Agregar {{ $nr($conRegion['departamento']) }} a la línea</button>
+                                        @endif
                                     @endisset
                                 </div>
                             @endif

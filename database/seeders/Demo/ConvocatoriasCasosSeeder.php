@@ -40,7 +40,7 @@ final class ConvocatoriasCasosSeeder extends Seeder
         $ruc = fn (string $base): string => $base.DocumentoIdentidad::digitoVerificadorRuc($base);
         $release = fn (string $ocid, string $nom, string $entidad, string $rucE, string $titulo, string $metodo, string $valor, CarbonImmutable $fecha, CarbonImmutable $pres) => [
             'ocid' => "ocds-dgv273-{$ocid}", 'date' => $fecha->format('Y-m-d\TH:i:s.uP'), 'buyer' => ['id' => "PE-RUC-{$rucE}", 'name' => $entidad],
-            'parties' => [['id' => "PE-RUC-{$rucE}", 'name' => $entidad, 'identifier' => ['scheme' => 'PE-RUC', 'id' => $rucE], 'address' => ['region' => 'Valle Norte'], 'roles' => ['buyer']]],
+            'parties' => [['id' => "PE-RUC-{$rucE}", 'name' => $entidad, 'identifier' => ['scheme' => 'PE-RUC', 'id' => $rucE], 'address' => ['region' => 'Valle Norte', 'department' => 'LAMBAYEQUE'], 'roles' => ['buyer']]],
             'tender' => ['id' => $nom, 'title' => $nom, 'description' => $titulo, 'procurementMethodDetails' => $metodo, 'status' => 'active', 'value' => ['amount' => (float) $valor, 'currency' => 'PEN'],
                 'tenderPeriod' => ['endDate' => $pres->format('Y-m-d').'T23:59:00-05:00'], 'awardPeriod' => ['startDate' => $pres->addDays(7)->format('Y-m-d').'T10:00:00-05:00'],
                 'documents' => [['url' => 'https://prod2.seace.gob.pe/seacebus-uiwd-pub/buscadorPublico/buscadorPublico.xhtml', 'documentType' => 'biddingDocuments']]],

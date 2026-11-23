@@ -25,8 +25,8 @@ final readonly class BandejaSeace
     public const int DIAS_POR_VENCER = 5;
 
     /**
-     * @param  array{buscar: string, todo: bool, linea: ?int, ver: ?string, orden: string}  $f
-     * @return array{filas: list<array<string, mixed>>, lineas: list<array{id: ?int, nombre: string, n: int}>, ver: array<string, int>}
+     * @param  array{buscar: string, todo: bool, linea: ?int, ver: ?string, orden: string, region?: ?string, entidad?: ?string}  $f
+     * @return array{filas: list<array<string, mixed>>, lineas: list<array{id: ?int, nombre: string, n: int}>, ver: array<string, int>, regiones: array<string, int>, entidades: array<string, array{nombre: string, n: int}>}
      */
     public function lista(array $f, int $usuarioId): array
     {
@@ -53,6 +53,21 @@ final readonly class BandejaSeace
             default => ($r['estado'] === 'nueva' && $r['abierta']) || ! $r['enBandeja'],
         });
         $porLinea = fn (Collection $c, ?int $linea): Collection => $linea === null ? $c : $c->filter(fn (array $r): bool => $r['lineaId'] === $linea);
+        // Observación 8.9: los filtros rápidos de región y entidad (lo que se ve ahora, sin cambiar la configuración).
+        $region = $f['region'] ?? null;
+        $entidad = $f['entidad'] ?? null;
+        $porRegion = fn (Collection $c): Collection => $region === null ? $c : $c->filter(fn (array $r): bool => ($r['departamento'] ?? '') === $region);
+        $porEntidad = fn (Collection $c): Collection => $entidad === null ? $c : $c->filter(fn (array $r): bool => $r['claveEntidad'] === $entidad);
+        $opcionesRegion = $porEntidad($porLinea($porVer($filas, $f['ver']), $f['linea']))->countBy(fn (array $r): string => $r['departamento'] ?? '')->sortKeys()->all();
+        $opcionesEntidad = [];
+
+        foreach ($porRegion($porLinea($porVer($filas, $f['ver']), $f['linea'])) as $r) {
+            $opcionesEntidad[$r['claveEntidad']] ??= ['nombre' => $r['entidad'], 'n' => 0];
+            $opcionesEntidad[$r['claveEntidad']]['n']++;
+        }
+
+        uasort($opcionesEntidad, fn (array $a, array $b): int => [$b['n'], $a['nombre']] <=> [$a['n'], $b['nombre']]);
+        $filas = $porEntidad($porRegion($filas));
 
         $conVer = $porVer($filas, $f['ver']);
         $chipsLinea = [['id' => null, 'nombre' => 'Todas', 'n' => $conVer->count()]];
@@ -76,7 +91,7 @@ final readonly class BandejaSeace
             default => fn (array $a, array $b): int => [$a['dias'] === null || $a['dias'] < 0 ? 1 : 0, $a['dias'] ?? PHP_INT_MAX, $a['id']] <=> [$b['dias'] === null || $b['dias'] < 0 ? 1 : 0, $b['dias'] ?? PHP_INT_MAX, $b['id']],
         });
 
-        return ['filas' => $lista, 'lineas' => $chipsLinea, 'ver' => $chipsVer];
+        return ['filas' => $lista, 'lineas' => $chipsLinea, 'ver' => $chipsVer, 'regiones' => $opcionesRegion, 'entidades' => $opcionesEntidad];
     }
 
     /**
@@ -148,7 +163,7 @@ final readonly class BandejaSeace
         $c = DB::table('convocatorias_seace')->where('nomenclatura', 'ilike', $codigo)->orWhere('ocid', $codigo)->first()
             ?? DB::table('convocatorias_seace')->where('nomenclatura', 'ilike', "%{$codigo}%")->orWhere('ocid', 'ilike', "%{$codigo}%")->orderByDesc('id')->first();
 
-        return $c === null ? null : ['id' => (int) $c->id, 'nomenclatura' => $c->nomenclatura, 'objeto' => $c->objeto, 'entidad' => $c->entidad,
+        return $c === null ? null : ['id' => (int) $c->id, 'ruc' => $c->ruc_entidad, 'nomenclatura' => $c->nomenclatura, 'objeto' => $c->objeto, 'entidad' => $c->entidad,
             'valor' => $c->valor_referencial === null ? null : (string) $c->valor_referencial, 'enBandeja' => (bool) $c->en_bandeja, 'evaluacion' => app(FiltroConvocatorias::class)->evaluar($c)];
     }
 
@@ -165,6 +180,7 @@ final readonly class BandejaSeace
 
         return [
             'id' => (int) $c->id, 'nomenclatura' => $c->nomenclatura, 'entidad' => $c->entidad, 'objeto' => $c->objeto, 'tipo' => $c->tipo,
+            'departamento' => $c->departamento ?? null, 'claveEntidad' => $c->ruc_entidad ?? 'n:'.md5($c->entidad),
             'valor' => $c->valor_referencial === null ? null : (string) $c->valor_referencial, 'moneda' => $c->moneda, 'publicada' => $c->publicada,
             'presentacion' => $c->presentacion === null ? null : CarbonImmutable::parse($c->presentacion), 'dias' => $dias,
             'urgente' => $dias !== null && $dias >= 0 && $dias < self::DIAS_POR_VENCER, 'abierta' => $dias === null || $dias >= 0,

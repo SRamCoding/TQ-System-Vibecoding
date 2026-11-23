@@ -18,16 +18,28 @@ final readonly class FiltroConvocatorias
 {
     private const string CLAVE_FIRMA = 'crm.seace.firma_filtro';
 
+    /** Observación 8.9: los departamentos del Perú (y Callao), como los trae el OECE. */
+    public const array REGIONES = ['AMAZONAS', 'ANCASH', 'APURIMAC', 'AREQUIPA', 'AYACUCHO', 'CAJAMARCA', 'CALLAO', 'CUSCO', 'HUANCAVELICA', 'HUANUCO', 'ICA', 'JUNIN',
+        'LA LIBERTAD', 'LAMBAYEQUE', 'LIMA', 'LORETO', 'MADRE DE DIOS', 'MOQUEGUA', 'PASCO', 'PIURA', 'PUNO', 'SAN MARTIN', 'TACNA', 'TUMBES', 'UCAYALI'];
+
+    /** Cómo se lee una región: «LA LIBERTAD» → «La Libertad». */
+    public static function nombreRegion(?string $region): string
+    {
+        return $region === null ? 'Sin región' : mb_convert_case(mb_strtolower($region), MB_CASE_TITLE);
+    }
+
     /**
      * Las líneas de negocio de la búsqueda, en orden.
      *
-     * @return list<array{id: int, nombre: string, palabras: list<string>, negativas: list<string>, minimo: string}>
+     * @return list<array{id: int, nombre: string, palabras: list<string>, negativas: list<string>, minimo: string, regiones: list<string>, excluidas: list<array{ruc: string, nombre: string}>}>
      */
     public function lineas(): array
     {
         return DB::table('seace_lineas')->orderBy('orden')->orderBy('id')->get()->map(fn (object $l): array => [
             'id' => (int) $l->id, 'nombre' => $l->nombre, 'palabras' => array_values((array) json_decode($l->palabras, true)),
             'negativas' => array_values((array) json_decode($l->negativas, true)), 'minimo' => (string) $l->valor_minimo,
+            'regiones' => array_values((array) json_decode((string) ($l->regiones ?? '[]'), true)),
+            'excluidas' => array_values((array) json_decode((string) ($l->entidades_excluidas ?? '[]'), true)),
         ])->all();
     }
 
@@ -47,9 +59,14 @@ final readonly class FiltroConvocatorias
             $coincide = array_values(array_filter($l['palabras'], fn (string $p): bool => $p !== '' && str_contains($texto, self::normal($p))));
             $negativas = array_values(array_filter($l['negativas'], fn (string $p): bool => $p !== '' && str_contains($texto, self::normal($p))));
             $bajo = $c->valor_referencial !== null && bccomp((string) $c->valor_referencial, $l['minimo'], 2) < 0;
-            $detalle[] = ['linea' => $l['nombre'], 'coincide' => $coincide, 'negativas' => $negativas, 'bajoMinimo' => $bajo, 'minimo' => $l['minimo']];
+            // Observación 8.9: solo sus regiones (vacío = todas) y nunca sus entidades excluidas.
+            $departamento = $c->departamento ?? null;
+            $fueraRegion = $l['regiones'] !== [] && ($departamento === null || ! in_array(mb_strtoupper((string) $departamento), $l['regiones'], true));
+            $excluida = ($c->ruc_entidad ?? null) !== null && collect($l['excluidas'])->contains('ruc', $c->ruc_entidad);
+            $detalle[] = ['linea' => $l['nombre'], 'coincide' => $coincide, 'negativas' => $negativas, 'bajoMinimo' => $bajo, 'minimo' => $l['minimo'],
+                'fueraRegion' => $fueraRegion, 'regiones' => $l['regiones'], 'departamento' => $departamento, 'excluida' => $excluida];
 
-            if ($coincide !== [] && $negativas === [] && ! $bajo && ($mejor === null || count($coincide) > count($mejor[1]))) {
+            if ($coincide !== [] && $negativas === [] && ! $bajo && ! $fueraRegion && ! $excluida && ($mejor === null || count($coincide) > count($mejor[1]))) {
                 $mejor = [$l['id'], $coincide];
             }
         }
@@ -62,6 +79,8 @@ final readonly class FiltroConvocatorias
         $motivo = match (true) {
             $conPalabra === [] => 'No coincide con ninguna palabra clave',
             $conPalabra[0]['negativas'] !== [] => "La descartó la palabra negativa «{$conPalabra[0]['negativas'][0]}» ({$conPalabra[0]['linea']})",
+            $conPalabra[0]['excluida'] => "La entidad está entre las excluidas de {$conPalabra[0]['linea']}",
+            $conPalabra[0]['fueraRegion'] => 'Es de '.self::nombreRegion($conPalabra[0]['departamento'])." y {$conPalabra[0]['linea']} solo busca en ".implode(', ', array_map(self::nombreRegion(...), $conPalabra[0]['regiones'])),
             default => 'Valor referencial bajo el mínimo de '.$conPalabra[0]['linea'].' (S/ '.number_format((float) $conPalabra[0]['minimo'], 2).')',
         };
         $linea = $conPalabra === [] ? null : collect($this->lineas())->firstWhere('nombre', $conPalabra[0]['linea'])['id'] ?? null;

@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v7, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v7
+- **Estado:** en curso (v8, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v8
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -23,6 +23,8 @@ perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
 
+- **MV-089** (ficha) · Región y entidad: por línea en la configuración (regiones y entidades excluidas) y como filtros rápidos en la bandeja; «¿Por qué no entró?» las explica.
+
 - **MV-078** (ficha) · Convocatorias del SEACE: «B · Bandeja con detalle» (lista compacta y detalle, chips de líneas de
   negocio y de «ver»), configuración con líneas de negocio, palabras negativas y «¿Por qué no entró?».
 - **MV-077** (ficha) · Convocatorias del SEACE: se guarda todo lo liviano del OECE y la bandeja muestra lo filtrado; se
@@ -39,6 +41,8 @@ perdida con el ganador y su precio.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **v8 · Región y entidad** (MV-089): en la bandeja, junto al orden, **Región ▾** y **Entidad ▾** con buscador, «Todas» y la cantidad de cada opción (se combinan con los chips; quedan en la dirección `?region=` y `?entidad=`). En la configuración, cada línea suma **REGIONES** (chips de los 25 departamentos y «Todas») y **ENTIDADES EXCLUIDAS** (buscador sobre lo guardado del OECE desde 3 letras; × para volver a incluir). «¿Por qué no entró?» dice «… pero es de Cusco y esa línea solo busca en …» con «Agregar Cusco a la línea», o «… la entidad está entre las excluidas …» con «Quitar la entidad de las excluidas»; al guardar, todo se vuelve a filtrar al instante.
 
 - **Inicio:** caja «Licitaciones» en el área CRM.
 - **Lista** `/licitaciones`: código (y nomenclatura debajo), objeto (y entidad debajo), procedimiento, valor
@@ -169,6 +173,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Reglas y números
 
+- **v8 · Región:** la del OECE es `address.department` de la entidad convocante (`region` es la provincia); se guarda en `departamento`. Una línea con regiones solo toma convocatorias de esas regiones; sin regiones, todas. Una entidad excluida (por RUC) nunca entra por esa línea. Demo: Videovigilancia y Redes con Lambayeque, Piura, La Libertad, Cajamarca y Amazonas; Software, todas; la demo de «Valle Norte» está en Lambayeque. Caso: AS-SM-12-2026-MDW-1 (cámaras en Cusco) queda fuera por región.
+
 - **v7 · Filtro por líneas:** por cada línea, coincide si el texto (sin tildes ni mayúsculas) contiene alguna palabra
   clave; si contiene una negativa, esa línea no la toma; si el valor referencial está bajo su mínimo, tampoco. Entra con
   la línea que más palabras coincide; si ninguna, queda fuera con su motivo (sin palabra, palabra negativa o bajo el
@@ -222,6 +228,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
   Tech, Conectividad del Pacífico y Sistemas Integrados de Salud.
 
 ## Supuestos sin confirmar
+
+- **v8 · Lo guardado antes** sin departamento se completó releyendo las páginas del OECE (quedan 3 viejas sin dato: fuera de las líneas con regiones). Una convocatoria sin región no entra a una línea que tiene regiones.
 
 - **v7 · Fechas estimadas del cronograma:** el OECE trae convocatoria, fin de consultas, presentación y buena pro;
   absolución (+4 días de las consultas) e integración (+7) se estiman y nunca pasan la presentación.
@@ -288,6 +296,8 @@ y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.ph
 `2026_11_23_900001_bandeja_con_detalle.php` y `Demo/BandejaCasosSeeder.php`.
 
 ## Cambios desde la versión anterior
+
+- **v8** (MV-089): regiones y entidades excluidas por línea; filtros rápidos de región y entidad.
 
 - **v7** (MV-078): la bandeja con detalle reemplaza la tabla; líneas de negocio con palabras negativas y su mínimo
   (reemplazan el parámetro único de palabras clave), «¿Por qué no entró?», responsable, etiquetas, vistas por persona.

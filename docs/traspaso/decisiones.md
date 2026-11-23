@@ -1121,3 +1121,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (asistente; paneles y ventanas)
 - **Estado:** vigente
 - **Commit:** el de «Asistente siempre encima de todo»
+
+### MV-089 · 2026-11-23 · Convocatorias del SEACE: filtros por región y por entidad
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-8, punto 9) «Como en LicitaLab, se puede acotar por región y por entidad, en dos lugares: En la configuración de la búsqueda … Regiones: chips con los departamentos del Perú; por omisión «Todas» … Entidades excluidas … En la bandeja … dos filtros rápidos con buscador, Región y Entidad, con la cantidad de cada opción … «¿Por qué no entró?» también explica estas dos reglas … con el botón «Traer igual a la bandeja» y, según el caso, «Agregar Cusco a la línea» o «Quitar la entidad de las excluidas»».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.9: región y entidad en Convocatorias»

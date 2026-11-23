@@ -53,6 +53,13 @@ final class BandejaConvocatorias extends Page
     #[Url(as: 'ver')]
     public ?string $ver = null;
 
+    /** Observación 8.9: filtros rápidos de la bandeja. */
+    #[Url(as: 'region')]
+    public ?string $region = null;
+
+    #[Url(as: 'entidad')]
+    public ?string $entidad = null;
+
     #[Url(as: 'orden', except: 'urgencia')]
     public string $orden = 'urgencia';
 
@@ -248,7 +255,7 @@ final class BandejaConvocatorias extends Page
 
     public function nuevaLinea(): void
     {
-        $this->lineas[] = ['id' => null, 'nombre' => '', 'palabras' => [], 'negativas' => [], 'minimo' => '20000'];
+        $this->lineas[] = ['id' => null, 'nombre' => '', 'palabras' => [], 'negativas' => [], 'minimo' => '20000', 'regiones' => [], 'excluidas' => []];
     }
 
     public function quitarLinea(int $i): void
@@ -277,6 +284,57 @@ final class BandejaConvocatorias extends Page
         $this->dispatch('close-modal', id: 'tq-busqueda-seace');
         Notification::make()->success()->title('Búsqueda guardada: la bandeja se volvió a filtrar.')->send();
     }
+
+    public function agregarRegion(string $linea, string $region): void
+    {
+        if (self::puede()) {
+            app(ConvocatoriasSeaceService::class)->agregarRegion($linea, $region);
+            $this->abrirBusqueda();
+            Notification::make()->success()->title('Agregada '.FiltroConvocatorias::nombreRegion($region)." a {$linea}.")->send();
+        }
+    }
+
+    public function quitarExcluida(string $linea, string $ruc): void
+    {
+        if (self::puede()) {
+            app(ConvocatoriasSeaceService::class)->quitarExcluida($linea, $ruc);
+            $this->abrirBusqueda();
+            Notification::make()->success()->title("La entidad ya no está excluida de {$linea}.")->send();
+        }
+    }
+
+    /** Observación 8.9: en la configuración, una región se marca o desmarca en una línea (ninguna = todas). */
+    public function alternarRegion(int $i, string $region): void
+    {
+        if (! isset($this->lineas[$i])) {
+            return;
+        }
+
+        $actuales = $this->lineas[$i]['regiones'] ?? [];
+        $this->lineas[$i]['regiones'] = $region === '*' ? [] : (in_array($region, $actuales, true) ? array_values(array_diff($actuales, [$region])) : [...$actuales, $region]);
+    }
+
+    /** Excluir o volver a incluir una entidad (de lo guardado del OECE) en una línea. */
+    public function excluirEntidad(int $i, string $ruc): void
+    {
+        $nombre = (string) DB::table('convocatorias_seace')->where('ruc_entidad', $ruc)->value('entidad');
+
+        if (isset($this->lineas[$i]) && $nombre !== '' && ! collect($this->lineas[$i]['excluidas'] ?? [])->contains('ruc', $ruc)) {
+            $this->lineas[$i]['excluidas'][] = ['ruc' => $ruc, 'nombre' => $nombre];
+        }
+
+        $this->buscarEntidad[$i] = '';
+    }
+
+    public function incluirEntidad(int $i, string $ruc): void
+    {
+        if (isset($this->lineas[$i])) {
+            $this->lineas[$i]['excluidas'] = array_values(array_filter($this->lineas[$i]['excluidas'] ?? [], fn (array $e): bool => $e['ruc'] !== $ruc));
+        }
+    }
+
+    /** @var array<int, string> lo que se escribe en el buscador de entidades de cada línea */
+    public array $buscarEntidad = [];
 
     public function traerIgual(int $id): void
     {
@@ -308,7 +366,7 @@ final class BandejaConvocatorias extends Page
         $usuario = (int) auth()->id();
         $bandeja = app(BandejaSeace::class);
         $lista = $bandeja->lista(['buscar' => $this->buscar, 'todo' => $this->todo, 'linea' => $this->linea, 'ver' => array_key_exists((string) $this->ver, BandejaSeace::VER) ? $this->ver : null,
-            'orden' => array_key_exists($this->orden, BandejaSeace::ORDENES) ? $this->orden : 'urgencia'], $usuario);
+            'orden' => array_key_exists($this->orden, BandejaSeace::ORDENES) ? $this->orden : 'urgencia', 'region' => $this->region ?: null, 'entidad' => $this->entidad ?: null], $usuario);
         $ids = array_column($lista['filas'], 'id');
 
         if ($this->elegida === null || ! in_array($this->elegida, $ids, true)) {
@@ -327,6 +385,9 @@ final class BandejaConvocatorias extends Page
             'detalle' => $detalle ?? null,
             'lectura' => app(ConvocatoriasSeaceService::class)->estadoLectura(),
             'porQueResultado' => $bandeja->porQue($this->porQue),
+            'regionesPeru' => FiltroConvocatorias::REGIONES,
+            'sugerenciasEntidad' => collect($this->buscarEntidad)->filter(fn ($q): bool => mb_strlen(trim((string) $q)) >= 3)->map(fn ($q): array => DB::table('convocatorias_seace')->whereNotNull('ruc_entidad')
+                ->where('entidad', 'ilike', '%'.trim((string) $q).'%')->distinct()->orderBy('entidad')->limit(8)->pluck('entidad', 'ruc_entidad')->all())->all(),
             'puede' => self::puede(),
         ];
     }

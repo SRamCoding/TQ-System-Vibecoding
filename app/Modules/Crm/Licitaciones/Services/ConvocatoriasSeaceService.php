@@ -215,6 +215,8 @@ final readonly class ConvocatoriasSeaceService
         $datos = [
             'nomenclatura' => mb_substr((string) ($t['id'] ?? $r['ocid']), 0, 120), 'entidad' => mb_substr((string) ($r['buyer']['name'] ?? $comprador['name'] ?? 'Entidad'), 0, 250),
             'ruc_entidad' => strlen($ruc) === 11 ? $ruc : null, 'region' => $comprador['address']['region'] ?? null,
+            // Observación 8.9: la región (departamento) de la entidad; `region` del OECE es la provincia.
+            'departamento' => isset($comprador['address']['department']) ? mb_strtoupper(mb_substr((string) $comprador['address']['department'], 0, 40)) : null,
             // En el OECE el título suele ser la nomenclatura: el objeto es la descripción si la hay.
             'objeto' => mb_substr($descripcion !== '' ? $descripcion : $titulo, 0, 600),
             'texto' => mb_substr(trim($titulo.' '.$descripcion.' '.implode(' ', array_map(fn ($i): string => (string) ($i['description'] ?? ''), $t['items'] ?? []))), 0, 2000),
@@ -370,6 +372,30 @@ final readonly class ConvocatoriasSeaceService
         $this->priorizar($id);
     }
 
+    /** Observación 8.9, «Agregar [región] a la línea»; después se vuelve a filtrar todo. */
+    public function agregarRegion(string $linea, string $region): void
+    {
+        $l = DB::table('seace_lineas')->where('nombre', $linea)->first();
+
+        if ($l !== null && in_array($region, FiltroConvocatorias::REGIONES, true)) {
+            $regiones = array_values(array_unique([...(array) json_decode($l->regiones, true), $region]));
+            DB::table('seace_lineas')->where('id', $l->id)->update(['regiones' => json_encode($regiones, JSON_UNESCAPED_UNICODE), 'updated_at' => now()]);
+            app(FiltroConvocatorias::class)->reaplicar();
+        }
+    }
+
+    /** Observación 8.9, «Quitar la entidad de las excluidas» de una línea; después se vuelve a filtrar todo. */
+    public function quitarExcluida(string $linea, string $ruc): void
+    {
+        $l = DB::table('seace_lineas')->where('nombre', $linea)->first();
+
+        if ($l !== null) {
+            $quedan = array_values(array_filter((array) json_decode($l->entidades_excluidas, true), fn (array $e): bool => ($e['ruc'] ?? null) !== $ruc));
+            DB::table('seace_lineas')->where('id', $l->id)->update(['entidades_excluidas' => json_encode($quedan, JSON_UNESCAPED_UNICODE), 'updated_at' => now()]);
+            app(FiltroConvocatorias::class)->reaplicar();
+        }
+    }
+
     /** Observación 7.5, «Quitar la palabra negativa» de una línea; después se vuelve a filtrar todo. */
     public function quitarNegativa(string $linea, string $palabra): void
     {
@@ -400,6 +426,8 @@ final readonly class ConvocatoriasSeaceService
                 }
 
                 $datos = ['nombre' => $nombre, 'palabras' => json_encode(self::limpias($l['palabras']), JSON_UNESCAPED_UNICODE), 'negativas' => json_encode(self::limpias($l['negativas']), JSON_UNESCAPED_UNICODE),
+                    'regiones' => json_encode(array_values(array_intersect(array_map('mb_strtoupper', (array) ($l['regiones'] ?? [])), FiltroConvocatorias::REGIONES)), JSON_UNESCAPED_UNICODE),
+                    'entidades_excluidas' => json_encode(array_values(array_filter((array) ($l['excluidas'] ?? []), fn ($e): bool => is_array($e) && ! empty($e['ruc']))), JSON_UNESCAPED_UNICODE),
                     'valor_minimo' => number_format(max(0, (float) $l['minimo']), 2, '.', ''), 'orden' => $i + 1, 'updated_at' => now()];
 
                 if (! empty($l['id']) && DB::table('seace_lineas')->where('id', $l['id'])->exists()) {
