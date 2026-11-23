@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v28
+- **Versión:** v29
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -15,6 +15,8 @@ proceso y sus cajas internas (las pantallas de siempre) como barra de navegació
 elegida. Cada persona ve solo los procesos en que puede abrir al menos una pantalla y ordena sus cajas a su gusto.
 
 ## Decisiones de Sebastián
+
+- **MV-084** (cruza módulos) · Reordenar las cajas no recarga ni cambia la vista, los filtros, el panel ni el desplazamiento.
 
 - **MV-075** (ficha) · El contenido de cada caja empieza justo bajo el nombre del proceso, con el respiro normal entre
   secciones; sin el espacio vacío grande (en todas las portadas).
@@ -288,6 +290,8 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Reglas y números
 
+- **Reordenar cajas** (v29, MV-084): al soltar una caja arrastrada, ni el «soltar» ni el clic llegan a su enlace (antes Livewire navegaba a la lista de esa caja y se perdía la vista). Solo se mueven las cajas y se guarda el orden; la caja elegida sigue elegida en su nuevo lugar. Las vistas de Oportunidades ya viven en la dirección (`/oportunidades/embudo`, `/oportunidades/linea-de-tiempo`, con sus filtros en la consulta), así que también se conservan al recargar o compartir.
+
 - **Bajo el nombre del proceso** (v28, MV-075): 28 px hasta lo primero de la caja (botones de la cabecera o el
   contenido) y 1.5 rem entre la cabecera y el contenido; vale para todas las portadas de proceso.
 - **Qué procesos ve una persona:** los que tienen al menos una caja interna cuyo permiso tiene. Ejemplo: con solo
@@ -297,6 +301,8 @@ contar solas, porque no coinciden con ningún proceso).
   motivos, empresa, general) siguen en Configuración.
 
 ## Supuestos sin confirmar
+
+- **v29 · La causa** era que el enlace de la caja arrastrada recibía el «soltar» del puntero (por la captura del puntero) y Livewire navegaba; se corta en la barra durante el arrastre y 400 ms después.
 
 - **Superficies en modo claro (MV-059):** el documento dice «lo mismo pero hacia el negro»; las superficies se
   llevaron hacia el blanco (si no, las tarjetas quedaban más oscuras que el fondo, como huecos) y bordes y textos hacia
@@ -370,6 +376,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v29** (MV-084): reordenar cajas sin recargar ni perder la vista.
 
 - **v28** (MV-075): sin el espacio vacío bajo el nombre del proceso (se quita el relleno de 2 rem de la cabecera de
   Filament y su separación baja a 1.5 rem, solo en las pantallas con la barra de proceso).

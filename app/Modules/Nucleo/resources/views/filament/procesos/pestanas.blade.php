@@ -176,7 +176,11 @@
         .tq-proceso-caja.tq-arrastrando { opacity: 0.4; }
         @media (prefers-reduced-motion: reduce) { .tq-proceso-caja { transition: none; } }
     </style>
-    <div class="tq-proceso-cuerpo" x-ref="cuerpo" role="list">
+    {{-- Observación 8.5: al soltar una caja arrastrada, ni el «mouseup» ni el clic llegan a su enlace (Livewire navegaría a
+         su lista y se perdería la vista, los filtros y el desplazamiento): se cortan aquí, antes de llegar. --}}
+    <div class="tq-proceso-cuerpo" x-ref="cuerpo" role="list"
+        x-on:mouseup.capture="if (arrastre?.activo || Date.now() < sinClicHasta) { $event.stopPropagation(); $event.preventDefault() }"
+        x-on:click.capture="if (arrastre?.activo || Date.now() < sinClicHasta) { $event.stopPropagation(); $event.preventDefault() }">
         <span class="tq-proceso-marca" aria-hidden="true"></span>
         @foreach ($datos['internas'] as $interna)
             <a href="{{ $interna->url }}" wire:navigate class="tq-proceso-caja" role="listitem" data-caja="{{ $interna->clave }}"

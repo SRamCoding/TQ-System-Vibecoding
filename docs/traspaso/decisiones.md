@@ -1074,3 +1074,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.4: sin título en las vistas de Oportunidades»
+
+### MV-084 · 2026-11-23 · Reordenar las cajas de un proceso no mueve nada más
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-8, punto 5) «Al reordenar solo deben moverse las cajas (con su animación de deslizar) y guardarse el nuevo orden por persona, sin recargar ni volver a pedir la página. Todo lo demás queda exactamente como estaba … Si la vista actual no queda en la dirección (URL), guárdala ahí».
+- **Decisión:** lo dicho.
+- **Alcance:** cruza módulos (navegación de todos los procesos)
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.5: reordenar cajas sin recargar»
