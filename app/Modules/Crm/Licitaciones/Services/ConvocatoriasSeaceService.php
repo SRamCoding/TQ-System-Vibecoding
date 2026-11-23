@@ -226,6 +226,8 @@ final readonly class ConvocatoriasSeaceService
             'consultas_hasta' => $fecha($t['enquiryPeriod']['endDate'] ?? null), 'presentacion' => $fecha($t['tenderPeriod']['endDate'] ?? null), 'buena_pro' => $fecha($t['awardPeriod']['startDate'] ?? null),
             'url' => mb_substr((string) (collect($t['documents'] ?? [])->first()['url'] ?? ''), 0, 500) ?: null,
             'estado_ocds' => isset($t['status']) ? mb_substr((string) $t['status'], 0, 30) : null,
+            // Observación 8.10: los enlaces a los documentos del proceso (de la convocatoria y de la adjudicación).
+            'documentos' => json_encode(self::documentosDe($r), JSON_UNESCAPED_UNICODE),
             'ganador' => $proveedor === null ? null : mb_substr((string) ($proveedor['name'] ?? ''), 0, 250),
             'ganador_ruc' => $proveedor === null ? null : (strlen($g = preg_replace('/\D/', '', (string) ($proveedor['id'] ?? ''))) === 11 ? $g : null),
             'monto_adjudicado' => isset($award['value']['amount']) && (float) $award['value']['amount'] > 0 ? $award['value']['amount'] : null,
@@ -264,6 +266,33 @@ final readonly class ConvocatoriasSeaceService
         }
 
         return ['id' => (int) $guardada->id, 'nueva' => false];
+    }
+
+    /** La página pública del proceso en el portal de contrataciones abiertas del OECE (observación 8.10). */
+    public const string URL_PROCESO_OECE = 'https://contratacionesabiertas.oece.gob.pe/proceso/';
+
+    /** Cómo se llama un documento del OECE cuando no trae título. */
+    public const array TIPOS_DOCUMENTO = ['biddingDocuments' => 'Bases', 'tenderNotice' => 'Aviso de convocatoria', 'clarifications' => 'Absolución de consultas',
+        'evaluationReports' => 'Informe de evaluación', 'awardNotice' => 'Acta de buena pro', 'contractSigned' => 'Contrato', 'technicalSpecifications' => 'Especificaciones técnicas'];
+
+    /**
+     * Los documentos de un release (bases, bases integradas, actas…): título, tipo, formato y enlace; hasta 15.
+     *
+     * @param  array<string, mixed>  $r
+     * @return list<array{titulo: string, tipo: ?string, formato: ?string, url: string}>
+     */
+    public static function documentosDe(array $r): array
+    {
+        $docs = [...($r['tender']['documents'] ?? []), ...array_merge(...array_map(fn (array $a): array => $a['documents'] ?? [], $r['awards'] ?? [])), ...array_merge(...array_map(fn (array $c): array => $c['documents'] ?? [], $r['contracts'] ?? []))];
+        $lista = [];
+
+        foreach ($docs as $d) {
+            if (! empty($d['url'])) {
+                $lista[] = ['titulo' => mb_substr((string) ($d['title'] ?? self::TIPOS_DOCUMENTO[$d['documentType'] ?? ''] ?? 'Documento'), 0, 150), 'tipo' => $d['documentType'] ?? null, 'formato' => isset($d['format']) ? mb_strtoupper((string) $d['format']) : null, 'url' => mb_substr((string) $d['url'], 0, 500)];
+            }
+        }
+
+        return array_slice($lista, 0, 15);
     }
 
     /** Observación 7.4, reacción «Priorizar»: valor alto (parámetro) o entidad que ya es cuenta. */

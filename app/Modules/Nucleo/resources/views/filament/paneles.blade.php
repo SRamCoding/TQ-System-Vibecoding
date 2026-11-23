@@ -29,3 +29,10 @@
     #tq-asis-chat { z-index: 2147483102 !important; }
     #tq-asis-menu { z-index: 2147483103 !important; }
 </style>
+<script>
+    // Observación 8.10: el buscador del SEACE no tiene dirección por proceso; al abrirlo se copia la nomenclatura y se avisa.
+    window.tqCopiarNomenclatura = (nomenclatura) => {
+        try { navigator.clipboard.writeText(nomenclatura) } catch (e) {}
+        try { new FilamentNotification().title('Nomenclatura copiada: pégala en el buscador del SEACE').body(nomenclatura).success().send() } catch (e) {}
+    }
+</script>

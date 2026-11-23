@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v8, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v8
+- **Estado:** en curso (v9, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v9
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -23,6 +23,8 @@ perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
 
+- **MV-090** (ficha) · «Ver en el OECE» abre la página del proceso; el detalle lista sus documentos; «Buscar en el SEACE» (y los botones del SEACE de la postulación) copian la nomenclatura y avisan.
+
 - **MV-089** (ficha) · Región y entidad: por línea en la configuración (regiones y entidades excluidas) y como filtros rápidos en la bandeja; «¿Por qué no entró?» las explica.
 
 - **MV-078** (ficha) · Convocatorias del SEACE: «B · Bandeja con detalle» (lista compacta y detalle, chips de líneas de
@@ -41,6 +43,8 @@ perdida con el ganador y su precio.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **v9 · Ver en el OECE** (MV-090): en el detalle de una convocatoria, **Ver en el OECE** abre `https://contratacionesabiertas.oece.gob.pe/proceso/{código OCDS}` (verificado: la página pública del proceso con convocatoria, ítems, oferentes, documentos, adjudicación y contrato). **Documentos del proceso**: cada uno con su título y formato («Bases administrativas · PDF»), abre el archivo directo. **Buscar en el SEACE** copia la nomenclatura, abre el buscador público y avisa «Nomenclatura copiada: pégala en el buscador del SEACE». Los botones «Abrir el SEACE» de la postulación hacen lo mismo.
 
 - **v8 · Región y entidad** (MV-089): en la bandeja, junto al orden, **Región ▾** y **Entidad ▾** con buscador, «Todas» y la cantidad de cada opción (se combinan con los chips; quedan en la dirección `?region=` y `?entidad=`). En la configuración, cada línea suma **REGIONES** (chips de los 25 departamentos y «Todas») y **ENTIDADES EXCLUIDAS** (buscador sobre lo guardado del OECE desde 3 letras; × para volver a incluir). «¿Por qué no entró?» dice «… pero es de Cusco y esa línea solo busca en …» con «Agregar Cusco a la línea», o «… la entidad está entre las excluidas …» con «Quitar la entidad de las excluidas»; al guardar, todo se vuelve a filtrar al instante.
 
@@ -173,6 +177,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Reglas y números
 
+- **v9 · Documentos:** se guardan solo los enlaces (título, tipo, formato y dirección) de la convocatoria, la adjudicación y el contrato, hasta 15; sin título, el tipo se traduce (biddingDocuments → Bases, awardNotice → Acta de buena pro…). Lo guardado antes se completó releyendo las páginas del OECE.
+
 - **v8 · Región:** la del OECE es `address.department` de la entidad convocante (`region` es la provincia); se guarda en `departamento`. Una línea con regiones solo toma convocatorias de esas regiones; sin regiones, todas. Una entidad excluida (por RUC) nunca entra por esa línea. Demo: Videovigilancia y Redes con Lambayeque, Piura, La Libertad, Cajamarca y Amazonas; Software, todas; la demo de «Valle Norte» está en Lambayeque. Caso: AS-SM-12-2026-MDW-1 (cámaras en Cusco) queda fuera por región.
 
 - **v7 · Filtro por líneas:** por cada línea, coincide si el texto (sin tildes ni mayúsculas) contiene alguna palabra
@@ -228,6 +234,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
   Tech, Conectividad del Pacífico y Sistemas Integrados de Salud.
 
 ## Supuestos sin confirmar
+
+- **v9 · Las convocatorias de la demo** tienen códigos OCDS inventados: «Ver en el OECE» abre una página vacía y su único documento lleva al buscador del SEACE.
 
 - **v8 · Lo guardado antes** sin departamento se completó releyendo las páginas del OECE (quedan 3 viejas sin dato: fuera de las líneas con regiones). Una convocatoria sin región no entra a una línea que tiene regiones.
 
@@ -296,6 +304,8 @@ y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.ph
 `2026_11_23_900001_bandeja_con_detalle.php` y `Demo/BandejaCasosSeeder.php`.
 
 ## Cambios desde la versión anterior
+
+- **v9** (MV-090): Ver en el OECE, documentos del proceso y nomenclatura copiada al ir al SEACE.
 
 - **v8** (MV-089): regiones y entidades excluidas por línea; filtros rápidos de región y entidad.
 

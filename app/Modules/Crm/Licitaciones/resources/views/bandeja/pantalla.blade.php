@@ -234,6 +234,17 @@
                 </div>
 
                 <div>
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px">Documentos del proceso</div>
+                    @forelse ($d['documentos'] as $doc)
+                        <a href="{{ $doc['url'] }}" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; margin: 0 14px 6px 0; font-size: 13px; color: var(--b-azul)">
+                            <x-filament::icon icon="heroicon-o-document-arrow-down" class="h-4 w-4" />{{ $doc['titulo'] }}{{ $doc['formato'] ? ' · '.$doc['formato'] : '' }}
+                        </a>
+                    @empty
+                        <div class="tq-band-sub">El OECE aún no publica documentos de este proceso.</div>
+                    @endforelse
+                </div>
+
+                <div>
                     <div style="font-size: 13px; font-weight: 600; margin-bottom: 8px">Ganadores anteriores en esta entidad</div>
                     @if ($d['ganadores'] === [])
                         <div class="tq-band-sub">Sin procesos anteriores guardados.</div>
@@ -263,7 +274,9 @@
                 </div>
 
                 <div class="tq-band-acciones">
-                    @if ($d['url'])<a class="tq-band-btn" href="{{ $d['url'] }}" target="_blank" rel="noopener">Ver en el SEACE</a>@endif
+                    {{-- Observación 8.10: el OECE tiene página por proceso; el buscador del SEACE no, así que se copia la nomenclatura. --}}
+                    <a class="tq-band-btn" href="{{ $d['urlOece'] }}" target="_blank" rel="noopener">Ver en el OECE</a>
+                    <a class="tq-band-btn" href="{{ $d['urlSeace'] }}" target="_blank" rel="noopener" x-on:click="window.tqCopiarNomenclatura({{ \Illuminate\Support\Js::from($d['nomenclatura']) }})">Buscar en el SEACE</a>
                     @if ($d['estado'] === 'nueva') {{ $this->descartarAction }} @endif
                     <span style="flex: 1"></span>
                     @if ($d['estado'] !== 'descartada') {{ $this->asignarAction }} @endif

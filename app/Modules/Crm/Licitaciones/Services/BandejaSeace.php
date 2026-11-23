@@ -136,7 +136,10 @@ final readonly class BandejaSeace
             ]);
 
         return [...$fila,
-            'region' => $c->region, 'url' => $c->url, 'cronograma' => $cronograma, 'avance' => max(0, min(100, ($pasados - 0.5) * 100 / 5)),
+            'region' => $c->region, 'url' => $c->url,
+            // Observación 8.10: la página del proceso en el OECE y los documentos que trae (bases, integradas, actas…).
+            'urlOece' => ConvocatoriasSeaceService::URL_PROCESO_OECE.$c->ocid, 'urlSeace' => PostulacionService::URL_SEACE,
+            'documentos' => $c->documentos === null ? [] : (array) json_decode($c->documentos, true), 'cronograma' => $cronograma, 'avance' => max(0, min(100, ($pasados - 0.5) * 100 / 5)),
             'conEntidad' => $this->conEntidad($c->ruc_entidad), 'ganadores' => $ganadores->all(), 'motivoDescarte' => $c->motivo_descarte, 'fueraPor' => $c->fuera_por,
             'licitacionId' => $c->licitacion_id === null ? null : (int) $c->licitacion_id, 'motivoPrioridad' => $c->motivo_prioridad,
         ];

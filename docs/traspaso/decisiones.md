@@ -1130,3 +1130,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.9: región y entidad en Convocatorias»
+
+### MV-090 · 2026-11-23 · Ver el proceso en el OECE, sus documentos y la nomenclatura copiada para el SEACE
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-8, punto 10) «Primero, investiga si el portal de contrataciones abiertas del OECE tiene una página pública de detalle por proceso … Si la tiene, el botón pasa a «Ver en el OECE» … Documentos directos … Muéstralos en el detalle … Si de todos modos hay que ir al buscador del SEACE: el botón «Buscar en el SEACE» copia la nomenclatura al portapapeles y abre el buscador, con un aviso corto … Lo mismo para los botones del SEACE de la postulación».
+- **Decisión:** lo dicho: el OECE sí tiene página por proceso.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.10: Ver en el OECE y documentos del proceso»

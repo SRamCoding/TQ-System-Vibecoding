@@ -141,7 +141,7 @@
                         @endif
                     </div>
                     <div class="tq-pos-pie"><span style="flex: 1"></span>
-                        <x-filament::button tag="a" :href="$urlSeace" target="_blank" color="gray" icon="heroicon-o-arrow-top-right-on-square">Abrir el SEACE</x-filament::button>
+                        <x-filament::button tag="a" :href="$urlSeace" target="_blank" color="gray" icon="heroicon-o-arrow-top-right-on-square" x-on:click="window.tqCopiarNomenclatura({{ \Illuminate\Support\Js::from($l->nomenclatura) }})">Abrir el SEACE</x-filament::button>
                         @unless ($l->registrado_seace_el) {{ $this->registrarParticipacionAction }} @endunless
                     </div>
                     @break
@@ -190,7 +190,7 @@
                         @endif
                     </div>
                     <div class="tq-pos-pie"><span style="flex: 1"></span>
-                        <x-filament::button tag="a" :href="$urlSeace" target="_blank" color="gray" icon="heroicon-o-arrow-top-right-on-square">Abrir el SEACE</x-filament::button>
+                        <x-filament::button tag="a" :href="$urlSeace" target="_blank" color="gray" icon="heroicon-o-arrow-top-right-on-square" x-on:click="window.tqCopiarNomenclatura({{ \Illuminate\Support\Js::from($l->nomenclatura) }})">Abrir el SEACE</x-filament::button>
                         @unless ($l->bases_integradas_el) {{ $this->basesIntegradasAction }} @endunless
                     </div>
                     @break
@@ -301,7 +301,7 @@
                         @endif
                     </div>
                     <div class="tq-pos-pie"><span style="flex: 1"></span>
-                        <x-filament::button tag="a" :href="$urlSeace" target="_blank" color="gray" icon="heroicon-o-arrow-top-right-on-square">Abrir el SEACE</x-filament::button>
+                        <x-filament::button tag="a" :href="$urlSeace" target="_blank" color="gray" icon="heroicon-o-arrow-top-right-on-square" x-on:click="window.tqCopiarNomenclatura({{ \Illuminate\Support\Js::from($l->nomenclatura) }})">Abrir el SEACE</x-filament::button>
                         @if ($l->estado->value === 'en_preparacion') {{ $this->registrarPresentacionAction }} @endif
                     </div>
                     @break
