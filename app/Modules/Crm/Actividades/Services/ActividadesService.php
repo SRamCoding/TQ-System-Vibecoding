@@ -131,6 +131,31 @@ final readonly class ActividadesService
     }
 
     /**
+     * Observación 8.8: las actividades de un mes de la persona, por día, como pastillas (hora, asunto y estado).
+     *
+     * @return array<string, list<array{hora: string, asunto: string, estado: string}>>
+     */
+    public function delMes(int $userId, int $anio, int $mes): array
+    {
+        $desde = CarbonImmutable::create($anio, $mes, 1, 0, 0, 0, 'America/Lima');
+        $dias = [];
+
+        foreach (Actividad::query()->where('responsable_user_id', $userId)->whereBetween('fecha', [$desde, $desde->endOfMonth()])->orderBy('fecha')->get(['fecha', 'asunto', 'es_realizada']) as $a) {
+            $fecha = CarbonImmutable::parse($a->fecha)->setTimezone('America/Lima');
+            $dias[$fecha->toDateString()][] = ['hora' => $fecha->format('H:i'), 'asunto' => $a->asunto, 'estado' => self::estadoDe((bool) $a->es_realizada, $fecha)];
+        }
+
+        return $dias;
+    }
+
+    /** Observación 8.8: cuántas actividades sin hacer quedan de días anteriores al dado. */
+    public function vencidasAntesDe(int $userId, string $dia): int
+    {
+        return Actividad::query()->where('responsable_user_id', $userId)->where('es_realizada', false)
+            ->where('fecha', '<', CarbonImmutable::parse($dia, 'America/Lima')->startOfDay())->count();
+    }
+
+    /**
      * MV-025: las actividades de un día de la persona, con quién, de qué cliente u oportunidad y su estado.
      *
      * @return list<array{id: int, tipo: string, asunto: string, hora: string, cuenta: ?string, oportunidad: ?string, estado: string, resultado: ?string, quien: string}>

@@ -21,6 +21,7 @@
     .fi-modal:not(.fi-modal-slide-over) > .fi-modal-close-overlay { background-color: rgb(255 255 255 / .16) !important; -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); }
     .dark .fi-modal:not(.fi-modal-slide-over) > .fi-modal-close-overlay { background-color: rgb(255 255 255 / .05) !important; }
     html:has(.fi-modal.fi-modal-open.fi-modal-slide-over) #tq-asis { left: 24px !important; }
+    html.tq-ventana-abierta #tq-asis, html.tq-ventana-abierta .tq-asis-globo,
     html:has(.fi-modal.fi-modal-open:not(.fi-modal-slide-over)) #tq-asis,
     html:has(.fi-modal.fi-modal-open:not(.fi-modal-slide-over)) .tq-asis-globo { opacity: 0 !important; pointer-events: none !important; transition: opacity .2s ease; }
     html:has(.fi-modal.fi-modal-open.fi-modal-slide-over) .tq-asis-globo { display: none !important; }

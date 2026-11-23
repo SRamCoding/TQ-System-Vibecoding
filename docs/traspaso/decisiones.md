@@ -1101,3 +1101,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (todos los paneles deslizantes y ventanas; asistente; Convocatorias)
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.7: paneles sólidos y legibles»
+
+### MV-087 · 2026-11-23 · La agenda nueva: «Mes con actividades», sólida sobre la pantalla desenfocada
+
+- **Ficha:** `fichas/t1-agenda.md`
+- **Dijo Sebastián:** (observaciones-8, punto 8) Diseño elegido «A · Mes con actividades»: «Ventana sólida (sin vidrio), centrada … la pantalla de atrás desenfocada (blur) y un poco aclarada, sin oscurecer … Encabezado: «Noviembre 2026», flechas …, «Hoy», el selector Año · Mes y «+ Registrar actividad». Las vistas Semana y Lista … no se construyen por ahora … El mes: … pastillas con hora y asunto … «+N más» … Hoy con su número en un círculo turquesa … Detalle del día … botón Hecha (pide «Qué pasó», como hoy) … «+ Actividad para este día»».
+- **Decisión:** lo dicho; MV-025 y MV-026 siguen.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.8: la agenda nueva»

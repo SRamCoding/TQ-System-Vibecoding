@@ -1,7 +1,7 @@
 # Ficha · Agenda y actividades (CRM-05)
 
-- **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v3
+- **Estado:** en curso (v4, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v4
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-agenda-v1`
 - **Fuentes del diseño:** `docs/diseno/v4/parte-2-crm.md` (paso 6: «Mi agenda», registro rápido, próxima acción);
@@ -17,6 +17,8 @@ Oportunidades su columna «Próxima acción» y el punto ámbar de las que no ti
 
 ## Decisiones de Sebastián
 
+- **MV-087** (ficha) · La agenda como «A · Mes con actividades»: ventana sólida centrada, lo de atrás desenfocado, mes con pastillas y detalle del día.
+
 - **MV-055** (ficha) · El ícono de la agenda en el muelle es la hoja del día, estilo aplicación.
 - **MV-025** (cruza módulos) · La agenda es una herramienta del muelle; Mien muestra «Mi agenda».
 - **MV-026** (ficha) · Botón «Año»; desde las descripciones se marca hecha y se registra.
@@ -24,6 +26,8 @@ Oportunidades su columna «Próxima acción» y el punto ámbar de las que no ti
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **Agenda (MV-087, lienzo `docs/vibe/pedidos/lienzos/agenda-nueva/Main.dc.html`):** ventana sólida centrada (hasta 76 × 46 rem, esquinas de 20 px, sombra), con la pantalla de atrás desenfocada y un poco aclarada; se cierra con «×», Esc o clic fuera, y el asistente se esconde mientras está abierta. Encabezado: «Noviembre 2026», ‹ ›, «Hoy», el selector Año · Mes y «+ Registrar actividad». Al abrir, el año un momento y se acerca solo al mes actual (MV-025); «Año» se aleja. El mes: lunes a domingo, celdas con hasta 3 pastillas (hora y asunto recortado) del color de su estado (vencida coral, por vencer ámbar, programada turquesa, hecha verde) y «+N más»; hoy con su número en círculo turquesa y la flecha; el día elegido con borde azul; los huecos de otros meses apagados; leyenda al pie. A la derecha (360 px): día de la semana y fecha, cuántas actividades y cuántas vencidas quedan de días anteriores; cada actividad con su hora del color de su estado, asunto, tipo, cliente u oportunidad, su estado como etiqueta y **Hecha** (pide «Qué pasó»); al pie «+ Actividad para este día». Al abrir, el día elegido es hoy.
 
 - **Inicio:** caja «Agenda» en el área CRM.
 - **Mi agenda** `/agenda`: subtítulo «2 vencidas · 2 oportunidades sin próxima acción». Tabla con Cuándo («Vencida ·
@@ -67,6 +71,8 @@ polimórfica (`actividable_type`) para cuentas, oportunidades, proyectos y ticke
 
 ## Supuestos sin confirmar
 
+- **Agenda · Hecha** guarda «Qué pasó» como resultado (puede quedar vacío). Semana y Lista no se construyen (pedido).
+
 - La agenda es personal: muestra solo las actividades de quien entra (no hay vista del equipo).
 - Registrar una gestión hecha cumple sola la pendiente de esa oportunidad que estaba vencida o era para hoy.
 - La próxima acción se programa a las 10:00 del día que toca.
@@ -89,6 +95,8 @@ polimórfica (`actividable_type`) para cuentas, oportunidades, proyectos y ticke
 `DemoSeeder::actividades()`.
 
 ## Cambios desde la versión anterior
+
+- (MV-087): la agenda nueva, «Mes con actividades».
 
 - **v2** (ronda 1, MV-025 y MV-026): la caja Agenda deja el inicio. En el muelle, arriba de Recortes, un ícono de
   calendario con reloj abre en el centro dos recuadros pegados:

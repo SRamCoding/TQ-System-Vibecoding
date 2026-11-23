@@ -33,6 +33,11 @@ final class AgendaMuelle extends Component
 
     public bool $registrando = false;
 
+    /** Observación 8.8: la actividad que se está marcando como hecha (pide «Qué pasó»). */
+    public ?int $cumpliendo = null;
+
+    public string $quePaso = '';
+
     public function mount(): void
     {
         $hoy = CarbonImmutable::parse(Calendario::hoy());
@@ -66,7 +71,19 @@ final class AgendaMuelle extends Component
 
     public function marcarHecha(int $id): void
     {
-        $this->hacer(fn () => app(ActividadesService::class)->cumplir($id, null), 'Marcada como hecha.');
+        $this->hacer(fn () => app(ActividadesService::class)->cumplir($id, trim($this->quePaso) === '' ? null : trim($this->quePaso)), 'Marcada como hecha.');
+        $this->cumpliendo = null;
+        $this->quePaso = '';
+    }
+
+    public function irAHoy(): void
+    {
+        $this->mount();
+    }
+
+    public function registrarEnDia(): void
+    {
+        $this->registrando = true;
     }
 
     public function registrar(): void
@@ -110,6 +127,8 @@ final class AgendaMuelle extends Component
             'dias' => $servicio->diasDelAnio($usuario->id, $this->anio),
             'hoy' => CarbonImmutable::parse(Calendario::hoy()),
             'actividades' => $this->dia === null ? [] : $servicio->delDia($usuario->id, $this->dia),
+            'delMes' => $servicio->delMes($usuario->id, $this->anio, $this->mes),
+            'vencidasAntes' => $this->dia === null ? 0 : $servicio->vencidasAntesDe($usuario->id, $this->dia),
             'puedeRegistrar' => $usuario->can(ActividadesService::PERMISO_REGISTRAR),
             'tipos' => Actividad::TIPOS,
             // Atajo del MVP: las listas del formulario se leen aquí.
