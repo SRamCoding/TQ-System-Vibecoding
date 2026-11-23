@@ -5,39 +5,48 @@ declare(strict_types=1);
 namespace App\Modules\Erp\Valorizaciones\Filament\Pages;
 
 use App\Modules\Erp\Compras\Filament\Compras;
-use App\Modules\Erp\Valorizaciones\Models\Subcontrato;
-use App\Modules\Erp\Valorizaciones\Models\SubcontratoValorizacion;
+use App\Modules\Erp\Valorizaciones\Services\SubcontratosService;
 use App\Modules\Erp\Valorizaciones\Services\ValorizacionesService;
 use App\Modules\Nucleo\Models\User;
-use App\Modules\Nucleo\Tiempo\Calendario;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
-use RuntimeException;
+use Illuminate\Support\Str;
+use Livewire\Attributes\Url;
 
-/** MVP rápido (t4-valorizaciones): los subcontratos y las valorizaciones de cada subcontratista. */
-final class Subcontratos extends Page implements HasTable
+/**
+ * MVP rápido (t4-valorizaciones; observaciones 6, punto 12): una tarjeta por subcontrato con su dinero, la bandeja «Por
+ * aprobar», la alarma «le pagas más avance del que cobras», cinco cifras, filtros en chips y orden por urgencia. Un
+ * clic abre el panel con el resumen; doble clic, la ficha. Todo sale de `SubcontratosService::estados()`.
+ */
+final class Subcontratos extends Page
 {
-    use InteractsWithTable;
+    use AccionesDeSubcontrato;
+
+    public const array FILTROS = ['por_aprobar' => 'Por aprobar', 'por_pagar' => 'Por pagar', 'con_aviso' => 'Con aviso', 'terminados' => 'Terminados'];
 
     protected static ?string $slug = 'subcontratos';
 
     protected static ?string $title = 'Subcontratos';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-wrench-screwdriver';
+
+    protected string $view = 'valorizaciones::subcontratos.pantalla';
+
+    #[Url]
+    public ?string $filtro = null;
+
+    #[Url]
+    public string $buscar = '';
+
+    #[Url]
+    public ?int $proyecto = null;
 
     public static function canAccess(): bool
     {
@@ -46,50 +55,67 @@ final class Subcontratos extends Page implements HasTable
         return $u instanceof User && $u->can(ValorizacionesService::PERMISO_VER);
     }
 
-    public function getSubheading(): string
+    public function poner(string $filtro): void
     {
-        return Subcontrato::query()->orderBy('codigo')->get()->map(fn (Subcontrato $s): string => "{$s->codigo} {$s->subcontratista}: ".Compras::soles($s->monto)
-            .', retención acumulada '.Compras::soles(app(ValorizacionesService::class)->retencionAcumulada($s->id)))->implode(' · ');
+        $this->filtro = $this->filtro === $filtro || ! array_key_exists($filtro, self::FILTROS) ? null : $filtro;
     }
 
-    public function content(Schema $schema): Schema
+    public function limpiar(): void
     {
-        return $schema->components([EmbeddedTable::make()]);
+        $this->filtro = null;
+        $this->buscar = '';
+        $this->proyecto = null;
     }
 
-    public function table(Table $table): Table
+    /** @return array{todos: list<array<string, mixed>>, tarjetas: list<array<string, mixed>>, cifras: array<string, mixed>, bandeja: list<array<string, mixed>>, proyectos: array<int, string>} */
+    public function datos(): array
     {
-        $m = fn (string $c, string $l, bool $menos = false) => TextColumn::make($c)->label($l)->alignEnd()->fontFamily('mono')
-            ->formatStateUsing(fn ($state): string => ($menos ? '−' : '').number_format((float) $state, 2));
+        $servicio = app(SubcontratosService::class);
+        $todos = $servicio->estados();
+        $texto = Str::lower(Str::ascii(trim($this->buscar)));
+        $tarjetas = array_values(array_filter($todos, fn (array $e): bool => ($this->proyecto === null || $e['proyecto_id'] === $this->proyecto)
+            && ($texto === '' || str_contains(Str::lower(Str::ascii("{$e['subcontratista']} {$e['objeto']} {$e['codigo']}")), $texto))
+            && match ($this->filtro) {
+                'por_aprobar' => $e['pendientes'] !== [],
+                'por_pagar' => bccomp($e['por_pagar'], '0', 2) > 0,
+                'con_aviso' => $e['alarma'],
+                'terminados' => $e['terminado'],
+                default => true,
+            }));
+        $bandeja = [];
 
-        return $table
-            ->query(fn () => SubcontratoValorizacion::query())
-            ->defaultSort('subcontrato_id')
-            ->paginated(false)
-            ->columns([
-                TextColumn::make('subcontrato')->label('Subcontrato')->state(fn (SubcontratoValorizacion $record): string => (string) Subcontrato::query()->whereKey($record->subcontrato_id)->value('codigo'))
-                    ->description(fn (SubcontratoValorizacion $record): string => (string) Subcontrato::query()->whereKey($record->subcontrato_id)->value('subcontratista')),
-                TextColumn::make('numero')->label('Val.')->formatStateUsing(fn ($state, SubcontratoValorizacion $record): string => "{$state} · {$record->periodo}"),
-                TextColumn::make('avance_pct')->label('Avance')->formatStateUsing(fn ($state): string => rtrim(rtrim((string) $state, '0'), '.').' %'),
-                $m('monto', 'Monto'),
-                $m('amortizacion', 'Amort. adelanto', true),
-                $m('retencion', 'Retención', true),
-                TextColumn::make('neto')->label('Neto a pagar')->alignEnd()->fontFamily('mono')->weight('bold')->formatStateUsing(fn ($state): string => number_format((float) $state, 2)),
-                TextColumn::make('estado')->label('Estado')->badge()->formatStateUsing(fn (string $state): string => ['por_aprobar' => 'Por aprobar', 'aprobada' => 'Aprobada', 'pagada' => 'Pagada'][$state])
-                    ->color(fn (string $state): string => $state === 'por_aprobar' ? 'warning' : 'success'),
-            ])
-            ->recordActions([
-                Action::make('aprobar')->label('Aprobar')->button()->color('success')->requiresConfirmation()->hidden(fn (SubcontratoValorizacion $record): bool => $record->estado !== 'por_aprobar')
-                    ->action(fn (SubcontratoValorizacion $record) => app(ValorizacionesService::class)->aprobarSubcontrato($record->id)),
-            ]);
+        foreach ($todos as $e) {
+            foreach ($e['pendientes'] as $v) {
+                $bandeja[] = [...$v, 'sc' => $e];
+            }
+        }
+
+        usort($bandeja, fn (array $a, array $b): int => $b['dias'] <=> $a['dias']);
+
+        return [
+            'todos' => $todos, 'tarjetas' => $tarjetas, 'cifras' => $servicio->cifras($todos), 'bandeja' => $bandeja,
+            'proyectos' => DB::table('proyectos')->whereIn('id', array_unique(array_column($todos, 'proyecto_id')))->orderBy('codigo')->selectRaw("id, codigo || ' · ' || nombre AS t")->pluck('t', 'id')->all(),
+        ];
+    }
+
+    public static function urlFicha(int $id): string
+    {
+        return FichaSubcontrato::getUrl(['id' => $id]);
+    }
+
+    /** Un clic en la tarjeta: el panel deslizante con el resumen y sus botones. */
+    public function resumenAction(): Action
+    {
+        return Action::make('resumen')->slideOver()->modalWidth('lg')
+            ->modalHeading(fn (array $arguments): string => (string) (app(SubcontratosService::class)->estado((int) ($arguments['id'] ?? 0))['codigo'] ?? 'Subcontrato'))
+            ->modalContent(fn (array $arguments) => view('valorizaciones::subcontratos.panel', ['e' => app(SubcontratosService::class)->estado((int) ($arguments['id'] ?? 0))]))
+            ->modalSubmitAction(false)->modalCancelActionLabel('Cerrar');
     }
 
     protected function getHeaderActions(): array
     {
-        $puede = fn (): bool => auth()->user()?->can(ValorizacionesService::PERMISO_GESTIONAR) ?? false;
-
         return [
-            Action::make('nuevo')->label('Nuevo subcontrato')->icon('heroicon-o-plus')->color('gray')->visible($puede)->slideOver()
+            Action::make('nuevo')->label('Nuevo subcontrato')->icon('heroicon-o-plus')->color('gray')->visible(fn (): bool => self::puedeGestionar())->slideOver()
                 ->schema([
                     Select::make('proyecto')->label('Proyecto')->required()->live()->options(fn (): array => DB::table('proyectos as p')->join('estados as e', 'e.id', '=', 'p.estado_id')->where('e.codigo', 'en_ejecucion')->selectRaw("p.id, p.codigo || ' · ' || p.nombre AS t")->pluck('t', 'p.id')->all()),
                     TextInput::make('subcontratista')->label('Subcontratista')->required(),
@@ -103,20 +129,7 @@ final class Subcontratos extends Page implements HasTable
                 ])
                 ->action(fn (array $data) => app(ValorizacionesService::class)->crearSubcontrato((int) $data['proyecto'], $data['subcontratista'], $data['objeto'], (string) $data['adelanto'], (string) $data['retencion'],
                     collect($data['alcance'])->mapWithKeys(fn (array $a): array => [(int) $a['partida'] => (string) $a['monto']])->all())),
-            Action::make('valorizar')->label('Valorización del subcontratista')->icon('heroicon-o-plus')->visible($puede)
-                ->fillForm(fn (): array => ['periodo' => Calendario::ahora()->format('Y-m')])
-                ->schema([
-                    Select::make('subcontrato')->label('Subcontrato')->required()->options(fn (): array => Subcontrato::query()->pluck('codigo', 'id')->all()),
-                    TextInput::make('periodo')->label('Periodo (AAAA-MM)')->required(),
-                    TextInput::make('avance')->label('Avance del periodo (%)')->numeric()->required(),
-                ])
-                ->action(function (array $data): void {
-                    try {
-                        app(ValorizacionesService::class)->valorizarSubcontrato((int) $data['subcontrato'], $data['periodo'], (string) $data['avance']);
-                    } catch (RuntimeException $e) {
-                        Notification::make()->danger()->title($e->getMessage())->send();
-                    }
-                }),
+            $this->valorizarAction(),
         ];
     }
 }

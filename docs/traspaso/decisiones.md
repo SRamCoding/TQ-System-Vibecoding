@@ -932,3 +932,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (los avisos tocan Mien)
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.11: Contratos en tarjetas que avisan antes»
+
+### MV-072 · 2026-11-23 · Subcontratos: una tarjeta por subcontrato y la alarma de pagar de más
+
+- **Ficha:** `fichas/t4-valorizaciones.md`
+- **Dijo Sebastián:** (observaciones-6, punto 12; «aprobada completa») «Tarjetas en dos columnas, una por subcontrato …
+  barra apilada del dinero: pagado · aprobado por pagar · por aprobar · por ejecutar … adelanto por amortizar y retención
+  acumulada. Bandeja "Por aprobar" con su cuenta y el botón Aprobar. Alarma "le pagas más avance del que cobras" si el
+  subcontratista va más de 10 puntos adelante … Cinco cifras arriba. Liberar retención (operación nueva) con el 100 % y
+  su conformidad, registrada como acción con su permiso. Ficha del subcontrato (doble clic; un clic, el panel). Orden
+  por urgencia y filtros en chips. Avisos en Mien».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (la alarma lee Valorizaciones y los avisos tocan Mien)
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.12: Subcontratos en tarjetas y la alarma de pagar de más»

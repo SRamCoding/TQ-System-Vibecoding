@@ -47,10 +47,10 @@ final readonly class ValorizacionesService
             ->map(fn (object $p): array => ['codigo' => $p->codigo, 'descripcion' => $p->descripcion, 'total' => bcadd(bcmul((string) $p->parcial, $factor, 4), '0.005', 2)])->all();
     }
 
-    /** Lo ya valorizado de cada partida (porcentaje acumulado de las valorizaciones aprobadas). */
+    /** Lo ya valorizado de cada partida (porcentaje acumulado de las valorizaciones aprobadas, también las ya facturadas). */
     public function acumulado(int $contratoId): array
     {
-        return DB::table('valorizacion_lineas as l')->join('valorizaciones as v', 'v.id', '=', 'l.valorizacion_id')->where('v.contrato_id', $contratoId)->where('v.estado', 'aprobada')
+        return DB::table('valorizacion_lineas as l')->join('valorizaciones as v', 'v.id', '=', 'l.valorizacion_id')->where('v.contrato_id', $contratoId)->where('v.estado', '<>', 'borrador')
             ->groupBy('l.codigo')->selectRaw('l.codigo, SUM(l.porcentaje) AS pct')->pluck('pct', 'codigo')->map(fn ($v) => (string) $v)->all();
     }
 
