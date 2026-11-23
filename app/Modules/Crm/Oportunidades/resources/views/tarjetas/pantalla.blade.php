@@ -30,13 +30,14 @@
         .tq-op-opcion .tq-n { margin-inline-start: auto; font-size: 0.75rem; font-variant-numeric: tabular-nums; color: var(--gray-500); }
         .tq-op-barra { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
         .tq-op-barra .tq-op-buscar { flex: 1 1 16rem; }
-        .tq-op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr)); gap: 1rem; }
+        /* Observación 8.1: 3 columnas como máximo (3 en anchas, 2 en medianas, 1 en angostas); las tarjetas crecen. */
+        .tq-op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(17.5rem, calc((100% - 2rem) / 3)), 1fr)); gap: 1rem; }
         .tq-op-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 0.75rem; background: white; box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); outline: 1px solid rgb(3 7 18 / 0.06); text-align: start; cursor: pointer; transition: box-shadow 160ms ease, transform 160ms ease; }
         .dark .tq-op-card { background: var(--gray-900); outline-color: rgb(255 255 255 / 0.08); }
         .tq-op-card:hover, .tq-op-card:focus-visible { box-shadow: 0 8px 20px -6px color-mix(in oklab, var(--primary-600) 35%, transparent); transform: translateY(-2px); }
         @media (prefers-reduced-motion: reduce) { .tq-op-card { transition: none; transform: none !important; } }
         html.tq-sin-animaciones .tq-op-card { transition: none; transform: none !important; }
-        .tq-op-foto { position: relative; height: 7.5rem; overflow: hidden; background: var(--gray-100); }
+        .tq-op-foto { position: relative; aspect-ratio: 16 / 6; overflow: hidden; background: var(--gray-100); }
         .tq-op-foto > img, .tq-op-foto > svg { width: 100%; height: 100%; object-fit: cover; display: block; }
         .tq-op-foto .tq-op-linea { position: absolute; left: 0.6rem; bottom: 0.5rem; padding: 0.1rem 0.5rem; border-radius: 9999px; background: rgb(255 255 255 / 0.9); font-size: 0.75rem; font-weight: 600; color: var(--gray-700); }
         .tq-op-foto .tq-op-etapa { position: absolute; right: 0.6rem; top: 0.6rem; }

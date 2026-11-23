@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v5
+- **Versión:** v6
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -14,6 +14,8 @@ pestañas de portada: los leads y las licitaciones por decidir son la primera et
 misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Decisiones de Sebastián
+
+- **MV-080** (ficha) · Mis oportunidades: 3 columnas como máximo; las tarjetas crecen y la foto mantiene su proporción.
 
 - **MV-074** (cruza módulos) · Una sola lista: «Por calificar» como primera etapa con su gema, filtro TIPO, plazos de
   la licitación en la tarjeta y en la urgencia; sin pestañas de portada (reemplaza parte de MV-023 y MV-024).
@@ -151,6 +153,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v6** (MV-080): tarjetas en 3 columnas como máximo, foto con proporción fija.
 
 - **v5** (MV-074): sin pestañas de portada; «Por calificar» como primera etapa con la gema en la roca (lista, embudo y
   línea de tiempo), filtro TIPO, plazos de licitación en la tarjeta y en la urgencia.

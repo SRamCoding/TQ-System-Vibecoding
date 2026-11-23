@@ -1038,3 +1038,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (Campañas, Oportunidades, Proyectos, Postventa, Finanzas por el gasto, Mien)
 - **Estado:** vigente
 - **Commit:** el de «Observación 7.6: Campañas con su retorno y Mis clientes»
+
+### MV-080 · 2026-11-23 · Mis oportunidades en 3 columnas como máximo
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-8, punto 1) «Pasan a 3 columnas como máximo: 3 en pantallas anchas, 2 en medianas y 1 en angostas. Las tarjetas crecen para ocupar el ancho (la foto o ilustración de arriba mantiene su proporción)».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.1: Mis oportunidades en 3 columnas»
