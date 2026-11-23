@@ -13,7 +13,9 @@
 @endphp
 @if ($proceso !== \App\Modules\Nucleo\Navegacion\Proceso::Mien)
 {{-- MV-044: la barra se conserva entre pantallas del mismo proceso; solo se desliza la marca (navegacion-interna). --}}
-<div x-persist="tq-proceso-{{ $proceso->value }}">
+{{-- Observación 8.6: Livewire no la vuelve a dibujar en cada actualización de la página (cerrar un panel, filtrar…), que
+     le borraba la marca de la caja elegida; la marca la pone `tqMarcarProceso` según la ruta. --}}
+<div x-persist="tq-proceso-{{ $proceso->value }}" wire:ignore>
 <nav class="tq-proceso" data-area="{{ $datos['caja']->area->value }}" aria-label="{{ $proceso->nombre() }}"
     x-data="{
         claves: @js(array_map(fn ($c) => $c->clave, $datos['internas'])),

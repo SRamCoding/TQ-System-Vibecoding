@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v29
+- **Versión:** v30
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -15,6 +15,8 @@ proceso y sus cajas internas (las pantallas de siempre) como barra de navegació
 elegida. Cada persona ve solo los procesos en que puede abrir al menos una pantalla y ordena sus cajas a su gusto.
 
 ## Decisiones de Sebastián
+
+- **MV-085** (cruza módulos) · La caja queda elegida en cualquier pantalla de su módulo (lista, vistas, crear, editar, ficha, paneles).
 
 - **MV-084** (cruza módulos) · Reordenar las cajas no recarga ni cambia la vista, los filtros, el panel ni el desplazamiento.
 
@@ -290,6 +292,8 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Reglas y números
 
+- **Caja elegida** (v30, MV-085): se decide por el prefijo de ruta del módulo (todas las rutas de `/oportunidades…` marcan Oportunidades), en el servidor y al navegar sin recargar. Livewire ya no vuelve a dibujar la barra de cajas en cada actualización de la página (antes, al cerrar un panel o filtrar, se borraba la marca de la elegida).
+
 - **Reordenar cajas** (v29, MV-084): al soltar una caja arrastrada, ni el «soltar» ni el clic llegan a su enlace (antes Livewire navegaba a la lista de esa caja y se perdía la vista). Solo se mueven las cajas y se guarda el orden; la caja elegida sigue elegida en su nuevo lugar. Las vistas de Oportunidades ya viven en la dirección (`/oportunidades/embudo`, `/oportunidades/linea-de-tiempo`, con sus filtros en la consulta), así que también se conservan al recargar o compartir.
 
 - **Bajo el nombre del proceso** (v28, MV-075): 28 px hasta lo primero de la caja (botones de la cabecera o el
@@ -376,6 +380,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v30** (MV-085): la caja sigue elegida tras paneles, fichas y «atrás».
 
 - **v29** (MV-084): reordenar cajas sin recargar ni perder la vista.
 

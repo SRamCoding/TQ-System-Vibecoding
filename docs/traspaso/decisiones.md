@@ -1083,3 +1083,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (navegación de todos los procesos)
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.5: reordenar cajas sin recargar»
+
+### MV-085 · 2026-11-23 · La caja sigue elegida mientras se esté en su módulo
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-8, punto 6) «La caja de un módulo debe quedar elegida mientras la persona siga en ese módulo, en cualquiera de sus pantallas (lista, vistas, crear, editar, ficha, paneles), y solo cambiar cuando pase a otra caja o a otro proceso … también al volver con el botón «atrás» del navegador y después de navegar sin recargar».
+- **Decisión:** lo dicho.
+- **Alcance:** cruza módulos (navegación de todos los procesos)
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.6: la caja sigue elegida en su módulo»
