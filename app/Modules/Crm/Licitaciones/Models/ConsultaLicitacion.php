@@ -12,11 +12,14 @@ class ConsultaLicitacion extends Model
 {
     protected $table = 'licitacion_consultas';
 
-    protected $fillable = ['licitacion_id', 'pregunta', 'respuesta', 'fecha'];
+    /** Observación 7.3: borrador (redactada, aún no enviada), enviada (con su constancia) y absuelta. */
+    public const array ESTADOS = ['borrador' => 'Borrador', 'enviada' => 'Enviada', 'absuelta' => 'Absuelta'];
+
+    protected $fillable = ['licitacion_id', 'pregunta', 'respuesta', 'fecha', 'tipo', 'numeral', 'estado', 'origen', 'enviada_el', 'constancia'];
 
     protected function casts(): array
     {
-        return ['fecha' => 'date'];
+        return ['fecha' => 'date', 'enviada_el' => 'date'];
     }
 
     /** @return BelongsTo<Licitacion, $this> */

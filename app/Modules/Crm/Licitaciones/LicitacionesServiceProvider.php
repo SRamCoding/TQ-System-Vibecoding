@@ -10,6 +10,8 @@ use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
 use App\Modules\Crm\Oportunidades\Pestanas\PestanaOportunidad;
 use App\Modules\Crm\Oportunidades\Pestanas\RegistroPestanasOportunidad;
 use App\Modules\Nucleo\Enums\TipoParametro;
+use App\Modules\Nucleo\Mien\RegistroPendientesMien;
+use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Navegacion\AreaModulo;
 use App\Modules\Nucleo\Navegacion\CajaModulo;
 use App\Modules\Nucleo\Navegacion\RegistroModulos;
@@ -55,6 +57,18 @@ final class LicitacionesServiceProvider extends ServiceProvider
         ));
         // MV-023: Licitaciones ya no es caja: es una pestaña de la oportunidad y de la portada de Oportunidades.
         $this->loadViewsFrom(__DIR__.'/resources/views', 'licitaciones');
+        // Observación 7.3: cada fecha del cronograma que se acerca y lo que le falta a cada paso de la postulación.
+        $this->app->make(RegistroPendientesMien::class)->registrar('licitaciones', function (User $u): array {
+            if (! $u->can(LicitacionesService::PERMISO_GESTIONAR)) {
+                return ['cantidad' => 0, 'texto' => ''];
+            }
+
+            $items = app(Services\PostulacionService::class)->avisos();
+
+            return ['cantidad' => count($items), 'texto' => count($items) === 1 ? 'paso de licitación' : 'pasos de licitaciones', 'grupos' => [
+                ['titulo' => 'Licitaciones: lo que toca', 'items' => $items],
+            ]];
+        });
         $this->app->make(RegistroPestanasOportunidad::class)->registrar(new PestanaOportunidad(
             'licitacion', 'Licitación', LicitacionesService::PERMISO_VER, Filament\LicitacionDeOportunidad::class, 'heroicon-o-building-library', orden: 5,
             aplicaA: fn (int $id): bool => Filament\LicitacionDeOportunidad::tieneLicitacion($id),

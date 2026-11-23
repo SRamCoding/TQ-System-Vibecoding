@@ -39,6 +39,9 @@ class Licitacion extends Model
         'codigo', 'nomenclatura', 'cuenta_id', 'es_publica', 'tipo_procedimiento', 'objeto', 'linea_solucion_id', 'valor_referencial',
         'fecha_convocatoria', 'url_bases', 'estado', 'responsable_user_id', 'motivo_no_participa', 'monto_ofertado',
         'fecha_presentacion', 'fecha_resultado', 'oportunidad_id',
+        // Observación 7.3: la ruta por pasos.
+        'registrado_seace_el', 'constancia_registro', 'bases_integradas_el', 'consultas_absueltas_el', 'presupuesto_id',
+        'paquete_armado_at', 'paquete_archivo', 'presentada_at', 'constancia_presentacion',
     ];
 
     protected function casts(): array
@@ -53,6 +56,11 @@ class Licitacion extends Model
             'fecha_presentacion' => 'date',
             'fecha_resultado' => 'date',
             'version' => 'integer',
+            'registrado_seace_el' => 'date',
+            'bases_integradas_el' => 'date',
+            'consultas_absueltas_el' => 'date',
+            'paquete_armado_at' => 'immutable_datetime',
+            'presentada_at' => 'immutable_datetime',
         ];
     }
 
@@ -84,6 +92,12 @@ class Licitacion extends Model
     public function consultas(): HasMany
     {
         return $this->hasMany(ConsultaLicitacion::class)->orderBy('fecha');
+    }
+
+    /** @return HasMany<SubsanacionLicitacion, $this> */
+    public function subsanaciones(): HasMany
+    {
+        return $this->hasMany(SubsanacionLicitacion::class)->orderBy('pedida_el');
     }
 
     /** @return HasMany<ParticipanteLicitacion, $this> */

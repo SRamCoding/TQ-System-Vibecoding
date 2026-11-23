@@ -292,7 +292,8 @@ final class OportunidadResource extends Resource
                         Livewire::make($pestana->nombreLivewire(), fn (Oportunidad $record): array => ['oportunidadId' => $record->id])->key('oportunidad-'.$pestana->clave),
                     ]), app(RegistroPestanasOportunidad::class)->pestanasPara(self::usuario())),
                 PestanaHistorial::make(HistorialDeOportunidad::class, fn (Oportunidad $record): int => $record->id),
-            ]),
+                // Observación 7.3: `?pestana=licitacion::tab` abre la pestaña (los avisos de Mien llevan ahí).
+            ])->persistTabInQueryString('pestana'),
         ]);
     }
 

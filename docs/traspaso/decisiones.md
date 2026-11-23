@@ -984,3 +984,16 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 7.2: sin espacio vacío bajo el nombre del proceso»
+
+### MV-076 · 2026-11-23 · La postulación se gestiona desde el sistema; el SEACE solo para el envío
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-7, punto 3) «quiero que se haga toda la gestión de postulación y demás desde nuestro
+  sistema» … «todo el trabajo en el sistema y en el SEACE solo el envío, hecho por una persona. No se automatiza el
+  portal con un robot ni se guardan credenciales del SEACE en el sistema». Diseño elegido: «A · Ruta por pasos», con la
+  oferta económica desde el presupuesto.
+- **Decisión:** lo dicho: los 8 pasos en la pestaña Licitación (participar, consultas, bases integradas, expediente,
+  oferta, paquete, presentar, subsanación y resultado) y sus avisos en Mien.
+- **Alcance:** negocio (cómo Techquk postula a licitaciones)
+- **Estado:** vigente
+- **Commit:** el de «Observación 7.3: la postulación por pasos»
