@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Licitaciones\Filament\Pages;
 
-use App\Modules\Crm\Licitaciones\Filament\Resources\Licitaciones\Pages\VerLicitacion;
+use App\Modules\Crm\Licitaciones\Services\BandejaSeace;
 use App\Modules\Crm\Licitaciones\Services\ConvocatoriasSeaceService;
+use App\Modules\Crm\Licitaciones\Services\FiltroConvocatorias;
 use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
+use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TarjetasOportunidades;
 use App\Modules\Nucleo\Models\User;
+use App\Modules\Nucleo\RegistroAcciones\EjecutorAcciones;
+use App\Modules\Nucleo\Services\ParametrosService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -15,27 +19,57 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Table;
+use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Url;
 use RuntimeException;
 
-/** MVP rápido (ficha t1-licitaciones v2): la bandeja de convocatorias del SEACE que coinciden con lo que vende Techquk. */
-final class BandejaConvocatorias extends Page implements HasTable
+/**
+ * Observación 7.5 (MV-078, lienzo «B · Bandeja con detalle»): la bandeja de Convocatorias del SEACE funciona como un
+ * correo: arriba el buscador (con «Buscar en todo el SEACE»), «Leído hace…», Leer ahora y Búsqueda; los chips de líneas
+ * de negocio y de «ver» con su cantidad; a la izquierda la lista compacta, a la derecha el detalle de la elegida con
+ * Ver en el SEACE, Descartar, Asignar y Registrar como oportunidad. Observación 7.4: abre al instante con lo guardado y
+ * lee lo nuevo por detrás.
+ */
+final class BandejaConvocatorias extends Page
 {
-    use InteractsWithTable;
-
     protected static ?string $slug = 'convocatorias';
 
     protected static ?string $title = 'Convocatorias del SEACE';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-inbox-stack';
+
+    #[Url(as: 'q', except: '')]
+    public string $buscar = '';
+
+    #[Url(as: 'todo', except: false)]
+    public bool $todo = false;
+
+    #[Url(as: 'linea')]
+    public ?int $linea = null;
+
+    #[Url(as: 'ver')]
+    public ?string $ver = null;
+
+    #[Url(as: 'orden', except: 'urgencia')]
+    public string $orden = 'urgencia';
+
+    #[Url(as: 'c')]
+    public ?int $elegida = null;
+
+    /** La configuración de la búsqueda que se edita en el panel «Búsqueda». */
+    public array $lineas = [];
+
+    public string $umbral = '';
+
+    public string $porQue = '';
+
+    /** Palabra que se está escribiendo en cada línea: "i-palabras" o "i-negativas" => texto. */
+    public array $nuevaPalabra = [];
+
+    public string $nuevaEtiqueta = '';
 
     public static function canAccess(): bool
     {
@@ -44,20 +78,23 @@ final class BandejaConvocatorias extends Page implements HasTable
         return $u instanceof User && $u->can(LicitacionesService::PERMISO_VER);
     }
 
-    public function getSubheading(): string
+    public function getMaxContentWidth(): Width
     {
-        $nuevas = DB::table('convocatorias_seace')->where('en_bandeja', true)->where('estado', 'nueva')->count();
-        $e = app(ConvocatoriasSeaceService::class)->estadoLectura();
-
-        return "{$nuevas} nuevas"
-            .($e['ok'] === null ? '' : ' · Leído '.$e['ok']->locale('es')->diffForHumans())
-            .($e['fallo'] === null ? '' : ' · El OECE no respondió a las '.$e['falloEn']?->format('H:i').': se muestra lo guardado');
+        return Width::Full;
     }
 
-    /**
-     * Observación 7.4: la pantalla abre al instante con lo guardado; después (`wire:init`), si la última lectura tiene
-     * más de 15 minutos, se lee otra y lo nuevo aparece solo en la lista, sin recargar.
-     */
+    /** Sin encabezado propio: el nombre ya lo dice la barra del proceso. */
+    public function getHeading(): string
+    {
+        return '';
+    }
+
+    private static function puede(): bool
+    {
+        return auth()->user()?->can(LicitacionesService::PERMISO_GESTIONAR) ?? false;
+    }
+
+    /** Observación 7.4: si la última lectura tiene más de 15 minutos, lee otra; lo nuevo aparece solo. */
     public function leerAlEntrar(): void
     {
         $r = app(ConvocatoriasSeaceService::class)->leerSiHaceFalta();
@@ -67,71 +104,230 @@ final class BandejaConvocatorias extends Page implements HasTable
         }
     }
 
+    public function leerAhora(): void
+    {
+        if (! self::puede()) {
+            return;
+        }
+
+        try {
+            $r = app(ConvocatoriasSeaceService::class)->sincronizar('a_mano');
+            Notification::make()->success()->title("Leídas {$r['leidas']}: {$r['a_bandeja']} nuevas para la bandeja y {$r['actualizadas']} actualizadas.")->send();
+        } catch (RuntimeException $e) {
+            Notification::make()->warning()->title($e->getMessage())->send();
+        }
+    }
+
+    public function elegir(int $id): void
+    {
+        $this->elegida = $id;
+        app(BandejaSeace::class)->marcarVista($id, (int) auth()->id());
+    }
+
+    /** Flechas ↑ ↓: pasar a la anterior o la siguiente de la lista. */
+    public function mover(int $paso, array $ids): void
+    {
+        $i = array_search($this->elegida, $ids, true);
+        $siguiente = $ids[$i === false ? 0 : max(0, min(count($ids) - 1, $i + $paso))] ?? null;
+
+        if ($siguiente !== null) {
+            $this->elegir((int) $siguiente);
+        }
+    }
+
+    public function ponerVer(?string $ver): void
+    {
+        $this->ver = $this->ver === $ver ? null : $ver;
+    }
+
+    public function ponerLinea(?int $linea): void
+    {
+        $this->linea = $linea;
+    }
+
+    public function quitarEtiqueta(string $etiqueta): void
+    {
+        $c = DB::table('convocatorias_seace')->find($this->elegida);
+
+        if ($c !== null && self::puede()) {
+            app(ConvocatoriasSeaceService::class)->etiquetar($c->id, array_values(array_diff((array) json_decode((string) $c->etiquetas, true), [$etiqueta])));
+        }
+    }
+
+    public function agregarEtiqueta(): void
+    {
+        $c = DB::table('convocatorias_seace')->find($this->elegida);
+
+        if ($c !== null && self::puede() && trim($this->nuevaEtiqueta) !== '') {
+            app(ConvocatoriasSeaceService::class)->etiquetar($c->id, [...(array) json_decode((string) $c->etiquetas, true), $this->nuevaEtiqueta]);
+        }
+
+        $this->nuevaEtiqueta = '';
+    }
+
+    public function descartarAction(): Action
+    {
+        return Action::make('descartar')->label('Descartar')->color('gray')->visible(self::puede(...))
+            ->schema([Select::make('motivo')->label('Motivo')->required()->options(array_combine($m = ['No es nuestro rubro', 'Fuera de nuestra zona', 'Monto muy alto para nosotros', 'Monto muy bajo', 'Plazo imposible', 'No cumplimos la experiencia'], $m))])
+            ->action(function (array $data): void {
+                app(ConvocatoriasSeaceService::class)->descartar((int) $this->elegida, $data['motivo']);
+                Notification::make()->success()->title('Descartada.')->send();
+            });
+    }
+
+    public function asignarAction(): Action
+    {
+        return Action::make('asignar')->label('Asignar')->color('gray')->visible(self::puede(...))
+            ->fillForm(fn (): array => ['responsable' => DB::table('convocatorias_seace')->where('id', $this->elegida)->value('responsable_user_id') ?? auth()->id()])
+            ->schema([Select::make('responsable')->label('Responsable')->searchable()
+                ->options(fn (): array => User::query()->where('es_activo', true)->where('es_sistema', false)->orderBy('name')->pluck('name', 'id')->all())])
+            ->action(fn (array $data) => app(ConvocatoriasSeaceService::class)->asignar((int) $this->elegida, filled($data['responsable'] ?? null) ? (int) $data['responsable'] : null));
+    }
+
+    public function registrarAction(): Action
+    {
+        return Action::make('registrar')->label('Registrar como oportunidad')->visible(self::puede(...))
+            ->requiresConfirmation()->modalDescription('Entra a Oportunidades como «Por calificar»: ahí se decide si participar.')
+            ->action(function (): void {
+                try {
+                    /** @var User $u */
+                    $u = auth()->user();
+                    app(ConvocatoriasSeaceService::class)->registrar((int) $this->elegida, $u);
+                } catch (RuntimeException $e) {
+                    Notification::make()->danger()->title($e->getMessage())->send();
+
+                    return;
+                }
+
+                Notification::make()->success()->title('Registrada: está en Oportunidades, por calificar.')
+                    ->actions([Action::make('ver')->label('Ver por calificar')->url(TarjetasOportunidades::getUrl(['etapa' => ['por_calificar']]))])->send();
+            });
+    }
+
+    public function importarAction(): Action
+    {
+        return Action::make('importar')->label('Importar archivo OCDS')->icon('heroicon-o-arrow-up-tray')->color('gray')->size('sm')->visible(self::puede(...))
+            ->modalDescription('Un archivo JSON de contrataciones abiertas (release o record package) descargado del portal de datos abiertos del OECE.')
+            ->schema([FileUpload::make('archivo')->label('Archivo JSON')->required()->storeFiles(false)->acceptedFileTypes(['application/json', 'text/plain'])])
+            ->action(function (array $data): void {
+                try {
+                    $r = app(ConvocatoriasSeaceService::class)->importar($data['archivo']->get());
+                    Notification::make()->success()->title("Leídas {$r['leidas']}: {$r['a_bandeja']} nuevas para la bandeja.")->send();
+                } catch (RuntimeException $e) {
+                    Notification::make()->danger()->title($e->getMessage())->send();
+                }
+            });
+    }
+
+    /** Abre el panel «Búsqueda» con la configuración de hoy. */
+    public function abrirBusqueda(): void
+    {
+        $this->lineas = array_map(fn (array $l): array => [...$l, 'minimo' => number_format((float) $l['minimo'], 0, '.', '')], app(FiltroConvocatorias::class)->lineas());
+        $this->umbral = (string) app(ParametrosService::class)->entero(ConvocatoriasSeaceService::PARAMETRO_PRIORIDAD);
+        $this->dispatch('open-modal', id: 'tq-busqueda-seace');
+    }
+
+    public function agregarPalabra(int $i, string $tipo): void
+    {
+        $clave = "{$i}-{$tipo}";
+        $p = mb_strtolower(trim((string) ($this->nuevaPalabra[$clave] ?? '')));
+
+        if ($p !== '' && isset($this->lineas[$i]) && in_array($tipo, ['palabras', 'negativas'], true) && ! in_array($p, $this->lineas[$i][$tipo], true)) {
+            $this->lineas[$i][$tipo][] = $p;
+        }
+
+        $this->nuevaPalabra[$clave] = '';
+    }
+
+    public function quitarPalabra(int $i, string $tipo, int $j): void
+    {
+        if (isset($this->lineas[$i][$tipo][$j])) {
+            array_splice($this->lineas[$i][$tipo], $j, 1);
+        }
+    }
+
+    public function nuevaLinea(): void
+    {
+        $this->lineas[] = ['id' => null, 'nombre' => '', 'palabras' => [], 'negativas' => [], 'minimo' => '20000'];
+    }
+
+    public function quitarLinea(int $i): void
+    {
+        array_splice($this->lineas, $i, 1);
+    }
+
+    public function guardarBusqueda(): void
+    {
+        if (! self::puede()) {
+            return;
+        }
+
+        app(ConvocatoriasSeaceService::class)->guardarLineas($this->lineas);
+        // El umbral de prioritaria es un parámetro: se cambia con su acción general (con su versión).
+        [$grupo, $clave] = explode('.', ConvocatoriasSeaceService::PARAMETRO_PRIORIDAD, 2);
+        $version = DB::table('parametros')->where('grupo', $grupo)->where('clave', $clave)->value('version');
+
+        if ($version !== null && (string) (int) $this->umbral !== (string) app(ParametrosService::class)->entero(ConvocatoriasSeaceService::PARAMETRO_PRIORIDAD)) {
+            /** @var User $u */
+            $u = auth()->user();
+            app(EjecutorAcciones::class)->ejecutar('nucleo.cambiar-parametro', ['parametro' => ConvocatoriasSeaceService::PARAMETRO_PRIORIDAD, 'valor' => (string) (int) $this->umbral, 'version' => (int) $version], $u);
+            DB::table('convocatorias_seace')->pluck('id')->each(fn ($id) => app(ConvocatoriasSeaceService::class)->priorizar((int) $id));
+        }
+
+        $this->dispatch('close-modal', id: 'tq-busqueda-seace');
+        Notification::make()->success()->title('Búsqueda guardada: la bandeja se volvió a filtrar.')->send();
+    }
+
+    public function traerIgual(int $id): void
+    {
+        if (self::puede()) {
+            app(ConvocatoriasSeaceService::class)->traerIgual($id);
+            Notification::make()->success()->title('Traída a la bandeja.')->send();
+        }
+    }
+
+    public function quitarNegativa(string $linea, string $palabra): void
+    {
+        if (self::puede()) {
+            app(ConvocatoriasSeaceService::class)->quitarNegativa($linea, $palabra);
+            $this->abrirBusqueda();
+            Notification::make()->success()->title("Quitada «{$palabra}» de {$linea}.")->send();
+        }
+    }
+
     public function content(Schema $schema): Schema
     {
-        return $schema->components([View::make('licitaciones::bandeja.al-entrar'), EmbeddedTable::make()]);
+        return $schema->components([
+            View::make('licitaciones::bandeja.pantalla')->viewData(fn (): array => $this->datos()),
+        ]);
     }
 
-    public function table(Table $table): Table
+    /** @return array<string, mixed> */
+    private function datos(): array
     {
-        return $table
-            ->records(fn (?array $filters): array => DB::table('convocatorias_seace')->where('en_bandeja', true)->when(($filters['estado']['value'] ?? 'nueva') !== 'todas', fn ($q) => $q->where('estado', $filters['estado']['value'] ?? 'nueva'))
-                ->orderBy('presentacion')->get()->map(fn (object $c): array => ['__key' => (string) $c->id, ...(array) $c,
-                    'es_cuenta' => $c->ruc_entidad !== null && DB::table('cuentas')->join('parties', 'parties.id', '=', 'cuentas.party_id')->where('parties.numero_documento', $c->ruc_entidad)->exists()])->all())
-            ->paginated(false)
-            ->columns([
-                TextColumn::make('nomenclatura')->label('Convocatoria')->fontFamily('mono')->wrap()->description(fn (array $record): string => $record['tipo']),
-                TextColumn::make('objeto')->label('Objeto')->wrap()->limit(110)->description(fn (array $record): string => $record['entidad'].($record['region'] ? " · {$record['region']}" : '')),
-                TextColumn::make('es_cuenta')->label('Entidad')->badge()->formatStateUsing(fn (bool $state): string => $state ? 'ya es cuenta' : 'nueva')->color(fn (bool $state): string => $state ? 'success' : 'gray'),
-                TextColumn::make('valor_referencial')->label('Valor referencial')->alignEnd()->fontFamily('mono')->formatStateUsing(fn ($state, array $record): string => $state === null ? '—' : ($record['moneda'] === 'PEN' ? 'S/ ' : $record['moneda'].' ').number_format((float) $state, 2)),
-                TextColumn::make('presentacion')->label('Presentación')->date('d/m/Y')->placeholder('—')
-                    ->color(fn (array $record): ?string => $record['presentacion'] !== null && $record['presentacion'] < now()->addDays(5)->toDateString() ? 'danger' : null),
-                TextColumn::make('coincide')->label('Coincide con')->badge()->color('info'),
-            ])
-            ->filters([SelectFilter::make('estado')->label('Ver')->default('nueva')->options(['nueva' => 'Nuevas', 'registrada' => 'Registradas', 'descartada' => 'Descartadas', 'todas' => 'Todas'])->query(fn ($q) => $q)])
-            ->recordActions([
-                Action::make('registrar')->label('Registrar')->button()->color('success')->hidden(fn (array $record): bool => $record['estado'] !== 'nueva')
-                    ->requiresConfirmation()
-                    ->action(function (array $record): void {
-                        try {
-                            $id = app(ConvocatoriasSeaceService::class)->registrar((int) $record['id'], auth()->user());
-                            $this->redirect(VerLicitacion::getUrl(['record' => $id]));
-                        } catch (RuntimeException $e) {
-                            Notification::make()->danger()->title($e->getMessage())->send();
-                        }
-                    }),
-                Action::make('descartar')->label('Descartar')->color('gray')->hidden(fn (array $record): bool => $record['estado'] !== 'nueva')
-                    ->schema([Select::make('motivo')->label('Motivo')->required()->options(array_combine($m = ['No es nuestro rubro', 'Fuera de nuestra zona', 'Monto muy alto para nosotros', 'Monto muy bajo', 'Plazo imposible'], $m))])
-                    ->action(fn (array $record, array $data) => app(ConvocatoriasSeaceService::class)->descartar((int) $record['id'], $data['motivo'])),
-                Action::make('seace')->label('Ver en el SEACE')->color('gray')->url(fn (array $record): ?string => $record['url'], true)->hidden(fn (array $record): bool => $record['url'] === null),
-            ])
-            ->emptyStateHeading('Sin convocatorias nuevas');
-    }
+        $usuario = (int) auth()->id();
+        $bandeja = app(BandejaSeace::class);
+        $lista = $bandeja->lista(['buscar' => $this->buscar, 'todo' => $this->todo, 'linea' => $this->linea, 'ver' => array_key_exists((string) $this->ver, BandejaSeace::VER) ? $this->ver : null,
+            'orden' => array_key_exists($this->orden, BandejaSeace::ORDENES) ? $this->orden : 'urgencia'], $usuario);
+        $ids = array_column($lista['filas'], 'id');
 
-    protected function getHeaderActions(): array
-    {
-        $puede = fn (): bool => auth()->user()?->can(LicitacionesService::PERMISO_GESTIONAR) ?? false;
-        $avisar = fn (array $r) => Notification::make()->success()->title("Leídas {$r['leidas']}: {$r['a_bandeja']} nuevas para la bandeja; {$r['nuevas']} nuevas guardadas y {$r['actualizadas']} actualizadas.")->send();
+        if ($this->elegida === null || ! in_array($this->elegida, $ids, true)) {
+            $this->elegida = $ids[0] ?? null;
+        }
+
+        if ($this->elegida !== null) {
+            // Abrir una la marca como vista (deja de ser «Nueva» para esa persona) después de dibujar la lista.
+            $detalle = $bandeja->detalle($this->elegida, $usuario);
+            $bandeja->marcarVista($this->elegida, $usuario);
+        }
 
         return [
-            Action::make('sincronizar')->label('Leer ahora')->icon('heroicon-o-arrow-path')->visible($puede)
-                ->action(function () use ($avisar): void {
-                    try {
-                        $avisar(app(ConvocatoriasSeaceService::class)->sincronizar('a_mano'));
-                    } catch (RuntimeException $e) {
-                        Notification::make()->warning()->title($e->getMessage())->send();
-                    }
-                }),
-            Action::make('importar')->label('Importar archivo OCDS')->icon('heroicon-o-arrow-up-tray')->color('gray')->visible($puede)
-                ->modalDescription('Un archivo JSON de contrataciones abiertas (release o record package) descargado del portal de datos abiertos del OECE.')
-                ->schema([FileUpload::make('archivo')->label('Archivo JSON')->required()->storeFiles(false)->acceptedFileTypes(['application/json', 'text/plain'])])
-                ->action(function (array $data) use ($avisar): void {
-                    try {
-                        $avisar(app(ConvocatoriasSeaceService::class)->importar($data['archivo']->get()));
-                    } catch (RuntimeException $e) {
-                        Notification::make()->danger()->title($e->getMessage())->send();
-                    }
-                }),
+            ...$lista,
+            'ids' => $ids,
+            'detalle' => $detalle ?? null,
+            'lectura' => app(ConvocatoriasSeaceService::class)->estadoLectura(),
+            'porQueResultado' => $bandeja->porQue($this->porQue),
+            'puede' => self::puede(),
         ];
     }
 }

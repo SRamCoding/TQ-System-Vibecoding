@@ -39,13 +39,8 @@ final class LicitacionesServiceProvider extends ServiceProvider
         Relation::morphMap(['licitacion' => Licitacion::class]);
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
 
-        // MVP rápido (t1-licitaciones v2): qué convocatorias del SEACE entran a la bandeja.
         $this->app->make(RegistroParametros::class)->declarar(
-            new DefinicionParametro('crm', 'seace_palabras_clave', TipoParametro::Texto,
-                'videovigilancia, cámaras, cctv, red de datos, cableado estructurado, fibra óptica, switch, servidor, centro de datos, data center, software, sistema de información, telemetría, wifi, inalámbric',
-                'Palabras que debe mencionar una convocatoria del SEACE para entrar a la bandeja, separadas por comas.'),
-            new DefinicionParametro('crm', 'seace_valor_minimo', TipoParametro::Entero, 20000,
-                'Valor referencial mínimo (en soles) de una convocatoria para entrar a la bandeja.'),
+            // Observación 7.5: las palabras clave y el valor mínimo pasaron a las líneas de negocio de la bandeja.
             // Observación 7.4.
             new DefinicionParametro('crm', 'seace_valor_prioritaria', TipoParametro::Entero, 500000,
                 'Desde este valor referencial (en soles) una convocatoria es prioritaria (también si la entidad ya es cuenta).'),

@@ -1010,3 +1010,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 7.4: el SEACE se guarda entero y se lee solo lo nuevo»
+
+### MV-078 · 2026-11-23 · Convocatorias del SEACE: la bandeja con detalle
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-7, punto 5) diseño elegido «B · Bandeja con detalle»: «Reemplaza la tabla de hoy.
+  Funciona como un correo: decidir rápido, una por una» — buscador con «Buscar en todo el SEACE», chips de líneas de
+  negocio y de «ver», lista compacta con ↑ ↓, detalle con cronograma, ganadores anteriores, responsable y etiquetas, y
+  «Registrar como oportunidad»; configuración con «Líneas de negocio … cada una con sus palabras clave y sus palabras
+  negativas … y su valor mínimo. Reemplaza el parámetro único de palabras clave», «¿Por qué no entró?», fuentes y el
+  umbral de prioritaria.
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 7.5: la bandeja del SEACE con detalle»

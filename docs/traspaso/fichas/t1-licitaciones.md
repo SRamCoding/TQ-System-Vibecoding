@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v6, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v6
+- **Estado:** en curso (v7, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v7
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -23,6 +23,8 @@ perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
 
+- **MV-078** (ficha) · Convocatorias del SEACE: «B · Bandeja con detalle» (lista compacta y detalle, chips de líneas de
+  negocio y de «ver»), configuración con líneas de negocio, palabras negativas y «¿Por qué no entró?».
 - **MV-077** (ficha) · Convocatorias del SEACE: se guarda todo lo liviano del OECE y la bandeja muestra lo filtrado; se
   lee solo lo nuevo, cada hora y al entrar (si pasaron 15 min), con «Leer ahora»; cada llegada o cambio dispara
   reacciones separadas (filtrar, priorizar, avisar en Mien).
@@ -87,6 +89,28 @@ perdida con el ganador y su precio.
     «presentada».
   - **8 Subsanación y resultado:** **La entidad pide subsanar** (qué pide y plazo), cada pedido con su plazo en coral y
     **Responder** (texto, fecha, constancia); los participantes y **Registrar resultado** como siempre.
+- **Convocatorias del SEACE (v7, MV-078)** `/convocatorias`, como el lienzo «B · Bandeja con detalle»:
+  - **Arriba:** buscador por objeto, entidad o nomenclatura con el interruptor **«Buscar en todo el SEACE»** (busca en todo
+    lo guardado; lo que no está en la bandeja se ve más suave y dice «fuera de tu bandeja»); «Leído hace N minutos»;
+    **Leer ahora**; **Búsqueda**. Debajo, chips con su cantidad: líneas de negocio (Todas, Videovigilancia, Redes,
+    Software…) y «ver» (Nuevas, Prioritarias, Mías, Por vencer, Registradas, Descartadas; otro clic lo quita). Sin chip
+    «ver», las que esperan decisión (nuevas con la presentación por delante).
+  - **Izquierda, la lista** (430 px): punto turquesa y negrita si es nueva para esa persona (sin abrir), estrella dorada
+    si es prioritaria, entidad, días a la presentación (coral a menos de 5), objeto en dos líneas con lo que coincidió
+    resaltado, valor referencial, línea y el responsable (iniciales). Orden por urgencia y selector (mayor valor, más
+    recientes, por entidad). La elegida en azul de selección; **↑ ↓** pasan de una a otra. Abrir una la marca como vista.
+  - **Derecha, el detalle:** procedimiento, «Nueva», «Ya es cliente», línea, «Presentación en N días»; objeto grande con
+    lo resaltado; entidad, región y nomenclatura; valor referencial, **coincide con** y **con esta entidad** («2
+    proyectos ganados · último en 2026»); **cronograma** de puntos (convocatoria, consultas, absolución, integración,
+    presentación en coral, buena pro; lo pasado lleno); **ganadores anteriores en esta entidad** (objeto y año, ganador
+    con Techquk resaltado, adjudicado y descuento) o «Sin procesos anteriores guardados»; responsable y etiquetas
+    (agregar con Enter, quitar con ×). Botones: **Ver en el SEACE**, **Descartar** (motivo), **Asignar** (responsable) y
+    **Registrar como oportunidad** (entra a Oportunidades como «Por calificar»); registrada, «Ver la licitación».
+  - **Búsqueda** (panel deslizante): líneas de negocio con su nombre, valor mínimo, palabras clave y palabras negativas
+    (agregar con Enter, quitar con ×), «+ Nueva línea de negocio»; **¿Por qué no entró?** (nomenclatura o código: qué
+    coincidió y qué la dejó fuera, con **Traer igual a la bandeja** y **Quitar la palabra negativa**); **Fuentes**
+    (procedimientos del SEACE activo; contratos menores y PAC «más adelante»), «Importar archivo OCDS» y el umbral de
+    prioritaria. **Guardar y volver a filtrar** aplica las líneas a todo lo guardado.
 - **Convocatorias del SEACE (v6, MV-077)** `/convocatorias`: abre al instante con lo guardado; si la última lectura
   tiene más de 15 minutos, lee otra por detrás y lo nuevo aparece solo en la lista (con un aviso «Llegó 1 convocatoria
   nueva»). Arriba: «N nuevas · Leído hace 3 minutos» y, si la última lectura falló, «El OECE no respondió a las HH:MM:
@@ -145,6 +169,17 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Reglas y números
 
+- **v7 · Filtro por líneas:** por cada línea, coincide si el texto (sin tildes ni mayúsculas) contiene alguna palabra
+  clave; si contiene una negativa, esa línea no la toma; si el valor referencial está bajo su mínimo, tampoco. Entra con
+  la línea que más palabras coincide; si ninguna, queda fuera con su motivo (sin palabra, palabra negativa o bajo el
+  mínimo). «Traer igual» la deja en la bandeja aunque no pase. Líneas de la demo (desde S/ 20,000): Videovigilancia
+  (videovigilancia, cámaras, cámara, cctv, monitoreo · negativas: cámara frigorífica, cámara de gas), Redes (red de
+  datos, cableado estructurado, fibra óptica, switch, wifi, inalámbric, enlaces · red de agua, red de desagüe), Software
+  (software, sistema de información, telemetría, centro de datos, data center, servidor, servidores · software contable
+  licencia).
+- **v7 · Registrar como oportunidad** crea la licitación «por decidir» (con la línea de solución del mismo nombre que la
+  línea de negocio) y aparece en Oportunidades como «Por calificar».
+
 - **v6 · Lectura del OECE:** `GET /api/v1/releases?format=json&order=desc`, 20 por página, siguiendo `links.next` hasta
   encontrar un release con fecha igual o anterior al más nuevo guardado; tope de 20 páginas por lectura. Fechas con
   microsegundos y su desfase. Cada convocatoria por su código OCDS (único): si llega igual no se toca; si llega más nueva
@@ -188,6 +223,14 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Supuestos sin confirmar
 
+- **v7 · Fechas estimadas del cronograma:** el OECE trae convocatoria, fin de consultas, presentación y buena pro;
+  absolución (+4 días de las consultas) e integración (+7) se estiman y nunca pasan la presentación.
+- **v7 · «Nueva»** es por persona y se apaga al abrirla (también la primera, que se abre sola al entrar).
+- **v7 · La lista sin chip** muestra lo que espera decisión: nuevas con presentación por delante (o sin fecha). Las de
+  presentación vencida solo se ven buscando o con los chips de estado.
+- **v7 · Prioritaria** también por entidad que ya es cuenta: en la demo casi todas las entidades lo son.
+- **v7 · «Con esta entidad»** cuenta las oportunidades ganadas de la cuenta con ese RUC y el año de la última.
+
 - **v6 · Las guardadas antes** de esta versión no tienen su texto completo: se quedan en la bandeja como estaban y no
   se vuelven a filtrar.
 - **v6 · Avisos en Mien** de convocatorias: los de los últimos 3 días, para quien ve licitaciones (no por persona).
@@ -211,6 +254,9 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 - Las seis etapas del cronograma por omisión, con +0, +6, +11, +14, +19 y +26 días desde la convocatoria.
 
 ## Atajos tomados
+
+- **v7:** la bandeja arma la lista en memoria con todo lo guardado; «Con esta entidad» y los RUC de las cuentas se leen
+  con consultas directas. El parámetro viejo de palabras clave quedó sin uso (sus palabras pasaron a las líneas).
 
 - **v6:** la lectura al entrar corre en la misma petición de la pantalla (después de dibujarla), no en una cola; en
   local, lo que la demo deja «por publicar» (`storage/app/private/seace/por-publicar.json`) llega en la primera lectura.
@@ -237,9 +283,14 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.php` y `Demo/PostulacionCasosSeeder.php`. v6:
 `Services/ConvocatoriasSeaceService.php` (`sincronizar`, `guardar`, `leerSiHaceFalta`, `priorizar`), `Services/FiltroConvocatorias.php`,
 `Events/` y `Listeners/` (filtrar, priorizar, avisar), la migración `2026_11_23_800001_convocatorias_todo_lo_liviano.php`,
-`routes/console.php` (cada hora) y `Demo/ConvocatoriasCasosSeeder.php`.
+`routes/console.php` (cada hora) y `Demo/ConvocatoriasCasosSeeder.php`. v7: `Services/BandejaSeace.php`,
+`Filament/Pages/BandejaConvocatorias.php` con `resources/views/bandeja/pantalla.blade.php`, la migración
+`2026_11_23_900001_bandeja_con_detalle.php` y `Demo/BandejaCasosSeeder.php`.
 
 ## Cambios desde la versión anterior
+
+- **v7** (MV-078): la bandeja con detalle reemplaza la tabla; líneas de negocio con palabras negativas y su mínimo
+  (reemplazan el parámetro único de palabras clave), «¿Por qué no entró?», responsable, etiquetas, vistas por persona.
 
 - **v6** (MV-077): se guarda todo lo liviano del OECE; lectura incremental cada hora y al entrar; eventos «llegó» y
   «cambió» con sus reacciones (filtrar, priorizar, avisar en Mien).

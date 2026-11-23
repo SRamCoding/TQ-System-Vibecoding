@@ -32,10 +32,6 @@ final readonly class ConvocatoriasSeaceService
     /** MV-066: cuántas páginas de la API del OECE se leen como máximo en una lectura. */
     public const int PAGINAS_MAXIMAS = 20;
 
-    public const string PARAMETRO_PALABRAS = 'crm.seace_palabras_clave';
-
-    public const string PARAMETRO_VALOR_MINIMO = 'crm.seace_valor_minimo';
-
     /** Observación 7.4: desde este valor referencial (soles) una convocatoria es prioritaria. */
     public const string PARAMETRO_PRIORIDAD = 'crm.seace_valor_prioritaria';
 
@@ -44,12 +40,6 @@ final readonly class ConvocatoriasSeaceService
 
     /** Observación 7.4: lo que la demo deja «por publicar» (solo local). */
     public const string DEMO_POR_PUBLICAR = 'seace/por-publicar.json';
-
-    /** @return list<string> */
-    public function palabras(): array
-    {
-        return array_values(array_filter(array_map(fn (string $p): string => mb_strtolower(trim($p)), explode(',', app(ParametrosService::class)->texto(self::PARAMETRO_PALABRAS)))));
-    }
 
     /**
      * Observación 7.4: lee solo lo nuevo. Pide lo más reciente primero (`order=desc`) y sigue las páginas hasta llegar a
@@ -351,11 +341,85 @@ final readonly class ConvocatoriasSeaceService
             $buenaPro = $c->buena_pro === null ? $presentacion->addDays(7) : CarbonImmutable::parse($c->buena_pro);
             $cronograma = [['Convocatoria', $publicada->toDateString()], ['Consultas y observaciones', $publicada->addDays(6)->toDateString()], ['Absolución', $publicada->addDays(11)->toDateString()],
                 ['Integración de bases', $publicada->addDays(14)->toDateString()], ['Presentación de ofertas', $presentacion->toDateString()], ['Buena pro', $buenaPro->toDateString()]];
-            $l = app(LicitacionesService::class)->registrar($cuentaId, $c->nomenclatura, $tipo, $c->objeto, null, $c->valor_referencial === null ? null : (string) $c->valor_referencial, $publicada, $c->url, $cronograma, $quien);
+            // La línea de negocio de la bandeja, si tiene una línea de solución con el mismo nombre.
+            $lineaSolucion = $c->linea_id === null ? null : DB::table('lineas_solucion')->whereRaw('lower(nombre) = lower(?)', [(string) DB::table('seace_lineas')->where('id', $c->linea_id)->value('nombre')])->value('id');
+            $l = app(LicitacionesService::class)->registrar($cuentaId, $c->nomenclatura, $tipo, mb_substr($c->objeto, 0, 500), $lineaSolucion === null ? null : (int) $lineaSolucion, $c->valor_referencial === null ? null : (string) $c->valor_referencial, $publicada, $c->url, $cronograma, $quien);
             DB::table('convocatorias_seace')->where('id', $id)->update(['estado' => 'registrada', 'licitacion_id' => $l->id, 'updated_at' => now()]);
 
             return $l->id;
         });
+    }
+
+    /** Observación 7.5: el responsable de revisarla. */
+    public function asignar(int $id, ?int $userId): void
+    {
+        DB::table('convocatorias_seace')->where('id', $id)->update(['responsable_user_id' => $userId, 'updated_at' => now()]);
+    }
+
+    /** @param  list<string>  $etiquetas */
+    public function etiquetar(int $id, array $etiquetas): void
+    {
+        $limpias = array_values(array_unique(array_filter(array_map(fn (string $e): string => mb_substr(trim($e), 0, 40), $etiquetas))));
+        DB::table('convocatorias_seace')->where('id', $id)->update(['etiquetas' => $limpias === [] ? null : json_encode($limpias, JSON_UNESCAPED_UNICODE), 'updated_at' => now()]);
+    }
+
+    /** Observación 7.5, «Traer igual a la bandeja»: entra aunque el filtro la deje fuera. */
+    public function traerIgual(int $id): void
+    {
+        DB::table('convocatorias_seace')->where('id', $id)->update(['es_traida' => true, 'en_bandeja' => true, 'updated_at' => now()]);
+        $this->priorizar($id);
+    }
+
+    /** Observación 7.5, «Quitar la palabra negativa» de una línea; después se vuelve a filtrar todo. */
+    public function quitarNegativa(string $linea, string $palabra): void
+    {
+        $l = DB::table('seace_lineas')->where('nombre', $linea)->first();
+
+        if ($l !== null) {
+            $negativas = array_values(array_filter((array) json_decode($l->negativas, true), fn (string $p): bool => $p !== $palabra));
+            DB::table('seace_lineas')->where('id', $l->id)->update(['negativas' => json_encode($negativas, JSON_UNESCAPED_UNICODE), 'updated_at' => now()]);
+            app(FiltroConvocatorias::class)->reaplicar();
+        }
+    }
+
+    /**
+     * Observación 7.5: guarda las líneas de negocio de la búsqueda (con «+ Nueva línea») y vuelve a filtrar lo guardado.
+     *
+     * @param  list<array{id?: ?int, nombre: string, palabras: list<string>, negativas: list<string>, minimo: string|int|float}>  $lineas
+     */
+    public function guardarLineas(array $lineas): void
+    {
+        DB::transaction(function () use ($lineas): void {
+            $quedan = [];
+
+            foreach (array_values($lineas) as $i => $l) {
+                $nombre = mb_substr(trim((string) $l['nombre']), 0, 80);
+
+                if ($nombre === '') {
+                    continue;
+                }
+
+                $datos = ['nombre' => $nombre, 'palabras' => json_encode(self::limpias($l['palabras']), JSON_UNESCAPED_UNICODE), 'negativas' => json_encode(self::limpias($l['negativas']), JSON_UNESCAPED_UNICODE),
+                    'valor_minimo' => number_format(max(0, (float) $l['minimo']), 2, '.', ''), 'orden' => $i + 1, 'updated_at' => now()];
+
+                if (! empty($l['id']) && DB::table('seace_lineas')->where('id', $l['id'])->exists()) {
+                    DB::table('seace_lineas')->where('id', $l['id'])->update($datos);
+                    $quedan[] = (int) $l['id'];
+                } else {
+                    $quedan[] = (int) DB::table('seace_lineas')->insertGetId([...$datos, 'created_at' => now()]);
+                }
+            }
+
+            DB::table('seace_lineas')->whereNotIn('id', $quedan === [] ? [0] : $quedan)->delete();
+        });
+
+        app(FiltroConvocatorias::class)->reaplicar();
+    }
+
+    /** @param  list<string>  $palabras @return list<string> */
+    private static function limpias(array $palabras): array
+    {
+        return array_values(array_unique(array_filter(array_map(fn (string $p): string => mb_strtolower(trim($p)), $palabras))));
     }
 
     public function descartar(int $id, string $motivo): void
