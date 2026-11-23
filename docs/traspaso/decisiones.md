@@ -1024,3 +1024,17 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 7.5: la bandeja del SEACE con detalle»
+
+### MV-079 · 2026-11-23 · Campañas con su retorno, Mis clientes y el Radar del PAC en espera
+
+- **Ficha:** `fichas/t1-campanias.md`
+- **Dijo Sebastián:** (observaciones-7, punto 6) «La caja Campañas se divide en secciones con chips arriba: Campañas · Mis
+  clientes · Radar del PAC (el calendario del año queda para más adelante)». Campañas: cinco cifras, tarjeta con mini
+  embudo, gasto real con el selector de imputación, margen de lo ganado (real o previsto), retorno, formulario y QR,
+  WhatsApp, aviso en Mien. Mis clientes: tres grupos, «Ver la lista», «Crear campaña» con seguimiento «día 1 correo,
+  día 3 WhatsApp, día 7 llamada, editable … cada paso se vuelve una tarea en Mien». Radar del PAC: «antes de
+  construirlo, averigua si los datos abiertos del OECE … entregan los Planes Anuales … Detente y avísame».
+- **Decisión:** lo dicho; el Radar del PAC espera la respuesta de Sebastián a la investigación.
+- **Alcance:** cruza módulos (Campañas, Oportunidades, Proyectos, Postventa, Finanzas por el gasto, Mien)
+- **Estado:** vigente
+- **Commit:** el de «Observación 7.6: Campañas con su retorno y Mis clientes»

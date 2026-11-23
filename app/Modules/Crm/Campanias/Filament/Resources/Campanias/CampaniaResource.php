@@ -9,12 +9,14 @@ use App\Modules\Crm\Campanias\Filament\Resources\Campanias\Pages\VerCampania;
 use App\Modules\Crm\Campanias\Filament\Resources\Campanias\RelationManagers\LeadsRelationManager;
 use App\Modules\Crm\Campanias\Filament\Resources\Leads\LeadResource;
 use App\Modules\Crm\Campanias\Models\Campania;
+use App\Modules\Crm\Campanias\Services\CampaniasService;
 use App\Modules\Crm\Campanias\Services\LeadsService;
 use App\Modules\Nucleo\Filament\EtiquetasEnEspanol;
 use BackedEnum;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -100,6 +102,9 @@ final class CampaniaResource extends Resource
                 TextEntry::make('c_monto')->label('En oportunidades')->fontFamily('mono')->state(fn (Campania $record): string => 'S/ '.number_format((float) app(LeadsService::class)->cifras($record->id)['monto'], 2)),
                 TextEntry::make('c_cpl')->label('Costo por lead')->fontFamily('mono')->state(fn (Campania $record): string => ($v = app(LeadsService::class)->cifras($record->id)['costo_por_lead']) === null ? '—' : 'S/ '.number_format((float) $v, 2)),
             ]),
+            // Observación 7.6: el retorno (gasto real y margen de lo ganado) y, en las campañas a clientes, su seguimiento.
+            View::make('campanias::ficha')->columnSpanFull()
+                ->viewData(fn (Campania $record): array => app(CampaniasService::class)->ficha($record)),
         ]);
     }
 

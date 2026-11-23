@@ -49,6 +49,7 @@ final class DatabaseSeeder extends Seeder
         $this->call(Demo\PostulacionCasosSeeder::class);
         $this->call(Demo\ConvocatoriasCasosSeeder::class);
         $this->call(Demo\BandejaCasosSeeder::class);
+        $this->call(Demo\CampaniasCasosSeeder::class);
     }
 
     /**

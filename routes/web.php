@@ -1,6 +1,8 @@
 <?php
 
 declare(strict_types=1);
+use App\Modules\Crm\Campanias\Models\Campania;
+use App\Modules\Crm\Campanias\Services\CampaniasService;
 use App\Modules\Nucleo\Navegacion\Proceso;
 use App\Modules\Nucleo\Services\AsistenteService;
 use App\Modules\Nucleo\Services\NavegacionService;
@@ -32,3 +34,19 @@ Route::middleware(['web', 'auth'])->post('procesos/{proceso}/orden', function (R
 
     return response()->noContent();
 });
+
+// Observación 7.6 (ficha t1-campanias): el formulario público de cada campaña (sin sesión). Atajo del MVP: contra envíos
+// repetidos, solo un límite por dirección (5 por 10 minutos) y un campo trampa.
+Route::middleware(['web', 'throttle:5,10'])->match(['get', 'post'], 'c/{token}', function (Request $r, string $token) {
+    $campania = Campania::query()->where('token', $token)->where('es_activa', true)->firstOrFail();
+    $enviado = false;
+
+    if ($r->isMethod('post')) {
+        $d = $r->validate(['nombre' => 'required|string|max:150', 'organizacion' => 'nullable|string|max:200', 'telefono' => 'nullable|string|max:30',
+            'correo' => 'nullable|email|max:150', 'necesita' => 'nullable|string|max:1000', 'sitio' => 'nullable|max:0']);
+        app(CampaniasService::class)->recibirFormulario($token, $d['nombre'], $d['organizacion'] ?? null, $d['telefono'] ?? null, $d['correo'] ?? null, $d['necesita'] ?? null);
+        $enviado = true;
+    }
+
+    return view('campanias::formulario', ['campania' => $campania, 'enviado' => $enviado]);
+})->name('campania.formulario');

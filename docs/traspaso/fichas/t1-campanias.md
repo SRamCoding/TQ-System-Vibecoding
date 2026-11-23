@@ -1,9 +1,11 @@
 # Ficha · Campañas y leads (CRM-07)
 
-- **Estado:** en curso (v2, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v2
+- **Estado:** en curso (v3, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v3
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-campanias-v1`
+- **Fuentes del diseño (v3):** `docs/vibe/pedidos/observaciones-7.md` (punto 6) y `lienzos/campanias/` (`Main.dc.html`,
+  `Clientes.dc.html`; `Pac.dc.html` en espera).
 - **Fuentes del diseño:** `docs/diseno/v4/parte-2-crm.md` (paso 6, «Leads y conversión»); `crm-pantallas.md` (CRM-07:
   campañas y leads, convertir lead, detalle de campaña, nueva campaña); DBML `campanias`, `leads`.
 
@@ -18,6 +20,8 @@ módulo es el último del CRM.
 
 ## Decisiones de Sebastián
 
+- **MV-079** (cruza módulos) · Campañas con su retorno (gasto real, margen de lo ganado, formulario y QR) y Mis clientes
+  (tres grupos y campañas a clientes con su seguimiento como tareas). Radar del PAC: primero investigar y avisar.
 - **MV-074** (cruza módulos) · Los leads son tarjetas «Por calificar» en la lista de Oportunidades (Calificar /
   Descartar); `/leads` lleva ahí. Reemplaza la pestaña de MV-024.
 - **MV-024** (cruza módulos) · Los leads son la primera etapa del embudo («Por calificar»); Campañas muestra resultados.
@@ -25,6 +29,27 @@ módulo es el último del CRM.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **v3 · Campañas** `/campanias` (MV-079): chips **Campañas · Mis clientes** (el Radar del PAC no se muestra hasta que
+  Sebastián decida; el calendario, más adelante). «Nueva campaña» arriba.
+  - **Campañas:** cinco cifras del año: invertido (contra lo presupuestado), contactos (y costo por contacto),
+    oportunidades (y % de los contactos), ganado (y cuántos proyectos) y **retorno** (verde desde 1×, coral si no). Una
+    tarjeta por campaña: nombre, tipo, retorno; **mini embudo** contactos → oportunidades → ganadas en barras
+    proporcionales; gastado / presupuesto (coral si se pasó); ganado; **margen de lo ganado** («(previsto)» si algún
+    proyecto no cerró); «N sin atender hace 3 días»; en las de clientes, cuántos clientes. Botones **Formulario y QR**
+    (enlace público, QR para imprimir o descargar, enlace de WhatsApp «Hola, vengo de [campaña]», con copiar),
+    **Registrar gasto** (panel) y **Ver contactos** (la ficha de la campaña).
+  - **Mis clientes:** tres tarjetas con su cantidad y monto estimado: Garantía por vencer en 90 días (ofrecer
+    mantenimiento preventivo), Instalado hace 3 años o más (ofrecer renovación), Solo tienen una línea (ofrecer otra).
+    **Ver la lista**: cada cliente con su proyecto y el dato que lo puso ahí («vence en 21 días», coral bajo 30), con su
+    casilla para incluirlo o no. **Crear campaña** (panel): nombre, responsable y el seguimiento editable (día, canal,
+    plantilla con {cliente}, {oferta} y {proyecto}); al enviar lleva a la ficha de la nueva campaña.
+  - **Ficha de la campaña** `/campanias/{id}`: además de lo de siempre, «Retorno» con los gastos reales y, en las campañas
+    a clientes, «Clientes y seguimiento»: cada paso con el texto ya armado por cliente y su botón **Copiar**.
+  - **Formulario público** `/c/{token}` (sin sesión): nombre, organización, teléfono, correo y qué necesita; al enviar,
+    «¡Gracias!». Solo para campañas activas.
+  - **Mien:** «N contactos de [campaña] llevan 3 días sin atender» y, de las campañas a clientes, cada paso como
+    actividad en la agenda del responsable.
 
 - **Inicio:** caja «Campañas y leads» en el área CRM.
 - **Campañas y leads** `/leads`: subtítulo «Sin atender +3 días · 3 · …». Tabla con Nombre (cargo debajo),
@@ -60,6 +85,21 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Reglas y números
 
+- **v3 · Retorno** = margen de lo ganado ÷ gastado (una decimal). **Gastado** = suma de los gastos reales de la campaña
+  (gasto directo, centro de costo Comercial, rubro «Publicidad y ferias», con su sede; si pasa el saldo de la sede en
+  el mes, pide motivo). **Margen de lo ganado** = por cada oportunidad ganada de sus contactos, el margen real del cierre
+  de su proyecto; si no cerró, el previsto del proyecto (venta − presupuestado). Contactos = leads de la campaña;
+  oportunidades = los convertidos; ganadas = sus oportunidades ganadas.
+- **v3 · Demo:** feria 2,631.21 / 2,400.00 (se pasó), ganado 107,793.00, margen 23,944.00 → 9.1×; Facebook 2,411.00 /
+  2,500.00, margen 16,153.67 → 6.7×; correo 180.00 → 0×; referidos 3,853.53, margen 54,334.80 (previsto) → 14.1×. Año:
+  S/ 9,075.74 invertido, 76 contactos, 14 oportunidades, 4 proyectos, 10.4×.
+- **v3 · Mis clientes:** garantía = series instaladas con la garantía en los próximos 90 días (por proyecto); renovación =
+  proyectos cerrados que terminaron hace 3 años o más; una línea = cuentas cuyas oportunidades ganadas son todas de la
+  misma línea de solución. Estimados: mantenimiento 10 % de lo vendido (S/ 8,400.00 si no se sabe), renovación 60 %
+  (S/ 150,000.00 si no se sabe), otra línea S/ 40,000.00 por cliente.
+- **v3 · Seguimiento por defecto:** día 1 correo, día 3 WhatsApp, día 7 llamada; cada paso, una actividad por cliente en
+  la agenda del responsable el día que toca (correo como «correo»; WhatsApp y llamada como «llamada»).
+
 - Sin atender = lead «sin atender» que llegó hace más de 3 días.
 - Coincidencias: primero la cuenta con el mismo RUC; después las cuentas cuyo nombre es igual o parecido al de la
   organización (la misma búsqueda de parecidos de «Nueva cuenta»).
@@ -71,12 +111,26 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Supuestos sin confirmar
 
+- **v3 · Radar del PAC** no se construye todavía (pedido: investigar y avisar). Lo investigado: el OECE publica el PAC
+  como un Excel anual (`PAC{año}_0.xlsx`, ~8–17 MB, actualizado cada mes) con entidad y RUC, procedimiento, objeto,
+  descripción del ítem, cantidad, ubicación y **mes previsto**, pero **sin valor estimado**; la API OCDS no trae el PAC.
+- **v3 · Estimados de Mis clientes** (10 %, 60 %, S/ 40,000.00) y que la campaña a clientes no tenga presupuesto.
+- **v3 · Lo que el cliente responda** entra como lead de la campaña (Por calificar) cuando alguien lo registra; el
+  envío automático por correo o WhatsApp queda como punto de extensión.
+- **v3 · El número de WhatsApp** es el parámetro `crm.whatsapp_comercial` (inventado en la demo).
+- **v3 · Tres proyectos antiguos** (2021–2023) se agregaron a la demo para el grupo de renovación, con su oportunidad
+  ganada de entonces.
+
 - Tipos de campaña y motivos de descarte como listas fijas.
 - Al convertir, la oportunidad nace en prospecto con el ejecutivo que convierte.
 - No hay asignación automática de leads ni aviso por los que llevan días sin atender.
 - El correo y el teléfono del lead no se vuelven contacto de la cuenta al convertir.
 
 ## Atajos tomados
+
+- **v3:** el formulario público solo se protege con un límite por dirección (5 envíos cada 10 minutos) y un campo
+  trampa. Mis clientes y el margen leen proyectos, series y cierres con consultas directas. Los proyectos antiguos de la
+  demo se insertaron directo en la base. Los gastos de campaña se enlazan en una tabla propia.
 
 - Sin acciones registradas: los botones llaman al servicio o crean el registro directo.
 - Estado, tipo y motivo como texto.
@@ -89,6 +143,9 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 `Filament/Resources/Leads` y `Filament/Resources/Campanias`); datos en `DemoSeeder::campanias()`.
 
 ## Cambios desde la versión anterior
+
+- **v3** (MV-079): Campañas con retorno y gasto real, formulario y QR, Mis clientes y campañas a clientes con su
+  seguimiento; avisos en Mien.
 
 - **v2** (ronda 1, MV-024): la caja «Campañas y leads» pasa a ser **Campañas** (`/campanias`), con columnas nuevas
   Monto generado y Costo por lead junto a Leads y Convertidos (con su tasa). Los leads (`/leads`) son la pestaña
