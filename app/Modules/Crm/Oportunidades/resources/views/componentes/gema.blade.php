@@ -31,6 +31,13 @@
     @if ($decorativa) aria-hidden="true" focusable="false" @else role="img" aria-label="{{ $talla->textoAccesible() }}" @endif
     style="display: inline-block; flex: none; vertical-align: middle; overflow: visible">
     @switch ($talla->value)
+        @case('en_roca')
+            {{-- Observación 7.1: la roca sin abrir, gris y redondeada, con la veta turquesa que promete algo adentro. --}}
+            <path d="M4.5 18.5 7 11.5 13 7.5 21 8 27 13 27.5 20.5 22 26 12 26.5 6 23.5z" fill="#6F6A66" stroke="#9C958F" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M9 13.5 12.5 12M19 23l3.5-1.5M8 20.5l2 1" stroke="#9C958F" stroke-width=".8" opacity=".6" stroke-linecap="round" fill="none"/>
+            <path d="M8.5 17.5 13 15.5 15.5 17 19.5 13.5 23.5 14.5" stroke="#4DDDF5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M15.5 17 16.5 20.5" stroke="#7FE9FF" stroke-width="1" stroke-linecap="round" fill="none"/>
+            @break
         @case('en_bruto')
             <path d="M7 13.5 11.5 6.5 20 5.5 26.5 11.5 25 22 15.5 27 6 21z" fill="#4E6B72" stroke="#86A9B1" stroke-width="1.2" stroke-linejoin="round"/>
             <path d="M11.5 6.5 14 14 7 13.5M14 14l11 -2.5M14 14l1.5 13M14 14l-8 7" stroke="#86A9B1" stroke-width=".8" opacity=".55" fill="none"/>

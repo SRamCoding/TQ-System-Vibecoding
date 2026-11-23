@@ -4,10 +4,18 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages;
 
+use App\Modules\Crm\Campanias\Filament\Resources\Leads\LeadResource;
+use App\Modules\Crm\Campanias\Models\Lead;
+use App\Modules\Crm\Campanias\Services\LeadsService;
+use App\Modules\Crm\Licitaciones\Filament\AccionesLicitacion;
+use App\Modules\Crm\Licitaciones\Filament\Resources\Licitaciones\LicitacionResource;
+use App\Modules\Crm\Licitaciones\Models\Licitacion;
+use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
 use App\Modules\Crm\Oportunidades\Enums\EtapaAbierta;
 use App\Modules\Crm\Oportunidades\Filament\DibujoDeLinea;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLaFicha;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLasVistas;
+use App\Modules\Crm\Oportunidades\Filament\PanelesOportunidad;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\OportunidadResource;
 use App\Modules\Crm\Oportunidades\Filament\VistasDeOportunidades;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
@@ -15,7 +23,13 @@ use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
 use App\Modules\Crm\Oportunidades\Services\FiltrosOportunidades;
 use App\Modules\Crm\Oportunidades\Services\FotoOportunidadService;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
+use App\Modules\Crm\Oportunidades\Services\ResumenOportunidad;
 use App\Modules\Nucleo\Models\LineaSolucion;
+use Carbon\CarbonImmutable;
+use Closure;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
@@ -23,6 +37,7 @@ use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Pagination\Paginator;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
+use RuntimeException;
 
 /**
  * La vista «Tarjetas» de Oportunidades (plan 2.21d, D1 y D11; prototipo aprobado
@@ -40,6 +55,9 @@ final class TarjetasOportunidades extends Page
     use WithPagination;
 
     public const int POR_PAGINA = 24;
+
+    /** Observación 7.1: a menos de estos días, el plazo de la licitación va en coral. */
+    public const int DIAS_URGENTE = 5;
 
     protected static string $resource = OportunidadResource::class;
 
@@ -70,8 +88,15 @@ final class TarjetasOportunidades extends Page
     #[Url(as: 'cliente', except: [])]
     public array $clientes = [];
 
+    /** @var list<string> Observación 7.1: Privada · Licitación pública · Licitación privada. */
+    #[Url(as: 'tipo', except: [])]
+    public array $tipos = [];
+
     #[Url(as: 'orden', except: 'monto')]
     public string $orden = 'monto';
+
+    /** La tarjeta por calificar sobre la que se abrió una acción (lead o licitación). */
+    public ?int $porCalificarId = null;
 
     public static function canAccess(array $parameters = []): bool
     {
@@ -101,7 +126,7 @@ final class TarjetasOportunidades extends Page
 
     public function quitarFiltros(): void
     {
-        $this->reset('buscar', 'atencion', 'etapas', 'ejecutivos', 'lineas', 'clientes');
+        $this->reset('buscar', 'atencion', 'etapas', 'ejecutivos', 'lineas', 'clientes', 'tipos');
         $this->resetPage();
     }
 
@@ -115,6 +140,7 @@ final class TarjetasOportunidades extends Page
             lineas: array_map(intval(...), $this->lineas),
             clientes: array_map(strval(...), $this->clientes),
             orden: array_key_exists($this->orden, FiltrosOportunidades::ORDENES) ? $this->orden : 'monto',
+            tipos: array_values(array_intersect(array_map(strval(...), $this->tipos), array_keys(FiltrosOportunidades::TIPOS))),
         );
     }
 
@@ -137,14 +163,119 @@ final class TarjetasOportunidades extends Page
         $oportunidades = $pagina->items();
         $cuentas = OportunidadResource::cuentas(array_map(fn (Oportunidad $o): int => $o->cuenta_id, $oportunidades));
         $lineas = LineaSolucion::query()->whereKey(array_map(fn (Oportunidad $o): int => $o->linea_solucion_id, $oportunidades))->get(['id', 'codigo', 'nombre'])->keyBy('id');
+        $licitaciones = $portada->licitaciones();
+        // Observación 7.1: las tarjetas por calificar van primero (son la primera etapa), solo en la primera página.
+        $porCalificar = $pagina->currentPage() === 1 ? $portada->porCalificar($filtros) : [];
+        usort($porCalificar, fn (array $a, array $b): int => [$a['fecha'] === null ? 1 : 0, $a['fecha']?->getTimestamp() ?? 0, $a['desde']->getTimestamp()] <=> [$b['fecha'] === null ? 1 : 0, $b['fecha']?->getTimestamp() ?? 0, $b['desde']->getTimestamp()]);
 
         return [
             'pagina' => $pagina,
-            'tarjetas' => array_map(fn (Oportunidad $o): array => self::tarjeta($o, $cuentas[$o->cuenta_id] ?? '—', $lineas->get($o->linea_solucion_id)), $oportunidades),
+            'porCalificar' => array_map(fn (array $t): array => [...$t, 'plazo' => self::plazo($t['hito']), 'montoTexto' => $t['monto'] === null ? null : 'S/ '.number_format((float) $t['monto'], 2)], $porCalificar),
+            'puedeLeads' => LeadResource::puede(LeadsService::PERMISO_GESTIONAR),
+            'puedeLicitaciones' => LicitacionResource::puede(LicitacionesService::PERMISO_GESTIONAR),
+            'tarjetas' => array_map(fn (Oportunidad $o): array => [...self::tarjeta($o, $cuentas[$o->cuenta_id] ?? '—', $lineas->get($o->linea_solucion_id)), 'plazo' => in_array($o->estado->codigo, ['ganada', 'perdida'], true) ? null : self::plazo($licitaciones[$o->id]['hito'] ?? null), 'licitacion' => isset($licitaciones[$o->id])], $oportunidades),
             'opciones' => $portada->opcionesVitrina($filtros),
             'ordenes' => FiltrosOportunidades::ORDENES,
-            'conFiltros' => $this->buscar !== '' || $this->atencion !== [] || $this->etapas !== [] || $this->ejecutivos !== [] || $this->lineas !== [] || $this->clientes !== [],
+            'conFiltros' => $this->buscar !== '' || $this->atencion !== [] || $this->etapas !== [] || $this->ejecutivos !== [] || $this->lineas !== [] || $this->clientes !== [] || $this->tipos !== [],
             'fichaAbierta' => $this->ficha,
+        ];
+    }
+
+    /**
+     * Observación 7.1: el próximo plazo de la licitación, como se lee en la tarjeta («Presentación en 3 días»); coral a
+     * menos de 5 días o vencido.
+     *
+     * @param  array{etapa: string, fecha: CarbonImmutable, dias: int}|null  $hito
+     * @return array{texto: string, urgente: bool, titulo: string}|null
+     */
+    private static function plazo(?array $hito): ?array
+    {
+        if ($hito === null) {
+            return null;
+        }
+
+        $d = $hito['dias'];
+        $cuando = match (true) {
+            $d < 0 => 'venció hace '.abs($d).(abs($d) === 1 ? ' día' : ' días'),
+            $d === 0 => 'hoy',
+            $d === 1 => 'mañana',
+            default => "en {$d} días",
+        };
+
+        return ['texto' => "{$hito['etapa']} {$cuando}", 'urgente' => $d < self::DIAS_URGENTE, 'titulo' => $hito['etapa'].': '.$hito['fecha']->format('d/m/Y')];
+    }
+
+    /** Observación 7.1: abre una acción sobre una tarjeta por calificar (lead o licitación). */
+    public function decidir(string $accion, int $id): void
+    {
+        if (! in_array($accion, ['calificarLead', 'descartarLead', 'participar', 'noParticipar'], true)) {
+            return;
+        }
+
+        $this->porCalificarId = $id;
+        $this->mountAction($accion);
+    }
+
+    public function calificarLeadAction(): Action
+    {
+        return LeadResource::accionConvertir()->name('calificarLead')->label('Calificar')
+            ->record(fn (): ?Lead => Lead::query()->find($this->porCalificarId))
+            ->modalHeading(fn (): string => 'Calificar · '.Lead::query()->whereKey($this->porCalificarId)->value('nombre_contacto'))
+            ->after(fn () => $this->calcularCifras());
+    }
+
+    public function descartarLeadAction(): Action
+    {
+        return LeadResource::accionDescartar()->name('descartarLead')
+            ->record(fn (): ?Lead => Lead::query()->find($this->porCalificarId))
+            ->after(fn () => Notification::make()->success()->title('Lead descartado.')->send());
+    }
+
+    public function participarAction(): Action
+    {
+        return $this->accionLicitacion('participar');
+    }
+
+    public function noParticiparAction(): Action
+    {
+        return $this->accionLicitacion('noParticipar');
+    }
+
+    private function accionLicitacion(string $nombre): Action
+    {
+        $acciones = AccionesLicitacion::todas(
+            fn (): Licitacion => Licitacion::query()->findOrFail($this->porCalificarId),
+            function (Closure $hacer, string $mensaje): void {
+                try {
+                    $hacer();
+                } catch (RuntimeException $e) {
+                    Notification::make()->danger()->title($e->getMessage())->send();
+
+                    return;
+                }
+
+                Notification::make()->success()->title($mensaje)->send();
+                $this->calcularCifras();
+            },
+        );
+
+        return $acciones[$nombre];
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            PanelesOportunidad::nueva(null, function (mixed $resultado): void {
+                Notification::make()->success()->title('Oportunidad creada.')->send();
+
+                if ($resultado instanceof ResumenOportunidad) {
+                    $this->redirect(VerOportunidad::getUrl(['record' => $resultado->id]), navigate: true);
+                }
+            }),
+            ActionGroup::make([
+                LeadResource::accionNuevo(),
+                LicitacionResource::accionRegistrar(),
+            ])->label('Por calificar')->icon('heroicon-o-inbox-arrow-down')->button()->color('gray'),
         ];
     }
 

@@ -9,7 +9,7 @@
 --}}
 @php
     use App\Modules\Crm\Oportunidades\Filament\DibujoDelCronograma as D;
-    $etapas = ['prospecto' => ['Prospecto', 'en_bruto'], 'calificada' => ['Calificada', 'desbastada'], 'propuesta_enviada' => ['Propuesta enviada', 'tallada'], 'negociacion' => ['Negociación', 'pulida']];
+    $etapas = ['por_calificar' => ['Por calificar', 'en_roca'], 'prospecto' => ['Prospecto', 'en_bruto'], 'calificada' => ['Calificada', 'desbastada'], 'propuesta_enviada' => ['Propuesta enviada', 'tallada'], 'negociacion' => ['Negociación', 'pulida']];
     $hayFiltros = $this->buscar !== '' || $this->vencimiento !== null || $this->etapa !== null || $this->responsable !== 'mias';
     $separadorPuesto = false;
 @endphp
@@ -109,7 +109,12 @@
                     @php $separadorPuesto = true; @endphp
                     <div class="tq-linea-separador" data-tq-fila="sep-vencidas">↑ {{ $vencidas === 1 ? '1 vencida' : $vencidas.' vencidas' }}</div>
                 @endif
+                {{-- Observación 7.1: una fila por calificar lleva a su licitación o a la lista; las demás abren la ficha. --}}
+                @if (isset($f['url']))
+                <a href="{{ $f['url'] }}" wire:navigate class="tq-linea-fila" wire:key="linea-{{ $f['id'] }}" data-tq-fila="linea-{{ $f['id'] }}" style="text-decoration: none; color: inherit">
+                @else
                 <button type="button" class="tq-linea-fila" wire:key="linea-{{ $f['id'] }}" data-tq-fila="linea-{{ $f['id'] }}" wire:click="abrirFicha({{ $f['id'] }})">
+                @endif
                     <span style="display: flex; align-items: center; gap: 12px; padding: 10px 18px; min-width: 0">
                         <x-oportunidades::gema :talla="$f['talla']" :tamano="26" decorativa />
                         <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
@@ -132,7 +137,11 @@
                             <span class="tq-linea-hito" style="left: {{ $f['hito']['x'] }}%" @if ($f['vencida']) data-vencido @endif>{{ $f['hito']['texto'] }}</span>
                         @endif
                     </span>
+                @if (isset($f['url']))
+                </a>
+                @else
                 </button>
+                @endif
             @empty
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px; font-size: 14px; color: var(--tq-l-suave)">
                     <span>Ninguna oportunidad coincide.</span>

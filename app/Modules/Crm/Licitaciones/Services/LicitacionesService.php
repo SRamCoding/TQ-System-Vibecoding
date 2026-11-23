@@ -199,6 +199,71 @@ final readonly class LicitacionesService
     }
 
     /**
+     * Observación 7.1: las licitaciones por decidir («Registrada», aún sin oportunidad) son tarjetas «Por calificar» en
+     * la lista de Oportunidades, con su próximo hito.
+     *
+     * @return list<array{id: int, codigo: string, nomenclatura: string, objeto: string, cuenta_id: int, es_publica: bool, linea_solucion_id: ?int, valor_referencial: ?string, responsable: ?int, desde: CarbonImmutable, hito: ?array{etapa: string, fecha: CarbonImmutable, dias: int}}>
+     */
+    public function porDecidir(): array
+    {
+        $filas = Licitacion::query()->where('estado', EstadoLicitacion::Registrada->value)->whereNull('oportunidad_id')->orderBy('id')->get();
+        $hitos = $this->proximosHitosDe($filas->pluck('id')->all());
+
+        return $filas->map(fn (Licitacion $l): array => [
+            'id' => $l->id, 'codigo' => $l->codigo, 'nomenclatura' => $l->nomenclatura, 'objeto' => $l->objeto, 'cuenta_id' => (int) $l->cuenta_id,
+            'es_publica' => (bool) $l->es_publica, 'linea_solucion_id' => $l->linea_solucion_id === null ? null : (int) $l->linea_solucion_id,
+            'valor_referencial' => $l->valor_referencial === null ? null : (string) $l->valor_referencial, 'responsable' => $l->responsable_user_id === null ? null : (int) $l->responsable_user_id,
+            'desde' => CarbonImmutable::instance($l->created_at), 'hito' => $hitos[$l->id] ?? null,
+        ])->values()->all();
+    }
+
+    /**
+     * Observación 7.1: de cada oportunidad que nació de una licitación, si es pública o privada y su próximo hito sin
+     * cumplir (el vencido más viejo, o el que viene).
+     *
+     * @return array<int, array{licitacion_id: int, es_publica: bool, hito: ?array{etapa: string, fecha: CarbonImmutable, dias: int}}> por id de oportunidad
+     */
+    public function deOportunidades(): array
+    {
+        $filas = Licitacion::query()->whereNotNull('oportunidad_id')->get(['id', 'oportunidad_id', 'es_publica', 'estado']);
+        $abiertas = $filas->filter(fn (Licitacion $l): bool => in_array($l->estado, [EstadoLicitacion::Registrada, EstadoLicitacion::EnPreparacion, EstadoLicitacion::Presentada], true));
+        $hitos = $this->proximosHitosDe($abiertas->pluck('id')->all());
+        $resultado = [];
+
+        foreach ($filas as $l) {
+            $resultado[(int) $l->oportunidad_id] = ['licitacion_id' => $l->id, 'es_publica' => (bool) $l->es_publica, 'hito' => $hitos[$l->id] ?? null];
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * @param  list<int>  $ids
+     * @return array<int, array{etapa: string, fecha: CarbonImmutable, dias: int}>
+     */
+    private function proximosHitosDe(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $hoy = CarbonImmutable::parse(Calendario::hoy());
+        $resultado = [];
+
+        // El primero que viene (de hoy en adelante); si ya pasaron todos, el último, vencido.
+        foreach (HitoLicitacion::query()->whereIn('licitacion_id', $ids)->where('es_cumplido', false)->orderBy('fecha')->orderBy('orden')->get() as $h) {
+            $fecha = CarbonImmutable::parse($h->fecha);
+            $actual = $resultado[$h->licitacion_id] ?? null;
+
+            if ($actual === null || $actual['dias'] < 0) {
+                $resultado[$h->licitacion_id] = ['etapa' => $h->etapa, 'fecha' => $fecha, 'dias' => (int) $hoy->diffInDays($fecha, false)];
+            }
+        }
+
+        return $resultado;
+    }
+
+    /**
      * El histórico de la entidad (v4 paso 4: «esta entidad adjudica entre el 76 % y el 92 % del referencial»): sus otras
      * licitaciones con resultado, a qué precio adjudicó y cuánto del referencial fue.
      *

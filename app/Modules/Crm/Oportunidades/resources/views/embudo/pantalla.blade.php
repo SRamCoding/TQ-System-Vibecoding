@@ -43,6 +43,27 @@
 
     <div class="tq-embudo-cuerpo">
         <div class="tq-embudo-izq">
+            {{-- Observación 7.1: la boca del embudo, «Por calificar», con la gema en la roca; lleva a esas tarjetas. --}}
+            <div class="tq-embudo-etapa">
+                <a href="{{ $porCalificar['url'] }}" wire:navigate class="tq-embudo-boton" style="width: 100%; text-decoration: none" data-etapa="por_calificar"
+                    aria-label="Por calificar, {{ $porCalificar['cantidad'] }}: {{ $porCalificar['leads'] }} leads y {{ $porCalificar['licitaciones'] }} licitaciones por decidir">
+                    <span class="tq-embudo-franja" style="height: 66px; background: linear-gradient(180deg, #DCD7D1, #BEB7AF)">
+                        <x-oportunidades::gema talla="en_roca" :tamano="38" decorativa />
+                        <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 1px; flex: 1; min-width: 0">
+                            <span class="tq-embudo-nombre" style="color: #2E2A26">Por calificar</span>
+                            <span class="tq-embudo-sub" style="color: #4F4943">Gema en la roca · {{ $porCalificar['leads'] }} leads · {{ $porCalificar['licitaciones'] }} licitaciones</span>
+                        </span>
+                        <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 1px">
+                            <span class="tq-embudo-monto" style="color: #2E2A26">{{ $porCalificar['cantidad'] }}</span>
+                            <span class="tq-embudo-sub" style="color: #4F4943">ref. {{ $porCalificar['referencial'] }}</span>
+                        </span>
+                    </span>
+                </a>
+                <span class="tq-embudo-paso">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--tq-e-acento)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+                    Calificar · Participar
+                </span>
+            </div>
             @foreach ($etapas as $e)
                 <div class="tq-embudo-etapa">
                     <button type="button" class="tq-embudo-boton" style="width: {{ $e['ancho'] }}%" wire:click="elegirEtapa('{{ $e['lugar'] }}')"

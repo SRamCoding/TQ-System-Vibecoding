@@ -12,6 +12,7 @@ use App\Modules\Crm\Oportunidades\Filament\PanelesOportunidad;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\OportunidadResource;
 use App\Modules\Crm\Oportunidades\Filament\VistasDeOportunidades;
 use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
+use App\Modules\Crm\Oportunidades\Services\FiltrosOportunidades;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
 use App\Modules\Crm\Oportunidades\Services\ProximaAccionDeOportunidades;
@@ -160,7 +161,16 @@ final class TableroOportunidades extends Page
             $resumen = count($sala).' este año · '.$soles(self::sumar(array_column($sala, 'monto')));
         }
 
+        // Observación 7.1: «Por calificar», la boca del embudo (leads y licitaciones por decidir), con la gema en la roca.
+        $porCalificar = app(PortadaOportunidades::class)->porCalificar(new FiltrosOportunidades);
+        $leads = count(array_filter($porCalificar, fn (array $t): bool => $t['clase'] === 'lead'));
+
         return [
+            'porCalificar' => [
+                'cantidad' => count($porCalificar), 'leads' => $leads, 'licitaciones' => count($porCalificar) - $leads,
+                'referencial' => $soles(self::sumar(array_values(array_filter(array_column($porCalificar, 'monto'))))),
+                'url' => TarjetasOportunidades::getUrl(['etapa' => [TallaDeGema::POR_CALIFICAR]]),
+            ],
             'etapas' => $etapas,
             'ganadas' => ['cantidad' => count($ganadas = $this->delAnio('ganada')), 'monto' => $soles(self::sumar(array_column($ganadas, 'monto')))],
             'perdidas' => ['cantidad' => count($perdidas = $this->delAnio('perdida')), 'monto' => $soles(self::sumar(array_column($perdidas, 'monto')))],

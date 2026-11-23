@@ -8,6 +8,7 @@ use App\Modules\Crm\Oportunidades\Enums\EtapaAbierta;
 use App\Modules\Crm\Oportunidades\Enums\TallaDeGema;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\OportunidadResource;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
+use App\Modules\Crm\Oportunidades\Services\FiltrosOportunidades;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
 use App\Modules\Nucleo\Models\Estado;
 use App\Modules\Nucleo\Models\HistorialEstado;
@@ -47,7 +48,7 @@ final readonly class DibujoDelCronograma
         $inicio = $hoy->subDays($atras);
         $x = fn (CarbonImmutable $d): float => round($inicio->diffInDays($d, false) / $dias * 100, 2);
 
-        $oportunidades = $this->oportunidades($f['etapa'] === 'cerradas');
+        $oportunidades = $f['etapa'] === TallaDeGema::POR_CALIFICAR ? [] : $this->oportunidades($f['etapa'] === 'cerradas');
         $historial = $this->historial(array_map(fn (Oportunidad $o): int => $o->id, $oportunidades));
         $cuentas = OportunidadResource::cuentas(array_map(fn (Oportunidad $o): int => $o->cuenta_id, $oportunidades));
         $portada = app(PortadaOportunidades::class);
@@ -57,16 +58,29 @@ final readonly class DibujoDelCronograma
             $prob[$e->value] = $portada->probabilidad($e);
         }
 
-        $filas = array_map(fn (Oportunidad $o): array => $this->fila($o, $historial[$o->id] ?? [], $hoy, $x, Str::before($cuentas[$o->cuenta_id] ?? '—', ' · '), $prob), $oportunidades);
+        $licitaciones = $portada->licitaciones();
+        $filas = array_map(fn (Oportunidad $o): array => $this->conPlazo($this->fila($o, $historial[$o->id] ?? [], $hoy, $x, Str::before($cuentas[$o->cuenta_id] ?? '—', ' · '), $prob), $licitaciones[$o->id]['hito'] ?? null, $hoy, $x), $oportunidades);
+
+        // Observación 7.1: «Por calificar» con la gema en la roca. Sin filtro de etapa, las licitaciones por decidir (tienen
+        // plazos que apuran); con el chip «Por calificar», también los leads.
+        if ($f['etapa'] === null || $f['etapa'] === TallaDeGema::POR_CALIFICAR) {
+            foreach ($portada->porCalificar(new FiltrosOportunidades) as $t) {
+                if ($t['clase'] === 'licitacion' || $f['etapa'] === TallaDeGema::POR_CALIFICAR) {
+                    $filas[] = $this->filaPorCalificar($t, $hoy, $x);
+                }
+            }
+        }
         $texto = self::normal($f['buscar']);
         $filas = array_values(array_filter($filas, function (array $r) use ($f, $usuarioId, $texto, $hoy): bool {
-            if ($f['responsable'] === 'mias' && $r['ejecutivo'] !== $usuarioId) {
+            if ($r['etapa'] === TallaDeGema::POR_CALIFICAR) {
+                // Lo por calificar aún no tiene dueño fijo: se ve con «Mías» y «Todas».
+            } elseif ($f['responsable'] === 'mias' && $r['ejecutivo'] !== $usuarioId) {
                 return false;
             }
             if (ctype_digit($f['responsable']) && $r['ejecutivo'] !== (int) $f['responsable']) {
                 return false;
             }
-            if ($f['etapa'] !== null && $f['etapa'] !== 'cerradas' && $r['etapa'] !== $f['etapa']) {
+            if ($f['etapa'] !== null && $f['etapa'] !== 'cerradas' && $f['etapa'] !== TallaDeGema::POR_CALIFICAR && $r['etapa'] !== $f['etapa']) {
                 return false;
             }
             if ($texto !== '' && ! str_contains(self::normal($r['nombre'].' '.$r['cliente']), $texto)) {
@@ -111,6 +125,57 @@ final readonly class DibujoDelCronograma
             // monto; al final las sin fecha, de mayor a menor monto.
             default => fn (array $a, array $b): int => [$a['cierre'] === null ? 1 : 0, $cierre($a), $monto($b)] <=> [$b['cierre'] === null ? 1 : 0, $cierre($b), $monto($a)],
         };
+    }
+
+    /**
+     * Observación 7.1: el próximo plazo de su licitación cuenta como un cierre: si llega antes que el cierre estimado (o
+     * ya venció), manda en la urgencia y en el rombo.
+     *
+     * @param  array<string, mixed>  $fila
+     * @param  array{etapa: string, fecha: CarbonImmutable, dias: int}|null  $hito
+     * @param  callable(CarbonImmutable): float  $x
+     * @return array<string, mixed>
+     */
+    private function conPlazo(array $fila, ?array $hito, CarbonImmutable $hoy, callable $x): array
+    {
+        if ($hito === null || in_array($fila['etapa'], ['ganada', 'perdida'], true) || ($fila['cierre'] !== null && $fila['cierre']->lte($hito['fecha']))) {
+            return $fila;
+        }
+
+        $fecha = $hito['fecha'];
+        $vencida = $fecha->lt($hoy);
+
+        return [...$fila, 'cierre' => $fecha, 'vencida' => $vencida, 'diasVencida' => $vencida ? (int) $fecha->diffInDays($hoy) : 0,
+            'falta' => $fecha->gt($hoy) ? ['x' => max(0, $x($hoy)), 'ancho' => round(min(100, $x($fecha)) - max(0, $x($hoy)), 2)] : null,
+            'hito' => ['x' => $x($fecha), 'visible' => $x($fecha) >= 0 && $x($fecha) <= 100, 'texto' => $vencida ? 'venció' : mb_strtolower(Str::limit($hito['etapa'], 14, '…')),
+                'titulo' => "{$hito['etapa']} de la licitación: {$fecha->format('d/m/Y')}"]];
+    }
+
+    /**
+     * Una tarjeta por calificar como fila: un tramo gris desde que llegó y, si es licitación, su plazo como rombo.
+     *
+     * @param  array<string, mixed>  $t
+     * @param  callable(CarbonImmutable): float  $x
+     * @return array<string, mixed>
+     */
+    private function filaPorCalificar(array $t, CarbonImmutable $hoy, callable $x): array
+    {
+        $desde = $t['desde']->startOfDay();
+        $fecha = $t['hito']['fecha'] ?? null;
+        $vencida = $fecha !== null && $fecha->lt($hoy);
+        $inicio = max(0, $x($desde));
+
+        return [
+            'id' => $t['clave'], 'url' => $t['clase'] === 'licitacion' ? '/licitaciones/'.$t['id'] : '/oportunidades?etapa[0]=por_calificar',
+            'nombre' => $t['nombre'], 'cliente' => Str::before($t['entidad'], ' · '),
+            'monto' => $t['monto'] === null ? 'sin monto' : 'S/ '.number_format((float) $t['monto'], 2), 'montoNumero' => $t['monto'] ?? '0',
+            'etapa' => TallaDeGema::POR_CALIFICAR, 'orden' => -2, 'probabilidad' => 0, 'talla' => TallaDeGema::EnRoca, 'ejecutivo' => $t['ejecutivo'],
+            'diasEnEtapa' => (int) $desde->diffInDays($hoy), 'cierre' => $fecha, 'vencida' => $vencida, 'diasVencida' => $vencida ? (int) $fecha->diffInDays($hoy) : 0,
+            'tramos' => $x($hoy) > 0 ? [['etapa' => TallaDeGema::POR_CALIFICAR, 'x' => $inicio, 'ancho' => max(0.4, round(min(100, $x($hoy)) - $inicio, 2)), 'color' => '#C9C2BA', 'titulo' => 'Por calificar desde '.$desde->format('d/m/Y')]] : [],
+            'falta' => $fecha !== null && $fecha->gt($hoy) ? ['x' => max(0, $x($hoy)), 'ancho' => round(min(100, $x($fecha)) - max(0, $x($hoy)), 2)] : null,
+            'hito' => $fecha === null ? null : ['x' => $x($fecha), 'visible' => $x($fecha) >= 0 && $x($fecha) <= 100, 'texto' => $vencida ? 'venció' : mb_strtolower(Str::limit($t['hito']['etapa'], 14, '…')),
+                'titulo' => "{$t['hito']['etapa']}: {$fecha->format('d/m/Y')}"],
+        ];
     }
 
     private static function normal(string $texto): string

@@ -159,7 +159,7 @@ enum Proceso: string
 
     /**
      * Pantallas sin caja propia que viven dentro de otra (MV-023): su ruta cuenta como la de esa caja para las pestañas y
-     * la miga. «Por calificar» (los leads) y «Licitaciones» son pestañas de la portada de Oportunidades.
+     * la miga. `/leads` y `/licitaciones` llevan a Oportunidades con su filtro (MV-074) y la ficha de la licitación vive ahí.
      *
      * @return array<string, string> prefijo de ruta => clave de la caja
      */

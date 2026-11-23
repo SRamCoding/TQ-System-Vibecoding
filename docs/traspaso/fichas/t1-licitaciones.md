@@ -21,6 +21,8 @@ perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
 
+- **MV-074** (cruza módulos) · Las licitaciones por decidir son tarjetas «Por calificar» en Oportunidades (Participar /
+  No participar) y el filtro TIPO «Licitación pública» reemplaza la pestaña de MV-023; `/licitaciones` lleva ahí.
 - **MV-066** (ficha) · «Leer ahora del OECE» lee la API real de contrataciones abiertas por páginas.
 - **MV-023** (cruza módulos) · La licitación es una sección de la oportunidad; su lista, una pestaña de Oportunidades.
 - **MV-005** (ficha) · Licitaciones va después del puente al ERP.

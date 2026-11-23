@@ -20,6 +20,7 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -122,56 +123,93 @@ final class LeadResource extends Resource
                         $u = auth()->user();
                         app(LeadsService::class)->contactar($record->id, $u);
                     }),
-                Action::make('convertir')->label('Convertir')->icon('heroicon-o-arrow-right-circle')->color('success')->button()->visible($abierto)->slideOver()
-                    ->modalHeading(fn (Lead $record): string => "Convertir lead · {$record->nombre_contacto}")
-                    ->fillForm(function (Lead $record): array {
-                        $c = app(LeadsService::class)->coincidencias($record);
-
-                        return ['destino' => $c === [] ? 'nueva' : "c:{$c[0]['cuenta_id']}", 'ruc' => $record->ruc, 'nombre' => $record->organizacion === null ? 'Oportunidad de '.$record->nombre_contacto : mb_substr("{$record->organizacion} · ".($record->campania?->nombre ?? 'lead'), 0, 200),
-                            'monto' => '50000', 'cierre' => CarbonImmutable::parse(Calendario::hoy())->addDays(60)->toDateString()];
-                    })
-                    ->schema([
-                        Text::make(fn (Lead $record): string => ($n = count(app(LeadsService::class)->coincidencias($record))) === 0 ? 'No se encontraron coincidencias.' : "Se encontraron {$n} coincidencias antes de crear nada."),
-                        Radio::make('destino')->label('¿Con qué cuenta?')->required()->live()
-                            ->options(fn (Lead $record): array => [
-                                ...collect(app(LeadsService::class)->coincidencias($record))->mapWithKeys(fn (array $c): array => ["c:{$c['cuenta_id']}" => "{$c['etiqueta']} · {$c['por']}"])->all(),
-                                'otra' => 'Otra cuenta existente…',
-                                'nueva' => 'Crear una cuenta nueva de todas formas',
-                            ]),
-                        Select::make('cuenta_id')->label('Cuenta')->searchable()->visible(fn (Get $get): bool => $get('destino') === 'otra')->required(fn (Get $get): bool => $get('destino') === 'otra')
-                            ->getSearchResultsUsing(fn (string $search): array => collect(app(CuentasService::class)->buscar($search))->mapWithKeys(fn ($c): array => [$c->id => $c->etiqueta])->all()),
-                        TextInput::make('ruc')->label('RUC de la cuenta nueva')->maxLength(11)->visible(fn (Get $get): bool => $get('destino') === 'nueva')->required(fn (Get $get): bool => $get('destino') === 'nueva'),
-                        TextInput::make('nombre')->label('Oportunidad')->required()->maxLength(200),
-                        TextInput::make('monto')->label('Monto estimado (S/)')->numeric()->required()->minValue(1),
-                        Select::make('linea_solucion_id')->label('Línea de solución')->required()->options(fn (): array => DB::table('lineas_solucion')->orderBy('nombre')->pluck('nombre', 'id')->all()),
-                        DatePicker::make('cierre')->label('Cierre estimado')->required()->format('Y-m-d'),
-                    ])
-                    ->action(function (Lead $record, array $data, Action $action): void {
-                        $destino = (string) $data['destino'];
-                        $cuentaId = match (true) {
-                            str_starts_with($destino, 'c:') => (int) substr($destino, 2),
-                            $destino === 'otra' => (int) $data['cuenta_id'],
-                            default => null,
-                        };
-
-                        try {
-                            /** @var User $u */
-                            $u = auth()->user();
-                            $lead = app(LeadsService::class)->convertir($record->id, $cuentaId, $data['ruc'] ?? null, $data['nombre'], (string) $data['monto'], (int) $data['linea_solucion_id'], CarbonImmutable::parse($data['cierre']), $u);
-                        } catch (\Throwable $e) {
-                            Notification::make()->danger()->title($e->getMessage())->send();
-                            $action->halt();
-
-                            return;
-                        }
-
-                        Notification::make()->success()->title('Convertido: nació su oportunidad.')
-                            ->actions([Action::make('ver')->label('Abrir la oportunidad')->url(VerOportunidad::getUrl(['record' => $lead->oportunidad_id]))])->send();
-                    }),
-                Action::make('descartar')->label('Descartar')->icon('heroicon-o-x-mark')->color('gray')->visible($abierto)
-                    ->schema([Select::make('motivo')->label('Motivo')->required()->options(array_combine($m = ['No es mercado para Techquk', 'Sin presupuesto', 'Solo pedía información', 'Datos falsos o duplicado', 'No respondió'], $m))])
-                    ->action(fn (Lead $record, array $data) => app(LeadsService::class)->descartar($record->id, $data['motivo'])),
+                self::accionConvertir()->visible($abierto),
+                self::accionDescartar()->visible($abierto),
             ]);
+    }
+
+    /**
+     * «Convertir» (en Oportunidades, «Calificar»; observación 7.1): revisa coincidencias y crea la oportunidad en
+     * Prospecto. El lead llega como registro de la acción (`->record()` desde otra pantalla).
+     */
+    public static function accionConvertir(): Action
+    {
+        return Action::make('convertir')->label('Convertir')->icon('heroicon-o-arrow-right-circle')->color('success')->button()->slideOver()
+            ->modalHeading(fn (Lead $record): string => "Convertir lead · {$record->nombre_contacto}")
+            ->fillForm(function (Lead $record): array {
+                $c = app(LeadsService::class)->coincidencias($record);
+
+                return ['destino' => $c === [] ? 'nueva' : "c:{$c[0]['cuenta_id']}", 'ruc' => $record->ruc, 'nombre' => $record->organizacion === null ? 'Oportunidad de '.$record->nombre_contacto : mb_substr("{$record->organizacion} · ".($record->campania?->nombre ?? 'lead'), 0, 200),
+                    'monto' => '50000', 'cierre' => CarbonImmutable::parse(Calendario::hoy())->addDays(60)->toDateString()];
+            })
+            ->schema([
+                Text::make(fn (Lead $record): string => ($n = count(app(LeadsService::class)->coincidencias($record))) === 0 ? 'No se encontraron coincidencias.' : "Se encontraron {$n} coincidencias antes de crear nada."),
+                Radio::make('destino')->label('¿Con qué cuenta?')->required()->live()
+                    ->options(fn (Lead $record): array => [
+                        ...collect(app(LeadsService::class)->coincidencias($record))->mapWithKeys(fn (array $c): array => ["c:{$c['cuenta_id']}" => "{$c['etiqueta']} · {$c['por']}"])->all(),
+                        'otra' => 'Otra cuenta existente…',
+                        'nueva' => 'Crear una cuenta nueva de todas formas',
+                    ]),
+                Select::make('cuenta_id')->label('Cuenta')->searchable()->visible(fn (Get $get): bool => $get('destino') === 'otra')->required(fn (Get $get): bool => $get('destino') === 'otra')
+                    ->getSearchResultsUsing(fn (string $search): array => collect(app(CuentasService::class)->buscar($search))->mapWithKeys(fn ($c): array => [$c->id => $c->etiqueta])->all()),
+                TextInput::make('ruc')->label('RUC de la cuenta nueva')->maxLength(11)->visible(fn (Get $get): bool => $get('destino') === 'nueva')->required(fn (Get $get): bool => $get('destino') === 'nueva'),
+                TextInput::make('nombre')->label('Oportunidad')->required()->maxLength(200),
+                TextInput::make('monto')->label('Monto estimado (S/)')->numeric()->required()->minValue(1),
+                Select::make('linea_solucion_id')->label('Línea de solución')->required()->options(fn (): array => DB::table('lineas_solucion')->orderBy('nombre')->pluck('nombre', 'id')->all()),
+                DatePicker::make('cierre')->label('Cierre estimado')->required()->format('Y-m-d'),
+            ])
+            ->action(function (Lead $record, array $data, Action $action): void {
+                $destino = (string) $data['destino'];
+                $cuentaId = match (true) {
+                    str_starts_with($destino, 'c:') => (int) substr($destino, 2),
+                    $destino === 'otra' => (int) $data['cuenta_id'],
+                    default => null,
+                };
+
+                try {
+                    /** @var User $u */
+                    $u = auth()->user();
+                    $lead = app(LeadsService::class)->convertir($record->id, $cuentaId, $data['ruc'] ?? null, $data['nombre'], (string) $data['monto'], (int) $data['linea_solucion_id'], CarbonImmutable::parse($data['cierre']), $u);
+                } catch (\Throwable $e) {
+                    Notification::make()->danger()->title($e->getMessage())->send();
+                    $action->halt();
+
+                    return;
+                }
+
+                Notification::make()->success()->title('Convertido: nació su oportunidad.')
+                    ->actions([Action::make('ver')->label('Abrir la oportunidad')->url(VerOportunidad::getUrl(['record' => $lead->oportunidad_id]))])->send();
+            });
+    }
+
+    /** «Descartar» con su motivo. */
+    public static function accionDescartar(): Action
+    {
+        return Action::make('descartar')->label('Descartar')->icon('heroicon-o-x-mark')->color('gray')
+            ->schema([Select::make('motivo')->label('Motivo')->required()->options(array_combine($m = ['No es mercado para Techquk', 'Sin presupuesto', 'Solo pedía información', 'Datos falsos o duplicado', 'No respondió'], $m))])
+            ->action(fn (Lead $record, array $data) => app(LeadsService::class)->descartar($record->id, $data['motivo']));
+    }
+
+    /** «Nuevo lead»: entra a Oportunidades como tarjeta «Por calificar» (observación 7.1). */
+    public static function accionNuevo(): Action
+    {
+        return Action::make('nuevo')->label('Nuevo lead')->icon('heroicon-o-plus')->slideOver()
+            ->visible(fn (): bool => LeadResource::puede(LeadsService::PERMISO_GESTIONAR))
+            ->schema([
+                TextInput::make('nombre_contacto')->label('Nombre')->required()->maxLength(150),
+                TextInput::make('cargo')->label('Cargo')->maxLength(120),
+                TextInput::make('organizacion')->label('Organización')->maxLength(200),
+                TextInput::make('ruc')->label('RUC')->maxLength(11),
+                TextInput::make('email')->label('Correo')->email()->maxLength(150),
+                TextInput::make('telefono')->label('Teléfono')->maxLength(30),
+                Select::make('origen_comercial_id')->label('Origen')->required()->options(fn (): array => DB::table('origenes_comerciales')->orderBy('nombre')->pluck('nombre', 'id')->all()),
+                Select::make('campania_id')->label('Campaña')->options(fn (): array => Campania::query()->where('es_activa', true)->pluck('nombre', 'id')->all()),
+                Textarea::make('mensaje')->label('Qué pidió')->rows(3),
+            ])
+            ->action(function (array $data): void {
+                Lead::query()->create([...$data, 'estado' => 'nuevo']);
+                Notification::make()->success()->title('Lead registrado.')->send();
+            });
     }
 
     public static function getPages(): array

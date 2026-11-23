@@ -18,6 +18,8 @@ módulo es el último del CRM.
 
 ## Decisiones de Sebastián
 
+- **MV-074** (cruza módulos) · Los leads son tarjetas «Por calificar» en la lista de Oportunidades (Calificar /
+  Descartar); `/leads` lleva ahí. Reemplaza la pestaña de MV-024.
 - **MV-024** (cruza módulos) · Los leads son la primera etapa del embudo («Por calificar»); Campañas muestra resultados.
 - **MV-005** (ficha) · Va al final del tramo 1.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.

@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v4
+- **Versión:** v5
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -9,11 +9,14 @@
 ## Qué hace
 
 Oportunidades tiene tres vistas, con pestañas arriba: **Mis oportunidades** (la que se abre), **Embudo de
-oportunidades** y **Línea de tiempo**. Encima de las tres, las pestañas de la portada (Por calificar · Oportunidades ·
-Licitaciones) y la fila de cifras de siempre.
+oportunidades** y **Línea de tiempo**. Encima de las tres, la fila de cifras de siempre. Desde v5 (MV-074) ya no hay
+pestañas de portada: los leads y las licitaciones por decidir son la primera etapa, **«Por calificar»**, dentro de la
+misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Decisiones de Sebastián
 
+- **MV-074** (cruza módulos) · Una sola lista: «Por calificar» como primera etapa con su gema, filtro TIPO, plazos de
+  la licitación en la tarjeta y en la urgencia; sin pestañas de portada (reemplaza parte de MV-023 y MV-024).
 - **MV-061** (ficha) · El Embudo muestra solo la fila de cinco cifras de la cabecera.
 - **MV-060** (ficha) · La Línea de tiempo es el cronograma refinado, con «Por urgencia» por defecto, otros órdenes y filtros.
 - **MV-058** (ficha) · El Embudo es el embudo clásico con sus gemas (lienzo «A refinada»); las gemas, con el dibujo nuevo.
@@ -22,6 +25,25 @@ Licitaciones) y la fila de cifras de siempre.
 ## Pantallas y navegación
 
 - **Mis oportunidades** `/oportunidades` (antes «Tarjetas», en `/oportunidades/tarjetas`): las tarjetas de siempre.
+  Desde v5 (MV-074):
+  - **Filtros del costado:** Atención · **Tipo** (Privada · Licitación pública · Licitación privada por convocatoria,
+    esta última solo si hay alguna) · **Etapa** (Por calificar · Prospecto · Calificada · Propuesta enviada ·
+    Negociación · Ganada · Perdida) · Ejecutivo · Línea de solución · Cliente. Cada opción con su número (cuentan
+    también las tarjetas por calificar).
+  - **Tarjetas «Por calificar»** primero (solo en la primera página), con la gema en la roca: dicen «Por calificar ·
+    Lead» o «· Licitación», el nombre (o el objeto), la entidad o la organización, el valor referencial si lo hay, lo que
+    pidió el lead, el origen (con la campaña) o la nomenclatura, y el plazo («Absolución en 4 días», coral a menos de 5)
+    o los días del lead («hace 5 días · sin atender»). Botones a la mano: **Calificar** (el formulario de convertir:
+    coincidencias de cuenta, nombre, monto, línea y cierre; nace en Prospecto) y **Descartar** (motivo) en los leads;
+    **Participar** (responsable; nace en Prospecto) y **No participar** (motivo) en las licitaciones, más «Ver».
+  - **Tarjetas de oportunidades de licitación:** en lugar de «En la etapa desde…», el próximo plazo de su cronograma
+    con el ícono de licitación («Integración de bases hoy», coral a menos de 5 días o vencido).
+  - **Orden «Por urgencia (cierre o plazo)»** (antes «Cierre más cercano»): la fecha más cercana entre el cierre
+    estimado y el próximo plazo de la licitación; ganadas y perdidas al final.
+  - **Cabecera:** «Nueva oportunidad» y el menú «Por calificar» con **Nuevo lead** y **Registrar convocatoria**
+    (licitación a mano, pública o privada).
+  - `/leads` lleva a `/oportunidades?etapa[0]=por_calificar` y `/licitaciones` a `/oportunidades?tipo[0]=licitacion_publica`;
+    la ficha de la licitación (`/licitaciones/{id}`) sigue.
 - **Embudo de oportunidades** `/oportunidades/embudo` (antes «Tablero», que era la de entrada en `/oportunidades`). MV-058:
   - **Cifras (MV-061):** solo la fila de cinco de la cabecera de las vistas (Embudo abierto, Ponderado, Cierran este
     mes, Atascadas, Cierre estimado vencido); la fila propia de cuatro del lienzo se quitó.
@@ -72,6 +94,20 @@ Licitaciones) y la fila de cifras de siempre.
 
 ## Supuestos sin confirmar
 
+- **v5 · La gema de «Por calificar»:** la roca gris redondeada con una veta turquesa a la vista («Gema en la roca»).
+- **v5 · Las cinco cifras no cuentan lo por calificar** (como ya era): no tiene monto ni probabilidad propia.
+- **v5 · Un lead es de tipo «Privada»**; una licitación por decidir es pública o privada según su convocatoria.
+- **v5 · «Próximo plazo» de una licitación:** el primer hito del cronograma de hoy en adelante; si ya pasaron todos, el
+  último, como vencido. Una licitación por decidir con un plazo vencido cuenta en «Cierre estimado vencido»; un lead
+  sin atender más de 3 días cuenta en «Atascadas».
+- **v5 · Con filtros de línea o cliente**, los leads no aparecen (no tienen línea ni cuenta todavía).
+- **v5 · Embudo:** «Por calificar» va como la boca del embudo, en gris piedra, con cuántos leads y licitaciones hay y el
+  valor referencial sumado; lleva a esas tarjetas (no abre el panel de la derecha).
+- **v5 · Línea de tiempo:** sin filtro de etapa se ven también las licitaciones por decidir (sus plazos apuran); con el
+  chip «Por calificar», además los leads. Su tramo es gris desde que llegaron; clic lleva a la licitación o a la lista.
+  Se ven con «Mías» y con «Todas» (aún no tienen dueño fijo). En las oportunidades de licitación, el rombo marca el
+  plazo si llega antes que el cierre estimado.
+
 - **Rango del eje (MV-060):** Mes abarca 45 días, Trimestre 90 y Semestre 180, con hoy a un tercio (como en el lienzo);
   por defecto, Semestre (el lienzo muestra unos cinco meses).
 - **«Sin fecha»** nunca coincide hoy: la fecha de cierre esperada es obligatoria en la base.
@@ -93,6 +129,10 @@ Licitaciones) y la fila de cifras de siempre.
 
 ## Atajos tomados
 
+- **v5:** la página de Oportunidades arma las acciones de leads y licitaciones con las de sus pantallas
+  (`LeadResource::accionConvertir`, `AccionesLicitacion::todas`) y lee sus modelos para abrirlas; el orden por urgencia
+  pasa las fechas de los plazos a la consulta. Lo por calificar se filtra en memoria.
+
 - **Ganadas y Perdidas del año** se consultan directo en la página del Embudo.
 - **Se borró** la botonera del Tablero (`DibujoDeLaBotonera`, `tablero/botonera`) y el dibujo procedural de las gemas
   (`DibujoDeGema`); las acciones de fijar o soltar en el tablero quedan en el código sin pantalla.
@@ -111,6 +151,9 @@ Licitaciones) y la fila de cifras de siempre.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v5** (MV-074): sin pestañas de portada; «Por calificar» como primera etapa con la gema en la roca (lista, embudo y
+  línea de tiempo), filtro TIPO, plazos de licitación en la tarjeta y en la urgencia.
 
 - **v4** (MV-061): sin la segunda fila de cifras en el Embudo.
 

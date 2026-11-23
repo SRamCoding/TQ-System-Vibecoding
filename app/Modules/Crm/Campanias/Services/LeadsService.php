@@ -63,6 +63,27 @@ final readonly class LeadsService
         return array_values($resultado);
     }
 
+    /**
+     * Observación 7.1: los leads abiertos son tarjetas «Por calificar» en la lista de Oportunidades. Lo que tiene cada
+     * uno, ya listo para dibujar (sin monto: un lead aún no lo tiene).
+     *
+     * @return list<array{id: int, nombre: string, organizacion: ?string, origen: string, campania: ?string, mensaje: ?string, telefono: ?string, desde: CarbonImmutable, dias: int, sinAtender: bool, asignado: ?int}>
+     */
+    public function porCalificar(): array
+    {
+        $hoy = Calendario::ahora();
+        $origenes = DB::table('origenes_comerciales')->pluck('nombre', 'id');
+
+        return Lead::query()->with('campania:id,nombre')->whereIn('estado', ['nuevo', 'contactado'])->orderBy('created_at')->get()
+            ->map(fn (Lead $l): array => [
+                'id' => $l->id, 'nombre' => $l->nombre_contacto, 'organizacion' => $l->organizacion,
+                'origen' => (string) ($origenes[$l->origen_comercial_id] ?? 'Lead'), 'campania' => $l->campania?->nombre,
+                'mensaje' => $l->mensaje, 'telefono' => $l->telefono, 'desde' => CarbonImmutable::instance($l->created_at),
+                'dias' => (int) $l->created_at->diffInDays($hoy), 'sinAtender' => $l->estado === 'nuevo' && $l->created_at->lt($hoy->subDays(self::DIAS_SIN_ATENDER)),
+                'asignado' => $l->asignado_user_id,
+            ])->values()->all();
+    }
+
     public function contactar(int $leadId, User $quien): void
     {
         Lead::query()->whereKey($leadId)->where('estado', 'nuevo')->update(['estado' => 'contactado', 'atendido_at' => Calendario::ahora(), 'asignado_user_id' => $quien->id]);

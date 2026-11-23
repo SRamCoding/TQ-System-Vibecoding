@@ -7,12 +7,16 @@ namespace App\Modules\Crm\Oportunidades\Enums;
 use InvalidArgumentException;
 
 /**
- * Cómo está tallada la gema de una oportunidad (plan 2.21c, D3): sale del código de su etapa. Prospecto en bruto,
+ * Cómo está tallada la gema de una oportunidad (plan 2.21c, D3): sale del código de su etapa. Por calificar (lead o
+ * licitación por decidir; observación 7.1) es la roca con la veta, antes de sacar la piedra; Prospecto en bruto,
  * Calificada desbastada, Propuesta enviada tallada, Negociación pulida, Ganada brillante y Perdida fisurada. Una anulada
  * no tiene gema: no está en el tablero (D11.2 de la 2.21).
  */
 enum TallaDeGema: string
 {
+    /** Observación 7.1: «Por calificar», la roca gris con la veta turquesa a la vista. */
+    case EnRoca = 'en_roca';
+
     case EnBruto = 'en_bruto';
     case Desbastada = 'desbastada';
     case Tallada = 'tallada';
@@ -20,10 +24,14 @@ enum TallaDeGema: string
     case Brillante = 'brillante';
     case Fisurada = 'fisurada';
 
+    /** La etapa previa al embudo (leads y licitaciones por decidir): no es un estado de la oportunidad. */
+    public const string POR_CALIFICAR = 'por_calificar';
+
     /** De un código de estado de la oportunidad («prospecto», «ganada»…). */
     public static function desdeEtapa(string $codigoEtapa): self
     {
         return match ($codigoEtapa) {
+            self::POR_CALIFICAR => self::EnRoca,
             EtapaAbierta::Prospecto->value => self::EnBruto,
             EtapaAbierta::Calificada->value => self::Desbastada,
             EtapaAbierta::PropuestaEnviada->value => self::Tallada,
@@ -42,6 +50,7 @@ enum TallaDeGema: string
     public function etiqueta(): string
     {
         return match ($this) {
+            self::EnRoca => 'En la roca',
             self::EnBruto => 'En bruto',
             self::Desbastada => 'Desbastada',
             self::Tallada => 'Tallada',

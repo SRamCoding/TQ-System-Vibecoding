@@ -13,7 +13,11 @@ final readonly class FiltrosOportunidades
     /** Atención con dato hoy. «Sin próxima acción» espera a CRM-05 y «Buena pro cerca» a su fecha (D14). */
     public const array ATENCION = ['atascadas' => 'Atascadas (pasaron su plazo)', 'cierre-vencido' => 'Cierre estimado vencido'];
 
-    public const array ORDENES = ['monto' => 'Mayor monto', 'cierre' => 'Cierre más cercano', 'dias' => 'Más días en la etapa', 'recientes' => 'Más recientes'];
+    /** Observación 7.1: privada o licitación (pública o privada por convocatoria). */
+    public const array TIPOS = ['privada' => 'Privada', 'licitacion_publica' => 'Licitación pública', 'licitacion_privada' => 'Licitación privada (convocatoria)'];
+
+    /** Observación 7.1: «Por urgencia» cuenta el próximo plazo de la licitación como un cierre. */
+    public const array ORDENES = ['monto' => 'Mayor monto', 'cierre' => 'Por urgencia (cierre o plazo)', 'dias' => 'Más días en la etapa', 'recientes' => 'Más recientes'];
 
     /**
      * @param  list<string>  $atencion
@@ -21,6 +25,7 @@ final readonly class FiltrosOportunidades
      * @param  list<int>  $ejecutivos
      * @param  list<int>  $lineas  líneas de solución
      * @param  list<string>  $clientes  `privado` o `nivel:<id>` (nivel de gobierno), de la cuenta
+     * @param  list<string>  $tipos  claves de TIPOS
      */
     public function __construct(
         public string $texto = '',
@@ -30,5 +35,6 @@ final readonly class FiltrosOportunidades
         public array $lineas = [],
         public array $clientes = [],
         public string $orden = 'monto',
+        public array $tipos = [],
     ) {}
 }

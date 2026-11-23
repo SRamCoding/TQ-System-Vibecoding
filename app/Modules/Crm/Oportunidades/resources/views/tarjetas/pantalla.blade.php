@@ -7,7 +7,7 @@
     Colores del sistema por nombre: el anillo en el morado del CRM, verde ganada, rojo perdida.
 --}}
 @php
-    $grupos = ['atencion' => 'Atención', 'etapas' => 'Etapa', 'ejecutivos' => 'Ejecutivo', 'lineas' => 'Línea de solución', 'clientes' => 'Cliente'];
+    $grupos = ['atencion' => 'Atención', 'tipos' => 'Tipo', 'etapas' => 'Etapa', 'ejecutivos' => 'Ejecutivo', 'lineas' => 'Línea de solución', 'clientes' => 'Cliente'];
     $anillo = function (array $t): string {
         $p = $t['probabilidad'] / 100;
         $r = 21;
@@ -54,6 +54,19 @@
         .tq-op-atascada { color: var(--warning-600); font-weight: 600; }
         .tq-op-pie { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.3rem; padding-top: 0.6rem; border-top: 1px solid var(--gray-100); font-size: 0.8125rem; }
         .dark .tq-op-pie { border-top-color: var(--gray-800); }
+        /* Observación 7.1: el plazo de la licitación (coral a menos de 5 días) y las tarjetas por calificar. */
+        .tq-op-plazo { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; font-weight: 600; color: var(--gray-600); }
+        .tq-op-plazo.tq-urgente { color: #E8604C; }
+        .dark .tq-op-plazo { color: var(--gray-300); }
+        .dark .tq-op-plazo.tq-urgente { color: #FF8A75; }
+        .tq-op-card.tq-pc { cursor: default; background: color-mix(in oklab, white 92%, #8C857F); }
+        .dark .tq-op-card.tq-pc { background: color-mix(in oklab, var(--gray-900) 90%, #8C857F); }
+        .tq-pc-tope { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.9rem 1rem 0.35rem; }
+        .tq-pc-clase { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-500); }
+        .tq-pc-detalle { font-size: 0.8125rem; color: var(--gray-600); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .dark .tq-pc-detalle { color: var(--gray-400); }
+        .tq-pc-botones { display: flex; gap: 0.5rem; margin-top: 0.4rem; padding-top: 0.6rem; border-top: 1px solid var(--gray-200); }
+        .dark .tq-pc-botones { border-top-color: var(--gray-800); }
     </style>
 
     <aside class="tq-op-filtros" aria-label="Filtros">
@@ -90,10 +103,49 @@
             </x-filament::input.wrapper>
         </div>
 
-        @if ($tarjetas === [])
+        @if ($tarjetas === [] && $porCalificar === [])
             <x-filament::empty-state heading="Ninguna oportunidad cumple los filtros" icon="heroicon-o-funnel" />
         @else
             <div class="tq-op-grid">
+                {{-- Observación 7.1: «Por calificar», la primera etapa: leads y licitaciones por decidir, con sus dos botones. --}}
+                @foreach ($porCalificar as $p)
+                    <article class="tq-op-card tq-pc" wire:key="pc-{{ $p['clave'] }}" data-por-calificar="{{ $p['clave'] }}">
+                        <span class="tq-pc-tope">
+                            <x-oportunidades::gema talla="en_roca" :tamano="44" decorativa />
+                            <span style="min-width: 0">
+                                <span class="tq-pc-clase">Por calificar · {{ $p['clase'] === 'lead' ? 'Lead' : 'Licitación' }}</span>
+                                <span class="tq-op-nom" style="display: block">{{ \Illuminate\Support\Str::limit($p['nombre'], 90) }}</span>
+                                <span class="tq-op-ent" style="display: block">{{ $p['entidad'] }}</span>
+                            </span>
+                        </span>
+                        <span class="tq-op-cuerpo">
+                            @if ($p['montoTexto'] !== null)
+                                <span class="tq-op-monto">{{ $p['montoTexto'] }}<small>{{ $p['montoEtiqueta'] }}</small></span>
+                            @endif
+                            @if ($p['detalle'] !== null)
+                                <span class="tq-pc-detalle">«{{ $p['detalle'] }}»</span>
+                            @endif
+                            <span class="tq-op-etl">
+                                <span>{{ $p['origen'] }}</span>
+                                @if ($p['plazo'] !== null)
+                                    <span @class(['tq-op-plazo', 'tq-urgente' => $p['plazo']['urgente']]) title="{{ $p['plazo']['titulo'] }}">{{ $p['plazo']['texto'] }}</span>
+                                @elseif ($p['clase'] === 'lead')
+                                    <span @class(['tq-op-atascada' => $p['sinAtender']])>hace {{ $p['dias'] }} {{ $p['dias'] === 1 ? 'día' : 'días' }}{{ $p['sinAtender'] ? ' · sin atender' : '' }}</span>
+                                @endif
+                            </span>
+                            <span class="tq-pc-botones">
+                                @if ($p['clase'] === 'lead' && $puedeLeads)
+                                    <x-filament::button size="sm" color="success" icon="heroicon-o-arrow-right-circle" wire:click="decidir('calificarLead', {{ $p['id'] }})">Calificar</x-filament::button>
+                                    <x-filament::button size="sm" color="gray" icon="heroicon-o-x-mark" wire:click="decidir('descartarLead', {{ $p['id'] }})">Descartar</x-filament::button>
+                                @elseif ($p['clase'] === 'licitacion' && $puedeLicitaciones)
+                                    <x-filament::button size="sm" color="success" icon="heroicon-o-check-circle" wire:click="decidir('participar', {{ $p['id'] }})">Participar</x-filament::button>
+                                    <x-filament::button size="sm" color="gray" icon="heroicon-o-x-circle" wire:click="decidir('noParticipar', {{ $p['id'] }})">No participar</x-filament::button>
+                                    <x-filament::link :href="'/licitaciones/'.$p['id']" size="sm" style="margin-inline-start: auto">Ver</x-filament::link>
+                                @endif
+                            </span>
+                        </span>
+                    </article>
+                @endforeach
                 @foreach ($tarjetas as $t)
                     <a href="{{ $t['url'] }}" wire:navigate class="tq-op-card" wire:key="op-{{ $t['id'] }}" data-oportunidad="{{ $t['id'] }}">
                         <span class="tq-op-foto">
@@ -117,7 +169,11 @@
                             <span class="tq-op-monto">{{ $t['monto'] }}@if ($t['ponderado'] !== null)<small>pond. {{ $t['ponderado'] }}</small>@endif</span>
                             <span class="tq-op-etl">
                                 @if ($t['dias'] !== null)
-                                    <span>En la etapa desde {{ $t['desde'] }}</span>
+                                    @if ($t['plazo'] !== null)
+                                        <span @class(['tq-op-plazo', 'tq-urgente' => $t['plazo']['urgente']]) title="{{ $t['plazo']['titulo'] }}"><x-filament::icon icon="heroicon-o-building-library" class="h-3.5 w-3.5" />{{ $t['plazo']['texto'] }}</span>
+                                    @else
+                                        <span>En la etapa desde {{ $t['desde'] }}</span>
+                                    @endif
                                     <span @class(['tq-op-atascada' => $t['atascada']])>{{ $t['dias'] }}@if ($t['maximo'] > 0) de {{ $t['maximo'] }}@endif días{{ $t['atascada'] ? ' · atascada' : '' }}</span>
                                 @else
                                     <span>{{ $t['codigo_estado'] === 'ganada' ? 'Ganada' : 'Perdida' }} el {{ $t['cierre'] }}</span>
@@ -128,7 +184,9 @@
                     </a>
                 @endforeach
             </div>
-            <div style="margin-top: 1rem"><x-filament::pagination :paginator="$pagina" /></div>
+            @if ($tarjetas !== [])
+                <div style="margin-top: 1rem"><x-filament::pagination :paginator="$pagina" /></div>
+            @endif
         @endif
     </section>
 </div>

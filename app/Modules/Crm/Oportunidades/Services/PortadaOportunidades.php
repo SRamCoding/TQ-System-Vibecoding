@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Oportunidades\Services;
 
+use App\Modules\Crm\Campanias\Services\LeadsService;
 use App\Modules\Crm\Cuentas\Services\CuentasService;
 use App\Modules\Crm\Cuentas\Services\ResumenCuenta;
+use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
 use App\Modules\Crm\Oportunidades\Enums\EtapaAbierta;
+use App\Modules\Crm\Oportunidades\Enums\TallaDeGema;
 use App\Modules\Crm\Oportunidades\Estados\DefinicionOportunidad;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
 use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
@@ -18,6 +21,7 @@ use App\Modules\Nucleo\Services\ParametrosService;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 /**
  * Lo que leen la portada de la lista y el tablero de oportunidades (plan 2.21, D11): pestañas, avisos con «Ver
@@ -227,6 +231,10 @@ final readonly class PortadaOportunidades
             $consulta->whereIn('oportunidades.cuenta_id', array_keys(array_filter($tipos, fn (string $t): bool => in_array($t, $filtros->clientes, true))));
         }
 
+        if ($salvo !== 'tipos' && $filtros->tipos !== []) {
+            $this->enTipos($consulta, $filtros->tipos);
+        }
+
         if ($salvo !== 'atencion') {
             foreach ($filtros->atencion as $clave) {
                 $this->enAtencion($consulta, $clave);
@@ -244,8 +252,10 @@ final readonly class PortadaOportunidades
     {
         return match ($clave) {
             'atascadas' => $this->estancadas($consulta),
+            // Observación 7.1: un plazo de la licitación vencido cuenta como un cierre vencido.
             'cierre-vencido' => $consulta->whereIn('oportunidades.estado_id', $this->estados(array_map(fn (EtapaAbierta $e): string => $e->value, EtapaAbierta::cases())))
-                ->where('oportunidades.fecha_cierre_estimada', '<', Calendario::hoy()),
+                ->where(fn (Builder $q) => $q->where('oportunidades.fecha_cierre_estimada', '<', Calendario::hoy())
+                    ->orWhereIn('oportunidades.id', array_keys(array_filter($this->licitaciones(), fn (array $l): bool => ($l['hito']['dias'] ?? 0) < 0)))),
             default => $consulta,
         };
     }
@@ -257,7 +267,8 @@ final readonly class PortadaOportunidades
     public function ordenarVitrina(Builder $consulta, string $orden): Builder
     {
         return match ($orden) {
-            'cierre' => $consulta->orderBy('oportunidades.fecha_cierre_estimada')->orderBy('oportunidades.id'),
+            // Observación 7.1: por urgencia, la fecha más cercana entre el cierre estimado y el próximo plazo de su licitación.
+            'cierre' => $this->ordenPorUrgencia($consulta),
             'dias' => $consulta->orderBy('oportunidades.en_etapa_desde')->orderBy('oportunidades.id'),
             'recientes' => $consulta->orderByDesc('oportunidades.id'),
             default => $consulta->orderByDesc('oportunidades.monto_estimado')->orderByDesc('oportunidades.id'),
@@ -271,11 +282,26 @@ final readonly class PortadaOportunidades
      */
     public function opcionesVitrina(FiltrosOportunidades $filtros): array
     {
-        $opciones = ['atencion' => [], 'etapas' => [], 'ejecutivos' => [], 'lineas' => [], 'clientes' => []];
+        $opciones = ['atencion' => [], 'tipos' => [], 'etapas' => [], 'ejecutivos' => [], 'lineas' => [], 'clientes' => []];
 
+        // Observación 7.1: los números junto a cada filtro también cuentan las tarjetas por calificar.
         foreach (FiltrosOportunidades::ATENCION as $clave => $etiqueta) {
-            $opciones['atencion'][$clave] = ['etiqueta' => $etiqueta, 'cantidad' => $this->enAtencion($this->filtrarVitrina($filtros, 'atencion'), $clave)->count()];
+            $extra = count(array_filter($this->porCalificar($filtros, 'atencion'), fn (array $t): bool => in_array($clave, $t['atencion'], true)));
+            $opciones['atencion'][$clave] = ['etiqueta' => $etiqueta, 'cantidad' => $this->enAtencion($this->filtrarVitrina($filtros, 'atencion'), $clave)->count() + $extra];
         }
+
+        $porCalificarSinTipo = $this->porCalificar($filtros, 'tipos');
+
+        foreach (FiltrosOportunidades::TIPOS as $clave => $etiqueta) {
+            $extra = count(array_filter($porCalificarSinTipo, fn (array $t): bool => $t['tipo'] === $clave));
+            $cantidad = $this->enTipos($this->filtrarVitrina($filtros, 'tipos'), [$clave])->count() + $extra;
+
+            if ($clave !== 'licitacion_privada' || $cantidad > 0) {
+                $opciones['tipos'][$clave] = ['etiqueta' => $etiqueta, 'cantidad' => $cantidad];
+            }
+        }
+
+        $opciones['etapas'][TallaDeGema::POR_CALIFICAR] = ['etiqueta' => 'Por calificar', 'cantidad' => count($this->porCalificar($filtros, 'etapas'))];
 
         $porEtapa = $this->filtrarVitrina($filtros, 'etapas')->join('estados', 'estados.id', '=', 'oportunidades.estado_id')
             ->groupBy('estados.codigo')->selectRaw('estados.codigo, count(*) as n')->pluck('n', 'codigo');
@@ -317,6 +343,133 @@ final readonly class PortadaOportunidades
         }
 
         return $opciones;
+    }
+
+    /**
+     * Observación 7.1: lo que está «Por calificar» (los leads abiertos y las licitaciones por decidir), como tarjetas,
+     * con los filtros puestos (salvo el grupo `$salvo`, para contar sus opciones). Sin filtro de etapa, o con «Por
+     * calificar» marcado, aparecen; con otra etapa sola, no.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function porCalificar(FiltrosOportunidades $filtros, ?string $salvo = null): array
+    {
+        if ($salvo !== 'etapas' && $filtros->etapas !== [] && ! in_array(TallaDeGema::POR_CALIFICAR, $filtros->etapas, true)) {
+            return [];
+        }
+
+        $items = once(function (): array {
+            $licitaciones = app(LicitacionesService::class)->porDecidir();
+            $cuentas = app(CuentasService::class)->resumenesDe(array_values(array_unique(array_column($licitaciones, 'cuenta_id'))));
+            $items = [];
+
+            foreach ($licitaciones as $l) {
+                $c = $cuentas[$l['cuenta_id']] ?? null;
+                $items[] = [
+                    'clase' => 'licitacion', 'id' => $l['id'], 'clave' => "lic-{$l['id']}", 'nombre' => $l['objeto'], 'entidad' => $c->etiqueta ?? '—',
+                    'origen' => $l['nomenclatura'], 'detalle' => null, 'monto' => $l['valor_referencial'], 'montoEtiqueta' => 'Valor referencial',
+                    'tipo' => $l['es_publica'] ? 'licitacion_publica' : 'licitacion_privada', 'hito' => $l['hito'], 'desde' => $l['desde'],
+                    'ejecutivo' => $l['responsable'], 'linea' => $l['linea_solucion_id'],
+                    'cliente' => $c === null ? null : (! $c->esPublica ? 'privado' : ($c->nivelGobiernoId === null ? 'publica' : "nivel:{$c->nivelGobiernoId}")),
+                    'atencion' => ($l['hito']['dias'] ?? 0) < 0 ? ['cierre-vencido'] : [],
+                    'fecha' => $l['hito']['fecha'] ?? null,
+                ];
+            }
+
+            foreach (app(LeadsService::class)->porCalificar() as $l) {
+                $items[] = [
+                    'clase' => 'lead', 'id' => $l['id'], 'clave' => "lead-{$l['id']}", 'nombre' => $l['organizacion'] === null ? $l['nombre'] : "{$l['nombre']} · {$l['organizacion']}",
+                    'entidad' => $l['organizacion'] ?? $l['nombre'], 'origen' => $l['campania'] === null ? $l['origen'] : "{$l['origen']} · {$l['campania']}",
+                    'detalle' => $l['mensaje'], 'monto' => null, 'montoEtiqueta' => null, 'tipo' => 'privada', 'hito' => null, 'desde' => $l['desde'],
+                    'dias' => $l['dias'], 'sinAtender' => $l['sinAtender'], 'ejecutivo' => $l['asignado'], 'linea' => null, 'cliente' => null,
+                    'atencion' => $l['sinAtender'] ? ['atascadas'] : [], 'fecha' => null,
+                ];
+            }
+
+            return $items;
+        });
+
+        $texto = mb_strtolower(trim(Str::ascii($filtros->texto)));
+
+        return array_values(array_filter($items, function (array $t) use ($filtros, $salvo, $texto): bool {
+            if ($texto !== '' && ! str_contains(mb_strtolower(Str::ascii("{$t['nombre']} {$t['entidad']} {$t['origen']}")), $texto)) {
+                return false;
+            }
+            if ($salvo !== 'tipos' && $filtros->tipos !== [] && ! in_array($t['tipo'], $filtros->tipos, true)) {
+                return false;
+            }
+            if ($salvo !== 'ejecutivos' && $filtros->ejecutivos !== [] && ! in_array($t['ejecutivo'], $filtros->ejecutivos, true)) {
+                return false;
+            }
+            if ($salvo !== 'lineas' && $filtros->lineas !== [] && ! in_array($t['linea'], $filtros->lineas, true)) {
+                return false;
+            }
+            if ($salvo !== 'clientes' && $filtros->clientes !== [] && ! in_array($t['cliente'], $filtros->clientes, true)) {
+                return false;
+            }
+            if ($salvo !== 'atencion' && array_diff($filtros->atencion, $t['atencion']) !== []) {
+                return false;
+            }
+
+            return true;
+        }));
+    }
+
+    /**
+     * Observación 7.1: la licitación de cada oportunidad que nació de una (pública o privada y su próximo plazo).
+     *
+     * @return array<int, array{licitacion_id: int, es_publica: bool, hito: ?array{etapa: string, fecha: CarbonImmutable, dias: int}}>
+     */
+    public function licitaciones(): array
+    {
+        return once(fn (): array => app(LicitacionesService::class)->deOportunidades());
+    }
+
+    /**
+     * @param  Builder<Oportunidad>  $consulta
+     * @param  list<string>  $tipos
+     * @return Builder<Oportunidad>
+     */
+    private function enTipos(Builder $consulta, array $tipos): Builder
+    {
+        $lic = $this->licitaciones();
+        $publicas = array_keys(array_filter($lic, fn (array $l): bool => $l['es_publica']));
+        $privadas = array_keys(array_filter($lic, fn (array $l): bool => ! $l['es_publica']));
+
+        return $consulta->where(function (Builder $q) use ($tipos, $lic, $publicas, $privadas): void {
+            if (in_array('privada', $tipos, true)) {
+                $q->orWhereNotIn('oportunidades.id', array_keys($lic) === [] ? [0] : array_keys($lic));
+            }
+            if (in_array('licitacion_publica', $tipos, true)) {
+                $q->orWhereIn('oportunidades.id', $publicas);
+            }
+            if (in_array('licitacion_privada', $tipos, true)) {
+                $q->orWhereIn('oportunidades.id', $privadas);
+            }
+        });
+    }
+
+    /**
+     * @param  Builder<Oportunidad>  $consulta
+     * @return Builder<Oportunidad>
+     */
+    private function ordenPorUrgencia(Builder $consulta): Builder
+    {
+        $casos = [];
+        $valores = [];
+
+        foreach ($this->licitaciones() as $id => $l) {
+            if ($l['hito'] !== null) {
+                $casos[] = 'when ? then least(oportunidades.fecha_cierre_estimada, ?::date)';
+                array_push($valores, $id, $l['hito']['fecha']->toDateString());
+            }
+        }
+
+        $expresion = $casos === [] ? 'oportunidades.fecha_cierre_estimada' : 'case oportunidades.id '.implode(' ', $casos).' else oportunidades.fecha_cierre_estimada end';
+
+        // Las cerradas (ganadas o perdidas) al final: ya no apuran.
+        return $consulta->orderByRaw('case when oportunidades.estado_id in (select id from estados where documento_type = ? and codigo in (?, ?)) then 1 else 0 end', [(new DefinicionOportunidad)->tipo(), 'ganada', 'perdida'])
+            ->orderByRaw("{$expresion} asc nulls last", $valores)->orderBy('oportunidades.id');
     }
 
     /**

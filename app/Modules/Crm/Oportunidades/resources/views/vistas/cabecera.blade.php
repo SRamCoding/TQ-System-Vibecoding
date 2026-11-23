@@ -5,8 +5,7 @@
     `$cifras` de `VistasDeOportunidades`.
 --}}
 <div class="tq-vistas" data-vistas>
-    {{-- MV-057: las pestañas de la portada (Por calificar · Oportunidades · Licitaciones), que antes estaban en la Lista. --}}
-    @include('oportunidades::portada.embudo-pestanas', ['actual' => 'oportunidades'])
+    {{-- MV-074 (observación 7.1): sin las pestañas Por calificar · Oportunidades · Licitaciones; todo va en la lista. --}}
     <style>
         .tq-vistas { display: flex; flex-direction: column; gap: 0.75rem; }
         .tq-vistas-cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; }

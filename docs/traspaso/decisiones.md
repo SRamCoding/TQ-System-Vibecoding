@@ -297,7 +297,7 @@ confirma, recién entonces se vuelve una decisión con su número.
   (ganada con la buena pro, perdida si la ganó otro o quedó desierta). «Licitaciones» es una pestaña de la portada de
   Oportunidades.
 - **Alcance:** cruza módulos
-- **Estado:** vigente
+- **Estado:** reemplazada en parte por MV-074 (la pestaña «Licitaciones» de la portada; la sección de la oportunidad sigue)
 - **Commit:** el de «Ronda 1 · paso 4: licitaciones y leads dentro de la oportunidad»
 
 ### MV-024 · 2026-11-20 · Los leads son la primera etapa del embudo; Campañas muestra resultados
@@ -308,7 +308,7 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Decisión:** «Por calificar» es la primera pestaña de la portada de Oportunidades; la caja Campañas abre la lista de
   campañas con leads, convertidos y tasa, monto generado y costo por lead.
 - **Alcance:** cruza módulos
-- **Estado:** vigente
+- **Estado:** reemplazada en parte por MV-074 (la pestaña «Por calificar»; Campañas con sus resultados sigue)
 - **Commit:** el de «Ronda 1 · paso 4: licitaciones y leads dentro de la oportunidad»
 
 ### MV-025 · 2026-11-20 · La agenda es una herramienta del muelle
@@ -957,3 +957,19 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 7.7: el modo oscuro se activa y "Sistema" sigue al cielo»
+
+### MV-074 · 2026-11-23 · Oportunidades en una sola lista: «Por calificar» es la primera etapa y hay filtro TIPO
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md` (toca `t1-campanias.md` y `t1-licitaciones.md`)
+- **Dijo Sebastián:** (observaciones-7, punto 1) «Se quitan [las pestañas Por calificar · Oportunidades · Licitaciones]:
+  todo va en la lista de oportunidades y se separa con los filtros del costado. "Por calificar" es la primera etapa del
+  embudo, antes de Prospecto … Elige una gema para esta etapa, anterior a "en bruto" … En "Por calificar" caen los leads
+  (Calificar / Descartar) y las licitaciones por decidir (Participar / No participar) … Filtro nuevo "TIPO": Privada ·
+  Licitación pública … Plazos de las licitaciones en la tarjeta … en coral a menos de 5 días. El orden por urgencia las
+  considera … Los contadores de las pestañas pasan a ser los números junto a cada filtro … Convocatorias del SEACE sigue
+  como caja aparte; Campañas también».
+- **Decisión:** lo dicho. Reemplaza la parte de MV-023 que hacía de «Licitaciones» una pestaña y la de MV-024 que hacía
+  de «Por calificar» una pestaña; `/leads` y `/licitaciones` llevan a Oportunidades con su filtro puesto.
+- **Alcance:** cruza módulos (Oportunidades, Campañas y leads, Licitaciones)
+- **Estado:** vigente
+- **Commit:** el de «Observación 7.1: Oportunidades en una sola lista»

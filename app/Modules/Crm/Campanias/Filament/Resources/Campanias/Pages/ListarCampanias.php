@@ -8,6 +8,7 @@ use App\Modules\Crm\Campanias\Filament\Resources\Campanias\CampaniaResource;
 use App\Modules\Crm\Campanias\Filament\Resources\Leads\LeadResource;
 use App\Modules\Crm\Campanias\Models\Campania;
 use App\Modules\Crm\Campanias\Services\LeadsService;
+use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TarjetasOportunidades;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -23,7 +24,7 @@ final class ListarCampanias extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('leads')->label('Volver a los leads')->icon('heroicon-o-inbox-arrow-down')->color('gray')->url(LeadResource::getUrl()),
+            Action::make('leads')->label('Por calificar')->icon('heroicon-o-inbox-arrow-down')->color('gray')->url(TarjetasOportunidades::getUrl(['etapa' => ['por_calificar']])),
             Action::make('nueva')->label('Nueva campaña')->icon('heroicon-o-plus')->slideOver()
                 ->visible(fn (): bool => LeadResource::puede(LeadsService::PERMISO_GESTIONAR))
                 ->schema([
