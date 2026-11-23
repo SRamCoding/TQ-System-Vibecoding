@@ -14,6 +14,9 @@ use App\Modules\Nucleo\Navegacion\RegistroModulos;
 use App\Modules\Nucleo\Navegacion\RegistroPantallas;
 use App\Modules\Nucleo\Seguridad\RegistroPermisos;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 
 /** MVP rápido (ficha t4-personal-tareo): personal, asignación y tareo (flujo 3). */
@@ -29,6 +32,14 @@ final class PersonalServiceProvider extends ServiceProvider
         Relation::morphMap(['tareo_linea' => TareoLinea::class, 'colaborador' => Models\Colaborador::class, 'tareo' => Models\Tareo::class]);
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'personal');
+        // MV-067: la foto de perfil de un colaborador, solo con sesión y con permiso de ver personal.
+        Route::middleware(['web', 'auth'])->get('personal/fotos/{colaborador}', function (int $colaborador) {
+            abort_unless(auth()->user()?->can(PersonalService::PERMISO_VER), 403);
+            $ruta = DB::table('colaboradores')->where('id', $colaborador)->value('foto_ruta');
+            abort_if($ruta === null || ! Storage::disk(PersonalService::DISCO_FOTOS)->exists($ruta), 404);
+
+            return Storage::disk(PersonalService::DISCO_FOTOS)->response($ruta, null, ['Cache-Control' => 'private, max-age=86400']);
+        })->whereNumber('colaborador');
         $p = $this->app->make(RegistroPermisos::class);
         $p->declarar(PersonalService::PERMISO_VER, 'Ver personal, asignación y tareo');
         $p->declarar(PersonalService::PERMISO_TAREAR, 'Asignar personas y registrar horas');

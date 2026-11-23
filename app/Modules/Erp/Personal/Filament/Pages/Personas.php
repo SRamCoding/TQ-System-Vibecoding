@@ -20,6 +20,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
@@ -77,6 +78,7 @@ final class Personas extends Page implements HasTable
                 })->all())
             ->paginated(false)
             ->columns([
+                ViewColumn::make('avatar')->label('')->view('personal::avatar-columna')->width('1%'),
                 TextColumn::make('nombres')->label('Persona')->weight('bold')->description(fn (array $record): string => $record['categoria'].' · '.$record['vinculo'].($record['regimen'] ? ' · '.strtoupper($record['regimen']) : '')),
                 TextColumn::make('remuneracion')->label('Remuneración')->alignEnd()->fontFamily('mono')->formatStateUsing(fn ($state): string => $state === null ? '—' : number_format((float) $state, 2))->placeholder('—'),
                 TextColumn::make('habilitacion')->label('Habilitación de campo')->color(fn (array $record): string => $record['habil_ok'] ? 'success' : 'danger'),
@@ -86,6 +88,14 @@ final class Personas extends Page implements HasTable
             ])
             ->filters([SelectFilter::make('vista')->label('Ver')->default('activos')->options(['activos' => 'Activos', 'salidas' => 'Que se fueron', 'todos' => 'Todos'])->query(fn ($q) => $q)])
             ->recordActions([
+                Action::make('foto')->label('Foto')->color('gray')->icon('heroicon-o-camera')->visible(fn (): bool => auth()->user()?->can(PersonalService::PERMISO_TAREAR) ?? false)
+                    ->modalHeading(fn (array $record): string => "Foto de {$record['nombres']}")
+                    ->fillForm(fn (array $record): array => ['sexo' => $record['sexo'] ?? null])
+                    ->schema([Select::make('sexo')->label('Sexo')->options(PersonalService::SEXOS)->required(), Asignacion::campoFoto()->required(false)->helperText('')])
+                    ->action(function (array $record, array $data): void {
+                        DB::table('colaboradores')->where('id', $record['id'])->update(['sexo' => $data['sexo'], 'updated_at' => now()]);
+                        Asignacion::guardarFoto((int) $record['id'], $data['foto'] ?? null);
+                    }),
                 Action::make('documento')->label('Documento')->color('gray')->visible(fn (): bool => auth()->user()?->can(PersonalService::PERMISO_TAREAR) ?? false)
                     ->schema([Select::make('tipo')->label('Tipo')->options(self::TIPOS_DOC)->required(), TextInput::make('nombre')->label('Nombre')->required(), TextInput::make('emisor')->label('Emisor'), DatePicker::make('vence')->label('Vence')->format('Y-m-d')])
                     ->action(fn (array $record, array $data) => app(PersonasService::class)->documento((int) $record['id'], $data['tipo'], $data['nombre'], $data['emisor'] ?? null, $data['vence'] ?? null)),

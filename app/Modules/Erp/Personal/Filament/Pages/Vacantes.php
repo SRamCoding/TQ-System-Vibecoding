@@ -64,8 +64,8 @@ final class Vacantes extends Page implements HasTable
             ->recordActions([
                 Action::make('contratar')->label('Contratar')->button()->color('success')->hidden(fn (array $record): bool => in_array($record['estado'], ['contratado', 'descartado'], true))
                     ->fillForm(fn (): array => ['ingreso' => Calendario::hoy(), 'regimen' => 'onp'])
-                    ->schema([TextInput::make('remuneracion')->label('Remuneración mensual')->numeric()->required(), Select::make('regimen')->label('Régimen')->options(['onp' => 'ONP', 'afp' => 'AFP'])->required(), DatePicker::make('ingreso')->label('Ingreso')->required()->format('Y-m-d')])
-                    ->action(fn (array $record, array $data) => app(PersonasService::class)->contratar((int) $record['id'], (string) $data['remuneracion'], $data['regimen'], CarbonImmutable::parse($data['ingreso']))),
+                    ->schema([Select::make('sexo')->label('Sexo')->options(PersonalService::SEXOS)->required(), TextInput::make('remuneracion')->label('Remuneración mensual')->numeric()->required(), Select::make('regimen')->label('Régimen')->options(['onp' => 'ONP', 'afp' => 'AFP'])->required(), DatePicker::make('ingreso')->label('Ingreso')->required()->format('Y-m-d')])
+                    ->action(fn (array $record, array $data) => app(PersonasService::class)->contratar((int) $record['id'], (string) $data['remuneracion'], $data['regimen'], CarbonImmutable::parse($data['ingreso']), $data['sexo'])),
                 Action::make('descartar')->label('Descartar')->color('gray')->hidden(fn (array $record): bool => in_array($record['estado'], ['contratado', 'descartado'], true))
                     ->action(fn (array $record) => DB::table('candidatos')->where('id', $record['id'])->update(['estado' => 'descartado', 'updated_at' => now()])),
             ]);

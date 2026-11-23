@@ -13,24 +13,18 @@ use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\EmbeddedTable;
-use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use RuntimeException;
 
-/** MVP rápido (t4-personal-tareo): el tablero de asignación por persona y semana; marca la sobreasignación antes del conflicto. */
-final class Asignacion extends Page implements HasTable
+/** MVP rápido (t4-personal-tareo): Personal asignado, una tarjeta por persona con sus cuatro semanas (MV-067); marca la sobreasignación antes del conflicto. */
+final class Asignacion extends Page
 {
-    use InteractsWithTable;
-
     protected static ?string $slug = 'asignacion';
 
     protected static ?string $title = 'Personal asignado';
@@ -44,57 +38,66 @@ final class Asignacion extends Page implements HasTable
         return $u instanceof User && $u->can(PersonalService::PERMISO_VER);
     }
 
-    public function content(Schema $schema): Schema
+    protected string $view = 'personal::asignacion.pantalla';
+
+    public string $buscar = '';
+
+    /** @return list<array<string, mixed>> las tarjetas de Personal asignado (MV-067) */
+    public function tarjetas(): array
     {
-        return $schema->components([EmbeddedTable::make()]);
+        return app(PersonalService::class)->tableroAsignacion($this->buscar);
     }
 
-    /** @return list<CarbonImmutable> el lunes de esta semana y las tres siguientes */
-    private function semanas(): array
+    /** Clic en la tarjeta: el detalle de la persona en el panel deslizante, semana por semana. */
+    public function detalleAction(): Action
     {
-        $lunes = CarbonImmutable::parse(Calendario::hoy())->startOfWeek();
+        $tarjeta = fn (array $arguments): ?array => collect(app(PersonalService::class)->tableroAsignacion())->firstWhere('id', (int) ($arguments['colaborador'] ?? 0));
 
-        return [$lunes, $lunes->addWeek(), $lunes->addWeeks(2), $lunes->addWeeks(3)];
+        return Action::make('detalle')->slideOver()->modalWidth('md')
+            ->modalHeading(fn (array $arguments): string => $tarjeta($arguments)['nombres'] ?? 'Persona')
+            ->modalContent(fn (array $arguments) => view('personal::asignacion.detalle', ['t' => $tarjeta($arguments)]))
+            ->modalSubmitAction(false)->modalCancelActionLabel('Cerrar')
+            ->extraModalFooterActions(fn (array $arguments): array => [
+                $this->fotoAccion((int) ($arguments['colaborador'] ?? 0)),
+            ]);
     }
 
-    public function table(Table $table): Table
+    /** Subir o cambiar la foto (se recorta cuadrada) o quitarla; sin foto vuelve el avatar por defecto. */
+    private function fotoAccion(int $id): Action
     {
-        $s = app(PersonalService::class);
-        $columnas = [
-            TextColumn::make('nombres')->label('Persona')->weight('bold')->description(fn (array $record): string => $record['categoria'].' · '.$record['vinculo']),
-            TextColumn::make('sctr')->label('Habilitación')->color(fn (array $record): ?string => $record['vencida'] ? 'danger' : null),
-        ];
+        $tiene = DB::table('colaboradores')->where('id', $id)->value('foto_ruta') !== null;
 
-        foreach ($this->semanas() as $i => $lunes) {
-            $columnas[] = TextColumn::make("s{$i}")->label('Sem '.$lunes->isoWeek().' · '.$lunes->format('d/m'))->wrap()
-                ->color(fn (array $record): ?string => $record["t{$i}"] > 100 ? 'danger' : ($record["t{$i}"] === 0 ? 'gray' : null))
-                ->description(fn (array $record): ?string => $record["t{$i}"] > 100 ? $record["t{$i}"].' % · sobreasignado' : null);
+        return Action::make('foto')->label($tiene ? 'Cambiar foto' : 'Subir foto')->icon('heroicon-o-camera')->color('gray')
+            ->visible(fn (): bool => auth()->user()?->can(PersonalService::PERMISO_TAREAR) ?? false)
+            ->modalHeading('Foto de perfil')->modalSubmitActionLabel('Guardar foto')
+            ->schema([self::campoFoto()])
+            ->extraModalFooterActions($tiene ? [Action::make('quitarFoto')->label('Quitar foto')->color('danger')->link()->cancelParentActions()
+                ->action(function () use ($id): void {
+                    app(PersonalService::class)->quitarFoto($id);
+                    Notification::make()->success()->title('Foto quitada.')->send();
+                })] : [])
+            ->action(function (array $data) use ($id): void {
+                self::guardarFoto($id, $data['foto'] ?? null);
+            });
+    }
+
+    public static function campoFoto(): FileUpload
+    {
+        return FileUpload::make('foto')->label('Foto')->image()->required()->imageEditor()->imageCropAspectRatio('1:1')->automaticallyOpenImageEditorForAspectRatio()
+            ->automaticallyResizeImagesToWidth('400')->automaticallyResizeImagesToHeight('400')
+            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(5 * 1024)->storeFiles(false);
+    }
+
+    public static function guardarFoto(int $id, mixed $archivo): void
+    {
+        $archivo = is_array($archivo) ? reset($archivo) : $archivo;
+
+        if (! $archivo instanceof TemporaryUploadedFile) {
+            return;
         }
 
-        return $table
-            ->records(function (): array {
-                $filas = [];
-
-                foreach (Colaborador::query()->where('es_activo', true)->orderBy('nombres')->get() as $c) {
-                    $fila = ['__key' => (string) $c->id, 'nombres' => $c->nombres, 'categoria' => (string) DB::table('categorias_personal')->where('id', $c->categoria_id)->value('nombre'),
-                        'vinculo' => $c->vinculo, 'sctr' => $c->habilitado_hasta === null ? 'sin SCTR' : 'SCTR hasta '.$c->habilitado_hasta->format('d/m/Y'),
-                        'vencida' => $c->habilitado_hasta === null || $c->habilitado_hasta->lt(CarbonImmutable::parse(Calendario::hoy()))];
-
-                    foreach ($this->semanas() as $i => $lunes) {
-                        $partes = DB::table('asignaciones as a')->join('proyectos as p', 'p.id', '=', 'a.proyecto_id')->where('a.colaborador_id', $c->id)
-                            ->where('a.desde', '<=', $lunes->addDays(6)->toDateString())->where(fn ($q) => $q->whereNull('a.hasta')->orWhere('a.hasta', '>=', $lunes->toDateString()))
-                            ->get(['p.codigo', 'a.porcentaje']);
-                        $fila["s{$i}"] = $partes->isEmpty() ? 'sin asignar' : $partes->map(fn ($p): string => "{$p->codigo} {$p->porcentaje} %")->implode(' · ');
-                        $fila["t{$i}"] = (int) $partes->sum('porcentaje');
-                    }
-
-                    $filas[] = $fila;
-                }
-
-                return $filas;
-            })
-            ->paginated(false)
-            ->columns($columnas);
+        app(PersonalService::class)->cambiarFoto($id, (string) $archivo->get(), $archivo->guessExtension() ?: 'jpg');
+        Notification::make()->success()->title('Foto guardada.')->send();
     }
 
     protected function getHeaderActions(): array
@@ -108,6 +111,7 @@ final class Asignacion extends Page implements HasTable
                     TextInput::make('dni')->label('DNI')->required()->length(8),
                     Select::make('categoria_id')->label('Categoría')->required()->options(fn (): array => DB::table('categorias_personal')->pluck('nombre', 'id')->all()),
                     Select::make('vinculo')->label('Vínculo')->required()->options(['planilla' => 'Planilla', 'eventual' => 'Eventual']),
+                    Select::make('sexo')->label('Sexo')->required()->options(PersonalService::SEXOS),
                     DatePicker::make('habilitado_hasta')->label('SCTR vigente hasta'),
                 ])
                 ->action(fn (array $data) => Colaborador::query()->create($data)),

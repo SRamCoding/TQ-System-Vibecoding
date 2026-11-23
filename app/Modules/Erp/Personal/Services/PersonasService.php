@@ -77,9 +77,9 @@ final readonly class PersonasService
     }
 
     /** Contrata al candidato: nace el colaborador con su contrato; la vacante se cubre al completar su cantidad. */
-    public function contratar(int $candidatoId, string $remuneracion, string $regimen, CarbonImmutable $ingreso): int
+    public function contratar(int $candidatoId, string $remuneracion, string $regimen, CarbonImmutable $ingreso, string $sexo = 'hombre'): int
     {
-        return DB::transaction(function () use ($candidatoId, $remuneracion, $regimen, $ingreso): int {
+        return DB::transaction(function () use ($candidatoId, $remuneracion, $regimen, $ingreso, $sexo): int {
             $c = DB::table('candidatos')->lockForUpdate()->find($candidatoId);
             $v = DB::table('vacantes')->find($c->vacante_id);
 
@@ -87,7 +87,7 @@ final readonly class PersonasService
                 throw new RuntimeException('Ya fue contratado.');
             }
 
-            $id = Colaborador::query()->create(['nombres' => $c->nombres, 'dni' => $c->dni, 'categoria_id' => $v->categoria_id, 'vinculo' => 'planilla', 'remuneracion' => $remuneracion,
+            $id = Colaborador::query()->create(['nombres' => $c->nombres, 'dni' => $c->dni, 'categoria_id' => $v->categoria_id, 'vinculo' => 'planilla', 'sexo' => $sexo, 'remuneracion' => $remuneracion,
                 'regimen' => $regimen, 'ingreso' => $ingreso->toDateString(), 'es_activo' => true])->id;
             DB::table('candidatos')->where('id', $candidatoId)->update(['estado' => 'contratado', 'updated_at' => now()]);
 

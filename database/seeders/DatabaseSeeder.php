@@ -42,6 +42,7 @@ final class DatabaseSeeder extends Seeder
         $this->call(Demo\HerramientasSeeder::class);
         $this->call(Demo\TicketsAyudaSeeder::class);
         $this->call(Demo\OportunidadesVencidasSeeder::class);
+        $this->call(Demo\FotosPersonalSeeder::class);
     }
 
     /**

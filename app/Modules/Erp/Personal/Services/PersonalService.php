@@ -15,6 +15,7 @@ use App\Modules\Nucleo\Services\ImputacionService;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 /**
@@ -32,6 +33,92 @@ final readonly class PersonalService
     public const string PERMISO_CERRAR = 'erp.personal.cerrar';
 
     public const array DIAS = ['lu' => 'Lu', 'ma' => 'Ma', 'mi' => 'Mi', 'ju' => 'Ju', 'vi' => 'Vi', 'sa' => 'Sá'];
+
+    /** Observación 6.7 (MV-067): el sexo elige el avatar por defecto de quien no tiene foto. */
+    public const array SEXOS = ['hombre' => 'Hombre', 'mujer' => 'Mujer'];
+
+    /** Las fotos de perfil del personal, en el disco privado de adjuntos (se sirven por `/personal/fotos/{id}`). */
+    public const string DISCO_FOTOS = 'adjuntos';
+
+    /** Guarda la foto ya recortada (cuadrada) del colaborador y borra la anterior. */
+    public function cambiarFoto(int $colaboradorId, string $contenido, string $extension): void
+    {
+        $ruta = 'colaboradores/'.$colaboradorId.'-'.bin2hex(random_bytes(4)).'.'.$extension;
+        Storage::disk(self::DISCO_FOTOS)->put($ruta, $contenido);
+        $anterior = DB::table('colaboradores')->where('id', $colaboradorId)->value('foto_ruta');
+        DB::table('colaboradores')->where('id', $colaboradorId)->update(['foto_ruta' => $ruta, 'updated_at' => now()]);
+
+        if ($anterior !== null && $anterior !== $ruta) {
+            Storage::disk(self::DISCO_FOTOS)->delete($anterior);
+        }
+    }
+
+    public function quitarFoto(int $colaboradorId): void
+    {
+        $anterior = DB::table('colaboradores')->where('id', $colaboradorId)->value('foto_ruta');
+        DB::table('colaboradores')->where('id', $colaboradorId)->update(['foto_ruta' => null, 'updated_at' => now()]);
+
+        if ($anterior !== null) {
+            Storage::disk(self::DISCO_FOTOS)->delete($anterior);
+        }
+    }
+
+    /** @return array{nombre: string, sexo: string, foto: ?string} lo que dibuja `personal::avatar` */
+    public static function avatar(object|array $c): array
+    {
+        $c = (object) $c;
+        $foto = $c->foto_ruta ?? null;
+
+        return ['nombre' => (string) $c->nombres, 'sexo' => ($c->sexo ?? null) === 'mujer' ? 'mujer' : 'hombre',
+            'foto' => $foto === null ? null : '/personal/fotos/'.$c->id.'?v='.substr(hash('sha256', (string) $foto), 0, 10)];
+    }
+
+    /** @return list<CarbonImmutable> el lunes de esta semana y las tres siguientes */
+    public function semanasDelTablero(): array
+    {
+        $lunes = CarbonImmutable::parse(Calendario::hoy())->startOfWeek();
+
+        return [$lunes, $lunes->addWeek(), $lunes->addWeeks(2), $lunes->addWeeks(3)];
+    }
+
+    /**
+     * Personal asignado (MV-067): una tarjeta por persona activa con sus cuatro semanas; cada semana, su ocupación (la
+     * suma de los porcentajes de sus asignaciones vigentes esa semana) y en qué proyectos.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function tableroAsignacion(string $buscar = ''): array
+    {
+        $hoy = CarbonImmutable::parse(Calendario::hoy());
+        $buscar = mb_strtolower(trim($buscar));
+        $tarjetas = [];
+
+        foreach (DB::table('colaboradores as c')->join('categorias_personal as k', 'k.id', '=', 'c.categoria_id')->where('c.es_activo', true)->orderBy('c.nombres')->get(['c.*', 'k.nombre as categoria']) as $c) {
+            if ($buscar !== '' && ! str_contains(mb_strtolower($c->nombres), $buscar)) {
+                continue;
+            }
+
+            $habil = $c->habilitado_hasta === null ? null : CarbonImmutable::parse($c->habilitado_hasta);
+            $semanas = [];
+
+            foreach ($this->semanasDelTablero() as $lunes) {
+                $partes = DB::table('asignaciones as a')->join('proyectos as p', 'p.id', '=', 'a.proyecto_id')->where('a.colaborador_id', $c->id)
+                    ->where('a.desde', '<=', $lunes->addDays(6)->toDateString())->where(fn ($q) => $q->whereNull('a.hasta')->orWhere('a.hasta', '>=', $lunes->toDateString()))
+                    ->orderByDesc('a.porcentaje')->get(['p.codigo', 'p.nombre', 'a.porcentaje', 'a.desde', 'a.hasta']);
+                $total = (int) $partes->sum('porcentaje');
+                $semanas[] = ['etiqueta' => 'Sem '.$lunes->isoWeek().' · '.$lunes->format('d/m'), 'total' => $total,
+                    'tono' => $total === 0 ? 'libre' : ($total > 100 ? 'sobre' : 'normal'),
+                    'proyectos' => $partes->map(fn ($p): array => ['codigo' => $p->codigo, 'nombre' => $p->nombre, 'porcentaje' => (int) $p->porcentaje,
+                        'vigencia' => 'desde '.CarbonImmutable::parse($p->desde)->format('d/m').($p->hasta ? ' hasta '.CarbonImmutable::parse($p->hasta)->format('d/m') : '')])->all()];
+            }
+
+            $tarjetas[] = ['id' => (int) $c->id, 'nombres' => $c->nombres, 'categoria' => $c->categoria, 'vinculo' => $c->vinculo === 'planilla' ? 'Planilla' : 'Eventual',
+                'sctr' => $habil === null ? 'Sin SCTR' : 'SCTR hasta '.$habil->format('d/m/Y'), 'sctr_mal' => $habil === null || $habil->lt($hoy),
+                'avatar' => self::avatar($c), 'semanas' => $semanas];
+        }
+
+        return $tarjetas;
+    }
 
     public function asignar(int $colaboradorId, int $proyectoId, int $porcentaje, CarbonImmutable $desde, ?CarbonImmutable $hasta): Asignacion
     {

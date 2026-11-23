@@ -860,3 +860,18 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.6: Leer ahora del OECE con la API real»
+
+### MV-067 · 2026-11-23 · «Personal asignado» en tarjetas, con foto de perfil o avatar por defecto
+
+- **Ficha:** `fichas/t4-personal-tareo.md`
+- **Dijo Sebastián:** (observaciones-6, punto 7) «Pasa a tarjetas en dos columnas (una en pantallas angostas), una por
+  persona activa: arriba la foto de perfil en círculo, el nombre, "categoría · vínculo" y la habilitación SCTR como
+  etiqueta (en coral si está vencida o no tiene); debajo sus 4 semanas como barritas de ocupación … gris si está en 0 %,
+  en el color normal hasta 100 %, en coral con "sobreasignado" si pasa del 100 %. Arriba, el buscador por nombre … Un
+  clic abre el panel deslizante con el detalle. El colaborador gana sexo (obligatorio) y foto (opcional, recortada
+  cuadrada). Sin foto, un avatar por defecto de hombre y de mujer, ilustrados, en tonos neutros que sigan al ambiente.
+  Nunca fotos de personas reales. El mismo avatar o foto donde aparezca esa persona».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (el sexo y la foto cruzan a Personas)
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.7: Personal asignado en tarjetas con foto»
