@@ -39,6 +39,7 @@
         const raiz = document.documentElement
         const sede = @js($sede);
         let ubicacion = sede
+        let anterior = null
 
         // La altura del sol en grados (aproximación de la NOAA).
         const alturaDelSol = (lat, lon, fecha) => {
@@ -82,7 +83,10 @@
             const v = document.createElement('div')
             v.id = id
             v.className = 'tq-velo'
+            // Un velo nuevo (al cambiar de pantalla Livewire cambia el body) toma su tono al instante; solo después funde.
+            v.style.transition = 'none'
             document.body.appendChild(v)
+            requestAnimationFrame(() => requestAnimationFrame(() => { v.style.transition = '' }))
 
             return v
         })()
@@ -97,6 +101,7 @@
             const luz = velo('tq-velo-luz')
 
             if (tema !== 'system') {
+                anterior = null
                 sombra.style.opacity = 0
                 luz.style.opacity = 0
                 raiz.removeAttribute('data-tq-noche')
@@ -107,11 +112,16 @@
             const { p, gris } = cielo()
             const oscuro = p >= 0.5
 
-            if (oscuro !== raiz.classList.contains('dark') && raiz.dataset.tqNoche !== undefined) {
-                // El cambio de tema en el punto más oscuro: todo se funde en 10 s.
+            // El cambio de tema en el punto más oscuro: todo se funde en 10 s. Solo cuando el cielo de verdad cruza ese
+            // punto (comparado con la vez anterior), no cuando otro guion puso `dark` al cambiar de pantalla: Filament
+            // lo vuelve a poner en cada navegación si el sistema operativo está en oscuro, y eso fundía cada pantalla
+            // de oscuro a claro.
+            if (anterior !== null && oscuro !== anterior) {
                 raiz.classList.add('tq-cielo-cambio')
                 setTimeout(() => raiz.classList.remove('tq-cielo-cambio'), 11000)
             }
+
+            anterior = oscuro
 
             raiz.classList.toggle('dark', oscuro)
             raiz.dataset.tqNoche = p.toFixed(3)

@@ -1,7 +1,7 @@
 # Ficha · El tema «Sistema» sigue el cielo
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v1
+- **Versión:** v1 (corrección 2026-11-23: sin fundido al cambiar de pantalla)
 - **Tramo de la ruta:** entre T3 y T4 (MV-011)
 - **Aprobada:** 2026-11-20 · etiqueta `aprobado/t3b-transicion-cielo-v1`
 - **Fuentes del diseño:** pedido de Sebastián (MV-010, MV-012, MV-013); la ambientación de clima y hora que ya existía
@@ -47,6 +47,9 @@ Ninguna tabla nueva. Las sedes de la empresa usan su latitud y longitud (en la d
   opacidad sube hasta 0.88. p ≥ 0.5: tema oscuro con un velo que aclara (trama), azul grisáceo, de 0.5 a 0. En p =
   0.5 el tema cambia y todos los colores se funden en 10 s mientras un velo se apaga y el otro se enciende.
 - Se recalcula cada 20 s y cada cambio de velo se funde en 20 s.
+- El fundido de 10 s ocurre solo cuando el cielo cruza p = 0.5 respecto del cálculo anterior, nunca al cambiar de
+  pantalla ni al recargar: cada pantalla aparece ya con su tema y su velo, sin fundido (corrección del 2026-11-23: con el
+  sistema operativo en oscuro, cada cambio de módulo se fundía de oscuro a claro durante 10 s).
 - Ejemplo: sede principal el 20/11/2026: 17:30 sol a 10.5° (día); 18:00 a 3.5° (p 0.18, dorado); 18:15 a 0.0° (p 0.43,
   rosado); 18:30 a −3.5° (p 0.68, ya en oscuro aclarado); 18:45 a −7.0° (p 0.93); 19:00 de noche.
 
