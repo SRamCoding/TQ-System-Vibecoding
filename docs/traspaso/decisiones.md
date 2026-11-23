@@ -1056,3 +1056,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.2: el panel de «Por calificar» en el Embudo»
+
+### MV-082 · 2026-11-23 · Mis oportunidades: el panel de filtros baja por su cuenta
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-8, punto 3) «El panel tiene su propio desplazamiento … Grupos plegables: Atención y Etapa abiertos; Tipo, Ejecutivo, Línea de solución y Cliente plegados, con la cantidad de filtros activos junto al título … Se recuerda qué grupos dejó abiertos cada persona. Cliente y Ejecutivo, si tienen más de 6 opciones: un buscador pequeño … y las 6 con más oportunidades primero, con «Ver todos». Arriba del panel, «Quitar filtros»».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.3: el panel de filtros baja por su cuenta»

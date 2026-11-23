@@ -101,8 +101,23 @@ final class TarjetasOportunidades extends Page
         return VistasDeOportunidades::TARJETAS;
     }
 
+    /** @var list<string> Observación 8.3: los grupos de filtros abiertos (por persona). */
+    public array $abiertos = self::ABIERTOS;
+
+    public const array ABIERTOS = ['atencion', 'etapas'];
+
+    public const string CLAVE_ABIERTOS = 'oportunidades.filtros_abiertos';
+
+    /** Observación 8.3: abre o pliega un grupo de filtros y lo recuerda para la persona. */
+    public function plegar(string $grupo): void
+    {
+        $this->abiertos = in_array($grupo, $this->abiertos, true) ? array_values(array_diff($this->abiertos, [$grupo])) : [...$this->abiertos, $grupo];
+        app(\App\Modules\Nucleo\Services\EstadoInterfazService::class)->guardar((int) auth()->id(), self::CLAVE_ABIERTOS, $this->abiertos);
+    }
+
     public function mount(): void
     {
+        $this->abiertos = (array) app(\App\Modules\Nucleo\Services\EstadoInterfazService::class)->leer((int) auth()->id(), self::CLAVE_ABIERTOS, self::ABIERTOS);
         $this->calcularCifras();
         $this->abrirFichaDeLaDireccion();
     }

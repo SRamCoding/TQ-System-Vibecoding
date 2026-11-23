@@ -23,7 +23,16 @@
     <style>
         .tq-op-vitrina { display: grid; grid-template-columns: 15rem minmax(0, 1fr); gap: 1.5rem; align-items: start; }
         @media (max-width: 1023px) { .tq-op-vitrina { grid-template-columns: minmax(0, 1fr); } }
-        .tq-op-filtros { position: sticky; top: 5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+        .tq-op-filtros { position: sticky; top: 5rem; display: flex; flex-direction: column; gap: 0.9rem; }
+        /* Observación 8.3: el panel baja por su cuenta; la barra, invisible hasta que se usa. */
+        .tq-op-filtros { max-height: calc(100vh - 6rem); overflow-y: auto; overscroll-behavior: contain; padding-inline-end: 0.35rem; scrollbar-width: thin; scrollbar-color: transparent transparent; }
+        .tq-op-filtros:hover, .tq-op-filtros:focus-within { scrollbar-color: color-mix(in oklab, var(--tq-texto, #000) 25%, transparent) transparent; }
+        @media (max-width: 1023px) { .tq-op-filtros { position: static; max-height: none; } }
+        .tq-op-grupo-tit { display: flex; align-items: center; gap: 0.35rem; width: 100%; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); padding: 0.15rem 0; }
+        .tq-op-grupo-tit .tq-activos { text-transform: none; letter-spacing: 0; color: var(--primary-600); }
+        .tq-op-grupo-tit svg { margin-inline-start: auto; transition: transform 150ms ease; }
+        .tq-op-grupo-tit[aria-expanded="false"] svg { transform: rotate(-90deg); }
+        .tq-op-mini-buscar { width: 100%; margin: 0.25rem 0 0.35rem; padding: 0.25rem 0.5rem; font-size: 0.8125rem; border: 1px solid var(--tq-borde, var(--gray-200)); border-radius: 0.4rem; background: transparent; }
         .tq-op-filtros h3 { margin-bottom: 0.4rem; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gray-500); }
         .tq-op-opcion { display: flex; align-items: center; gap: 0.5rem; padding: 0.2rem 0; font-size: 0.875rem; cursor: pointer; }
         .tq-op-opcion.tq-cero { color: var(--gray-400); }
@@ -71,21 +80,41 @@
     </style>
 
     <aside class="tq-op-filtros" aria-label="Filtros">
+        {{-- Observación 8.3: «Quitar filtros» arriba; grupos plegables (recordados por persona); buscador si hay más de 6. --}}
+        @if ($conFiltros)
+            <x-filament::link tag="button" wire:click="quitarFiltros" icon="heroicon-o-x-mark">Quitar filtros</x-filament::link>
+        @endif
         @foreach ($grupos as $grupo => $titulo)
             @if ($opciones[$grupo] !== [])
-                <div>
-                    <h3>{{ $titulo }}</h3>
-                    @foreach ($opciones[$grupo] as $valor => $op)
-                        <label @class(['tq-op-opcion', 'tq-cero' => $op['cantidad'] === 0])>
-                            <x-filament::input.checkbox wire:model.live="{{ $grupo }}" value="{{ $valor }}" />{{ $op['etiqueta'] }}<span class="tq-n">{{ $op['cantidad'] }}</span>
-                        </label>
-                    @endforeach
+                @php
+                    $abierto = in_array($grupo, $this->abiertos, true);
+                    $activos = count((array) $this->{$grupo});
+                    $muchas = in_array($grupo, ['ejecutivos', 'clientes'], true) && count($opciones[$grupo]) > 6;
+                    $orden = $opciones[$grupo];
+                    if ($muchas) { uasort($orden, fn ($a, $b) => $b['cantidad'] <=> $a['cantidad']); }
+                @endphp
+                <div wire:key="grupo-{{ $grupo }}" x-data="{ q: '', todos: false }">
+                    <button type="button" class="tq-op-grupo-tit" aria-expanded="{{ $abierto ? 'true' : 'false' }}" wire:click="plegar('{{ $grupo }}')">
+                        {{ $titulo }}@if ($activos > 0)<span class="tq-activos">· {{ $activos }}</span>@endif
+                        <x-filament::icon icon="heroicon-m-chevron-down" class="h-4 w-4" />
+                    </button>
+                    @if ($abierto)
+                        @if ($muchas)
+                            <input type="search" class="tq-op-mini-buscar" x-model="q" placeholder="Buscar {{ mb_strtolower($titulo) }}…" aria-label="Buscar en {{ $titulo }}">
+                        @endif
+                        @foreach ($orden as $valor => $op)
+                            <label @class(['tq-op-opcion', 'tq-cero' => $op['cantidad'] === 0])
+                                @if ($muchas) x-show="q !== '' ? {{ \Illuminate\Support\Js::from(mb_strtolower($op['etiqueta'])) }}.includes(q.toLowerCase()) : (todos || {{ $loop->index < 6 || in_array((string) $valor, array_map('strval', (array) $this->{$grupo}), true) ? 'true' : 'false' }})" @endif>
+                                <x-filament::input.checkbox wire:model.live="{{ $grupo }}" value="{{ $valor }}" />{{ $op['etiqueta'] }}<span class="tq-n">{{ $op['cantidad'] }}</span>
+                            </label>
+                        @endforeach
+                        @if ($muchas)
+                            <x-filament::link tag="button" size="sm" x-show="q === ''" x-on:click="todos = ! todos"><span x-text="todos ? 'Ver menos' : 'Ver todos ({{ count($orden) }})'"></span></x-filament::link>
+                        @endif
+                    @endif
                 </div>
             @endif
         @endforeach
-        @if ($conFiltros)
-            <x-filament::link tag="button" wire:click="quitarFiltros" icon="heroicon-o-x-mark">Quitar todos los filtros</x-filament::link>
-        @endif
     </aside>
 
     <section>
