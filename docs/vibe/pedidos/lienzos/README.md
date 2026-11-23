@@ -25,3 +25,9 @@ Son ilustrativos: se copian los colores, medidas, formas y la disposición, no e
 | 7.3 Postulación (ruta por pasos) | `postulacion/` | `Main.dc.html` (la «A · Ruta por pasos»); `Oferta.dc.html`, la oferta desde el presupuesto |
 | 7.5 Bandeja de Convocatorias del SEACE | `convocatorias/` | `Main.dc.html` (la «B · Bandeja con detalle»); `Configuracion.dc.html`, la configuración de la búsqueda |
 | 7.6 Campañas | `campanias/` | `Main.dc.html` (campañas con su retorno), `Clientes.dc.html` (Mis clientes), `Pac.dc.html` (Radar del PAC, primero investigar) |
+
+## Octava tanda
+
+| Observación | Carpeta | Archivo que manda |
+|---|---|---|
+| 8.8 La agenda nueva | `agenda-nueva/` | `Main.dc.html` (la «A · Mes con actividades»; las vistas Semana y Lista no se construyen) |
