@@ -30,7 +30,12 @@ class DocumentoLicitacion extends Model
     {
         // `es_listo` (lo que ya usaban las otras pantallas) sigue al estado.
         static::saving(function (self $d): void {
-            $d->es_listo = in_array($d->estado, self::LISTOS, true);
+            // Quien manda solo «es_listo» (las pantallas de antes y la demo) deja el estado a juego; si no, manda el estado.
+            if ($d->isDirty('es_listo') && ! $d->isDirty('estado')) {
+                $d->estado = $d->es_listo ? 'listo' : 'falta';
+            } else {
+                $d->es_listo = in_array($d->estado ?? 'falta', self::LISTOS, true);
+            }
         });
     }
 
