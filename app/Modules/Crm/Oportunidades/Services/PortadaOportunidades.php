@@ -367,7 +367,7 @@ final readonly class PortadaOportunidades
                 $c = $cuentas[$l['cuenta_id']] ?? null;
                 $items[] = [
                     'clase' => 'licitacion', 'id' => $l['id'], 'clave' => "lic-{$l['id']}", 'nombre' => $l['objeto'], 'entidad' => $c->etiqueta ?? '—',
-                    'origen' => $l['nomenclatura'], 'detalle' => null, 'monto' => $l['valor_referencial'], 'montoEtiqueta' => 'Valor referencial',
+                    'origen' => $l['nomenclatura'], 'origenEtiqueta' => ($l['deSeace'] ?? false) ? 'Convocatoria del SEACE' : 'Registrada a mano', 'detalle' => null, 'monto' => $l['valor_referencial'], 'montoEtiqueta' => 'Valor referencial',
                     'tipo' => $l['es_publica'] ? 'licitacion_publica' : 'licitacion_privada', 'hito' => $l['hito'], 'desde' => $l['desde'],
                     'ejecutivo' => $l['responsable'], 'linea' => $l['linea_solucion_id'],
                     'cliente' => $c === null ? null : (! $c->esPublica ? 'privado' : ($c->nivelGobiernoId === null ? 'publica' : "nivel:{$c->nivelGobiernoId}")),
@@ -380,6 +380,7 @@ final readonly class PortadaOportunidades
                 $items[] = [
                     'clase' => 'lead', 'id' => $l['id'], 'clave' => "lead-{$l['id']}", 'nombre' => $l['organizacion'] === null ? $l['nombre'] : "{$l['nombre']} · {$l['organizacion']}",
                     'entidad' => $l['organizacion'] ?? $l['nombre'], 'origen' => $l['campania'] === null ? $l['origen'] : "{$l['origen']} · {$l['campania']}",
+                    'origenEtiqueta' => $l['campania'] === null ? $l['origen'] : "Campaña {$l['campania']}",
                     'detalle' => $l['mensaje'], 'monto' => null, 'montoEtiqueta' => null, 'tipo' => 'privada', 'hito' => null, 'desde' => $l['desde'],
                     'dias' => $l['dias'], 'sinAtender' => $l['sinAtender'], 'ejecutivo' => $l['asignado'], 'linea' => null, 'cliente' => null,
                     'atencion' => $l['sinAtender'] ? ['atascadas'] : [], 'fecha' => null,

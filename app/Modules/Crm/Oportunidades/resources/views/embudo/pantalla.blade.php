@@ -45,7 +45,7 @@
         <div class="tq-embudo-izq">
             {{-- Observación 7.1: la boca del embudo, «Por calificar», con la gema en la roca; lleva a esas tarjetas. --}}
             <div class="tq-embudo-etapa">
-                <a href="{{ $porCalificar['url'] }}" wire:navigate class="tq-embudo-boton" style="width: 100%; text-decoration: none" data-etapa="por_calificar"
+                <button type="button" wire:click="elegirEtapa('por_calificar')" class="tq-embudo-boton" style="width: 100%" data-etapa="por_calificar" aria-pressed="{{ $elegida['lugar'] === 'por_calificar' ? 'true' : 'false' }}"
                     aria-label="Por calificar, {{ $porCalificar['cantidad'] }}: {{ $porCalificar['leads'] }} leads y {{ $porCalificar['licitaciones'] }} licitaciones por decidir">
                     <span class="tq-embudo-franja" style="height: 66px; background: linear-gradient(180deg, #DCD7D1, #BEB7AF)">
                         <x-oportunidades::gema talla="en_roca" :tamano="38" decorativa />
@@ -58,7 +58,7 @@
                             <span class="tq-embudo-sub" style="color: #4F4943">ref. {{ $porCalificar['referencial'] }}</span>
                         </span>
                     </span>
-                </a>
+                </button>
                 <span class="tq-embudo-paso">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--tq-e-acento)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
                     Calificar · Participar
@@ -110,6 +110,36 @@
                     <span style="font-size: 13px; color: var(--tq-e-suave)">{{ $elegida['resumen'] }}</span>
                 </div>
             </div>
+            {{-- Observación 8.2: el panel de «Por calificar», con sus botones; al resolver uno, sale con la animación suave. --}}
+            @if ($elegida['porCalificar'] !== null)
+                <div style="display: flex; flex-direction: column" data-tq-escalonar>
+                    @forelse ($elegida['porCalificar'] as $p)
+                        <div class="tq-embudo-fila" style="grid-template-columns: 22px minmax(0, 1fr) auto; cursor: default" wire:key="pc-{{ $p['clave'] }}" data-tq-fila="pc-{{ $p['clave'] }}">
+                            <x-oportunidades::gema talla="en_roca" :tamano="22" decorativa />
+                            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+                                <span class="tq-embudo-corta" style="font-size: 14px; font-weight: 600">{{ $p['nombre'] }}</span>
+                                <span class="tq-embudo-corta" style="font-size: 12px; color: var(--tq-e-suave)">{{ $p['entidad'] }} · {{ $p['origenEtiqueta'] }}</span>
+                                <span style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap">
+                                    @if ($p['clase'] === 'lead')
+                                        <x-filament::button size="xs" color="success" wire:click="decidir('calificarLead', {{ $p['id'] }})">Calificar</x-filament::button>
+                                        <x-filament::button size="xs" color="gray" wire:click="decidir('descartarLead', {{ $p['id'] }})">Descartar</x-filament::button>
+                                    @else
+                                        <x-filament::button size="xs" color="success" wire:click="decidir('participar', {{ $p['id'] }})">Participar</x-filament::button>
+                                        <x-filament::button size="xs" color="gray" wire:click="decidir('noParticipar', {{ $p['id'] }})">No participar</x-filament::button>
+                                    @endif
+                                </span>
+                            </span>
+                            <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px">
+                                <span style="font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums">{{ $p['montoTexto'] ?? '' }}</span>
+                                @if ($p['plazo'])<span style="font-size: 12px; font-weight: 600; color: {{ $p['plazo']['urgente'] ? 'var(--tq-e-coral)' : 'var(--tq-e-suave)' }}">{{ $p['plazo']['texto'] }}</span>@endif
+                                <span style="font-size: 12px; color: {{ $p['esperaUrgente'] ? 'var(--tq-e-coral)' : 'var(--tq-e-suave)' }}">{{ $p['espera'] }}</span>
+                            </span>
+                        </div>
+                    @empty
+                        <p style="padding: 18px 20px; font-size: 14px; color: var(--tq-e-suave)">Nada por calificar.</p>
+                    @endforelse
+                </div>
+            @else
             <div style="display: flex; flex-direction: column">
                 @forelse ($elegida['filas'] as $f)
                     <button type="button" class="tq-embudo-fila" wire:click="abrirFicha({{ $f['id'] }})" data-tq-fila="embudo-{{ $f['id'] }}">
@@ -130,6 +160,7 @@
                     <p style="padding: 18px 20px; font-size: 14px; color: var(--tq-e-suave)">Ninguna oportunidad en esta etapa.</p>
                 @endforelse
             </div>
+            @endif
             <a href="{{ $urlMias }}" wire:navigate class="tq-embudo-ver">Ver todas en Mis oportunidades →</a>
         </div>
     </div>

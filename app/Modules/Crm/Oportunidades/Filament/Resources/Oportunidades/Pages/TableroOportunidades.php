@@ -6,6 +6,7 @@ namespace App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages;
 
 use App\Modules\Crm\Oportunidades\Enums\LugarFaja;
 use App\Modules\Crm\Oportunidades\Enums\TallaDeGema;
+use App\Modules\Crm\Oportunidades\Filament\DecideLoPorCalificar;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLaFicha;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLasVistas;
 use App\Modules\Crm\Oportunidades\Filament\PanelesOportunidad;
@@ -44,6 +45,7 @@ use Livewire\Attributes\Url;
  */
 final class TableroOportunidades extends Page
 {
+    use DecideLoPorCalificar;
     use MuestraLaFicha;
     use MuestraLasVistas;
 
@@ -93,7 +95,7 @@ final class TableroOportunidades extends Page
     /** MV-058: elegir una franja del embudo (o Ganadas o Perdidas) cambia el panel de la derecha. */
     public function elegirEtapa(string $lugar): void
     {
-        if (LugarFaja::tryFrom($lugar) !== null) {
+        if (LugarFaja::tryFrom($lugar) !== null || $lugar === TallaDeGema::POR_CALIFICAR) {
             $this->etapaAbierta = $lugar;
         }
     }
@@ -130,6 +132,11 @@ final class TableroOportunidades extends Page
             ];
         }
 
+        // Observación 8.2: «Por calificar» también abre su panel.
+        if ($this->etapaAbierta === TallaDeGema::POR_CALIFICAR) {
+            return $this->conPanelPorCalificar($etapas, $soles);
+        }
+
         if ($this->etapaAbierta === null || LugarFaja::tryFrom($this->etapaAbierta) === null) {
             $masAtascada = collect($etapas)->sortByDesc('atascadas')->first();
             $this->etapaAbierta = ($masAtascada['atascadas'] ?? 0) > 0 ? $masAtascada['lugar'] : LugarFaja::PropuestaEnviada->value;
@@ -161,7 +168,27 @@ final class TableroOportunidades extends Page
             $resumen = count($sala).' este año · '.$soles(self::sumar(array_column($sala, 'monto')));
         }
 
-        // Observación 7.1: «Por calificar», la boca del embudo (leads y licitaciones por decidir), con la gema en la roca.
+        return [
+            ...$this->datosBase($etapas, $soles),
+            'elegida' => [
+                'lugar' => $elegida->value, 'nombre' => $elegida->etiqueta(), 'talla' => $tallaElegida,
+                'resumen' => $resumen,
+                'filas' => $filasPanel,
+                'porCalificar' => null,
+            ],
+            'urlMias' => TarjetasOportunidades::getUrl(),
+        ];
+    }
+
+    /**
+     * Lo que va igual con cualquier etapa elegida: la boca «Por calificar» (observación 7.1), las etapas, Ganadas y
+     * Perdidas.
+     *
+     * @param  list<array<string, mixed>>  $etapas
+     * @return array<string, mixed>
+     */
+    private function datosBase(array $etapas, \Closure $soles): array
+    {
         $porCalificar = app(PortadaOportunidades::class)->porCalificar(new FiltrosOportunidades);
         $leads = count(array_filter($porCalificar, fn (array $t): bool => $t['clase'] === 'lead'));
 
@@ -174,13 +201,38 @@ final class TableroOportunidades extends Page
             'etapas' => $etapas,
             'ganadas' => ['cantidad' => count($ganadas = $this->delAnio('ganada')), 'monto' => $soles(self::sumar(array_column($ganadas, 'monto')))],
             'perdidas' => ['cantidad' => count($perdidas = $this->delAnio('perdida')), 'monto' => $soles(self::sumar(array_column($perdidas, 'monto')))],
-            'elegida' => [
-                'lugar' => $elegida->value, 'nombre' => $elegida->etiqueta(), 'talla' => $tallaElegida,
-                'resumen' => $resumen,
-                'filas' => $filasPanel,
-            ],
-            'urlMias' => TarjetasOportunidades::getUrl(),
         ];
+    }
+
+    /**
+     * Observación 8.2: el panel de «Por calificar»: primero las licitaciones por decidir por su próximo plazo, luego los
+     * leads del más antiguo al más nuevo, cada uno con su origen, monto si lo hay y cuánto lleva esperando.
+     *
+     * @param  list<array<string, mixed>>  $etapas
+     * @return array<string, mixed>
+     */
+    private function conPanelPorCalificar(array $etapas, \Closure $soles): array
+    {
+        $hoy = CarbonImmutable::parse(Calendario::hoy());
+        $items = app(PortadaOportunidades::class)->porCalificar(new FiltrosOportunidades);
+        usort($items, fn (array $a, array $b): int => [$a['clase'] === 'lead' ? 1 : 0, $a['clase'] === 'lead' ? $a['desde']->getTimestamp() : ($a['fecha']?->getTimestamp() ?? PHP_INT_MAX)]
+            <=> [$b['clase'] === 'lead' ? 1 : 0, $b['clase'] === 'lead' ? $b['desde']->getTimestamp() : ($b['fecha']?->getTimestamp() ?? PHP_INT_MAX)]);
+        $conMonto = array_values(array_filter(array_column($items, 'monto')));
+        $leads = count(array_filter($items, fn (array $t): bool => $t['clase'] === 'lead'));
+        $base = $this->datosBase($etapas, $soles);
+
+        return [...$base, 'elegida' => [
+            'lugar' => TallaDeGema::POR_CALIFICAR, 'nombre' => 'Por calificar', 'talla' => TallaDeGema::EnRoca,
+            'resumen' => count($items).' por calificar · '.$leads.' leads · '.(count($items) - $leads).' licitaciones'.($conMonto === [] ? '' : ' · ref. '.$soles(self::sumar($conMonto))),
+            'filas' => [],
+            'porCalificar' => array_map(function (array $t) use ($hoy): array {
+                $espera = (int) $t['desde']->startOfDay()->diffInDays($hoy);
+                $plazo = $t['hito'] === null ? null : ['texto' => $t['hito']['etapa'].' '.($t['hito']['dias'] < 0 ? 'venció' : ($t['hito']['dias'] === 0 ? 'hoy' : "en {$t['hito']['dias']} días")), 'urgente' => $t['hito']['dias'] < 5];
+
+                return [...$t, 'espera' => $espera === 0 ? 'hoy' : ($espera === 1 ? 'hace 1 día' : "hace {$espera} días"), 'esperaUrgente' => $espera >= 3, 'plazo' => $plazo,
+                    'montoTexto' => $t['monto'] === null ? null : 'S/ '.number_format((float) $t['monto'], 2)];
+            }, $items),
+        ], 'urlMias' => TarjetasOportunidades::getUrl(['etapa' => [TallaDeGema::POR_CALIFICAR]])];
     }
 
     /**

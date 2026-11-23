@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v6
+- **Versión:** v7
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -15,6 +15,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Decisiones de Sebastián
 
+- **MV-081** (ficha) · Embudo: «Por calificar» abre su panel con lo que falta calificar y sus botones.
+
 - **MV-080** (ficha) · Mis oportunidades: 3 columnas como máximo; las tarjetas crecen y la foto mantiene su proporción.
 
 - **MV-074** (cruza módulos) · Una sola lista: «Por calificar» como primera etapa con su gema, filtro TIPO, plazos de
@@ -25,6 +27,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 - **MV-057** (ficha) · Mis oportunidades por defecto; Embudo de oportunidades; sin Lista ni Faja 3D.
 
 ## Pantallas y navegación
+
+- **v7 · Embudo, panel «Por calificar»** (MV-081): pulsar la banda «Por calificar» la elige (`?etapa=por_calificar`) y el panel de la derecha muestra la cantidad, cuántos leads y licitaciones y el valor referencial sumado; luego cada elemento con la gema en la roca, nombre, cuenta u organización con su origen («Convocatoria del SEACE», «Registrada a mano», «Campaña …» o el origen del lead), monto o valor referencial, el próximo plazo (coral a menos de 5 días) y cuánto lleva esperando (coral desde 3 días), con Calificar / Descartar o Participar / No participar. Al resolver uno, sale con la animación de filas y las cifras se recalculan. «Ver todas» lleva a Mis oportunidades con «Por calificar» puesto.
 
 - **Mis oportunidades** `/oportunidades` (antes «Tarjetas», en `/oportunidades/tarjetas`): las tarjetas de siempre.
   Desde v5 (MV-074):
@@ -96,6 +100,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Supuestos sin confirmar
 
+- **v7 · «Cuánto lleva esperando»** se cuenta desde que se registró el lead o la licitación.
+
 - **v5 · La gema de «Por calificar»:** la roca gris redondeada con una veta turquesa a la vista («Gema en la roca»).
 - **v5 · Las cinco cifras no cuentan lo por calificar** (como ya era): no tiene monto ni probabilidad propia.
 - **v5 · Un lead es de tipo «Privada»**; una licitación por decidir es pública o privada según su convocatoria.
@@ -131,6 +137,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Atajos tomados
 
+- **v7:** las acciones de calificar viven en un rasgo (`DecideLoPorCalificar`) que usan Mis oportunidades y el Embudo.
+
 - **v5:** la página de Oportunidades arma las acciones de leads y licitaciones con las de sus pantallas
   (`LeadResource::accionConvertir`, `AccionesLicitacion::todas`) y lee sus modelos para abrirlas; el orden por urgencia
   pasa las fechas de los plazos a la consulta. Lo por calificar se filtra en memoria.
@@ -153,6 +161,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v7** (MV-081): el panel de «Por calificar» en el Embudo.
 
 - **v6** (MV-080): tarjetas en 3 columnas como máximo, foto con proporción fija.
 

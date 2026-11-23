@@ -208,12 +208,14 @@ final readonly class LicitacionesService
     {
         $filas = Licitacion::query()->where('estado', EstadoLicitacion::Registrada->value)->whereNull('oportunidad_id')->orderBy('id')->get();
         $hitos = $this->proximosHitosDe($filas->pluck('id')->all());
+        $seace = DB::table('convocatorias_seace')->whereIn('licitacion_id', $filas->pluck('id')->all() ?: [0])->pluck('id', 'licitacion_id');
 
         return $filas->map(fn (Licitacion $l): array => [
             'id' => $l->id, 'codigo' => $l->codigo, 'nomenclatura' => $l->nomenclatura, 'objeto' => $l->objeto, 'cuenta_id' => (int) $l->cuenta_id,
             'es_publica' => (bool) $l->es_publica, 'linea_solucion_id' => $l->linea_solucion_id === null ? null : (int) $l->linea_solucion_id,
             'valor_referencial' => $l->valor_referencial === null ? null : (string) $l->valor_referencial, 'responsable' => $l->responsable_user_id === null ? null : (int) $l->responsable_user_id,
             'desde' => CarbonImmutable::instance($l->created_at), 'hito' => $hitos[$l->id] ?? null,
+            'deSeace' => isset($seace[$l->id]),
         ])->values()->all();
     }
 

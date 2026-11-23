@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages;
 
 use App\Modules\Crm\Campanias\Filament\Resources\Leads\LeadResource;
-use App\Modules\Crm\Campanias\Models\Lead;
 use App\Modules\Crm\Campanias\Services\LeadsService;
-use App\Modules\Crm\Licitaciones\Filament\AccionesLicitacion;
 use App\Modules\Crm\Licitaciones\Filament\Resources\Licitaciones\LicitacionResource;
-use App\Modules\Crm\Licitaciones\Models\Licitacion;
 use App\Modules\Crm\Licitaciones\Services\LicitacionesService;
 use App\Modules\Crm\Oportunidades\Enums\EtapaAbierta;
+use App\Modules\Crm\Oportunidades\Filament\DecideLoPorCalificar;
 use App\Modules\Crm\Oportunidades\Filament\DibujoDeLinea;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLaFicha;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLasVistas;
@@ -26,8 +24,6 @@ use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
 use App\Modules\Crm\Oportunidades\Services\ResumenOportunidad;
 use App\Modules\Nucleo\Models\LineaSolucion;
 use Carbon\CarbonImmutable;
-use Closure;
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
@@ -37,7 +33,6 @@ use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Pagination\Paginator;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
-use RuntimeException;
 
 /**
  * La vista «Tarjetas» de Oportunidades (plan 2.21d, D1 y D11; prototipo aprobado
@@ -50,6 +45,7 @@ use RuntimeException;
  */
 final class TarjetasOportunidades extends Page
 {
+    use DecideLoPorCalificar;
     use MuestraLaFicha;
     use MuestraLasVistas;
     use WithPagination;
@@ -94,9 +90,6 @@ final class TarjetasOportunidades extends Page
 
     #[Url(as: 'orden', except: 'monto')]
     public string $orden = 'monto';
-
-    /** La tarjeta por calificar sobre la que se abrió una acción (lead o licitación). */
-    public ?int $porCalificarId = null;
 
     public static function canAccess(array $parameters = []): bool
     {
@@ -203,63 +196,6 @@ final class TarjetasOportunidades extends Page
         };
 
         return ['texto' => "{$hito['etapa']} {$cuando}", 'urgente' => $d < self::DIAS_URGENTE, 'titulo' => $hito['etapa'].': '.$hito['fecha']->format('d/m/Y')];
-    }
-
-    /** Observación 7.1: abre una acción sobre una tarjeta por calificar (lead o licitación). */
-    public function decidir(string $accion, int $id): void
-    {
-        if (! in_array($accion, ['calificarLead', 'descartarLead', 'participar', 'noParticipar'], true)) {
-            return;
-        }
-
-        $this->porCalificarId = $id;
-        $this->mountAction($accion);
-    }
-
-    public function calificarLeadAction(): Action
-    {
-        return LeadResource::accionConvertir()->name('calificarLead')->label('Calificar')
-            ->record(fn (): ?Lead => Lead::query()->find($this->porCalificarId))
-            ->modalHeading(fn (): string => 'Calificar · '.Lead::query()->whereKey($this->porCalificarId)->value('nombre_contacto'))
-            ->after(fn () => $this->calcularCifras());
-    }
-
-    public function descartarLeadAction(): Action
-    {
-        return LeadResource::accionDescartar()->name('descartarLead')
-            ->record(fn (): ?Lead => Lead::query()->find($this->porCalificarId))
-            ->after(fn () => Notification::make()->success()->title('Lead descartado.')->send());
-    }
-
-    public function participarAction(): Action
-    {
-        return $this->accionLicitacion('participar');
-    }
-
-    public function noParticiparAction(): Action
-    {
-        return $this->accionLicitacion('noParticipar');
-    }
-
-    private function accionLicitacion(string $nombre): Action
-    {
-        $acciones = AccionesLicitacion::todas(
-            fn (): Licitacion => Licitacion::query()->findOrFail($this->porCalificarId),
-            function (Closure $hacer, string $mensaje): void {
-                try {
-                    $hacer();
-                } catch (RuntimeException $e) {
-                    Notification::make()->danger()->title($e->getMessage())->send();
-
-                    return;
-                }
-
-                Notification::make()->success()->title($mensaje)->send();
-                $this->calcularCifras();
-            },
-        );
-
-        return $acciones[$nombre];
     }
 
     protected function getHeaderActions(): array

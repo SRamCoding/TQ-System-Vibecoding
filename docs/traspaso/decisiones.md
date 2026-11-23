@@ -1047,3 +1047,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.1: Mis oportunidades en 3 columnas»
+
+### MV-081 · 2026-11-23 · Embudo: «Por calificar» también abre su panel
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-8, punto 2) «Al pulsar «Por calificar» debe pasar lo mismo: el panel muestra lo que falta calificar … su gema, nombre, cuenta o contacto, origen … monto o valor referencial … cuánto lleva esperando («hace 3 días», en coral desde 3 días) … primero las licitaciones por decidir, por la fecha de su próximo plazo … luego los leads, del más antiguo al más nuevo … Calificar / Descartar … Participar / No participar … la cantidad y el total».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.2: el panel de «Por calificar» en el Embudo»
