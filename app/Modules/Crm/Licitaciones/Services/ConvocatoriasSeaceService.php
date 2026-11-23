@@ -24,6 +24,9 @@ use Throwable;
  */
 final readonly class ConvocatoriasSeaceService
 {
+    /** MV-066: cuántas páginas de la API del OECE se leen como máximo en una lectura. */
+    public const int PAGINAS_MAXIMAS = 20;
+
     public const string PARAMETRO_PALABRAS = 'crm.seace_palabras_clave';
 
     public const string PARAMETRO_VALOR_MINIMO = 'crm.seace_valor_minimo';
@@ -43,13 +46,50 @@ final readonly class ConvocatoriasSeaceService
             throw new RuntimeException('Falta la dirección de los datos abiertos del OECE (OECE_OCDS_URL en el .env). Mientras tanto, importa un archivo OCDS descargado del portal.');
         }
 
-        try {
-            $json = Http::timeout(60)->acceptJson()->get($url, ['since' => ($desde ?? Calendario::ahora()->subDays(3))->toIso8601String()])->throw()->body();
-        } catch (Throwable $e) {
-            throw new RuntimeException('El OECE no respondió: '.mb_substr($e->getMessage(), 0, 120));
+        // MV-066: la API del OECE (`/releases`) no acepta «since»: entrega lo más reciente primero, 20 por página, y se
+        // siguen sus páginas (`links.next`) mientras traigan releases más nuevos que «desde», hasta 20 páginas.
+        $desde ??= Calendario::ahora()->subDays(3);
+        // `releasesAfter` ordena por su id interno (salen releases de 2024 primero): se usa `/releases`, que sí va por fecha.
+        $url = (string) preg_replace('#/releasesAfter(?=$|\?)#', '/releases', $url);
+        $siguiente = $url.(str_contains($url, '?') ? '&' : '?').'format=json';
+        $total = ['leidas' => 0, 'nuevas' => 0, 'descartadas_por_filtro' => 0];
+
+        for ($pagina = 0; $pagina < self::PAGINAS_MAXIMAS && $siguiente !== null; $pagina++) {
+            try {
+                // La dirección va completa: si se pasaran parámetros aparte, Guzzle reemplazaría los que ya trae.
+                // El OECE rechaza (403) la cabecera por defecto de Guzzle: el cliente se presenta con un nombre genérico.
+                $json = Http::timeout(60)->acceptJson()->withUserAgent('TechQuk-OCDS/1.0')->get($siguiente)->throw()->body();
+            } catch (Throwable $e) {
+                if ($pagina === 0) {
+                    throw new RuntimeException('El OECE no respondió: '.mb_substr($e->getMessage(), 0, 120));
+                }
+
+                break;
+            }
+
+            $datos = json_decode($json, true);
+            $releases = is_array($datos) ? self::releasesDe($datos) : [];
+            $recientes = array_values(array_filter($releases, fn (array $r): bool => ! isset($r['date']) || CarbonImmutable::parse($r['date'])->greaterThanOrEqualTo($desde)));
+            $parte = $this->importar(json_encode(['releases' => $recientes]) ?: '{}');
+
+            foreach ($total as $k => $v) {
+                $total[$k] = $v + $parte[$k];
+            }
+
+            // Si en esta página ya hubo releases más viejos que «desde», no hace falta seguir.
+            $siguiente = count($recientes) < count($releases) ? null : ($datos['links']['next'] ?? null);
         }
 
-        return $this->importar($json);
+        return $total;
+    }
+
+    /**
+     * @param  array<mixed>  $datos
+     * @return list<array<string, mixed>>
+     */
+    private static function releasesDe(array $datos): array
+    {
+        return $datos['releases'] ?? (isset($datos['records']) ? array_map(fn (array $r): array => $r['compiledRelease'] ?? ($r['releases'][0] ?? []), $datos['records']) : (array_is_list($datos) ? $datos : []));
     }
 
     /**
@@ -65,7 +105,7 @@ final readonly class ConvocatoriasSeaceService
             throw new RuntimeException('El archivo no es un JSON de contrataciones abiertas (OCDS).');
         }
 
-        $releases = $datos['releases'] ?? (isset($datos['records']) ? array_map(fn (array $r): array => $r['compiledRelease'] ?? ($r['releases'][0] ?? []), $datos['records']) : (array_is_list($datos) ? $datos : []));
+        $releases = self::releasesDe($datos);
         $palabras = $this->palabras();
         $minimo = (float) app(ParametrosService::class)->entero(self::PARAMETRO_VALOR_MINIMO);
         [$leidas, $nuevas, $fuera] = [0, 0, 0];
@@ -76,6 +116,7 @@ final readonly class ConvocatoriasSeaceService
             $texto = mb_strtolower(($t['title'] ?? '').' '.($t['description'] ?? '').' '.implode(' ', array_map(fn ($i): string => (string) ($i['description'] ?? ''), $t['items'] ?? [])));
             $coinciden = array_values(array_filter($palabras, fn (string $p): bool => str_contains($texto, $p)));
             $valor = $t['value']['amount'] ?? null;
+            $valor = $valor !== null && (float) $valor > 0 ? $valor : null; // el OECE manda 0 cuando el valor no es público
 
             if ($coinciden === [] || ($valor !== null && (float) $valor < $minimo) || ! isset($r['ocid'])) {
                 $fuera++;

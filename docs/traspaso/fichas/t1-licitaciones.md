@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v3, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v3
+- **Estado:** en curso (v4, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v4
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -21,6 +21,7 @@ perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
 
+- **MV-066** (ficha) · «Leer ahora del OECE» lee la API real de contrataciones abiertas por páginas.
 - **MV-023** (cruza módulos) · La licitación es una sección de la oportunidad; su lista, una pestaña de Oportunidades.
 - **MV-005** (ficha) · Licitaciones va después del puente al ERP.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
@@ -114,6 +115,16 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 `database/seeders/Demo/CarteraDemo.php` (`licitaciones()`, `competidores()`) y `DemoSeeder::licitaciones()`.
 
 ## Cambios desde la versión anterior
+
+- **v4** (observaciones-6, MV-066): «Leer ahora del OECE» lee
+  `https://contratacionesabiertas.oece.gob.pe/api/v1/releases` (`format=json`): lo más nuevo primero, 20 releases por
+  página, siguiendo `links.next` mientras haya releases publicados después de «desde» (3 días atrás por omisión) y hasta
+  20 páginas (400 releases). Si la dirección configurada es `releasesAfter`, se usa `/releases` (la primera ordena por
+  id interno y trae releases de 2024). El servicio responde 403 a clientes sin nombre: se pide con un agente genérico
+  propio. Si la primera página falla, avisa; si falla una siguiente, se queda con lo leído. Un valor referencial 0 se
+  toma como «no publicado» (antes el valor mínimo lo dejaba fuera: el OECE manda 0 en la mayoría). Probado contra el
+  servicio real el 2026-11-23: 400 leídas, 11 entran, 389 fuera por el filtro, en unos 35 s. El supuesto de la v2 sobre
+  la dirección queda resuelto.
 
 - **v3** (ronda 1, MV-023): ya no hay caja Licitaciones. La oportunidad que nació de una licitación tiene la pestaña
   **Licitación** (primera de las que suman otros módulos): estado y plazo próximo, las acciones del estado (participar,

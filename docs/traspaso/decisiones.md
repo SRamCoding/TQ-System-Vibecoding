@@ -845,3 +845,18 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 6.5: doble clic en la estrella de Mien»
+
+### MV-066 · 2026-11-23 · «Leer ahora del OECE» con la API real de contrataciones abiertas, leída por páginas
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-6, punto 6) «La dirección vigente de la API … es
+  `https://contratacionesabiertas.oece.gob.pe/api/v1/releasesAfter`. La API no acepta `since`. Se pide lo más reciente
+  primero y se siguen las páginas (`links.next`) mientras los releases sigan siendo más nuevos que la fecha "desde" (por
+  defecto, 3 días atrás), con un tope de páginas (por ejemplo 20). Al terminar, el aviso dice cuántas leyó, cuántas
+  entraron y cuántas quedaron fuera por el filtro».
+- **Decisión:** lo dicho. Se precisó al probarla: `releasesAfter` con `order=desc` no ordena por fecha (devuelve releases
+  de 2024), así que se lee `/releases` del mismo servicio, que sí entrega lo más nuevo primero (20 por página); si la
+  dirección configurada es `releasesAfter`, se cambia sola. Reemplaza el supuesto «dirección no confirmada» de la v2.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 6.6: Leer ahora del OECE con la API real»
