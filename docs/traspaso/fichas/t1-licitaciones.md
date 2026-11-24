@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v13, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v13
+- **Estado:** en curso (v14, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v14
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -22,6 +22,8 @@ adjudica entre el 76.6 % y el 94.5 % del referencial»). Si se pierde o queda de
 perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
+
+- **MV-107** (ficha) · Prueba de punta a punta con datos reales; arreglados: la lectura que perdía publicaciones de una misma tanda, el RUC de la entidad (venía en otro campo), una convocatoria en dos líneas, «Recuperar» una descartada y los botones de región y entidad de «¿Por qué no entró?».
 
 - **MV-101** (ficha) · Convocatorias del SEACE solo con lo leído del OECE; los ganadores anteriores ficticios quedan como dato de demo de las licitaciones de Oportunidades. Junto a «Leído hace…», «X leídas · Y entraron a tu bandeja» con su detalle, o «El OECE no respondió · reintentar».
 
@@ -194,6 +196,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Reglas y números
 
+- **Prueba de punta a punta** (v14, MV-107): la lectura sigue desde lo más reciente mientras cada página traiga algo nuevo o una versión más nueva (no usa la fecha como marca: el OECE publica por tandas con la misma hora) y, si llega al tope de 20 páginas, la siguiente lectura retoma desde ahí; «leídas» = las que trajeron algo. El RUC de la entidad sale de `additionalIdentifiers` (PE-RUC); se rellenó en lo guardado (quedan 115 sin RUC, más antiguas que las 60 páginas releídas). Una convocatoria que pasa dos líneas aparece en las dos (`lineas_ids`; la principal es la de más coincidencias). Una descartada se puede «Recuperar» (vuelve como nueva).
+
 - **Solo lo real** (v13, MV-101): se borraron las 11 convocatorias inventadas (y sus 25 avisos de Mien) y la lectura «por publicar» de la demo; los 19 procesos anteriores ficticios quedan con `es_demo` y la bandeja, «Buscar en todo el SEACE», «¿Por qué no entró?», Ganadores anteriores del detalle y el histórico no los ven; «¿Cuánto bajar?» de la postulación sí. La licitación LP-SM-12-2026-GRVN-1 se registra a mano en la demo. La configuración de la búsqueda sigue sembrada.
 - **Lectura del OECE** (v13): la nomenclatura es el `title` del OECE (el `id` es un número interno); el fin del periodo que trae el listado es el mismo día de la publicación, así que la presentación queda sin fecha hasta que llegue un cronograma. La fecha de la versión se compara en segundos (antes cada lectura «actualizaba» las mismas 31).
 
@@ -259,6 +263,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
   Tech, Conectividad del Pacífico y Sistemas Integrados de Salud.
 
 ## Supuestos sin confirmar
+
+- **v14 · Programador de tareas:** la lectura de cada hora necesita `php artisan schedule:work` corriendo (en el README); en el entorno del agente no estaba levantado.
 
 - **v13 · Presentación sin fecha:** el listado del OECE no trae la fecha de presentación de ofertas; esas convocatorias se ven «Sin fecha» y no salen como vencidas.
 
@@ -344,6 +350,8 @@ y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.ph
 `2026_11_23_900001_bandeja_con_detalle.php` y `Demo/BandejaCasosSeeder.php`.
 
 ## Cambios desde la versión anterior
+
+- **v14** (MV-107): arreglos de la prueba de punta a punta.
 
 - **v13** (MV-101): Convocatorias solo con datos reales y el resultado de cada lectura.
 

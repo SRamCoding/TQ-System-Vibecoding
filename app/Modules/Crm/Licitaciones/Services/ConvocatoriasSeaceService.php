@@ -40,6 +40,9 @@ final class ConvocatoriasSeaceService
     /** Observación 7.4: al entrar, se lee otra vez si la última lectura tiene más de estos minutos. */
     public const int MINUTOS_FRESCA = 15;
 
+    /** Observación 9.13: dónde retomar si una lectura llegó al tope de páginas. */
+    private const string CLAVE_REANUDAR = 'crm.seace.reanudar';
+
     /**
      * Observación 7.4: lee solo lo nuevo. Pide lo más reciente primero (`order=desc`) y sigue las páginas hasta llegar a
      * un release que ya tiene (la fecha del más nuevo guardado), con un tope de páginas. Cada convocatoria se guarda
@@ -62,31 +65,46 @@ final class ConvocatoriasSeaceService
                 throw new RuntimeException('Falta la dirección de los datos abiertos del OECE (OECE_OCDS_URL en el .env).');
             }
 
-            $hasta = DB::table('convocatorias_seace')->max('release_fecha');
-            $hasta = $hasta === null ? Calendario::ahora()->subDays(3) : CarbonImmutable::parse($hasta);
+            // Observación 9.13: se lee desde lo más reciente y se sigue mientras una página traiga algo (nuevas o versiones
+            // más nuevas); la primera página que no trae nada dice que ya se llegó a lo leído. El OECE publica por tandas
+            // con la misma hora, así que no se usa la fecha como marca. Si se llega al tope de páginas, la próxima lectura
+            // retoma desde ahí (`crm.seace.reanudar`) después de mirar lo nuevo de arriba.
             $url = (string) preg_replace('#/releasesAfter(?=$|\?)#', '/releases', $url);
-            $siguiente = $url.(str_contains($url, '?') ? '&' : '?').'format=json&order=desc';
+            $primera = DB::table('convocatorias_seace')->where('es_demo', false)->exists();
+            $tramos = [[$url.(str_contains($url, '?') ? '&' : '?').'format=json&order=desc', true]];
+            $reanudar = Cache::get(self::CLAVE_REANUDAR);
 
-            for ($pagina = 0; $pagina < self::PAGINAS_MAXIMAS && $siguiente !== null; $pagina++) {
-                try {
-                    // La dirección va completa; el OECE rechaza (403) la cabecera por defecto de Guzzle.
-                    $json = Http::timeout(30)->acceptJson()->withUserAgent('TechQuk-OCDS/1.0')->get($siguiente)->throw()->body();
-                } catch (Throwable $e) {
-                    if ($pagina === 0) {
-                        throw new RuntimeException('El OECE no respondió: '.mb_substr($e->getMessage(), 0, 120));
+            if (is_string($reanudar) && $reanudar !== '') {
+                $tramos[] = [$reanudar, false];
+            }
+
+            Cache::forget(self::CLAVE_REANUDAR);
+
+            foreach ($tramos as [$siguiente, $esArriba]) {
+                for ($pagina = 0; $pagina < self::PAGINAS_MAXIMAS && $siguiente !== null; $pagina++) {
+                    try {
+                        // La dirección va completa; el OECE rechaza (403) la cabecera por defecto de Guzzle.
+                        $json = Http::timeout(30)->acceptJson()->withUserAgent('TechQuk-OCDS/1.0')->get($siguiente)->throw()->body();
+                    } catch (Throwable $e) {
+                        if ($pagina === 0 && $esArriba) {
+                            throw new RuntimeException('El OECE no respondió: '.mb_substr($e->getMessage(), 0, 120));
+                        }
+
+                        break;
                     }
 
-                    break;
+                    $datos = json_decode($json, true);
+                    $releases = is_array($datos) ? self::releasesDe($datos) : [];
+                    // Sin nada guardado todavía, solo los últimos 3 días.
+                    $releases = $primera ? $releases : array_values(array_filter($releases, fn (array $r): bool => ! isset($r['date']) || CarbonImmutable::parse($r['date'])->greaterThan(Calendario::ahora()->subDays(3))));
+                    $antes = $total['leidas'];
+                    $this->sumar($total, $this->guardarTodos($releases));
+                    $siguiente = $releases === [] || $total['leidas'] === $antes ? null : ($datos['links']['next'] ?? null);
                 }
 
-                $datos = json_decode($json, true);
-                $releases = is_array($datos) ? self::releasesDe($datos) : [];
-                // Observación 9.13: la base guarda la fecha en segundos y el OECE la manda con microsegundos: se compara en
-                // segundos, o la misma versión parecería siempre más nueva (y cada lectura «actualizaría» lo mismo).
-                $nuevos = array_values(array_filter($releases, fn (array $r): bool => ! isset($r['date']) || CarbonImmutable::parse($r['date'])->startOfSecond()->greaterThan($hasta)));
-                $this->sumar($total, $this->guardarTodos($nuevos));
-                // Llegó a lo que ya tenía: se detiene.
-                $siguiente = count($nuevos) < count($releases) || $releases === [] ? null : ($datos['links']['next'] ?? null);
+                if ($siguiente !== null) {
+                    Cache::forever(self::CLAVE_REANUDAR, $siguiente);
+                }
             }
 
             DB::table('seace_lecturas')->where('id', $lectura)->update(['fin' => now(), 'es_ok' => true, ...$total, 'fuera' => json_encode($this->fuera)]);
@@ -195,12 +213,14 @@ final class ConvocatoriasSeaceService
         $total = ['leidas' => 0, 'nuevas' => 0, 'actualizadas' => 0, 'a_bandeja' => 0];
 
         foreach ($releases as $r) {
-            $total['leidas']++;
             $hecho = $this->guardar($r);
 
+            // Observación 9.13: «leídas» son las que trajeron algo (nuevas o con una versión más nueva).
             if ($hecho === null) {
                 continue;
             }
+
+            $total['leidas']++;
 
             $total[$hecho['nueva'] ? 'nuevas' : 'actualizadas']++;
             $c = DB::table('convocatorias_seace')->where('id', $hecho['id'])->first(['en_bandeja', 'fuera_por']);
@@ -305,7 +325,8 @@ final class ConvocatoriasSeaceService
 
         $t = $r['tender'] ?? [];
         $comprador = collect($r['parties'] ?? [])->firstWhere('id', $r['buyer']['id'] ?? null) ?? [];
-        $ruc = preg_replace('/\D/', '', (string) ($comprador['identifier']['id'] ?? ''));
+        // Observación 9.13: el OECE trae el RUC en `additionalIdentifiers` (esquema PE-RUC); `identifier` es su código.
+        $ruc = self::rucDe($comprador);
         $fecha = fn (?string $f): ?string => $f === null ? null : substr($f, 0, 10);
         $valor = $t['value']['amount'] ?? null;
         $award = collect($r['awards'] ?? [])->first(fn (array $a): bool => ($a['status'] ?? 'active') === 'active') ?? ($r['awards'][0] ?? null);
@@ -341,6 +362,27 @@ final class ConvocatoriasSeaceService
             // Con su desfase: así Postgres no la corre de zona horaria y «hasta dónde se leyó» compara bien.
             'release_fecha' => (isset($r['date']) ? CarbonImmutable::parse($r['date']) : CarbonImmutable::now())->format('Y-m-d\TH:i:s.uP'),
         ];
+    }
+
+    /**
+     * El RUC de una party del OECE: el `identifier` si es PE-RUC; si no, el de `additionalIdentifiers`.
+     *
+     * @param  array<string, mixed>  $party
+     */
+    public static function rucDe(array $party): string
+    {
+        $ids = [$party['identifier'] ?? [], ...($party['additionalIdentifiers'] ?? [])];
+
+        foreach ($ids as $i) {
+            if (($i['scheme'] ?? '') === 'PE-RUC' && preg_match('/^\d{11}$/', (string) ($i['id'] ?? '')) === 1) {
+                return (string) $i['id'];
+            }
+        }
+
+        // Las de la demo y algunas viejas traían el RUC en `identifier` sin esquema.
+        $id = preg_replace('/\D/', '', (string) ($party['identifier']['id'] ?? ''));
+
+        return strlen((string) $id) === 11 ? (string) $id : '';
     }
 
     /** Observación 7.4, reacción «Priorizar»: valor alto (parámetro) o entidad que ya es cuenta. */
@@ -569,6 +611,12 @@ final class ConvocatoriasSeaceService
     public function descartar(int $id, string $motivo): void
     {
         DB::table('convocatorias_seace')->where('id', $id)->where('estado', 'nueva')->update(['estado' => 'descartada', 'motivo_descarte' => mb_substr($motivo, 0, 200), 'updated_at' => now()]);
+    }
+
+    /** Observación 9.13: una descartada vuelve a la bandeja como nueva (sin su motivo). */
+    public function recuperar(int $id): void
+    {
+        DB::table('convocatorias_seace')->where('id', $id)->where('estado', 'descartada')->update(['estado' => 'nueva', 'motivo_descarte' => null, 'updated_at' => now()]);
     }
 
     /** El nivel de gobierno por el nombre de la entidad (se puede corregir en la cuenta). */

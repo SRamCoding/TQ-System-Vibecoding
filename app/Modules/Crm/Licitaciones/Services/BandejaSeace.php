@@ -60,7 +60,7 @@ final readonly class BandejaSeace
             // Sin chip: las que esperan decisión (nuevas y abiertas; las de fuera de la bandeja si se buscó en todo).
             default => ($r['estado'] === 'nueva' && $r['abierta']) || ! $r['enBandeja'],
         });
-        $porLinea = fn (Collection $c, ?int $linea): Collection => $linea === null ? $c : $c->filter(fn (array $r): bool => $r['lineaId'] === $linea);
+        $porLinea = fn (Collection $c, ?int $linea): Collection => $linea === null ? $c : $c->filter(fn (array $r): bool => $r['lineaId'] === $linea || in_array($linea, $r['lineasIds'], true));
         // Observación 8.9: los filtros rápidos de región y entidad (lo que se ve ahora, sin cambiar la configuración).
         $region = $f['region'] ?? null;
         $entidad = $f['entidad'] ?? null;
@@ -218,7 +218,7 @@ final readonly class BandejaSeace
             'urgente' => $dias !== null && $dias >= 0 && $dias < self::DIAS_POR_VENCER, 'abierta' => $dias === null || $dias >= 0,
             'estado' => $c->estado, 'nueva' => ! $vistas->has($c->id), 'prioritaria' => (bool) $c->prioritaria, 'enBandeja' => (bool) $c->en_bandeja,
             'porQuePrioritaria' => self::porQuePrioritaria($c->motivo_prioridad ?? null),
-            'lineaId' => $c->linea_id === null ? null : (int) $c->linea_id, 'linea' => $c->linea_id === null ? null : $lineas[$c->linea_id] ?? null,
+            'lineaId' => $c->linea_id === null ? null : (int) $c->linea_id, 'lineasIds' => array_map('intval', (array) json_decode((string) ($c->lineas_ids ?? '[]'), true)), 'linea' => $c->linea_id === null ? null : $lineas[$c->linea_id] ?? null,
             'coincide' => $c->coincide === null ? [] : array_map('trim', explode(',', $c->coincide)),
             'responsableId' => $c->responsable_user_id === null ? null : (int) $c->responsable_user_id, 'responsable' => $responsable,
             'etiquetas' => $c->etiquetas === null ? [] : (array) json_decode($c->etiquetas, true),

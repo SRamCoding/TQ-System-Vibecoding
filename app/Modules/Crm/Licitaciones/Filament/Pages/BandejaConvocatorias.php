@@ -341,6 +341,15 @@ final class BandejaConvocatorias extends Page
     /** @var array<int, string> lo que se escribe en el buscador de entidades de cada línea */
     public array $buscarEntidad = [];
 
+    /** Observación 9.13: «Recuperar» una descartada (vuelve a la bandeja como nueva). */
+    public function recuperar(int $id): void
+    {
+        if (self::puede()) {
+            app(ConvocatoriasSeaceService::class)->recuperar($id);
+            Notification::make()->success()->title('Recuperada: volvió a la bandeja.')->send();
+        }
+    }
+
     public function traerIgual(int $id): void
     {
         if (self::puede()) {

@@ -306,6 +306,7 @@
                     <a class="tq-band-btn" href="{{ $d['urlOece'] }}" target="_blank" rel="noopener">Ver en el OECE</a>
                     <a class="tq-band-btn" href="{{ $d['urlSeace'] }}" target="_blank" rel="noopener" x-on:click="window.tqCopiarNomenclatura({{ \Illuminate\Support\Js::from($d['nomenclatura']) }})">Buscar en el SEACE</a>
                     @if ($d['estado'] === 'nueva') {{ $this->descartarAction }} @endif
+                    @if ($d['estado'] === 'descartada' && $puede)<button type="button" class="tq-band-btn" wire:click="recuperar({{ $d['id'] }})">Recuperar</button>@endif
                     <span style="flex: 1"></span>
                     @if ($d['estado'] !== 'descartada') {{ $this->asignarAction }} @endif
                     @if ($d['estado'] === 'nueva')
@@ -420,15 +421,15 @@
                                     @endif
                                 @endif
                             </div>
+                            {{-- Observación 9.13: «@isset» ocultaba los botones de región y entidad cuando no había negativa. --}}
+                            @php $conNeg ??= null; $conRegion ??= null; $conExcluida ??= null; $nr ??= fn ($r) => \App\Modules\Crm\Licitaciones\Services\FiltroConvocatorias::nombreRegion($r); @endphp
                             @if (! $porQueResultado['enBandeja'] && $puedeConfigurar)
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap">
                                     <button type="button" class="tq-band-btn p" wire:click="traerIgual({{ $porQueResultado['id'] }})">Traer igual a la bandeja</button>
-                                    @isset($conNeg)
                                         @if ($conNeg)<button type="button" class="tq-band-btn" wire:click="quitarNegativa(@js($conNeg['linea']), @js($conNeg['negativas'][0]))">Quitar la palabra negativa</button>
                                         @elseif ($conExcluida)<button type="button" class="tq-band-btn" wire:click="quitarExcluida(@js($conExcluida['linea']), @js((string) ($porQueResultado['ruc'] ?? '')))">Quitar la entidad de las excluidas</button>
                                         @elseif ($conRegion && $conRegion['departamento'])<button type="button" class="tq-band-btn" wire:click="agregarRegion(@js($conRegion['linea']), @js($conRegion['departamento']))">Agregar {{ $nr($conRegion['departamento']) }} a la línea</button>
                                         @endif
-                                    @endisset
                                 </div>
                             @endif
                         </div>

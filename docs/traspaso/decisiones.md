@@ -1283,3 +1283,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (Campañas)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.12: «Mis clientes» pasa a «Volver a vender»»
+
+### MV-107 · 2026-11-24 · Convocatorias del SEACE: prueba de punta a punta con datos reales
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-9, punto 13) «prueba con la app levantada y datos reales del OECE todo el circuito de Convocatorias del SEACE, paso por paso, y entrégame una lista corta con cada punto marcado funciona / no funciona (y, si no, qué pasaba y cómo lo arreglaste)».
+- **Decisión:** lo dicho; lo que no funcionaba se arregló en la misma prueba.
+- **Alcance:** ficha (t1-licitaciones)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.13: prueba de punta a punta de Convocatorias»

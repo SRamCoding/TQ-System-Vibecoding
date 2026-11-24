@@ -58,6 +58,7 @@ final readonly class FiltroConvocatorias
         $texto = self::normal((string) (($c->texto ?? null) ?: $c->objeto));
         $detalle = [];
         $mejor = null;
+        $todas = [];
 
         foreach ($lineas as $l) {
             $coincide = array_values(array_filter($l['palabras'], fn (string $p): bool => $p !== '' && str_contains($texto, self::normal($p))));
@@ -70,13 +71,18 @@ final readonly class FiltroConvocatorias
             $detalle[] = ['linea' => $l['nombre'], 'coincide' => $coincide, 'negativas' => $negativas, 'bajoMinimo' => $bajo, 'minimo' => $l['minimo'],
                 'fueraRegion' => $fueraRegion, 'regiones' => $l['regiones'], 'departamento' => $departamento, 'excluida' => $excluida];
 
-            if ($coincide !== [] && $negativas === [] && ! $bajo && ! $fueraRegion && ! $excluida && ($mejor === null || count($coincide) > count($mejor[1]))) {
-                $mejor = [$l['id'], $coincide];
+            if ($coincide !== [] && $negativas === [] && ! $bajo && ! $fueraRegion && ! $excluida) {
+                // Observación 9.13: entra en todas las líneas que la toman; la principal es la de más coincidencias.
+                $todas[] = $l['id'];
+
+                if ($mejor === null || count($coincide) > count($mejor[1])) {
+                    $mejor = [$l['id'], $coincide];
+                }
             }
         }
 
         if ($mejor !== null) {
-            return ['entra' => true, 'linea' => $mejor[0], 'coincide' => $mejor[1], 'motivo' => null, 'detalle' => $detalle];
+            return ['entra' => true, 'linea' => $mejor[0], 'lineas' => $todas, 'coincide' => $mejor[1], 'motivo' => null, 'detalle' => $detalle];
         }
 
         $conPalabra = array_values(array_filter($detalle, fn (array $d): bool => $d['coincide'] !== []));
@@ -89,7 +95,7 @@ final readonly class FiltroConvocatorias
         };
         $linea = $conPalabra === [] ? null : collect($lineas)->firstWhere('nombre', $conPalabra[0]['linea'])['id'] ?? null;
 
-        return ['entra' => false, 'linea' => $linea, 'coincide' => $conPalabra[0]['coincide'] ?? [], 'motivo' => $motivo, 'detalle' => $detalle];
+        return ['entra' => false, 'linea' => $linea, 'lineas' => [], 'coincide' => $conPalabra[0]['coincide'] ?? [], 'motivo' => $motivo, 'detalle' => $detalle];
     }
 
     /** Aplica el filtro a una guardada y deja el resultado (las traídas a mano se quedan en la bandeja). */
@@ -104,7 +110,7 @@ final readonly class FiltroConvocatorias
         $r = $this->evaluar($c);
         $entra = $r['entra'] || (bool) $c->es_traida;
         DB::table('convocatorias_seace')->where('id', $id)->update([
-            'en_bandeja' => $entra, 'linea_id' => $r['linea'], 'fuera_por' => $r['entra'] ? null : mb_substr((string) $r['motivo'], 0, 200),
+            'en_bandeja' => $entra, 'linea_id' => $r['linea'], 'lineas_ids' => json_encode($r['lineas']), 'fuera_por' => $r['entra'] ? null : mb_substr((string) $r['motivo'], 0, 200),
             'coincide' => $r['coincide'] === [] ? null : mb_substr(implode(', ', $r['coincide']), 0, 200),
         ]);
 
