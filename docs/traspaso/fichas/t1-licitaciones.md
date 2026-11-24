@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v9, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v9
+- **Estado:** en curso (v10, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v10
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -23,6 +23,8 @@ perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
 
+- **MV-091** (ficha) · La estrella de prioritaria dice su motivo al pasar el puntero o tocarla.
+
 - **MV-090** (ficha) · «Ver en el OECE» abre la página del proceso; el detalle lista sus documentos; «Buscar en el SEACE» (y los botones del SEACE de la postulación) copian la nomenclatura y avisan.
 
 - **MV-089** (ficha) · Región y entidad: por línea en la configuración (regiones y entidades excluidas) y como filtros rápidos en la bandeja; «¿Por qué no entró?» las explica.
@@ -43,6 +45,8 @@ perdida con el ganador y su precio.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **v10 · Estrella de prioritaria** (MV-091): en la lista y en el detalle, al pasar el puntero o tocarla, «Prioritaria: valor referencial alto», «Prioritaria: ya es cliente» o «Prioritaria: valor referencial alto y ya es cliente» (también para el lector de pantalla).
 
 - **v9 · Ver en el OECE** (MV-090): en el detalle de una convocatoria, **Ver en el OECE** abre `https://contratacionesabiertas.oece.gob.pe/proceso/{código OCDS}` (verificado: la página pública del proceso con convocatoria, ítems, oferentes, documentos, adjudicación y contrato). **Documentos del proceso**: cada uno con su título y formato («Bases administrativas · PDF»), abre el archivo directo. **Buscar en el SEACE** copia la nomenclatura, abre el buscador público y avisa «Nomenclatura copiada: pégala en el buscador del SEACE». Los botones «Abrir el SEACE» de la postulación hacen lo mismo.
 
@@ -304,6 +308,8 @@ y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.ph
 `2026_11_23_900001_bandeja_con_detalle.php` y `Demo/BandejaCasosSeeder.php`.
 
 ## Cambios desde la versión anterior
+
+- **v10** (MV-091): la estrella dice por qué es prioritaria.
 
 - **v9** (MV-090): Ver en el OECE, documentos del proceso y nomenclatura copiada al ir al SEACE.
 

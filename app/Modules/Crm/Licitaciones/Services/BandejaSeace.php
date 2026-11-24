@@ -188,12 +188,28 @@ final readonly class BandejaSeace
             'presentacion' => $c->presentacion === null ? null : CarbonImmutable::parse($c->presentacion), 'dias' => $dias,
             'urgente' => $dias !== null && $dias >= 0 && $dias < self::DIAS_POR_VENCER, 'abierta' => $dias === null || $dias >= 0,
             'estado' => $c->estado, 'nueva' => ! $vistas->has($c->id), 'prioritaria' => (bool) $c->prioritaria, 'enBandeja' => (bool) $c->en_bandeja,
+            'porQuePrioritaria' => self::porQuePrioritaria($c->motivo_prioridad ?? null),
             'lineaId' => $c->linea_id === null ? null : (int) $c->linea_id, 'linea' => $c->linea_id === null ? null : $lineas[$c->linea_id] ?? null,
             'coincide' => $c->coincide === null ? [] : array_map('trim', explode(',', $c->coincide)),
             'responsableId' => $c->responsable_user_id === null ? null : (int) $c->responsable_user_id, 'responsable' => $responsable,
             'etiquetas' => $c->etiquetas === null ? [] : (array) json_decode($c->etiquetas, true),
             'esCliente' => $c->ruc_entidad !== null && isset($cuentas[$c->ruc_entidad]), 'mia' => $c->responsable_user_id !== null && (int) $c->responsable_user_id === $usuarioId,
         ];
+    }
+
+    /** Observación 8.11: lo que dice la estrella al pasar el puntero o tocarla. */
+    public static function porQuePrioritaria(?string $motivo): string
+    {
+        $m = mb_strtolower((string) $motivo);
+        $alto = str_contains($m, 'valor');
+        $cliente = str_contains($m, 'cliente') || str_contains($m, 'cuenta');
+
+        return match (true) {
+            $alto && $cliente => 'Prioritaria: valor referencial alto y ya es cliente',
+            $alto => 'Prioritaria: valor referencial alto',
+            $cliente => 'Prioritaria: ya es cliente',
+            default => 'Prioritaria',
+        };
     }
 
     /** @return array<string, true> los RUC de las entidades que ya son cuenta */

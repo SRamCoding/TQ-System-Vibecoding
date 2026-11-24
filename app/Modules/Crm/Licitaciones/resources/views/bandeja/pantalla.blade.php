@@ -177,7 +177,7 @@
                         @if ($f['nueva'] && $f['estado'] === 'nueva')<span class="tq-band-punto" title="Nueva"></span>@else<span style="width: 8px; flex: none"></span>@endif
                         <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
                             <span style="display: flex; align-items: center; gap: 6px">
-                                @if ($f['prioritaria'])<x-filament::icon icon="heroicon-s-star" class="h-3.5 w-3.5" style="color: var(--b-oro); flex: none" />@endif
+                                @if ($f['prioritaria'])<span x-tooltip="{ content: {{ \Illuminate\Support\Js::from($f['porQuePrioritaria']) }}, theme: $store.theme }" aria-label="{{ $f['porQuePrioritaria'] }}" style="display: inline-flex; flex: none"><x-filament::icon icon="heroicon-s-star" class="h-3.5 w-3.5" style="color: var(--b-oro)" /></span>@endif
                                 <span class="tq-band-ent" style="font-weight: {{ $f['nueva'] && $f['estado'] === 'nueva' ? 700 : 500 }}">{{ $f['entidad'] }}</span>
                                 <span class="tq-band-dias" @if ($f['urgente']) data-urgente @endif>{{ $dias($f['dias']) }}</span>
                             </span>
@@ -200,7 +200,7 @@
         @if ($d !== null)
             <div class="tq-band-det" wire:key="det-{{ $d['id'] }}">
                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
-                    @if ($d['prioritaria'])<x-filament::icon icon="heroicon-s-star" class="h-4 w-4" style="color: var(--b-oro)" title="{{ $d['motivoPrioridad'] }}" />@endif
+                    @if ($d['prioritaria'])<span x-tooltip="{ content: {{ \Illuminate\Support\Js::from($d['porQuePrioritaria']) }}, theme: $store.theme }" aria-label="{{ $d['porQuePrioritaria'] }}" tabindex="0" style="display: inline-flex"><x-filament::icon icon="heroicon-s-star" class="h-4 w-4" style="color: var(--b-oro)" /></span>@endif
                     <span class="tq-band-tag" style="background: var(--b-celeste-fondo); color: var(--b-turquesa)">{{ $d['tipo'] }}</span>
                     @if ($d['estado'] === 'nueva' && $d['nueva'])<span class="tq-band-tag" style="background: var(--b-turquesa); color: #fff">Nueva</span>@endif
                     @if ($d['estado'] === 'registrada')<span class="tq-band-tag" style="background: var(--b-azul-fondo); color: var(--b-azul)">Registrada</span>@endif

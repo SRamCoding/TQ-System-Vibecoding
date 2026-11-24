@@ -1139,3 +1139,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.10: Ver en el OECE y documentos del proceso»
+
+### MV-091 · 2026-11-23 · La estrella de prioritaria dice por qué
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-8, punto 11) «la estrella dorada de las prioritarias, al pasar el puntero (y al tocarla en pantallas táctiles), dice el motivo: «Prioritaria: valor referencial alto» … o «Prioritaria: ya es cliente»; si son las dos, las dos».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.11: la estrella dice por qué»
