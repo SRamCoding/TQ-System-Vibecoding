@@ -340,3 +340,36 @@ redirección desde la vieja) y las fichas; el tipo de campaña que nace de ahí 
 chips: Campañas · Canales · Volver a vender.
 
 **Alcance:** ficha (Campañas).
+
+## 13. Convocatorias del SEACE: comprobar que todo funciona de punta a punta
+
+Al terminar la tanda (después de la 9.7), **prueba con la app levantada y datos reales del OECE** todo el circuito de
+Convocatorias del SEACE, paso por paso, y entrégame una lista corta con cada punto marcado **funciona / no funciona**
+(y, si no, qué pasaba y cómo lo arreglaste). Lo que no se pueda probar desde tu entorno (por ejemplo, si el OECE no
+responde), dilo con el error exacto.
+
+1. **Lectura real:** «Leer ahora» trae procesos reales del OECE (entidades reales), el contador «X leídas · Y entraron»
+   dice la verdad y «Leído hace…» se actualiza. La lectura de cada hora corre sola (el programador de tareas está
+   funcionando en el entorno de desarrollo; si hace falta un comando para levantarlo, dímelo).
+2. **Solo lo nuevo:** una segunda lectura no duplica nada y se detiene donde quedó la anterior; un proceso con cambios
+   se actualiza y anota qué cambió.
+3. **Filtros de la búsqueda:** una convocatoria entra por palabra clave; una palabra negativa la saca; el monto mínimo,
+   las regiones y las entidades excluidas funcionan; una convocatoria que coincide con dos líneas aparece en las dos.
+   Cambiar algo de la configuración vuelve a filtrar al instante.
+4. **«¿Por qué no entró?»** explica bien cada caso (palabra negativa, región, monto, entidad, sin coincidencia) y sus
+   botones hacen lo que dicen.
+5. **Asistente de configuración inicial:** se recorre completo, la vista previa cuenta bien y guardar deja la bandeja
+   llena.
+6. **Bandeja:** chips de línea y de «ver» (Nuevas, Prioritarias, Mías, Por vencer, Registradas, Descartadas), filtros de
+   región y entidad, orden, buscador y «Buscar en todo el SEACE», flechas ↑ ↓, resaltado de palabras, estrella de
+   prioritaria con su motivo.
+7. **Detalle:** cronograma correcto, documentos del proceso que abren el archivo, «Ver en el OECE» o «Buscar en el
+   SEACE» (copia la nomenclatura), ganadores anteriores con datos reales.
+8. **Acciones:** Asignar responsable, etiquetas, Descartar con motivo y recuperar desde «Descartadas», **Registrar como
+   oportunidad** (entra a Oportunidades como «Por calificar» con su cronograma) y su ruta de postulación.
+9. **Avisos en Mien:** convocatoria nueva que entra, cambio de cronograma de una registrada.
+10. **Histórico:** el ensayo cuenta y muestra los números (sin cargar de verdad si no lo apruebo).
+11. **Con los datos de demo apagados y encendidos** (9.8): la bandeja muestra lo mismo (solo lo real).
+12. **Sin errores:** ninguna página de Convocatorias da error 500 y no quedan errores nuevos en `storage/logs/laravel.log`.
+
+**Alcance:** ficha (t1-licitaciones, Convocatorias del SEACE).
