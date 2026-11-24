@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v32
+- **Versión:** v33
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -15,6 +15,8 @@ proceso y sus cajas internas (las pantallas de siempre) como barra de navegació
 elegida. Cada persona ve solo los procesos en que puede abrir al menos una pantalla y ordena sus cajas a su gusto.
 
 ## Decisiones de Sebastián
+
+- **MV-094** (cruza módulos) · Toda pantalla usa las variables del ambiente y sus colores de estado con el toque leve del tinte; regla en interfaz.md.
 
 - **MV-093** (cruza módulos) · Tema, preferencias de apariencia, orden de cajas, grupos de filtros, asistente y muelle se aplican al instante en todas las pestañas de la persona en ese navegador.
 
@@ -297,6 +299,8 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Reglas y números
 
+- **Colores del ambiente** (v33, MV-094): corregidas la Línea de tiempo (tramos de etapa, leyenda, acento, coral, dorado, «Hoy»), el Embudo (franjas, «Por calificar», Ganadas y Perdidas), Mis oportunidades (fondo de las tarjetas y el plazo en coral), Convocatorias del SEACE (interruptor, avatares y sus colores de estado), la postulación, Campañas, la agenda, Tareo, Subcontratos, Contratos y Personal asignado: sus colores de estado pasan por el toque leve del tinte y sus superficies por `--tq-superficie`. Comprobado a las 9:04 (tinte 13 %): el tramo de la Línea de tiempo ya sale mezclado.
+
 - **Entre pestañas** (v32, MV-093): al cambiar algo de la persona, la pestaña avisa a las demás por `BroadcastChannel('tq-persona')` (respaldo: el evento `storage`) y cada una lo aplica con el evento que ya existe: el tema y las clases de «Mis preferencias» con `tq-apariencia` (sin volver a guardarlos), el orden de cajas deslizándolas (`tq-remoto-orden-cajas`), los grupos de filtros de Mis oportunidades (`tq-remoto-filtros-abiertos`). El asistente (descanso o callado) y el muelle (su lugar) ya se guardan en el navegador y escuchan `storage`. La vista, los filtros puestos y la etapa abierta no se copian. En otro navegador o equipo, el cambio llega al recargar. Probado con dos pestañas: oscuro, sistema, orden de cajas, grupo «Tipo» y letra grande.
 
 - **Paneles y ventanas** (v31, MV-086): reglas en `docs/convenciones/interfaz.md` («Paneles y ventanas»), aplicadas a todos los de Filament desde `nucleo::filament.paneles`. En la configuración de la búsqueda del SEACE: cada línea en su caja con borde y cuadrito de color, «+ agregar» con borde y fondo de campo, montos como `S/ 20,000.00` (al enfocar se escribe el número), fuentes desactivadas con «más adelante» como etiqueta.
@@ -314,6 +318,8 @@ contar solas, porque no coinciden con ningún proceso).
   motivos, empresa, general) siguen en Configuración.
 
 ## Supuestos sin confirmar
+
+- **v33 · El texto blanco** sobre botones y etiquetas de color se deja fijo (contraste).
 
 - **v32 · «Apariencia según el día»** (colores del ambiente) se dibuja en el servidor: en las otras pestañas llega al navegar o recargar.
 
@@ -394,6 +400,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v33** (MV-094): pantallas nuevas con los colores del ambiente; regla en interfaz.md.
 
 - **v32** (MV-093): los cambios de la persona en todas sus pestañas.
 

@@ -1,9 +1,9 @@
 {{-- Observaciones 6, punto 12: los estilos de Subcontratos (tarjetas, panel y ficha), con los colores del ambiente. --}}
 <style>
     .tq-sc { --tq-sc-sup: var(--tq-superficie, #fff); --tq-sc-elev: var(--tq-superficie-elevada, #fff); --tq-sc-borde: var(--tq-borde, var(--gray-200)); --tq-sc-suave: var(--tq-texto-suave, var(--gray-500));
-        --tq-sc-erp: var(--tq-franja-misionales, #0790A8); --tq-sc-coral: #C2532F; --tq-sc-pagado: #3F8F5A; --tq-sc-poraprobar: #D99A1E; --tq-sc-resto: color-mix(in oklab, var(--tq-sc-suave) 22%, transparent); }
+        --tq-sc-erp: var(--tq-franja-misionales, #0790A8); --tq-sc-coral: color-mix(in oklch, #C2532F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #C2532F)); --tq-sc-pagado: color-mix(in oklch, #3F8F5A calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #3F8F5A)); --tq-sc-poraprobar: color-mix(in oklch, #D99A1E calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #D99A1E)); --tq-sc-resto: color-mix(in oklab, var(--tq-sc-suave) 22%, transparent); }
     .dark .tq-sc { --tq-sc-sup: var(--tq-superficie, #33302B); --tq-sc-elev: var(--tq-superficie-elevada, #3B3832); --tq-sc-borde: var(--tq-borde, #45413A); --tq-sc-suave: var(--tq-texto-suave, #A8ADB4);
-        --tq-sc-erp: var(--tq-franja-misionales, #7FE9FF); --tq-sc-coral: #F2A58C; --tq-sc-pagado: #7DC48D; --tq-sc-poraprobar: #F2C66B; }
+        --tq-sc-erp: var(--tq-franja-misionales, #7FE9FF); --tq-sc-coral: color-mix(in oklch, #F2A58C calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2A58C)); --tq-sc-pagado: color-mix(in oklch, #7DC48D calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #7DC48D)); --tq-sc-poraprobar: color-mix(in oklch, #F2C66B calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2C66B)); }
     .tq-sc-num { font-variant-numeric: tabular-nums; }
     .tq-sc-suave { color: var(--tq-sc-suave); }
     .tq-sc-cifras { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }

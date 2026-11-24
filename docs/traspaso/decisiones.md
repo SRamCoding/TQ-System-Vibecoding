@@ -1166,3 +1166,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (apariencia y preferencias)
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.13: los cambios en todas las pestañas»
+
+### MV-094 · 2026-11-23 · La Línea de tiempo y las pantallas nuevas siguen los colores del ambiente
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-8, punto 14) «Haz que la Línea de tiempo use las variables del ambiente … los colores de estado … con el toque leve del ambiente … Revisa todas las pantallas … buscando colores escritos a mano … Que no vuelva a pasar: anota en docs/convenciones/interfaz.md que toda pantalla nueva usa las variables del ambiente y nunca colores fijos».
+- **Decisión:** lo dicho; regla en interfaz.md («Colores del ambiente en toda pantalla nueva»).
+- **Alcance:** cruza módulos (apariencia de todas las pantallas)
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.14: las pantallas nuevas siguen al ambiente»

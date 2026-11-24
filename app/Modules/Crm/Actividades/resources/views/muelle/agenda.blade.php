@@ -67,18 +67,18 @@
         .dark .tq-agenda-fondo { background: rgb(255 255 255 / 0.05); }
         @media (max-width: 1100px) { .tq-agenda-fondo { padding: 1rem; } }
         .tq-agenda { --ag-borde: var(--tq-borde, #E5E0D6); --ag-linea: var(--ag-borde); --ag-suave: var(--tq-texto-suave, #5F5B53); --ag-fuera: color-mix(in oklab, var(--ag-borde) 25%, transparent);
-            --ag-turquesa: #0E8FAE; --ag-azul: var(--primary-600, #24389C);
+            --ag-turquesa: color-mix(in oklch, #0E8FAE calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #0E8FAE)); --ag-azul: var(--primary-600, #24389C);
             width: 100%; height: 100%; max-width: 76rem; max-height: 46rem; display: flex; flex-direction: column; border-radius: 20px; overflow: hidden;
             background: var(--tq-superficie-elevada, #fff); color: var(--tq-texto, inherit); box-shadow: 0 30px 80px rgb(30 25 15 / .25), 0 0 0 1px rgb(0 0 0 / .05); }
-        .dark .tq-agenda { --ag-turquesa: #4DCFEA; --ag-azul: var(--primary-400, #9DB0FF); }
-        [data-estado="vencida"] { --ag-c: #D9534A; --ag-f: #FBE9E7; }
-        [data-estado="por_vencer"] { --ag-c: #B07A00; --ag-f: #FFF4D6; }
-        [data-estado="programada"] { --ag-c: #0E8FAE; --ag-f: #E3F5F9; }
-        [data-estado="hecha"] { --ag-c: #2F7D4F; --ag-f: #E5F3EA; }
-        .dark [data-estado="vencida"] { --ag-c: #FF8A75; --ag-f: #4A2A26; }
-        .dark [data-estado="por_vencer"] { --ag-c: #F2C14E; --ag-f: #43381E; }
-        .dark [data-estado="programada"] { --ag-c: #4DCFEA; --ag-f: #1F3A42; }
-        .dark [data-estado="hecha"] { --ag-c: #8FD3A5; --ag-f: #243A2D; }
+        .dark .tq-agenda { --ag-turquesa: color-mix(in oklch, #4DCFEA calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #4DCFEA)); --ag-azul: var(--primary-400, #9DB0FF); }
+        [data-estado="vencida"] { --ag-c: color-mix(in oklch, #D9534A calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #D9534A)); --ag-f: color-mix(in oklch, #FBE9E7 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #FBE9E7)); }
+        [data-estado="por_vencer"] { --ag-c: color-mix(in oklch, #B07A00 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #B07A00)); --ag-f: color-mix(in oklch, #FFF4D6 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #FFF4D6)); }
+        [data-estado="programada"] { --ag-c: color-mix(in oklch, #0E8FAE calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #0E8FAE)); --ag-f: color-mix(in oklch, #E3F5F9 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #E3F5F9)); }
+        [data-estado="hecha"] { --ag-c: color-mix(in oklch, #2F7D4F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #2F7D4F)); --ag-f: color-mix(in oklch, #E5F3EA calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #E5F3EA)); }
+        .dark [data-estado="vencida"] { --ag-c: color-mix(in oklch, #FF8A75 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #FF8A75)); --ag-f: color-mix(in oklch, #4A2A26 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #4A2A26)); }
+        .dark [data-estado="por_vencer"] { --ag-c: color-mix(in oklch, #F2C14E calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2C14E)); --ag-f: color-mix(in oklch, #43381E calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #43381E)); }
+        .dark [data-estado="programada"] { --ag-c: color-mix(in oklch, #4DCFEA calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #4DCFEA)); --ag-f: color-mix(in oklch, #1F3A42 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #1F3A42)); }
+        .dark [data-estado="hecha"] { --ag-c: color-mix(in oklch, #8FD3A5 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #8FD3A5)); --ag-f: color-mix(in oklch, #243A2D calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #243A2D)); }
         .tq-ag-cab { display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--ag-linea); flex-wrap: wrap; }
         .tq-ag-titulo { font-size: 20px; font-weight: 700; }
         .tq-ag-btn { height: 32px; padding: 0 12px; border-radius: 9px; border: 1px solid var(--ag-borde); background: var(--tq-superficie, #fff); font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }

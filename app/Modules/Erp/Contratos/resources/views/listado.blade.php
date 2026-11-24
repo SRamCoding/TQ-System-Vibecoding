@@ -13,10 +13,10 @@
     <div class="tq-ct">
         <style>
             .tq-ct { --tq-ct-sup: var(--tq-superficie, #fff); --tq-ct-elev: var(--tq-superficie-elevada, #fff); --tq-ct-borde: var(--tq-borde, var(--gray-200)); --tq-ct-suave: var(--tq-texto-suave, var(--gray-500));
-                --tq-ct-acento: var(--tq-franja-misionales, #0790A8); --tq-ct-coral: #C2532F; --tq-ct-ambar: var(--warning-500); --tq-ct-verde: var(--success-500);
+                --tq-ct-acento: var(--tq-franja-misionales, #0790A8); --tq-ct-coral: color-mix(in oklch, #C2532F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #C2532F)); --tq-ct-ambar: var(--warning-500); --tq-ct-verde: var(--success-500);
                 display: flex; flex-direction: column; gap: 1rem; }
             .dark .tq-ct { --tq-ct-sup: var(--tq-superficie, #33302B); --tq-ct-elev: var(--tq-superficie-elevada, #3A3731); --tq-ct-borde: var(--tq-borde, #45413A); --tq-ct-suave: var(--tq-texto-suave, #A8ADB4);
-                --tq-ct-acento: var(--tq-franja-misionales, #7FE9FF); --tq-ct-coral: #F2A58C; }
+                --tq-ct-acento: var(--tq-franja-misionales, #7FE9FF); --tq-ct-coral: color-mix(in oklch, #F2A58C calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2A58C)); }
             .tq-ct-coral { color: var(--tq-ct-coral); font-weight: 600; }
             .tq-ct-suave { color: var(--tq-ct-suave); }
             .tq-ct-cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; }

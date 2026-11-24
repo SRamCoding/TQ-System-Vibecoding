@@ -9,9 +9,9 @@
     <div class="tq-pa">
         <style>
             .tq-pa { --tq-pa-elev: var(--tq-superficie-elevada, #fff); --tq-pa-borde: var(--tq-borde, var(--gray-200)); --tq-pa-suave: var(--tq-texto-suave, var(--gray-500));
-                --tq-pa-acento: var(--tq-franja-misionales, #0790A8); --tq-pa-coral: #C2532F; display: flex; flex-direction: column; gap: 1rem; }
+                --tq-pa-acento: var(--tq-franja-misionales, #0790A8); --tq-pa-coral: color-mix(in oklch, #C2532F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #C2532F)); display: flex; flex-direction: column; gap: 1rem; }
             .dark .tq-pa { --tq-pa-elev: var(--tq-superficie-elevada, #3A3731); --tq-pa-borde: var(--tq-borde, #45413A); --tq-pa-suave: var(--tq-texto-suave, #A8ADB4);
-                --tq-pa-acento: var(--tq-franja-misionales, #7FE9FF); --tq-pa-coral: #F2A58C; }
+                --tq-pa-acento: var(--tq-franja-misionales, #7FE9FF); --tq-pa-coral: color-mix(in oklch, #F2A58C calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2A58C)); }
             .tq-pa-buscar { display: flex; justify-content: flex-end; }
             .tq-pa-rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
             @media (max-width: 900px) { .tq-pa-rejilla { grid-template-columns: minmax(0, 1fr); } }

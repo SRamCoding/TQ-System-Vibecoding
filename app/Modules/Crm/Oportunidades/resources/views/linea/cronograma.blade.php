@@ -16,10 +16,10 @@
 <div class="tq-linea" data-cronograma>
     <style>
         .tq-linea { --tq-l-izq: 330px; --tq-l-sup: var(--tq-superficie, #fff); --tq-l-borde: var(--tq-borde, var(--gray-200)); --tq-l-suave: var(--tq-texto-suave, var(--gray-500)); --tq-l-cab: var(--tq-superficie-elevada, var(--gray-50));
-            --tq-l-acento: #0790A8; --tq-l-coral: #C2532F; --tq-l-oro: #F2C14E; --tq-l-oro-texto: #9A7000; --tq-l-hoy: rgba(31, 35, 40, .55); --tq-l-hoy-fondo: #1F2328; --tq-l-hoy-texto: #FFFFFF;
+            --tq-l-acento: color-mix(in oklch, #0790A8 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #0790A8)); --tq-l-coral: color-mix(in oklch, #C2532F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #C2532F)); --tq-l-oro: color-mix(in oklch, #F2C14E calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2C14E)); --tq-l-oro-texto: color-mix(in oklch, #9A7000 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #9A7000)); --tq-l-hoy: rgba(31, 35, 40, .55); --tq-l-hoy-fondo: color-mix(in oklch, #1F2328 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #1F2328)); --tq-l-hoy-texto: color-mix(in oklch, #FFFFFF calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #FFFFFF));
             display: flex; flex-direction: column; gap: 14px; margin-top: 0.5rem; }
         .dark .tq-linea { --tq-l-sup: var(--tq-superficie, #33302B); --tq-l-borde: var(--tq-borde, #45413A); --tq-l-suave: var(--tq-texto-suave, #A8ADB4); --tq-l-cab: var(--tq-superficie-elevada, #2F2C28);
-            --tq-l-acento: #7FE9FF; --tq-l-coral: #F2A58C; --tq-l-oro-texto: #E8C46A; --tq-l-hoy: rgba(236, 237, 239, .6); --tq-l-hoy-fondo: #ECEDEF; --tq-l-hoy-texto: #1E1F22; }
+            --tq-l-acento: color-mix(in oklch, #7FE9FF calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #7FE9FF)); --tq-l-coral: color-mix(in oklch, #F2A58C calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2A58C)); --tq-l-oro-texto: color-mix(in oklch, #E8C46A calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #E8C46A)); --tq-l-hoy: rgba(236, 237, 239, .6); --tq-l-hoy-fondo: color-mix(in oklch, #ECEDEF calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #ECEDEF)); --tq-l-hoy-texto: color-mix(in oklch, #1E1F22 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #1E1F22)); }
         .tq-linea-barra { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
         .tq-linea-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid var(--tq-l-borde); background: var(--tq-l-sup); color: inherit; cursor: pointer; }
         .tq-linea-chip[aria-pressed="true"] { background: var(--primary-600); border-color: var(--primary-600); color: #fff; }
@@ -86,7 +86,7 @@
     </div>
 
     <div class="tq-linea-leyenda" aria-hidden="true">
-        <span><span style="width: 18px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, #A6F2FF, #1FCDEB)"></span>etapas recorridas</span>
+        <span><span style="width: 18px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, color-mix(in oklch, #A6F2FF calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #A6F2FF)), color-mix(in oklch, #1FCDEB calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #1FCDEB)))"></span>etapas recorridas</span>
         <span><span style="width: 18px; height: 0; border-top: 2px dashed var(--tq-l-acento)"></span>lo que falta hasta el cierre</span>
         <span><span style="width: 10px; height: 10px; transform: rotate(45deg); background: var(--tq-l-oro)"></span>cierre esperado</span>
         <span><span style="width: 18px; height: 0; border-top: 2px dashed var(--tq-l-coral)"></span>cierre vencido</span>
@@ -127,7 +127,7 @@
                     </span>
                     <span class="tq-linea-pista">
                         @foreach ($f['tramos'] as $t)
-                            <span class="tq-linea-tramo" style="left: {{ $t['x'] }}%; width: calc({{ $t['ancho'] }}% - 2px); background: {{ $t['color'] }}" title="{{ $t['titulo'] }}"></span>
+                            <span class="tq-linea-tramo" style="left: {{ $t['x'] }}%; width: calc({{ $t['ancho'] }}% - 2px); background: color-mix(in oklch, {{ $t['color'] }} calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, {{ $t['color'] }}))" title="{{ $t['titulo'] }}"></span>
                         @endforeach
                         @if ($f['falta'])
                             <span class="tq-linea-falta" style="left: {{ $f['falta']['x'] }}%; width: {{ $f['falta']['ancho'] }}%"></span>

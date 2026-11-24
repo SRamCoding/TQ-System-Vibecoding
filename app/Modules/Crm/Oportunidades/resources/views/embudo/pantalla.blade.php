@@ -7,9 +7,9 @@
 --}}
 <div class="tq-embudo">
     <style>
-        .tq-embudo { --tq-e-sup: var(--tq-superficie, #fff); --tq-e-borde: var(--tq-borde, var(--gray-200)); --tq-e-suave: var(--tq-texto-suave, var(--gray-500)); --tq-e-acento: #0790A8; --tq-e-coral: #C2532F;
+        .tq-embudo { --tq-e-sup: var(--tq-superficie, #fff); --tq-e-borde: var(--tq-borde, var(--gray-200)); --tq-e-suave: var(--tq-texto-suave, var(--gray-500)); --tq-e-acento: color-mix(in oklch, #0790A8 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #0790A8)); --tq-e-coral: color-mix(in oklch, #C2532F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #C2532F));
             display: flex; flex-direction: column; gap: 22px; margin-top: 0.5rem; }
-        .dark .tq-embudo { --tq-e-sup: var(--tq-superficie, #33302B); --tq-e-borde: var(--tq-borde, #45413A); --tq-e-suave: var(--tq-texto-suave, #A8ADB4); --tq-e-acento: #7FE9FF; --tq-e-coral: #F2A58C; }
+        .dark .tq-embudo { --tq-e-sup: var(--tq-superficie, #33302B); --tq-e-borde: var(--tq-borde, #45413A); --tq-e-suave: var(--tq-texto-suave, #A8ADB4); --tq-e-acento: color-mix(in oklch, #7FE9FF calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #7FE9FF)); --tq-e-coral: color-mix(in oklch, #F2A58C calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2A58C)); }
         .tq-embudo-cuerpo { display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 9fr); gap: 36px; }
         @media (max-width: 1100px) { .tq-embudo-cuerpo { grid-template-columns: minmax(0, 1fr); } }
         .tq-embudo-izq { display: flex; flex-direction: column; align-items: center; }
@@ -27,8 +27,8 @@
         @media (max-width: 700px) { .tq-embudo-salidas { width: 100%; } }
         .tq-embudo-salida { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; cursor: pointer; text-align: left; border: 1px solid; }
         .tq-embudo-salida[aria-pressed="true"] { border-width: 2px; }
-        .tq-embudo-salida[data-salida="ganadas"] { background: rgba(125, 181, 130, .12); border-color: #7DB582; }
-        .tq-embudo-salida[data-salida="perdidas"] { background: rgba(255, 138, 101, .10); border-color: #C9715A; }
+        .tq-embudo-salida[data-salida="ganadas"] { background: rgba(125, 181, 130, .12); border-color: color-mix(in oklch, #7DB582 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #7DB582)); }
+        .tq-embudo-salida[data-salida="perdidas"] { background: rgba(255, 138, 101, .10); border-color: color-mix(in oklch, #C9715A calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #C9715A)); }
         .tq-embudo-panel { display: flex; flex-direction: column; border-radius: 16px; background: var(--tq-e-sup); border: 1px solid var(--tq-e-borde); overflow: hidden; animation: tq-embudo-panel .28s ease both; }
         @keyframes tq-embudo-panel { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
         @media (prefers-reduced-motion: reduce) { .tq-embudo-panel { animation: none; } .tq-embudo-boton { transition: none; } }
@@ -47,7 +47,7 @@
             <div class="tq-embudo-etapa">
                 <button type="button" wire:click="elegirEtapa('por_calificar')" class="tq-embudo-boton" style="width: 100%" data-etapa="por_calificar" aria-pressed="{{ $elegida['lugar'] === 'por_calificar' ? 'true' : 'false' }}"
                     aria-label="Por calificar, {{ $porCalificar['cantidad'] }}: {{ $porCalificar['leads'] }} leads y {{ $porCalificar['licitaciones'] }} licitaciones por decidir">
-                    <span class="tq-embudo-franja" style="height: 66px; background: linear-gradient(180deg, #DCD7D1, #BEB7AF)">
+                    <span class="tq-embudo-franja" style="height: 66px; background: linear-gradient(180deg, color-mix(in oklch, #DCD7D1 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #DCD7D1)), color-mix(in oklch, #BEB7AF calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #BEB7AF)))">
                         <x-oportunidades::gema talla="en_roca" :tamano="38" decorativa />
                         <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 1px; flex: 1; min-width: 0">
                             <span class="tq-embudo-nombre" style="color: #2E2A26">Por calificar</span>
@@ -69,7 +69,7 @@
                     <button type="button" class="tq-embudo-boton" style="width: {{ $e['ancho'] }}%" wire:click="elegirEtapa('{{ $e['lugar'] }}')"
                         aria-pressed="{{ $elegida['lugar'] === $e['lugar'] ? 'true' : 'false' }}"
                         aria-label="{{ $e['nombre'] }}, {{ $e['cantidad'] }} oportunidades, {{ $e['monto'] }}">
-                        <span class="tq-embudo-franja" style="background: linear-gradient(180deg, {{ $e['color1'] }}, {{ $e['color2'] }})">
+                        <span class="tq-embudo-franja" style="background: linear-gradient(180deg, color-mix(in oklch, {{ $e['color1'] }} calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, {{ $e['color1'] }})), color-mix(in oklch, {{ $e['color2'] }} calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, {{ $e['color2'] }})))">
                             <x-oportunidades::gema :talla="$e['talla']" :tamano="40" decorativa />
                             <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 1px; flex: 1; min-width: 0">
                                 <span class="tq-embudo-nombre">{{ $e['nombre'] }}</span>

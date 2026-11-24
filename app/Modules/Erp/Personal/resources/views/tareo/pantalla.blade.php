@@ -13,9 +13,9 @@
     <div class="tq-tr" x-data x-init="if (@js($this->vista === null) && window.innerWidth < 640) $wire.poner('vista', 'hoy')">
         <style>
             .tq-tr { --tq-tr-sup: var(--tq-superficie, #fff); --tq-tr-elev: var(--tq-superficie-elevada, #fff); --tq-tr-borde: var(--tq-borde, var(--gray-200)); --tq-tr-suave: var(--tq-texto-suave, var(--gray-500));
-                --tq-tr-acento: var(--tq-franja-misionales, #0790A8); --tq-tr-coral: #C2532F; --tq-tr-ambar: #B7791F; display: flex; flex-direction: column; gap: 1rem; }
+                --tq-tr-acento: var(--tq-franja-misionales, #0790A8); --tq-tr-coral: color-mix(in oklch, #C2532F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #C2532F)); --tq-tr-ambar: color-mix(in oklch, #B7791F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #B7791F)); display: flex; flex-direction: column; gap: 1rem; }
             .dark .tq-tr { --tq-tr-sup: var(--tq-superficie, #33302B); --tq-tr-elev: var(--tq-superficie-elevada, #3A3731); --tq-tr-borde: var(--tq-borde, #45413A); --tq-tr-suave: var(--tq-texto-suave, #A8ADB4);
-                --tq-tr-acento: var(--tq-franja-misionales, #7FE9FF); --tq-tr-coral: #F2A58C; --tq-tr-ambar: #F6C66B; }
+                --tq-tr-acento: var(--tq-franja-misionales, #7FE9FF); --tq-tr-coral: color-mix(in oklch, #F2A58C calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F2A58C)); --tq-tr-ambar: color-mix(in oklch, #F6C66B calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #F6C66B)); }
             .tq-tr-suave { color: var(--tq-tr-suave); }
             .tq-tr-coral { color: var(--tq-tr-coral) !important; }
             .tq-tr-barra-sup { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }

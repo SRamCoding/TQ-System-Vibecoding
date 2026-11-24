@@ -41,8 +41,8 @@
         .tq-op-barra .tq-op-buscar { flex: 1 1 16rem; }
         /* Observación 8.1: 3 columnas como máximo (3 en anchas, 2 en medianas, 1 en angostas); las tarjetas crecen. */
         .tq-op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(17.5rem, calc((100% - 2rem) / 3)), 1fr)); gap: 1rem; }
-        .tq-op-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 0.75rem; background: white; box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); outline: 1px solid rgb(3 7 18 / 0.06); text-align: start; cursor: pointer; transition: box-shadow 160ms ease, transform 160ms ease; }
-        .dark .tq-op-card { background: var(--gray-900); outline-color: rgb(255 255 255 / 0.08); }
+        .tq-op-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 0.75rem; background: var(--tq-superficie, white); box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); outline: 1px solid rgb(3 7 18 / 0.06); text-align: start; cursor: pointer; transition: box-shadow 160ms ease, transform 160ms ease; }
+        .dark .tq-op-card { background: var(--tq-superficie, var(--gray-900)); outline-color: rgb(255 255 255 / 0.08); }
         .tq-op-card:hover, .tq-op-card:focus-visible { box-shadow: 0 8px 20px -6px color-mix(in oklab, var(--primary-600) 35%, transparent); transform: translateY(-2px); }
         @media (prefers-reduced-motion: reduce) { .tq-op-card { transition: none; transform: none !important; } }
         html.tq-sin-animaciones .tq-op-card { transition: none; transform: none !important; }
@@ -66,10 +66,10 @@
         .dark .tq-op-pie { border-top-color: var(--gray-800); }
         /* Observación 7.1: el plazo de la licitación (coral a menos de 5 días) y las tarjetas por calificar. */
         .tq-op-plazo { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; font-weight: 600; color: var(--gray-600); }
-        .tq-op-plazo.tq-urgente { color: #E8604C; }
+        .tq-op-plazo.tq-urgente { color: color-mix(in oklch, #E8604C calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #E8604C)); }
         .dark .tq-op-plazo { color: var(--gray-300); }
-        .dark .tq-op-plazo.tq-urgente { color: #FF8A75; }
-        .tq-op-card.tq-pc { cursor: default; background: color-mix(in oklab, white 92%, #8C857F); }
+        .dark .tq-op-plazo.tq-urgente { color: color-mix(in oklch, #FF8A75 calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #FF8A75)); }
+        .tq-op-card.tq-pc { cursor: default; background: color-mix(in oklab, var(--tq-superficie, white) 92%, #8C857F); }
         .dark .tq-op-card.tq-pc { background: color-mix(in oklab, var(--gray-900) 90%, #8C857F); }
         .tq-pc-tope { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.9rem 1rem 0.35rem; }
         .tq-pc-clase { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-500); }

@@ -73,6 +73,18 @@ debe comparar con el tema anterior.
   lienzos son fuente para la **estructura** de cada pantalla (qué campos, qué acciones, qué orden); el
   color sale de esta convención. Las fuentes no se corrigen: la diferencia queda anotada aquí.
 
+## Colores del ambiente en toda pantalla nueva (MVP, observación 8.14)
+
+- Toda pantalla nueva usa **las variables del ambiente**, nunca colores fijos: `--tq-fondo`, `--tq-superficie`,
+  `--tq-superficie-elevada`, `--tq-borde`, `--tq-texto`, `--tq-texto-suave` y los colores de franja con tinte
+  (`--tq-franja-*`, `--tq-oro`, `--primary-600`). Nada de `white`, `bg-white`, `#…` ni `rgb(…)` para fondos, bordes o
+  textos.
+- Los **colores de estado** propios de una pantalla (coral de vencida, dorado, turquesa, tramos de etapa…) se escriben
+  con el toque leve del ambiente:
+  `color-mix(in oklch, #HEX calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #HEX))`.
+- Excepciones: íconos de aplicación, el logo, las ilustraciones y el texto blanco sobre un botón o etiqueta de color.
+- Comprobarlo con la hora de desarrollo al amanecer, a media tarde, al atardecer y de noche, en claro y en oscuro.
+
 ## Paneles y ventanas (MVP, observación 8.7)
 
 - Los **paneles deslizantes** y las **ventanas** van con **fondo sólido** (`--tq-superficie-elevada`) y una sombra que los
