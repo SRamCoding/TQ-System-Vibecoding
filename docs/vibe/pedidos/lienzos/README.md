@@ -31,3 +31,10 @@ Son ilustrativos: se copian los colores, medidas, formas y la disposición, no e
 | Observación | Carpeta | Archivo que manda |
 |---|---|---|
 | 8.8 La agenda nueva | `agenda-nueva/` | `Main.dc.html` (la «A · Mes con actividades»; las vistas Semana y Lista no se construyen) |
+
+## Novena tanda
+
+| Observación | Carpeta | Archivo que manda |
+|---|---|---|
+| 9.5 Mejoras de Oportunidades | `oportunidades-mejoras/` | Cada pizarra lleva el número de la mejora. **Sin la barrita del margen** de `Main.dc.html`: solo la etiqueta (observación 9.5, punto 1) |
+| 9.4, 9.9 a 9.12 Campañas y Canales | `campanias-vista/` | `Main.dc.html` (Campañas), `Canales.dc.html`, `Clientes.dc.html` («Volver a vender»). **Manda el texto** donde difiere del dibujo: contactos sin barra y «N de X» en oportunidades y ganadas (9.9), retorno esperado (9.11) |

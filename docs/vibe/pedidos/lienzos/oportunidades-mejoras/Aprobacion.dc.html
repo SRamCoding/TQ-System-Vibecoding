@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Aprobación y duplicados</title><script src="./support.js"></script></head>
+<body><x-dc><helmet><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"><style>body{margin:0}
+.btn{height:34px;padding:0 14px;border-radius:9px;border:1px solid #E5E0D6;background:#fff;font:600 13px Inter;color:#1F2328;display:inline-flex;align-items:center;gap:6px}
+.btn.p{background:#0E8FAE;border-color:#0E8FAE;color:#fff}.btn.a{background:#24389C;border-color:#24389C;color:#fff}
+.tag{font-size:11px;font-weight:600;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.card{background:#fff;border:1px solid #E5E0D6;border-radius:14px}
+.num{font-size:11px;font-weight:700;color:#fff;background:#24389C;border-radius:99px;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.lbl{font-size:12px;color:#5F5B53}</style></helmet>
+<div style="width:1440px;height:780px;box-sizing:border-box;background:#F7F5F0;color:#1F2328;font-family:Inter;padding:28px 40px;display:flex;flex-direction:column;gap:18px;overflow:hidden"><div><div style="display:flex;align-items:center;gap:10px"><span class=num>2</span><span class=num>7</span><span style="font-size:22px;font-weight:700">Aprobación de descuentos y aviso de duplicados</span></div><div style="font-size:14px;color:#5F5B53;margin-top:4px">Cotización de la oportunidad · Mien · Nueva oportunidad</div></div><div style="display:flex;gap:16px;align-items:flex-start"><div class="card" style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:14px">
+ <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px;font-weight:700">Cotización COT-2026-0047</span><span class="tag" style="background:#FFF4D6;color:#B07A00">Esperando aprobación</span></div>
+ <div class="lbl">Ampliación del centro de monitoreo · Mun. Prov. de Valle Norte</div>
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px"><div style="background:#F7F5F0;border-radius:10px;padding:10px 12px"><div class="lbl">Costo</div><div style="font-size:18px;font-weight:700;color:#1F2328">S/ 323,600.00</div></div><div style="background:#F7F5F0;border-radius:10px;padding:10px 12px"><div class="lbl">Precio</div><div style="font-size:18px;font-weight:700;color:#1F2328">S/ 356,000.00</div></div><div style="background:#F7F5F0;border-radius:10px;padding:10px 12px"><div class="lbl">Descuento pedido</div><div style="font-size:18px;font-weight:700;color:#1F2328">8 %</div></div><div style="background:#F7F5F0;border-radius:10px;padding:10px 12px"><div class="lbl">Margen</div><div style="font-size:18px;font-weight:700;color:#D9534A">9.1 %</div></div></div>
+ <div style="background:#FBE9E7;border-radius:10px;padding:12px 14px;font-size:14px;color:#D9534A">El margen queda por debajo del mínimo de <b>12 %</b>. Para enviarla al cliente hace falta el visto bueno de Gerencia.</div>
+ <div><div class="lbl" style="margin-bottom:6px">Motivo del descuento</div><div style="border:1px solid #E5E0D6;border-radius:10px;padding:10px 12px;font-size:14px;min-height:44px">Competencia fuerte: Redes Andinas ofertó 10 % menos en el proceso anterior.</div></div>
+ <div style="display:flex;gap:8px;margin-top:auto"><button class="btn">Volver a precio sin descuento</button><span style="flex:1"></span><button class="btn a">Pedir aprobación</button></div></div><div style="display:flex;flex-direction:column;gap:16px"><div class="card" style="width:380px;padding:18px;display:flex;flex-direction:column;gap:10px">
+ <div style="display:flex;align-items:center;gap:8px"><span style="color:#B07A00;font-size:18px">★</span><b>Mien · Por aprobar</b></div>
+ <div style="font-size:14px;font-weight:600">Descuento de 8 % · margen 9.1 %</div><div class="lbl">COT-2026-0047 · Valle Norte · pide Andrea Ruiz</div>
+ <div style="font-size:13px;color:#5F5B53;font-style:italic">«Competencia fuerte: Redes Andinas ofertó 10 % menos…»</div>
+ <div style="display:flex;gap:8px"><button class="btn">Rechazar</button><button class="btn p">Aprobar</button></div></div><div class="card" style="width:380px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 50px rgba(0,0,0,.12)">
+ <div style="font-weight:700">Nueva oportunidad</div>
+ <div class="lbl">Cliente</div><div style="border:1px solid #E5E0D6;border-radius:8px;padding:8px 10px;font-size:14px">Mun. Prov. de Valle Norte</div>
+ <div class="lbl">Nombre</div><div style="border:1px solid #E5E0D6;border-radius:8px;padding:8px 10px;font-size:14px">Cámaras para el centro de monitoreo</div>
+ <div style="background:#FFF4D6;border-radius:10px;padding:10px 12px;font-size:13px;color:#B07A00"><b>¿Ya existe?</b> «Ampliación del centro de monitoreo» · Calificada · la lleva Andrea Ruiz<div style="margin-top:6px;display:flex;gap:6px"><button class="btn" style="height:28px;font-size:12px">Ver esa</button><button class="btn" style="height:28px;font-size:12px">Es otra, seguir</button></div></div></div></div></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":780}}'>
+class Component extends DCLogic { renderVals() { return {}; } }
+</script></body></html>
