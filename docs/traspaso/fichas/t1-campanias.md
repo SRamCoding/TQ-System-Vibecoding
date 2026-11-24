@@ -1,7 +1,7 @@
 # Ficha · Campañas y leads (CRM-07)
 
-- **Estado:** en curso (v7, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v7
+- **Estado:** en curso (v8, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v8
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-campanias-v1`
 - **Fuentes del diseño (v3):** `docs/vibe/pedidos/observaciones-7.md` (punto 6) y `lienzos/campanias/` (`Main.dc.html`,
@@ -20,6 +20,8 @@ módulo es el último del CRM.
 
 ## Decisiones de Sebastián
 
+- **MV-105** (ficha) · Retorno real (margen de lo ganado ÷ gastado; en ejecución, el margen actual del proyecto) en verde o coral y retorno esperado (margen previsto × probabilidad ÷ gastado) en gris; los dos si hay ganadas y abiertas; «sin gasto» sin gasto. Calculado al mirar.
+
 - **MV-104** (ficha) · Clic en la tarjeta abre la ficha de la campaña (cabecera, cifras en grande, pestañas Contactos · Oportunidades · Gastos · Seguimiento · Actividad); los atajos de la tarjeta y «Registrar gasto» se abren en una ventana al medio.
 
 - **MV-103** (ficha) · Cada contacto que llega es nuevo o ya registrado (teléfono, correo o RUC); el ya registrado no se duplica. Tarjetas de Campañas y Canales: contactos sin barra, oportunidades «N de X» y ganadas «N de X» con barra.
@@ -37,6 +39,8 @@ módulo es el último del CRM.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **Retorno** (v8, MV-105): en las tarjetas y cifras de Campañas, en Canales y en la ficha de la campaña: «9.1×» (verde o coral), «6.7× esperado» (gris), «9.1× · + 2.3× esperado» (en la tarjeta y la cifra de arriba, el esperado en una segunda línea) o «sin gasto». Al pasar el puntero: «Por cada S/ 1 invertido volvieron S/ 9.10 de ganancia» y el detalle de lo esperado por oportunidad (etapa, probabilidad, margen previsto y lo que aporta; sin cotización, «monto × margen mínimo»).
 
 - **Ficha de la campaña** (v7, MV-104): «← Volver a Campañas» (a la sección donde se estaba); cabecera con nombre, estado (planificada, en curso, terminada), tipo, canal con ícono, fechas, responsable, objetivo y el retorno; botones Formulario y QR, Registrar gasto, Editar. Cifras: invertido / presupuesto, contactos (nuevos y ya registrados), oportunidades (N de X), ganadas y ganado, margen, costo por contacto y por contacto nuevo. Pestañas: Contactos (nombre, organización, teléfono, correo, nuevo o ya registrado y qué era, fecha, en qué quedó; clic abre su oportunidad o su ficha de persona), Oportunidades (etapa con su gema, monto, margen, responsable), Gastos (fecha, concepto, imputación, comprobante, monto; gastado, presupuesto y lo que queda o se pasó), Seguimiento (campañas a clientes) y Actividad (quién creó, editó y registró gastos).
 - **Tarjeta** (v7): «N contactos llegaron», «3 de 15», «1 de 3» y «Gastado / presupuesto» son enlaces (subrayados al pasar el puntero) que abren su lista en una ventana al medio («Oportunidades de Expo Seguridad Norte · 3»; × o Esc cierran); clic en el resto de la tarjeta abre la ficha. «Ver contactos» abre el atajo de contactos.
@@ -104,6 +108,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Reglas y números
 
+- **Retorno** (v8, MV-105): real = margen de las ganadas ÷ gastado (margen real del cierre; en ejecución, el margen proyectado del proyecto: venta − lo proyectado; sin proyecto, sin margen). Esperado = Σ (margen previsto de la cotización vigente, o monto × `crm.cotizacion_margen_minimo` sin cotización) × probabilidad de la etapa ÷ gastado, de las oportunidades abiertas nacidas de la campaña (o, en Canales, de los leads del canal en el periodo). Sin gasto: «sin gasto». Sin ganadas ni abiertas: 0×.
+
 - **Ya registrado** (v6, MV-103): mismo RUC de una cuenta (cliente), mismo correo o teléfono (últimos 9 dígitos) de un contacto de un cliente o de un lead anterior. Si tiene un lead abierto (nuevo o contactado) o una oportunidad abierta de su cuenta, no se crea nada: queda la llegada (`lead_llegadas`) y, con oportunidad, una actividad hecha «X llegó también por la campaña…». Si no, el lead se crea marcado ya registrado y unido a su cuenta. Vale para el formulario de la campaña, la landing y «+ Nuevo». Costo por contacto nuevo = gastado ÷ nuevos.
 
 - **Cifras de Canales** (v5, MV-098): periodo desde el 1 del mes, trimestre o año hasta hoy, por la fecha de llegada del lead. Calificado: el lead pasó a oportunidad. Ganado y margen: las oportunidades ganadas de esos leads, con el mismo margen de Campañas (real del cierre o previsto del proyecto). Gastado: cada lead del periodo carga el costo por contacto de su campaña (todo lo gastado en la campaña ÷ todos sus contactos); retorno = margen ÷ gastado; costo por lead = gastado ÷ leads. «Rinde más»: el de mayor retorno entre los que tienen gasto.
@@ -135,6 +141,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
   oportunidad, dos apuntan a oportunidades que ya existían—, 2 descartados y 1 nuevo de hoy).
 
 ## Supuestos sin confirmar
+
+- **v8 · Margen actual** del proyecto en ejecución = el «margen proyectado» que muestra su tablero (venta − la proyección de costo).
 
 - **v7 · Imputación de una campaña:** solo gasto directo a un centro de costo (si se elige «Proyecto › partida», avisa y no guarda).
 - **v7 · Actividad** se arma con la creación, la última edición y los gastos registrados (sin la bitácora campo por campo).
@@ -190,6 +198,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 `Filament/Resources/Leads` y `Filament/Resources/Campanias`); datos en `DemoSeeder::campanias()`.
 
 ## Cambios desde la versión anterior
+
+- **v8** (MV-105): retorno real y esperado.
 
 - **v7** (MV-104): ficha de la campaña, atajos y gasto al medio.
 

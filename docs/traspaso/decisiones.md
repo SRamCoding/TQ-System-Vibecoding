@@ -1265,3 +1265,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (Campañas)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.10: ficha de la campaña, atajos y gasto al medio»
+
+### MV-105 · 2026-11-24 · Retorno real y retorno esperado, calculados al mirar
+
+- **Ficha:** `fichas/t1-campanias.md`
+- **Dijo Sebastián:** (observaciones-9, punto 11) «Retorno esperado … margen previsto × probabilidad de su etapa (si no tiene cotización, monto × probabilidad × el margen mínimo del parámetro …), dividido entre lo gastado. Se muestra en gris con la palabra «esperado» … Retorno real … margen de los proyectos ganados ÷ lo gastado, en verde (1× o más) o coral … Mientras el proyecto está en ejecución, usa su margen actual … Las dos a la vez … «9.1× · + 2.3× esperado» … Sin gasto registrado: «sin gasto» … Se calcula al mirar … Si alguna pantalla tarda más de lo normal por esto, dímelo antes de guardarlo en caché … «Por cada S/ 1 invertido volvieron S/ 9.10 de ganancia»».
+- **Decisión:** lo dicho; se calcula al mirar (las pantallas no se pusieron lentas: Campañas ≈ 1.5 s, Canales ≈ 1.8 s, la ficha ≈ 1.3 s, como Proyectos ≈ 1.9 s), sin caché.
+- **Alcance:** ficha (Campañas); lee Oportunidades y Proyectos por sus servicios
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.11: retorno real y esperado»

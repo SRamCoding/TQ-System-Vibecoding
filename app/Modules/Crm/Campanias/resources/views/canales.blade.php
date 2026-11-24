@@ -56,11 +56,7 @@
                 <div style="display: flex; align-items: center; gap: 10px">
                     <span class="tq-can-icono"><x-filament::icon :icon="$t['icono']" class="h-5 w-5" /></span>
                     <span style="font-size: 15px; font-weight: 700">{{ $t['nombre'] }}</span>
-                    @if ($t['retorno'] === null)
-                        <span class="tq-can-retorno" style="background: var(--c-gris-fondo); color: var(--c-suave)">sin gasto</span>
-                    @else
-                        <span class="tq-can-retorno" style="background: color-mix(in oklab, {{ (float) $t['retorno'] >= 1 ? 'var(--c-verde)' : 'var(--c-coral)' }} 14%, var(--c-sup)); color: {{ (float) $t['retorno'] >= 1 ? 'var(--c-verde)' : 'var(--c-coral)' }}">Retorno {{ $veces($t['retorno']) }}</span>
-                    @endif
+                    <span style="margin-inline-start: auto">@include('campanias::retorno', ['r' => $t['retorno'], 'e' => $t['esperado'], 'ganadas' => $t['ganadas'], 'detalle' => $t['esperadoDetalle'], 'gastado' => $t['gastado'], 'tamano' => 15])</span>
                 </div>
                 {{-- Observación 9.9: contactos nuevos o ya registrados, y barras «N de X». --}}
                 @include('campanias::embudo-contactos', ['t' => ['contactos' => $t['contactos'], 'nuevos' => $t['nuevos'], 'yaRegistrados' => $t['yaRegistrados'], 'listaRegistrados' => $t['listaRegistrados'], 'calificados' => $t['calificados'], 'ganadas' => $t['ganadas']]])

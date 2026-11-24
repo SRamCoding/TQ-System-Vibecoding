@@ -7,11 +7,14 @@ namespace App\Modules\Crm\Campanias\Services;
 use App\Modules\Crm\Actividades\Services\ActividadesService;
 use App\Modules\Crm\Campanias\Models\Campania;
 use App\Modules\Crm\Campanias\Models\Lead;
+use App\Modules\Crm\Cotizaciones\CotizacionesServiceProvider;
+use App\Modules\Crm\Oportunidades\Enums\EtapaAbierta;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
 use App\Modules\Erp\Presupuestos\Services\DineroDelProyecto;
 use App\Modules\Erp\Presupuestos\Services\PresupuestoEmpresaService;
 use App\Modules\Erp\Proyectos\Services\VentaDelProyecto;
 use App\Modules\Nucleo\Models\User;
+use App\Modules\Nucleo\Services\ParametrosService;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -73,6 +76,9 @@ final readonly class CampaniasService
             'oportunidades' => $oportunidades, 'tasa' => $contactos === 0 ? '0' : number_format($oportunidades * 100 / $contactos, 0),
             'ganado' => $suma('ganado'), 'proyectos' => array_sum(array_column($tarjetas, 'ganadas')), 'margen' => $margen,
             'retorno' => bccomp($gastado, '0', 2) > 0 ? number_format((float) $margen / (float) $gastado, 1, '.', '') : null, 'anio' => $anio,
+            // Observación 9.11: lo esperado de todas las abiertas de las campañas.
+            'esperado' => bccomp($gastado, '0', 2) > 0 ? number_format((float) $suma('esperadoAporte') / (float) $gastado, 1, '.', '') : null,
+            'ganadas' => array_sum(array_column($tarjetas, 'ganadas')), 'abiertas' => array_sum(array_map(fn (array $t): int => count($t['esperadoDetalle']), $tarjetas)),
         ], 'tarjetas' => $tarjetas];
     }
 
@@ -99,7 +105,10 @@ final readonly class CampaniasService
         // Observación 9.9: los que llegaron, nuevos o ya registrados (los unidos a un lead u oportunidad abierta también).
         $contactos = $this->contactosDe(['campania_id' => $c->id]);
 
+        $esperado = $this->esperado($ops, $gastado);
+
         return [
+            'esperado' => $esperado['veces'], 'esperadoDetalle' => $esperado['detalle'], 'esperadoAporte' => $esperado['aporte'],
             'id' => $c->id, 'nombre' => $c->nombre, 'tipo' => Campania::TIPOS[$c->tipo] ?? $c->tipo, 'claveTipo' => $c->tipo,
             'contactos' => $contactos['total'], 'nuevos' => $contactos['nuevos'], 'yaRegistrados' => $contactos['ya'], 'listaRegistrados' => $contactos['lista'],
             'porContactoNuevo' => $contactos['nuevos'] > 0 && bccomp($gastado, '0', 2) > 0 ? bcdiv($gastado, (string) $contactos['nuevos'], 2) : null,
@@ -131,7 +140,10 @@ final readonly class CampaniasService
             return ['monto' => (string) $real, 'previsto' => false];
         }
 
-        return ['monto' => app(DineroDelProyecto::class)->de((int) $proyecto)['margen_previsto'] ?? null, 'previsto' => true];
+        // Observación 9.11: en ejecución, su margen actual (el que muestra el proyecto: venta − lo proyectado).
+        $dinero = app(DineroDelProyecto::class)->de((int) $proyecto);
+
+        return ['monto' => $dinero['margen_proyectado'] ?? $dinero['margen_previsto'] ?? null, 'previsto' => true];
     }
 
     /** Un gasto real: gasto directo del centro de costo Comercial, vinculado a la campaña. */
@@ -479,6 +491,7 @@ final readonly class CampaniasService
             $gastado = number_format((float) $suyos->reduce(fn (string $t, Lead $l): string => bcadd($t, $costoLead($l->campania_id), 6), '0'), 2, '.', '');
             $conGasto = bccomp($gastado, '0', 2) > 0;
             $contactos = $this->contactosDe(['canal_lead_id' => $id], $desde, $hasta);
+            $esperado = $this->esperado($suyos->pluck('oportunidad_id')->filter()->unique()->values()->all(), $gastado);
             $tarjetas[] = [
                 'id' => $id, 'codigo' => $canal['codigo'], 'nombre' => $canal['nombre'], 'icono' => $canal['icono'],
                 'contactos' => $contactos['total'], 'nuevos' => $contactos['nuevos'], 'yaRegistrados' => $contactos['ya'], 'listaRegistrados' => $contactos['lista'],
@@ -486,6 +499,7 @@ final readonly class CampaniasService
                 'ganadas' => $nGanadas, 'ganado' => $ganado, 'margen' => $margen, 'margenPrevisto' => $previsto,
                 'gastado' => $gastado, 'porLead' => $conGasto ? bcdiv($gastado, (string) $suyos->count(), 2) : null,
                 'porContactoNuevo' => $conGasto && $contactos['nuevos'] > 0 ? bcdiv($gastado, (string) $contactos['nuevos'], 2) : null,
+                'esperado' => $esperado['veces'], 'esperadoDetalle' => $esperado['detalle'],
                 'retorno' => $conGasto ? number_format((float) $margen / (float) $gastado, 1, '.', '') : null,
             ];
         }
@@ -526,5 +540,35 @@ final readonly class CampaniasService
         ];
 
         return ['total' => $leads->count() + $llegadas->count(), 'nuevos' => $leads->count() - $ya->count(), 'ya' => $ya->count() + $llegadas->count(), 'lista' => $lista];
+    }
+
+    /**
+     * Observación 9.11: el retorno esperado de las oportunidades abiertas: de cada una, su margen previsto (el de su
+     * cotización; sin cotización, monto × el margen mínimo del parámetro) × la probabilidad de su etapa, sumado y
+     * dividido entre lo gastado. Se calcula al mirar.
+     *
+     * @param  list<int>  $oportunidadIds
+     * @return array{veces: ?string, aporte: string, detalle: list<array{nombre: string, etapa: string, probabilidad: int, margen: string, supuesto: bool, aporta: string}>}
+     */
+    public function esperado(array $oportunidadIds, string $gastado): array
+    {
+        $abiertas = DB::table('oportunidades as o')->join('estados as e', 'e.id', '=', 'o.estado_id')->whereIn('o.id', $oportunidadIds ?: [0])
+            ->whereIn('e.codigo', array_map(fn ($e): string => $e->value, EtapaAbierta::cases()))->get(['o.id', 'o.nombre', 'o.monto_estimado', 'e.codigo', 'e.nombre as etapa']);
+        $portada = app(PortadaOportunidades::class);
+        $margenes = $portada->margenes($abiertas->pluck('id')->all());
+        $minimo = (string) app(ParametrosService::class)->decimal(CotizacionesServiceProvider::PARAMETRO_MARGEN_MINIMO);
+        $aporte = '0.00';
+        $detalle = [];
+
+        foreach ($abiertas as $o) {
+            $prob = $portada->probabilidad(EtapaAbierta::from($o->codigo));
+            $conCotizacion = isset($margenes[$o->id]) && $margenes[$o->id]['porcentaje'] !== null;
+            $margen = $conCotizacion ? $margenes[$o->id]['monto'] : bcdiv(bcmul((string) $o->monto_estimado, $minimo, 4), '100', 2);
+            $aporta = bcdiv(bcmul($margen, (string) $prob, 4), '100', 2);
+            $aporte = bcadd($aporte, $aporta, 2);
+            $detalle[] = ['nombre' => $o->nombre, 'etapa' => $o->etapa, 'probabilidad' => $prob, 'margen' => bcadd($margen, '0', 2), 'supuesto' => ! $conCotizacion, 'aporta' => $aporta];
+        }
+
+        return ['veces' => $abiertas->isEmpty() || bccomp($gastado, '0', 2) <= 0 ? null : number_format((float) $aporte / (float) $gastado, 1, '.', ''), 'aporte' => $aporte, 'detalle' => $detalle];
     }
 }

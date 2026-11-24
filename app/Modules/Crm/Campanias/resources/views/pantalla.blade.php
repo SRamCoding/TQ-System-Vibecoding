@@ -56,7 +56,7 @@
             <div class="tq-camp-card tq-camp-cifra"><div class="t">Contactos</div><div class="v">{{ $c['contactos'] }}</div><div class="d">{{ $c['porContacto'] === null ? '—' : $soles($c['porContacto']).' por contacto' }}</div></div>
             <div class="tq-camp-card tq-camp-cifra"><div class="t">Oportunidades</div><div class="v">{{ $c['oportunidades'] }}</div><div class="d">{{ $c['tasa'] }} % de los contactos</div></div>
             <div class="tq-camp-card tq-camp-cifra"><div class="t">Ganado</div><div class="v">{{ $soles($c['ganado']) }}</div><div class="d">{{ $c['proyectos'] }} {{ $c['proyectos'] === 1 ? 'proyecto' : 'proyectos' }}</div></div>
-            <div class="tq-camp-card tq-camp-cifra"><div class="t">Retorno</div><div class="v" style="color: {{ $c['retorno'] !== null && (float) $c['retorno'] >= 1 ? 'var(--c-verde)' : 'var(--c-coral)' }}">{{ $veces($c['retorno']) }}</div><div class="d">{{ $soles($c['margen']) }} de margen por {{ $soles($c['gastado']) }}</div></div>
+            <div class="tq-camp-card tq-camp-cifra"><div class="t">Retorno</div><div class="v">@include('campanias::retorno', ['r' => $c['retorno'], 'e' => $c['esperado'], 'ganadas' => $c['ganadas'], 'abiertas' => $c['abiertas'], 'gastado' => $c['gastado'], 'tamano' => 22, 'apilado' => true])</div><div class="d">{{ $soles($c['margen']) }} de margen por {{ $soles($c['gastado']) }}</div></div>
         </section>
 
         <div class="tq-camp-grid">
@@ -68,7 +68,7 @@
                     <div style="display: flex; align-items: center; gap: 8px">
                         <div style="flex: 1; min-width: 0"><div style="font-weight: 700">{{ $t['nombre'] }}</div><span class="tq-camp-tag">{{ $t['tipo'] }}</span></div>
                         <div style="text-align: right"><div style="font-size: 11px; color: var(--c-suave)">Retorno</div>
-                            <div style="font-size: 20px; font-weight: 700; color: {{ $t['retorno'] === null ? 'var(--c-suave)' : ((float) $t['retorno'] >= 1 ? 'var(--c-verde)' : 'var(--c-coral)') }}">{{ $veces($t['retorno']) }}</div></div>
+                            <div>@include('campanias::retorno', ['r' => $t['retorno'], 'e' => $t['esperado'], 'ganadas' => $t['ganadas'], 'detalle' => $t['esperadoDetalle'], 'gastado' => $t['gastado'], 'tamano' => 20, 'apilado' => true])</div></div>
                     </div>
                     @include('campanias::embudo-contactos', ['t' => $t, 'campaniaId' => $t['id']])
                     <div style="display: flex; flex-direction: column; gap: 4px">

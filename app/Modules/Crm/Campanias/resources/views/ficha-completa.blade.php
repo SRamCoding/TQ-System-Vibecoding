@@ -41,7 +41,7 @@
         </div>
         <div style="text-align: end">
             <div style="font-size: 12px; color: var(--gray-500)">Retorno</div>
-            <div style="font-size: 28px; font-weight: 700; color: {{ $t['retorno'] === null ? 'var(--gray-500)' : ((float) $t['retorno'] >= 1 ? 'var(--success-600)' : 'var(--danger-600)') }}">{{ $veces($t['retorno']) }}</div>
+            <div>@include('campanias::retorno', ['r' => $t['retorno'], 'e' => $t['esperado'], 'ganadas' => $t['ganadas'], 'detalle' => $t['esperadoDetalle'], 'gastado' => $t['gastado'], 'tamano' => 28])</div>
         </div>
     </section>
 
