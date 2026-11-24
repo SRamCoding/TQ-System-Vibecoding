@@ -16,7 +16,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Throwable;
 
@@ -27,8 +26,11 @@ use Throwable;
  * cambio dispara sus reacciones (filtrar, priorizar, avisar en Mien). «Registrar» la vuelve licitación (creando la cuenta de la
  * entidad si no existe) sin escribir nada.
  */
-final readonly class ConvocatoriasSeaceService
+final class ConvocatoriasSeaceService
 {
+    /** @var array<string, int> Observación 9.7: por qué quedaron fuera las nuevas de la lectura en curso. */
+    private array $fuera = [];
+
     /** MV-066: cuántas páginas de la API del OECE se leen como máximo en una lectura. */
     public const int PAGINAS_MAXIMAS = 20;
 
@@ -37,9 +39,6 @@ final readonly class ConvocatoriasSeaceService
 
     /** Observación 7.4: al entrar, se lee otra vez si la última lectura tiene más de estos minutos. */
     public const int MINUTOS_FRESCA = 15;
-
-    /** Observación 7.4: lo que la demo deja «por publicar» (solo local). */
-    public const string DEMO_POR_PUBLICAR = 'seace/por-publicar.json';
 
     /**
      * Observación 7.4: lee solo lo nuevo. Pide lo más reciente primero (`order=desc`) y sigue las páginas hasta llegar a
@@ -52,12 +51,11 @@ final readonly class ConvocatoriasSeaceService
     public function sincronizar(string $origen = 'a_mano'): array
     {
         $lectura = DB::table('seace_lecturas')->insertGetId(['inicio' => now(), 'origen' => $origen]);
+        $this->fuera = [];
         $total = ['leidas' => 0, 'nuevas' => 0, 'actualizadas' => 0, 'a_bandeja' => 0];
 
         try {
             app(FiltroConvocatorias::class)->reaplicarSiCambio();
-            // En local, lo que la demo dejó «por publicar» llega primero (atajo del MVP para ver la llegada en vivo).
-            $this->sumar($total, $this->pendientesDeDemo());
             $url = (string) config('services.oece.ocds_url');
 
             if ($url === '') {
@@ -83,15 +81,17 @@ final readonly class ConvocatoriasSeaceService
 
                 $datos = json_decode($json, true);
                 $releases = is_array($datos) ? self::releasesDe($datos) : [];
-                $nuevos = array_values(array_filter($releases, fn (array $r): bool => ! isset($r['date']) || CarbonImmutable::parse($r['date'])->greaterThan($hasta)));
+                // Observación 9.13: la base guarda la fecha en segundos y el OECE la manda con microsegundos: se compara en
+                // segundos, o la misma versión parecería siempre más nueva (y cada lectura «actualizaría» lo mismo).
+                $nuevos = array_values(array_filter($releases, fn (array $r): bool => ! isset($r['date']) || CarbonImmutable::parse($r['date'])->startOfSecond()->greaterThan($hasta)));
                 $this->sumar($total, $this->guardarTodos($nuevos));
                 // Llegó a lo que ya tenía: se detiene.
                 $siguiente = count($nuevos) < count($releases) || $releases === [] ? null : ($datos['links']['next'] ?? null);
             }
 
-            DB::table('seace_lecturas')->where('id', $lectura)->update(['fin' => now(), 'es_ok' => true, ...$total]);
+            DB::table('seace_lecturas')->where('id', $lectura)->update(['fin' => now(), 'es_ok' => true, ...$total, 'fuera' => json_encode($this->fuera)]);
         } catch (Throwable $e) {
-            DB::table('seace_lecturas')->where('id', $lectura)->update(['fin' => now(), 'es_ok' => false, 'error' => mb_substr($e->getMessage(), 0, 300), ...$total]);
+            DB::table('seace_lecturas')->where('id', $lectura)->update(['fin' => now(), 'es_ok' => false, 'error' => mb_substr($e->getMessage(), 0, 300), ...$total, 'fuera' => json_encode($this->fuera)]);
 
             throw $e instanceof RuntimeException ? $e : new RuntimeException($e->getMessage());
         }
@@ -138,8 +138,14 @@ final readonly class ConvocatoriasSeaceService
         $ok = DB::table('seace_lecturas')->where('es_ok', true)->max('fin');
         $ultima = DB::table('seace_lecturas')->whereNotNull('fin')->orderByDesc('id')->first();
 
+        // Observación 9.7: el resultado de la última lectura que terminó bien, con su detalle.
+        $buena = DB::table('seace_lecturas')->where('es_ok', true)->whereNotNull('fin')->orderByDesc('id')->first();
+        $fuera = $buena === null ? [] : (array) json_decode((string) ($buena->fuera ?? '[]'), true);
+
         return ['ok' => $ok === null ? null : CarbonImmutable::parse($ok), 'fallo' => $ultima !== null && ! $ultima->es_ok ? $ultima->error : null,
-            'falloEn' => $ultima !== null && ! $ultima->es_ok ? CarbonImmutable::parse($ultima->fin) : null];
+            'falloEn' => $ultima !== null && ! $ultima->es_ok ? CarbonImmutable::parse($ultima->fin) : null,
+            'resultado' => $buena === null ? null : ['leidas' => (int) $buena->leidas, 'entraron' => (int) $buena->a_bandeja, 'nuevas' => (int) $buena->nuevas,
+                'actualizadas' => (int) $buena->actualizadas, 'fuera' => $fuera, 'hora' => CarbonImmutable::parse($buena->fin)->setTimezone('America/Lima')->format('H:i')]];
     }
 
     /**
@@ -171,6 +177,19 @@ final readonly class ConvocatoriasSeaceService
      * @param  list<array<string, mixed>>  $releases
      * @return array{leidas: int, nuevas: int, actualizadas: int, a_bandeja: int}
      */
+    /** Clasifica el motivo de «fuera» para el detalle de cada lectura. */
+    public static function porQueFuera(string $motivo): string
+    {
+        return match (true) {
+            str_contains($motivo, 'palabra negativa') => 'negativa',
+            str_contains($motivo, 'No coincide') => 'palabras',
+            str_starts_with($motivo, 'Es de ') => 'region',
+            str_contains($motivo, 'excluidas') => 'entidad',
+            str_contains($motivo, 'mínimo') => 'monto',
+            default => 'otro',
+        };
+    }
+
     private function guardarTodos(array $releases): array
     {
         $total = ['leidas' => 0, 'nuevas' => 0, 'actualizadas' => 0, 'a_bandeja' => 0];
@@ -184,7 +203,14 @@ final readonly class ConvocatoriasSeaceService
             }
 
             $total[$hecho['nueva'] ? 'nuevas' : 'actualizadas']++;
-            $total['a_bandeja'] += $hecho['nueva'] && DB::table('convocatorias_seace')->where('id', $hecho['id'])->value('en_bandeja') ? 1 : 0;
+            $c = DB::table('convocatorias_seace')->where('id', $hecho['id'])->first(['en_bandeja', 'fuera_por']);
+            $total['a_bandeja'] += $hecho['nueva'] && $c?->en_bandeja ? 1 : 0;
+
+            // Observación 9.7: las nuevas que quedaron fuera, por qué (palabras, negativa, región, entidad, monto).
+            if ($hecho['nueva'] && $c !== null && ! $c->en_bandeja) {
+                $por = self::porQueFuera((string) $c->fuera_por);
+                $this->fuera[$por] = ($this->fuera[$por] ?? 0) + 1;
+            }
         }
 
         return $total;
@@ -213,7 +239,7 @@ final readonly class ConvocatoriasSeaceService
             return ['id' => $id, 'nueva' => true];
         }
 
-        if ($guardada->release_fecha !== null && ! CarbonImmutable::parse($datos['release_fecha'])->greaterThan(CarbonImmutable::parse($guardada->release_fecha))) {
+        if ($guardada->release_fecha !== null && ! CarbonImmutable::parse($datos['release_fecha'])->startOfSecond()->greaterThan(CarbonImmutable::parse($guardada->release_fecha)->startOfSecond())) {
             return null;
         }
 
@@ -287,8 +313,14 @@ final readonly class ConvocatoriasSeaceService
         $titulo = trim((string) ($t['title'] ?? ''));
         $descripcion = trim((string) ($t['description'] ?? ''));
 
+        // Observación 9.13: en el OECE la nomenclatura viene en `title` («CP-ABR-1-2026-MDS/C-1»); `id` es un número interno.
+        $nomenclatura = preg_match('/^[A-Z0-9][A-Z0-9.\/]*(-[A-Z0-9.\/]+){2,}$/iu', $titulo) === 1 ? $titulo : (string) ($t['id'] ?? $r['ocid']);
+        // En el listado del OECE el fin del periodo es el mismo día de la publicación: no es la presentación de ofertas.
+        $presentacion = $fecha($t['tenderPeriod']['endDate'] ?? null);
+        $presentacion = $presentacion !== null && $presentacion <= (string) $fecha($t['tenderPeriod']['startDate'] ?? $t['datePublished'] ?? null) ? null : $presentacion;
+
         return [
-            'nomenclatura' => mb_substr((string) ($t['id'] ?? $r['ocid']), 0, 120), 'entidad' => mb_substr((string) ($r['buyer']['name'] ?? $comprador['name'] ?? 'Entidad'), 0, 250),
+            'nomenclatura' => mb_substr($nomenclatura, 0, 120), 'entidad' => mb_substr((string) ($r['buyer']['name'] ?? $comprador['name'] ?? 'Entidad'), 0, 250),
             'ruc_entidad' => strlen($ruc) === 11 ? $ruc : null, 'region' => $comprador['address']['region'] ?? null,
             // Observación 8.9: la región (departamento) de la entidad; `region` del OECE es la provincia.
             'departamento' => isset($comprador['address']['department']) ? mb_strtoupper(mb_substr((string) $comprador['address']['department'], 0, 40)) : null,
@@ -298,7 +330,7 @@ final readonly class ConvocatoriasSeaceService
             'tipo' => mb_substr((string) ($t['procurementMethodDetails'] ?? 'Por definir'), 0, 30),
             // El OECE manda 0 cuando el valor no es público.
             'valor_referencial' => $valor !== null && (float) $valor > 0 ? $valor : null, 'moneda' => $t['value']['currency'] ?? 'PEN', 'publicada' => $fecha($t['datePublished'] ?? $r['date'] ?? null),
-            'consultas_hasta' => $fecha($t['enquiryPeriod']['endDate'] ?? null), 'presentacion' => $fecha($t['tenderPeriod']['endDate'] ?? null), 'buena_pro' => $fecha($t['awardPeriod']['startDate'] ?? null),
+            'consultas_hasta' => $fecha($t['enquiryPeriod']['endDate'] ?? null), 'presentacion' => $presentacion, 'buena_pro' => $fecha($t['awardPeriod']['startDate'] ?? null),
             'url' => mb_substr((string) (collect($t['documents'] ?? [])->first()['url'] ?? ''), 0, 500) ?: null,
             'estado_ocds' => isset($t['status']) ? mb_substr((string) $t['status'], 0, 30) : null,
             // Observación 8.10: los enlaces a los documentos del proceso (de la convocatoria y de la adjudicación).
@@ -327,26 +359,6 @@ final readonly class ConvocatoriasSeaceService
             'prioritaria' => $alto || $esCuenta,
             'motivo_prioridad' => $alto && $esCuenta ? 'Valor alto y ya es cliente' : ($alto ? 'Valor desde S/ '.number_format($umbral, 0) : ($esCuenta ? 'La entidad ya es cuenta' : null)),
         ]);
-    }
-
-    /**
-     * Atajo del MVP (solo en local): releases que la demo dejó «por publicar» en `storage/app/seace/por-publicar.json`;
-     * la primera lectura los trae (así se ve una convocatoria llegar sola) y el archivo se borra.
-     *
-     * @return array{leidas: int, nuevas: int, actualizadas: int, a_bandeja: int}
-     */
-    private function pendientesDeDemo(): array
-    {
-        $disco = Storage::disk('local');
-
-        if (! app()->environment('local') || ! $disco->exists(self::DEMO_POR_PUBLICAR)) {
-            return ['leidas' => 0, 'nuevas' => 0, 'actualizadas' => 0, 'a_bandeja' => 0];
-        }
-
-        $json = (string) $disco->get(self::DEMO_POR_PUBLICAR);
-        $disco->delete(self::DEMO_POR_PUBLICAR);
-
-        return $this->importar($json);
     }
 
     /** @param  array<string, int>  $total @param  array<string, int>  $parte */

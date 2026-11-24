@@ -121,9 +121,21 @@
             <input type="search" wire:model.live.debounce.400ms="buscar" placeholder="Buscar por objeto, entidad o nomenclatura…" aria-label="Buscar convocatorias">
             <button type="button" class="tq-band-interruptor" role="switch" aria-checked="{{ $this->todo ? 'true' : 'false' }}" wire:click="$toggle('todo')"><span class="pista"></span>Buscar en todo el SEACE</button>
         </label>
+        @php
+            $res = $lectura['resultado'];
+            $porQue = ['palabras' => 'sin palabra clave', 'negativa' => 'por una palabra negativa', 'region' => 'fuera de sus regiones', 'entidad' => 'entidad excluida', 'monto' => 'bajo el monto mínimo', 'otro' => 'otro motivo'];
+            $detalleFuera = $res === null ? '' : collect($res['fuera'])->map(fn ($n, $k) => $n.' '.($porQue[$k] ?? $k))->implode(', ');
+            $titulo = $res === null ? '' : "Lectura de las {$res['hora']}: {$res['nuevas']} nuevas, {$res['actualizadas']} actualizadas; ".(array_sum($res['fuera']) > 0 ? array_sum($res['fuera']).' quedaron fuera ('.$detalleFuera.')' : 'ninguna nueva quedó fuera').'.';
+        @endphp
         <span class="tq-band-leido" title="{{ $lectura['ok']?->format('d/m/Y H:i') }}">
             {{ $lectura['ok'] === null ? 'Sin lecturas todavía' : 'Leído '.$lectura['ok']->locale('es')->diffForHumans() }}
         </span>
+        {{-- Observación 9.7: el resultado de la última lectura; si el OECE no respondió, en coral con «reintentar». --}}
+        @if ($lectura['fallo'] !== null)
+            <button type="button" class="tq-band-leido" style="color: var(--b-coral); font-weight: 600" wire:click="leerAhora" title="{{ $lectura['fallo'] }}">El OECE no respondió · reintentar</button>
+        @elseif ($res !== null)
+            <span class="tq-band-leido" style="font-weight: 600; cursor: help" title="{{ $titulo }}">{{ number_format($res['leidas']) }} {{ $res['leidas'] === 1 ? 'leída' : 'leídas' }} · {{ $res['entraron'] }} {{ $res['entraron'] === 1 ? 'entró' : 'entraron' }} a tu bandeja</span>
+        @endif
         @if ($puede)
             <button type="button" class="tq-band-btn" wire:click="leerAhora" wire:loading.attr="disabled" wire:target="leerAhora"><x-filament::icon icon="heroicon-o-arrow-path" class="h-4 w-4" wire:loading.class="animate-spin" wire:target="leerAhora" />Leer ahora</button>
         @endif
@@ -202,7 +214,12 @@
                         </span>
                     </button>
                 @empty
-                    <div class="tq-band-sub" style="padding: 18px">Nada por aquí con estos filtros.</div>
+                    @if ($lectura['ok'] === null)
+                        {{-- Observación 9.7: todavía no se leyó nada del OECE. --}}
+                        <div class="tq-band-sub" style="padding: 18px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap">Todavía no hay convocatorias leídas del OECE. <button type="button" class="tq-band-btn" wire:click="leerAhora">Leer ahora</button></div>
+                    @else
+                        <div class="tq-band-sub" style="padding: 18px">Nada por aquí con estos filtros.</div>
+                    @endif
                 @endforelse
             </div>
         </div>

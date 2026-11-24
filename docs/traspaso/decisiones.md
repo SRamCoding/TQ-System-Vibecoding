@@ -1229,3 +1229,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (t1-licitaciones); permiso nuevo e historial de cambios
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.6: el asistente de configuración de la búsqueda»
+
+### MV-101 · 2026-11-24 · Convocatorias del SEACE solo con datos reales y el resultado de cada lectura
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-9, punto 7) «En Convocatorias del SEACE no se inventan datos … Quita del demo las convocatorias inventadas … La bandeja, «Buscar en todo el SEACE», «Ganadores anteriores» y el «¿Cuánto bajar?» se llenan solo con lo leído del OECE … «X leídas · Y entraron a tu bandeja» … El OECE no respondió · reintentar … el detalle». Y al preguntarle qué hacer con lo que dependía de ellas, eligió «Borrar, pero cuidar las licitaciones»: los ganadores anteriores ficticios se quedan solo como dato de demo de las licitaciones de Oportunidades (nunca en la bandeja ni en «Buscar en todo el SEACE»).
+- **Decisión:** lo dicho; los procesos anteriores ficticios quedan marcados como demo y solo los usan las licitaciones de demo.
+- **Alcance:** ficha (t1-licitaciones); toca los seeders de demo
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.7: Convocatorias solo con datos reales»

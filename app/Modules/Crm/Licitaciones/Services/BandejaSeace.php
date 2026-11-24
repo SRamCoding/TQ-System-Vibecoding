@@ -32,10 +32,11 @@ final readonly class BandejaSeace
     {
         $hoy = CarbonImmutable::parse(Calendario::hoy());
         // Observación 8.12: lo histórico no entra a la bandeja; con «Buscar en todo el SEACE» se busca con el índice de texto.
-        $todas = DB::table('convocatorias_seace')->where('es_historico', false)->get();
+        // Observación 9.7: solo lo leído del OECE (lo marcado como demo es de las licitaciones de Oportunidades).
+        $todas = DB::table('convocatorias_seace')->where('es_historico', false)->where('es_demo', false)->get();
 
         if ($f['todo'] && trim($f['buscar']) !== '') {
-            $todas = $todas->merge(DB::table('convocatorias_seace')->where('es_historico', true)
+            $todas = $todas->merge(DB::table('convocatorias_seace')->where('es_historico', true)->where('es_demo', false)
                 ->whereRaw("to_tsvector('spanish', tq_sin_tildes(objeto || ' ' || entidad || ' ' || nomenclatura)) @@ plainto_tsquery('spanish', tq_sin_tildes(?))", [trim($f['buscar'])])
                 ->orderByDesc('publicada')->limit(200)->get());
         }
@@ -136,7 +137,7 @@ final readonly class BandejaSeace
 
         // Observación 8.12: los procesos pasados parecidos de la misma entidad (misma línea, palabras clave de esa línea
         // o palabras en común), con su ganador; incluye lo cargado del histórico del OECE.
-        $ganadores = $c->ruc_entidad === null ? collect() : DB::table('convocatorias_seace')->where('ruc_entidad', $c->ruc_entidad)->where('id', '!=', $c->id)->whereNotNull('ganador')
+        $ganadores = $c->ruc_entidad === null ? collect() : DB::table('convocatorias_seace')->where('ruc_entidad', $c->ruc_entidad)->where('id', '!=', $c->id)->where('es_demo', false)->whereNotNull('ganador')
             ->orderByDesc('publicada')->limit(60)->get()->filter(fn (object $g): bool => $this->esParecido($c, $g))->take(6)->values()->map(fn (object $g): array => [
                 'objeto' => $g->objeto, 'anio' => $g->publicada === null ? null : substr((string) $g->publicada, 0, 4), 'ganador' => $g->ganador,
                 'techquk' => str_contains(FiltroConvocatorias::normal((string) $g->ganador), 'techquk'),
@@ -191,8 +192,8 @@ final readonly class BandejaSeace
             return null;
         }
 
-        $c = DB::table('convocatorias_seace')->where('nomenclatura', 'ilike', $codigo)->orWhere('ocid', $codigo)->first()
-            ?? DB::table('convocatorias_seace')->where('nomenclatura', 'ilike', "%{$codigo}%")->orWhere('ocid', 'ilike', "%{$codigo}%")->orderByDesc('id')->first();
+        $c = DB::table('convocatorias_seace')->where('es_demo', false)->where(fn ($q) => $q->where('nomenclatura', 'ilike', $codigo)->orWhere('ocid', $codigo))->first()
+            ?? DB::table('convocatorias_seace')->where('es_demo', false)->where(fn ($q) => $q->where('nomenclatura', 'ilike', "%{$codigo}%")->orWhere('ocid', 'ilike', "%{$codigo}%"))->orderByDesc('id')->first();
 
         return $c === null ? null : ['id' => (int) $c->id, 'ruc' => $c->ruc_entidad, 'nomenclatura' => $c->nomenclatura, 'objeto' => $c->objeto, 'entidad' => $c->entidad,
             'valor' => $c->valor_referencial === null ? null : (string) $c->valor_referencial, 'enBandeja' => (bool) $c->en_bandeja, 'evaluacion' => app(FiltroConvocatorias::class)->evaluar($c)];

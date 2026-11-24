@@ -185,10 +185,10 @@ final readonly class HistoricoSeaceService
     public function verificar(int $anio): array
     {
         $oece = (int) DB::table('seace_cargas')->where('anio', $anio)->where('es_ensayo', false)->sum('en_regiones');
-        $guardados = DB::table('convocatorias_seace')->where('es_historico', true)->whereYear('publicada', $anio)->count();
+        $guardados = DB::table('convocatorias_seace')->where('es_historico', true)->where('es_demo', false)->whereYear('publicada', $anio)->count();
         $muestra = [];
 
-        foreach (DB::table('convocatorias_seace')->where('es_historico', true)->whereYear('publicada', $anio)->inRandomOrder()->limit(5)->get() as $c) {
+        foreach (DB::table('convocatorias_seace')->where('es_historico', true)->where('es_demo', false)->whereYear('publicada', $anio)->inRandomOrder()->limit(5)->get() as $c) {
             try {
                 $rec = Http::timeout(30)->acceptJson()->withUserAgent('TechQuk-OCDS/1.0')->get('https://contratacionesabiertas.oece.gob.pe/api/v1/record/'.$c->ocid)->throw()->json();
                 $cr = $rec['records'][0]['compiledRelease'] ?? $rec['compiledRelease'] ?? [];

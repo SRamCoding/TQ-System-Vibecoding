@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v12, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v12
+- **Estado:** en curso (v13, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v13
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -22,6 +22,8 @@ adjudica entre el 76.6 % y el 94.5 % del referencial»). Si se pierde o queda de
 perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
+
+- **MV-101** (ficha) · Convocatorias del SEACE solo con lo leído del OECE; los ganadores anteriores ficticios quedan como dato de demo de las licitaciones de Oportunidades. Junto a «Leído hace…», «X leídas · Y entraron a tu bandeja» con su detalle, o «El OECE no respondió · reintentar».
 
 - **MV-100** (ficha) · Asistente de configuración inicial de la búsqueda (5 pasos, ventana al medio); la búsqueda es de la empresa (permiso `crm.convocatorias.configurar-busqueda`, los demás en lectura) y cada cambio queda en su historial.
 
@@ -49,6 +51,8 @@ perdida con el ganador y su precio.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **Resultado de la lectura** (v13, MV-101): junto a «Leído hace…», «N leídas · M entraron a tu bandeja» (de la última lectura buena); al pasar el puntero, la hora, cuántas nuevas, cuántas actualizadas y cuántas nuevas quedaron fuera y por qué (sin palabra clave, palabra negativa, región, entidad excluida, monto mínimo). Si la última falló: «El OECE no respondió · reintentar» en coral (vuelve a leer). Sin ninguna lectura, la bandeja vacía dice «Todavía no hay convocatorias leídas del OECE» con «Leer ahora».
 
 - **Asistente** (v12, MV-100): sin líneas, la bandeja muestra «Configura qué convocatorias le interesan a Techquk · Empezar»; en «Búsqueda», «Volver a configurar con el asistente» (precarga lo que hay) y «Empezar de cero». Pasos: 1 rubros (Videovigilancia, Redes y cableado, Software, Control de acceso, Centro de datos, Energía y UPS, Telecomunicaciones, Alarmas e incendios, «+ Otro») con sus palabras y negativas editables y las sugerencias por confirmar (Agregar · No; «Sugerir palabras» llama a la IA si está); 2 regiones (una elección para todas o por línea, «Todo el Perú»); 3 mínimo por línea y umbral de prioritaria; 4 vista previa (cuántas habrían entrado en el último mes, por línea, 5 ejemplos con las palabras resaltadas y ayuda si salen muchas o pocas); 5 guardar (crea o reemplaza las líneas y vuelve a filtrar). «Atrás» no pierde lo elegido. Al pie del panel Búsqueda, «Historial de cambios».
 
@@ -190,6 +194,9 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Reglas y números
 
+- **Solo lo real** (v13, MV-101): se borraron las 11 convocatorias inventadas (y sus 25 avisos de Mien) y la lectura «por publicar» de la demo; los 19 procesos anteriores ficticios quedan con `es_demo` y la bandeja, «Buscar en todo el SEACE», «¿Por qué no entró?», Ganadores anteriores del detalle y el histórico no los ven; «¿Cuánto bajar?» de la postulación sí. La licitación LP-SM-12-2026-GRVN-1 se registra a mano en la demo. La configuración de la búsqueda sigue sembrada.
+- **Lectura del OECE** (v13): la nomenclatura es el `title` del OECE (el `id` es un número interno); el fin del periodo que trae el listado es el mismo día de la publicación, así que la presentación queda sin fecha hasta que llegue un cronograma. La fecha de la versión se compara en segundos (antes cada lectura «actualizaba» las mismas 31).
+
 - **Asistente** (v12, MV-100): cada rubro marcado es una línea (si ya había una con su nombre, la reemplaza conservando su nombre). Vista previa sobre lo guardado del OECE con publicación en el último mes, con el mismo filtro de la bandeja. Ayuda: 0 → agrega palabras o baja el mínimo; menos de 3 → muy pocas; más de 80 → demasiadas. Historial: línea agregada o quitada, palabra, negativa, región y mínimo, y el umbral de prioritaria.
 
 - **v11 · Fuente del histórico:** `https://contratacionesabiertas.oece.gob.pe/api/v1/file/seace_v3/json/{año}/{mes}/` (ZIP con un «record package» de una sola línea; enero 2025: 1,314 procesos, 22.5 MB). Comando `php artisan seace:historico 2025 --ensayo` (solo cuenta), `seace:historico 2025` (carga) y `--verificar`. Se recorre proceso por proceso con un lector propio (separa cada objeto del arreglo `records` contando llaves), solo las regiones elegidas en las líneas, por lotes de 500 y sin eventos; cada mes guarda su posición en `seace_cargas` para retomar; si el proceso ya estaba, se actualiza solo si su dato es más nuevo y conserva su estado. Lo histórico (`es_historico`) no entra a la bandeja ni se prioriza ni avisa. Índice GIN en español sin tildes sobre objeto, entidad y nomenclatura.
@@ -253,6 +260,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Supuestos sin confirmar
 
+- **v13 · Presentación sin fecha:** el listado del OECE no trae la fecha de presentación de ofertas; esas convocatorias se ven «Sin fecha» y no salen como vencidas.
+
 - **v12 · Rubros** en una tabla propia (`seace_rubros`, ampliable con «+ Otro»), no en Directorio y catálogos.
 - **v12 · Demo:** tres sugerencias ya hechas, sacadas de proyectos ganados (videoconferencia, computadoras, historia clínica).
 
@@ -296,6 +305,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Atajos tomados
 
+- **v13 · Lo inventado se reconoce** por su código (no es «ocds-dgv273-seacev3-…») y se marca con una columna `es_demo` en la misma tabla.
+
 - **v12 · Asistente** guarda con el mismo servicio de líneas, sin acción registrada propia; el historial se calcula comparando antes y después.
 
 - **v11:** el lector del JSON por partes es propio (sin librería); la verificación de los 5 procesos compara el código y el monto adjudicado con `/api/v1/record/{ocid}`.
@@ -333,6 +344,8 @@ y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.ph
 `2026_11_23_900001_bandeja_con_detalle.php` y `Demo/BandejaCasosSeeder.php`.
 
 ## Cambios desde la versión anterior
+
+- **v13** (MV-101): Convocatorias solo con datos reales y el resultado de cada lectura.
 
 - **v12** (MV-100): asistente de configuración de la búsqueda.
 
