@@ -94,9 +94,14 @@ final readonly class CampaniasService
         $presupuesto = $c->presupuesto === null ? '0.00' : (string) $c->presupuesto;
         $sinAtender = $leads->where('estado', 'nuevo')->filter(fn ($l): bool => $l->created_at->lt(Calendario::ahora()->subDays(LeadsService::DIAS_SIN_ATENDER)))->count();
 
+        // Observación 9.9: los que llegaron, nuevos o ya registrados (los unidos a un lead u oportunidad abierta también).
+        $contactos = $this->contactosDe(['campania_id' => $c->id]);
+
         return [
             'id' => $c->id, 'nombre' => $c->nombre, 'tipo' => Campania::TIPOS[$c->tipo] ?? $c->tipo, 'claveTipo' => $c->tipo,
-            'contactos' => $leads->count(), 'oportunidades' => count($ops), 'ganadas' => $ganadas->count(),
+            'contactos' => $contactos['total'], 'nuevos' => $contactos['nuevos'], 'yaRegistrados' => $contactos['ya'], 'listaRegistrados' => $contactos['lista'],
+            'porContactoNuevo' => $contactos['nuevos'] > 0 && bccomp($gastado, '0', 2) > 0 ? bcdiv($gastado, (string) $contactos['nuevos'], 2) : null,
+            'oportunidades' => count($ops), 'ganadas' => $ganadas->count(),
             'ganado' => bcadd((string) ($ganadas->sum('monto_estimado') ?: '0'), '0', 2), 'margen' => $margen, 'margenPrevisto' => $previsto,
             'gastado' => $gastado, 'presupuesto' => $presupuesto, 'sePaso' => bccomp($gastado, $presupuesto, 2) > 0,
             'retorno' => bccomp($gastado, '0', 2) > 0 ? number_format((float) $margen / (float) $gastado, 1, '.', '') : null, 'sinAtender' => $sinAtender,
@@ -157,7 +162,8 @@ final readonly class CampaniasService
             'feria' => 'FERIA', 'referidos', 'clientes' => 'REFERENCIA', default => 'SITIO_WEB',
         };
 
-        Lead::query()->create([
+        // Observación 9.9: si ya lo conocemos (teléfono, correo o RUC), no se duplica.
+        app(LeadsService::class)->llega([
             'campania_id' => $c->id, 'origen_comercial_id' => (int) DB::table('origenes_comerciales')->where('codigo', $origen)->value('id'),
             // Observación 9.3: el canal de la campaña (sin canal, Página web).
             'canal_lead_id' => $c->canal_lead_id ?? DB::table('canales_lead')->where('codigo', 'sitio_web')->value('id'),
@@ -368,11 +374,14 @@ final readonly class CampaniasService
 
             $gastado = number_format((float) $suyos->reduce(fn (string $t, Lead $l): string => bcadd($t, $costoLead($l->campania_id), 6), '0'), 2, '.', '');
             $conGasto = bccomp($gastado, '0', 2) > 0;
+            $contactos = $this->contactosDe(['canal_lead_id' => $id], $desde, $hasta);
             $tarjetas[] = [
                 'id' => $id, 'codigo' => $canal['codigo'], 'nombre' => $canal['nombre'], 'icono' => $canal['icono'],
+                'contactos' => $contactos['total'], 'nuevos' => $contactos['nuevos'], 'yaRegistrados' => $contactos['ya'], 'listaRegistrados' => $contactos['lista'],
                 'leads' => $suyos->count(), 'calificados' => $calificados, 'tasa' => (int) round($calificados * 100 / $suyos->count()),
                 'ganadas' => $nGanadas, 'ganado' => $ganado, 'margen' => $margen, 'margenPrevisto' => $previsto,
                 'gastado' => $gastado, 'porLead' => $conGasto ? bcdiv($gastado, (string) $suyos->count(), 2) : null,
+                'porContactoNuevo' => $conGasto && $contactos['nuevos'] > 0 ? bcdiv($gastado, (string) $contactos['nuevos'], 2) : null,
                 'retorno' => $conGasto ? number_format((float) $margen / (float) $gastado, 1, '.', '') : null,
             ];
         }
@@ -393,5 +402,25 @@ final readonly class CampaniasService
             'leads' => $total, 'canales' => count($tarjetas), 'calificados' => $calificados, 'tasa' => $total === 0 ? 0 : (int) round($calificados * 100 / $total),
             'masLeads' => $masLeads, 'rinde' => $rinde,
         ], 'tarjetas' => $tarjetas, 'desde' => $desde];
+    }
+
+    /**
+     * Observación 9.9: los contactos que llegaron por una campaña o un canal (y desde una fecha): nuevos, ya registrados y
+     * la lista corta de los ya registrados (nombre y qué eran).
+     *
+     * @param  array{campania_id?: int, canal_lead_id?: int}  $donde
+     * @return array{total: int, nuevos: int, ya: int, lista: list<string>}
+     */
+    public function contactosDe(array $donde, ?CarbonImmutable $desde = null, ?CarbonImmutable $hasta = null): array
+    {
+        $leads = Lead::query()->where($donde)->when($desde !== null, fn ($q) => $q->whereBetween('created_at', [$desde, $hasta]))->get(['nombre_contacto', 'organizacion', 'ya_registrado', 'registrado_como']);
+        $llegadas = DB::table('lead_llegadas')->where($donde)->when($desde !== null, fn ($q) => $q->whereBetween('created_at', [$desde, $hasta]))->get(['nombre', 'organizacion', 'registrado_como']);
+        $ya = $leads->where('ya_registrado', true);
+        $lista = [
+            ...$ya->map(fn (Lead $l): string => $l->nombre_contacto.($l->organizacion ? " ({$l->organizacion})" : '').' · '.(LeadsService::REGISTRADO_COMO[$l->registrado_como] ?? 'ya registrado'))->values()->all(),
+            ...$llegadas->map(fn (object $l): string => $l->nombre.($l->organizacion ? " ({$l->organizacion})" : '').' · '.(LeadsService::REGISTRADO_COMO[$l->registrado_como] ?? 'ya registrado'))->values()->all(),
+        ];
+
+        return ['total' => $leads->count() + $llegadas->count(), 'nuevos' => $leads->count() - $ya->count(), 'ya' => $ya->count() + $llegadas->count(), 'lista' => $lista];
     }
 }

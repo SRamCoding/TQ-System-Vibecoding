@@ -1,7 +1,7 @@
 # Ficha · Campañas y leads (CRM-07)
 
-- **Estado:** en curso (v5, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v5
+- **Estado:** en curso (v6, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v6
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-campanias-v1`
 - **Fuentes del diseño (v3):** `docs/vibe/pedidos/observaciones-7.md` (punto 6) y `lienzos/campanias/` (`Main.dc.html`,
@@ -20,6 +20,8 @@ módulo es el último del CRM.
 
 ## Decisiones de Sebastián
 
+- **MV-103** (ficha) · Cada contacto que llega es nuevo o ya registrado (teléfono, correo o RUC); el ya registrado no se duplica. Tarjetas de Campañas y Canales: contactos sin barra, oportunidades «N de X» y ganadas «N de X» con barra.
+
 - **MV-098** (ficha) · Sección «Canales» en Campañas: una tarjeta por canal con leads, calificados, ganados, ganado, margen, gasto, costo por lead y retorno del periodo (mes, trimestre o año); clic lleva a Mis oportunidades filtrado por Por calificar y ese canal.
 
 - **MV-097** (cruza módulos) · Cada lead lleva su canal (catálogo «Canales de los leads» con ícono); la campaña también. Filtro «Origen» en Mis oportunidades. La landing crea leads en `POST /entrada/leads` con clave, casilla trampa y límite por minuto; aviso en Mien.
@@ -33,6 +35,8 @@ módulo es el último del CRM.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **Embudo de la tarjeta** (v6, MV-103): «15 contactos llegaron · 11 nuevos · 4 ya registrados» (al pasar el puntero por «ya registrados», la lista con nombre y qué era: ya era cliente, contacto de un cliente, ya había escrito antes, ya tenía una oportunidad abierta); «Oportunidades» con barra y «3 de 15»; «Ganadas» con barra y «1 de 3». En Canales, igual con «Calificados». Al pasar el puntero por «Gastado», el costo por contacto nuevo. Al registrar un contacto con «+ Nuevo», el aviso dice si ya lo conocíamos.
 
 - **Canales** (v5, MV-098, lienzo `campanias-vista/Canales.dc.html`): chips Campañas · Canales · Mis clientes. Arriba, cuatro cifras (leads del periodo y de cuántos canales, calificados y %, el canal que trae más, el que rinde más). Selector Este mes · Trimestre · Año y «Ordenar: leads / ganado / retorno». Una tarjeta por canal con leads (solo los canales con leads); retorno en verde (1× o más), coral (menos) o «sin gasto». Clic en la tarjeta: Mis oportunidades con `etapa=por_calificar` y `origen=<canal>`. Enlace «Probar la entrada de la página web» (abre `/entrada/prueba`, observación 9.3).
 
@@ -94,6 +98,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Reglas y números
 
+- **Ya registrado** (v6, MV-103): mismo RUC de una cuenta (cliente), mismo correo o teléfono (últimos 9 dígitos) de un contacto de un cliente o de un lead anterior. Si tiene un lead abierto (nuevo o contactado) o una oportunidad abierta de su cuenta, no se crea nada: queda la llegada (`lead_llegadas`) y, con oportunidad, una actividad hecha «X llegó también por la campaña…». Si no, el lead se crea marcado ya registrado y unido a su cuenta. Vale para el formulario de la campaña, la landing y «+ Nuevo». Costo por contacto nuevo = gastado ÷ nuevos.
+
 - **Cifras de Canales** (v5, MV-098): periodo desde el 1 del mes, trimestre o año hasta hoy, por la fecha de llegada del lead. Calificado: el lead pasó a oportunidad. Ganado y margen: las oportunidades ganadas de esos leads, con el mismo margen de Campañas (real del cierre o previsto del proyecto). Gastado: cada lead del periodo carga el costo por contacto de su campaña (todo lo gastado en la campaña ÷ todos sus contactos); retorno = margen ÷ gastado; costo por lead = gastado ÷ leads. «Rinde más»: el de mayor retorno entre los que tienen gasto.
 
 - **Canal del lead** (v4, MV-097): de `utm_source` (ig → Instagram, fb/meta → Facebook, google/web → Página web…), si no de su campaña, si no «Página web». La campaña sale de `campania` (su código o nombre) o `utm_campaign`. Origen comercial según el canal: Feria → FERIA, Referido → REFERENCIA, Llamada → VISITA_FRIO, los demás → SITIO_WEB. Los leads ya cargados tomaron el canal de su campaña o, sin campaña, de su origen. Límite: 10 envíos por minuto por dirección (`TECHQUK_ENTRADA_LEADS_POR_MINUTO`); se exige teléfono o correo.
@@ -124,6 +130,9 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Supuestos sin confirmar
 
+- **v6 · Oportunidades de la campaña:** solo las que nacieron de sus leads; una llegada a una oportunidad que ya existía cuenta como contacto ya registrado, no como oportunidad nueva.
+- **v6 · Demo:** en la feria, 5 clientes ya conocidos y 3 contactos con oportunidad abierta; en Facebook, 3 que ya habían escrito.
+
 - **v5 · Gasto prorrateado por lead:** se eligió así para que el retorno de un canal cuadre con el de sus campañas (un gasto de julio no deja en cero un canal cuyos leads llegaron en noviembre). Los leads sin campaña no cargan gasto.
 - **v5 · Demo:** los calificados de los canales nuevos se unieron a oportunidades que ya existían sin lead; el canal «Página web» tiene una ganada con margen negativo (la del proyecto con pérdida de la demo).
 
@@ -148,6 +157,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Atajos tomados
 
+- **v6 · Reconocimiento** con consultas directas a las tablas de contactos y cuentas desde el servicio de leads (sin pasar por los servicios del Directorio).
+
 - **v5 · Canales se calcula al mirar** recorriendo los leads del periodo y el margen de cada ganada (sin consulta agregada ni caché).
 
 - **v4 · Entrada de leads sin más defensa:** clave compartida (visible si la landing es solo HTML), casilla trampa y límite por dirección; sin CAPTCHA ni firma de cada envío. Lo crea el usuario de sistema. La ruta está fuera de CSRF y con CORS solo para ella.
@@ -168,6 +179,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 `Filament/Resources/Leads` y `Filament/Resources/Campanias`); datos en `DemoSeeder::campanias()`.
 
 ## Cambios desde la versión anterior
+
+- **v6** (MV-103): contactos nuevos o ya registrados y barras N de X.
 
 - **v5** (MV-098): vista Canales.
 

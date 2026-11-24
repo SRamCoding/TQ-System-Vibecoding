@@ -256,4 +256,15 @@ final readonly class ActividadesService
         return Actividad::query()->whereIn('oportunidad_id', $oportunidadIds)->groupBy('oportunidad_id')->selectRaw('oportunidad_id, max(created_at) as ultima')
             ->pluck('ultima', 'oportunidad_id')->map(fn (mixed $f): CarbonImmutable => CarbonImmutable::parse((string) $f))->all();
     }
+
+    /**
+     * Observación 9.9: deja anotado algo en el historial de actividades de una oportunidad (ya hecho, sin tocar las
+     * pendientes), p. ej. que el contacto llegó también por otra campaña.
+     */
+    public function anotar(int $cuentaId, ?int $oportunidadId, string $asunto, ?string $resultado = null): Actividad
+    {
+        return Actividad::query()->create(['tipo' => 'correo', 'cuenta_id' => $cuentaId, 'oportunidad_id' => $oportunidadId, 'asunto' => mb_substr(trim($asunto), 0, 200),
+            'fecha' => Calendario::ahora(), 'resultado' => $resultado === null || trim($resultado) === '' ? null : mb_substr(trim($resultado), 0, 1000), 'es_realizada' => true,
+            'responsable_user_id' => (int) (DB::table('oportunidades')->where('id', $oportunidadId ?? 0)->value('ejecutivo_user_id') ?? auth()->id() ?? 1)]);
+    }
 }

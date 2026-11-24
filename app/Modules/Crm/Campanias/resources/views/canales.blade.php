@@ -62,15 +62,12 @@
                         <span class="tq-can-retorno" style="background: color-mix(in oklab, {{ (float) $t['retorno'] >= 1 ? 'var(--c-verde)' : 'var(--c-coral)' }} 14%, var(--c-sup)); color: {{ (float) $t['retorno'] >= 1 ? 'var(--c-verde)' : 'var(--c-coral)' }}">Retorno {{ $veces($t['retorno']) }}</span>
                     @endif
                 </div>
-                <div class="tq-can-tres">
-                    <div><b>{{ $t['leads'] }}</b><span>leads</span></div>
-                    <div><b>{{ $t['calificados'] }}</b><span>calificados · {{ $t['tasa'] }} %</span></div>
-                    <div><b>{{ $t['ganadas'] }}</b><span>{{ $t['ganadas'] === 1 ? 'ganado' : 'ganados' }}</span></div>
-                </div>
-                <div class="tq-can-detalle">
+                {{-- Observación 9.9: contactos nuevos o ya registrados, y barras «N de X». --}}
+                @include('campanias::embudo-contactos', ['t' => ['contactos' => $t['contactos'], 'nuevos' => $t['nuevos'], 'yaRegistrados' => $t['yaRegistrados'], 'listaRegistrados' => $t['listaRegistrados'], 'calificados' => $t['calificados'], 'ganadas' => $t['ganadas']]])
+                                <div class="tq-can-detalle">
                     <span>Ganado</span><span>{{ $soles($t['ganado']) }}</span>
                     <span>Margen de lo ganado{{ $t['margenPrevisto'] && $t['ganadas'] > 0 ? ' (previsto)' : '' }}</span><span>{{ $soles($t['margen']) }}</span>
-                    <span>Gastado · por lead</span><span>{{ $soles($t['gastado']) }}{{ $t['porLead'] !== null ? ' · '.$soles($t['porLead']) : '' }}</span>
+                    <span title="{{ $t['porContactoNuevo'] === null ? '' : 'Por contacto nuevo: '.$soles($t['porContactoNuevo']) }}">Gastado · por lead</span><span>{{ $soles($t['gastado']) }}{{ $t['porLead'] !== null ? ' · '.$soles($t['porLead']) : '' }}</span>
                 </div>
                 <span class="tq-can-ir">Ver sus leads en Oportunidades →</span>
             </a>

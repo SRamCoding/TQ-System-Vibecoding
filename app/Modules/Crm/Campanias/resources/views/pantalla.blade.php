@@ -27,9 +27,12 @@
         .tq-camp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr)); gap: 14px; }
         .tq-camp-tarjeta { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
         .tq-camp-tag { font-size: 11px; font-weight: 600; border-radius: 6px; padding: 2px 8px; background: var(--c-gris-fondo); color: var(--c-suave); }
-        .tq-camp-embudo { display: grid; grid-template-columns: 6.5rem 1fr 2.5rem; gap: 6px 10px; align-items: center; font-size: 12px; color: var(--c-suave); }
+        .tq-camp-embudo { display: grid; grid-template-columns: 6.5rem 1fr auto; gap: 6px 10px; align-items: center; font-size: 12px; color: var(--c-suave); }
         .tq-camp-embudo .barra { height: 10px; border-radius: 99px; background: var(--c-pista); }
         .tq-camp-embudo .barra span { display: block; height: 10px; border-radius: 99px; background: var(--c-turquesa); }
+        .tq-camp-llegaron { font-size: 13px; }
+        .tq-camp-llegaron b { font-size: 15px; }
+        .tq-camp-ya { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
         .tq-camp-fila { display: flex; justify-content: space-between; font-size: 13px; font-variant-numeric: tabular-nums; }
         .tq-camp-fila span:first-child { color: var(--c-suave); }
         .tq-camp-acciones { display: flex; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--c-linea); padding-top: 12px; }
@@ -63,13 +66,9 @@
                         <div style="text-align: right"><div style="font-size: 11px; color: var(--c-suave)">Retorno</div>
                             <div style="font-size: 20px; font-weight: 700; color: {{ $t['retorno'] === null ? 'var(--c-suave)' : ((float) $t['retorno'] >= 1 ? 'var(--c-verde)' : 'var(--c-coral)') }}">{{ $veces($t['retorno']) }}</div></div>
                     </div>
-                    <div class="tq-camp-embudo">
-                        @foreach ([['Contactos', $t['contactos']], ['Oportunidades', $t['oportunidades']], ['Ganadas', $t['ganadas']]] as [$n, $v])
-                            <span>{{ $n }}</span><span class="barra"><span style="width: {{ max($v > 0 ? 3 : 0, round($v * 100 / $max)) }}%"></span></span><b style="text-align: right; color: var(--tq-texto, inherit)">{{ $v }}</b>
-                        @endforeach
-                    </div>
+                    @include('campanias::embudo-contactos', ['t' => $t])
                     <div style="display: flex; flex-direction: column; gap: 4px">
-                        <div class="tq-camp-fila"><span>Gastado / presupuesto</span><span @if ($t['sePaso']) style="color: var(--c-coral); font-weight: 600" @endif>{{ $soles($t['gastado']) }} / {{ $soles($t['presupuesto']) }}</span></div>
+                        <div class="tq-camp-fila" title="{{ $t['porContactoNuevo'] === null ? 'Sin contactos nuevos o sin gasto' : 'Costo por contacto nuevo: '.$soles($t['porContactoNuevo']).' (lo que la campaña de verdad consiguió)' }}"><span>Gastado / presupuesto</span><span @if ($t['sePaso']) style="color: var(--c-coral); font-weight: 600" @endif>{{ $soles($t['gastado']) }} / {{ $soles($t['presupuesto']) }}</span></div>
                         <div class="tq-camp-fila"><span>Ganado</span><span>{{ $soles($t['ganado']) }}</span></div>
                         <div class="tq-camp-fila"><span>Margen de lo ganado{{ $t['margenPrevisto'] ? ' (previsto)' : '' }}</span><span>{{ $soles($t['margen']) }}</span></div>
                         @if ($t['sinAtender'] > 0)<div class="tq-camp-fila"><span style="color: var(--c-coral)">{{ $t['sinAtender'] }} sin atender hace 3 días</span><span></span></div>@endif

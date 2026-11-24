@@ -211,8 +211,9 @@ final class LeadResource extends Resource
                 Textarea::make('mensaje')->label('Qué pidió')->rows(3),
             ])
             ->action(function (array $data): void {
-                Lead::query()->create([...$data, 'estado' => 'nuevo']);
-                Notification::make()->success()->title('Lead registrado.')->send();
+                // Observación 9.9: si ya lo conocemos (teléfono, correo o RUC), no se duplica: se une al que existe.
+                $r = app(LeadsService::class)->llega([...$data, 'estado' => 'nuevo']);
+                Notification::make()->success()->title($r['unido'] ? 'Ya lo conocíamos ('.(LeadsService::REGISTRADO_COMO[$r['como']] ?? 'ya registrado').'): quedó anotado, sin duplicar.' : ($r['como'] ? 'Lead registrado (ya registrado: '.LeadsService::REGISTRADO_COMO[$r['como']].').' : 'Lead registrado.'))->send();
             });
     }
 

@@ -20,7 +20,7 @@ class Lead extends Model
 
     protected $table = 'leads';
 
-    protected $fillable = ['campania_id', 'origen_comercial_id', 'canal_lead_id', 'nombre_contacto', 'cargo', 'organizacion', 'ruc', 'email', 'telefono', 'mensaje', 'cuenta_id', 'oportunidad_id', 'estado', 'motivo_descarte', 'asignado_user_id', 'atendido_at'];
+    protected $fillable = ['campania_id', 'origen_comercial_id', 'canal_lead_id', 'ya_registrado', 'registrado_como', 'nombre_contacto', 'cargo', 'organizacion', 'ruc', 'email', 'telefono', 'mensaje', 'cuenta_id', 'oportunidad_id', 'estado', 'motivo_descarte', 'asignado_user_id', 'atendido_at'];
 
     protected function casts(): array
     {

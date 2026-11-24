@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Campanias\Services;
 
+use App\Modules\Crm\Actividades\Services\ActividadesService;
 use App\Modules\Crm\Campanias\Models\Campania;
 use App\Modules\Crm\Campanias\Models\Lead;
 use App\Modules\Crm\Cuentas\Services\CuentasService;
@@ -79,7 +80,7 @@ final readonly class LeadsService
      *
      * @param  array{nombre: string, organizacion?: ?string, telefono?: ?string, correo?: ?string, mensaje?: ?string, cargo?: ?string, ruc?: ?string}  $d
      */
-    public function recibirDeLaWeb(array $d, ?string $utmSource = null, ?string $campania = null): Lead
+    public function recibirDeLaWeb(array $d, ?string $utmSource = null, ?string $campania = null): ?Lead
     {
         $c = null;
 
@@ -97,13 +98,14 @@ final readonly class LeadsService
         // Llega sin sesión: lo registra el usuario de sistema.
         $sistema = User::query()->findOrFail(app(UsuarioSistema::class)->id());
 
-        return app(ContextoAuditoria::class)->comoUsuario($sistema, fn (): Lead => Lead::query()->create([
+        // Observación 9.9: si ya lo conocemos, no se duplica (se une al que existe).
+        return app(ContextoAuditoria::class)->comoUsuario($sistema, fn (): ?Lead => $this->llega([
             'campania_id' => $c?->id, 'canal_lead_id' => $canalId, 'origen_comercial_id' => $this->origenDelCanal($canalId),
             'nombre_contacto' => mb_substr(trim($d['nombre']), 0, 150), 'organizacion' => $corta($d['organizacion'] ?? null, 200),
             'cargo' => $corta($d['cargo'] ?? null, 120), 'ruc' => $corta($d['ruc'] ?? null, 11),
             'telefono' => $corta($d['telefono'] ?? null, 30), 'email' => $corta($d['correo'] ?? null, 150), 'mensaje' => $corta($d['mensaje'] ?? null, 2000),
             'estado' => 'nuevo',
-        ]));
+        ])['lead']);
     }
 
     /**
@@ -254,5 +256,97 @@ final readonly class LeadsService
     {
         return DB::table('leads')->join('canales_lead as c', 'c.id', '=', 'leads.canal_lead_id')->whereNotNull('leads.oportunidad_id')
             ->pluck('c.codigo', 'leads.oportunidad_id')->map(fn (mixed $c): string => (string) $c)->all();
+    }
+
+    /** Observación 9.9: cómo se lee «ya registrado» (qué era antes). */
+    public const array REGISTRADO_COMO = ['cliente' => 'ya era cliente', 'contacto' => 'ya era contacto de un cliente', 'lead' => 'ya había escrito antes', 'oportunidad' => 'ya tenía una oportunidad abierta'];
+
+    /**
+     * Observación 9.9: ¿el sistema ya conoce a este contacto? Por el mismo teléfono, el mismo correo o el mismo RUC de la
+     * organización: un cliente (cuenta), un contacto de un cliente o un lead anterior. Dice también si tiene un lead
+     * abierto o una oportunidad abierta (entonces no se crea otra cosa: se anota la llegada).
+     *
+     * @return array{como: string, cuentaId: ?int, leadAbierto: ?int, oportunidadAbierta: ?int}|null
+     */
+    public function reconocer(?string $telefono, ?string $correo, ?string $ruc, ?int $salvoLead = null): ?array
+    {
+        $tel = substr((string) preg_replace('/\D/', '', (string) $telefono), -9);
+        $tel = strlen($tel) >= 7 ? $tel : null;
+        $mail = trim(mb_strtolower((string) $correo)) ?: null;
+        $ruc = preg_match('/^\d{11}$/', (string) $ruc) === 1 ? $ruc : null;
+        $cuentaId = null;
+        $como = null;
+
+        if ($ruc !== null) {
+            $cuentaId = DB::table('cuentas as c')->join('parties as p', 'p.id', '=', 'c.party_id')->where('p.numero_documento', $ruc)->value('c.id');
+            $como = $cuentaId !== null ? 'cliente' : null;
+        }
+
+        if ($como === null && ($tel !== null || $mail !== null)) {
+            $contacto = DB::table('party_contactos as pc')->join('cuentas as c', 'c.party_id', '=', 'pc.party_id')
+                ->where(fn ($q) => $q->when($mail !== null, fn ($q2) => $q2->orWhereRaw('lower(pc.email) = ?', [$mail]))
+                    ->when($tel !== null, fn ($q2) => $q2->orWhereRaw("right(regexp_replace(coalesce(pc.telefono, ''), '\\D', '', 'g'), 9) = ?", [$tel])))
+                ->value('c.id');
+            $cuentaId = $contacto !== null ? (int) $contacto : null;
+            $como = $cuentaId !== null ? 'contacto' : null;
+        }
+
+        $lead = ($tel === null && $mail === null) ? null : Lead::query()->when($salvoLead !== null, fn ($q) => $q->whereKeyNot($salvoLead))
+            ->where(fn ($q) => $q->when($mail !== null, fn ($q2) => $q2->orWhereRaw('lower(email) = ?', [$mail]))
+                ->when($tel !== null, fn ($q2) => $q2->orWhereRaw("right(regexp_replace(coalesce(telefono, ''), '\\D', '', 'g'), 9) = ?", [$tel])))
+            ->orderByDesc('id')->first();
+
+        if ($como === null && $lead !== null) {
+            $como = 'lead';
+            $cuentaId = $lead->cuenta_id;
+        }
+
+        if ($como === null) {
+            return null;
+        }
+
+        $leadAbierto = $lead !== null && in_array($lead->estado, ['nuevo', 'contactado'], true) ? $lead->id : null;
+        $oportunidadAbierta = null;
+
+        if ($cuentaId !== null) {
+            $oportunidadAbierta = DB::table('oportunidades as o')->join('estados as e', 'e.id', '=', 'o.estado_id')->where('o.cuenta_id', $cuentaId)
+                ->whereIn('e.codigo', ['prospecto', 'calificada', 'propuesta_enviada', 'negociacion'])->orderByDesc('o.id')->value('o.id');
+        }
+
+        return ['como' => $como, 'cuentaId' => $cuentaId === null ? null : (int) $cuentaId, 'leadAbierto' => $leadAbierto, 'oportunidadAbierta' => $oportunidadAbierta === null ? null : (int) $oportunidadAbierta];
+    }
+
+    /**
+     * Observación 9.9: la entrada única de un contacto que llega (formulario de campaña, landing, «+ Nuevo»). Nuevo: se
+     * crea el lead. Ya registrado: si tenía un lead abierto o una oportunidad abierta, no se duplica: se anota que
+     * también llegó por esta campaña (y en la oportunidad, en su historial de actividades); si no, el lead se crea
+     * marcado «ya registrado» y unido a su cuenta.
+     *
+     * @param  array<string, mixed>  $datos  columnas del lead (nombre_contacto, organizacion, telefono, email, ruc, mensaje, campania_id, canal_lead_id, origen_comercial_id…)
+     * @return array{lead: ?Lead, unido: bool, como: ?string}
+     */
+    public function llega(array $datos): array
+    {
+        $r = $this->reconocer($datos['telefono'] ?? null, $datos['email'] ?? null, $datos['ruc'] ?? null);
+
+        if ($r !== null && ($r['leadAbierto'] !== null || $r['oportunidadAbierta'] !== null)) {
+            $como = $r['oportunidadAbierta'] !== null ? 'oportunidad' : $r['como'];
+            DB::table('lead_llegadas')->insert(['lead_id' => $r['leadAbierto'], 'oportunidad_id' => $r['oportunidadAbierta'], 'cuenta_id' => $r['cuentaId'],
+                'campania_id' => $datos['campania_id'] ?? null, 'canal_lead_id' => $datos['canal_lead_id'] ?? null,
+                'nombre' => mb_substr((string) ($datos['nombre_contacto'] ?? 'Contacto'), 0, 150), 'organizacion' => $datos['organizacion'] ?? null, 'registrado_como' => $como, 'created_at' => now()]);
+
+            if ($r['oportunidadAbierta'] !== null && $r['cuentaId'] !== null) {
+                $campania = isset($datos['campania_id']) ? (string) DB::table('campanias')->where('id', $datos['campania_id'])->value('nombre') : null;
+                $canal = isset($datos['canal_lead_id']) ? (string) DB::table('canales_lead')->where('id', $datos['canal_lead_id'])->value('nombre') : null;
+                app(ActividadesService::class)->anotar($r['cuentaId'], $r['oportunidadAbierta'],
+                    mb_substr(($datos['nombre_contacto'] ?? 'El contacto').' llegó también por '.($campania ? "la campaña «{$campania}»" : "el canal {$canal}"), 0, 200), $datos['mensaje'] ?? null);
+            }
+
+            return ['lead' => null, 'unido' => true, 'como' => $como];
+        }
+
+        $lead = Lead::query()->create([...$datos, 'cuenta_id' => $datos['cuenta_id'] ?? $r['cuentaId'] ?? null, 'ya_registrado' => $r !== null, 'registrado_como' => $r['como'] ?? null, 'estado' => $datos['estado'] ?? 'nuevo']);
+
+        return ['lead' => $lead, 'unido' => false, 'como' => $r['como'] ?? null];
     }
 }

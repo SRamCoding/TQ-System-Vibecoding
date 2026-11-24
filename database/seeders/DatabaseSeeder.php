@@ -49,6 +49,7 @@ final class DatabaseSeeder extends Seeder
         $this->call(Demo\PostulacionCasosSeeder::class);
         $this->call(Demo\CampaniasCasosSeeder::class);
         $this->call(Demo\CanalesCasosSeeder::class);
+        $this->call(Demo\ContactosRegistradosSeeder::class);
         $this->call(Demo\MejorasOportunidadesSeeder::class);
         $this->call(Demo\BusquedaSeaceSeeder::class);
         $this->call(Demo\GanadoresCasosSeeder::class);

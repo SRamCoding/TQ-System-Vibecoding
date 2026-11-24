@@ -1247,3 +1247,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (núcleo: modo desarrollo; datos de demo de todos los módulos)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.8: el modo desarrollo y el interruptor «Datos de demo»»
+
+### MV-103 · 2026-11-24 · Campañas y Canales: contactos nuevos o ya registrados, y barras «N de X»
+
+- **Ficha:** `fichas/t1-campanias.md`
+- **Dijo Sebastián:** (observaciones-9, punto 9) «Contactos, sin barra: una línea «15 contactos llegaron · 11 nuevos · 4 ya registrados» … Se reconocen por mismo teléfono, mismo correo o mismo RUC … Un contacto ya registrado no se duplica: se une al que existe … Si ya tenía una oportunidad abierta, no se crea otra: se anota en su historial … Oportunidades, con barra … «3 de 15» … Ganadas … «1 de 3» … Al pasar el puntero por «ya registrados», la lista corta … «costo por contacto nuevo» al pasar el puntero».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (Campañas); el reconocimiento toca Directorio (contactos y cuentas)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.9: contactos nuevos o ya registrados y barras N de X»
