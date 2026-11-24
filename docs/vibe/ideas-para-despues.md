@@ -28,3 +28,9 @@ lee para dejar listos los puntos de extensión que cada pedido ya menciona.
 - **Logística de ferias:** stand, personal, materiales y pendientes, con su costo a la campaña.
 - **Comparar campañas** en un ranking para decidir dónde invertir el próximo año.
 - **Radar del PAC:** depende de lo que encuentre la investigación de la observación 7.6.
+
+## Canales
+
+- **Formularios de anuncios de Meta (Instagram y Facebook) y de TikTok** que entran solos como leads, con su canal y
+  campaña (necesitan conectar las cuentas de anuncios de Techquk). La entrada de leads de la observación 9.3 ya
+  sirve de punto de extensión.
