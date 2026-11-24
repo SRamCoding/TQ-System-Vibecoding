@@ -24,7 +24,15 @@ cp .env.example .env && php artisan key:generate
 php artisan migrate --seed
 npm install && npm run build
 php artisan serve --port=8001              # http://localhost:8001 · usuario dev@techquk.test (o el de tu .env), clave Clave-de-prueba1
+php artisan schedule:work                  # en otra terminal: la lectura del SEACE de cada hora
 ```
+
+**Modo desarrollo** (observación 9.8): necesita las tres llaves en el `.env`: `APP_ENV=local`, `APP_DEBUG=true` y
+`TECHQUK_MODO_DESARROLLO=true` (ya viene así en `.env.example`; **nunca** va al servidor). Si tu `.env` es anterior,
+agrégale la línea y corre `php artisan config:clear` (con la configuración en caché el cambio no se ve). Se prende en
+el menú de tu foto → «Modo desarrollo». En su barra, «Crear la base sin demo» (una vez; o `php artisan
+techquk:base-limpia`) y luego «Apagar / Encender los datos de demo»: con la demo apagada la sesión usa la base
+`techquk_limpia` (misma configuración, solo lo leído del OECE). La barra dice siempre en qué base estás.
 
 ## Traer los datos que ya tienes en la app original (opcional)
 

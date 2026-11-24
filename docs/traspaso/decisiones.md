@@ -1238,3 +1238,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (t1-licitaciones); toca los seeders de demo
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.7: Convocatorias solo con datos reales»
+
+### MV-102 · 2026-11-24 · El modo desarrollo se puede prender y el interruptor «Datos de demo» usa dos bases
+
+- **Ficha:** `fichas/t0-datos-demo.md`
+- **Dijo Sebastián:** (observaciones-9, punto 8) «deja TECHQUK_MODO_DESARROLLO=true sin comentar en .env.example … Interruptor «Datos de demo» en la barra de desarrollo … Apagados: el sistema se ve como quedaría en una instalación real … Vale para todo el sistema, sin excepción … No debe borrar nada ni obligar a reconstruir la base … Propón la forma antes de construirla … y espera mi elección». Eligió: «A, dos bases. Con una condición: la configuración se mantiene igual en las dos bases (parámetros como el margen mínimo, la configuración de la búsqueda del SEACE, catálogos, usuarios, permisos y mis preferencias). Si la cambio en una, se copia a la otra. Lo que sí queda separado son los datos de trabajo (oportunidades, proyectos, gastos, etc.). Y en la barra de desarrollo que siempre se vea en qué base estoy.»
+- **Decisión:** dos bases (la de siempre con la demo y `techquk_limpia`); la configuración se copia sola de una a otra; la barra muestra la base en uso.
+- **Alcance:** cruza módulos (núcleo: modo desarrollo; datos de demo de todos los módulos)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.8: el modo desarrollo y el interruptor «Datos de demo»»

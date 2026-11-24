@@ -59,6 +59,17 @@
         <button type="button" wire:click="elegirEstacion(null)" @if ($estacionElegida === null) aria-pressed="true" class="tq-dev-elegida" @endif>Por fecha</button>
     </span>
     <a href="{{ $vistaPrevia }}">Vista previa</a>
+    {{-- Observación 9.8: en qué base está la sesión, siempre a la vista, y el interruptor «Datos de demo». --}}
+    @php $demo = \App\Modules\Nucleo\Desarrollo\DatosDemo::encendidos(); $limpia = \App\Modules\Nucleo\Desarrollo\DatosDemo::limpiaLista(); @endphp
+    <span class="tq-dev-base" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.1rem 0.6rem; border-radius: 999px; font-weight: 700; {{ $demo ? 'background: rgb(255 255 255 / 0.14)' : 'color: #3f2a00; background: '.\App\Modules\Nucleo\Navegacion\ColoresMarca::DORADO_OSCURO }}"
+        title="Base: {{ \App\Modules\Nucleo\Desarrollo\DatosDemo::nombreBase() }}">
+        Demo: {{ $demo ? 'encendido' : 'apagado' }} · base {{ \App\Modules\Nucleo\Desarrollo\DatosDemo::nombreBase() }}
+    </span>
+    @if ($limpia)
+        <button type="button" wire:click="alternarDemo">{{ $demo ? 'Apagar los datos de demo' : 'Encender los datos de demo' }}</button>
+    @else
+        <button type="button" wire:click="crearBaseLimpia" wire:loading.attr="disabled" title="Crea la base sin datos de demo (tarda unos segundos)"><span wire:loading.remove wire:target="crearBaseLimpia">Crear la base sin demo</span><span wire:loading wire:target="crearBaseLimpia">Creando…</span></button>
+    @endif
     <button type="button" wire:click="apagar">Apagar</button>
     @include('nucleo::filament.desarrollo.selector', ['abierta' => $abierta, 'elegida' => $elegida])
 </div>

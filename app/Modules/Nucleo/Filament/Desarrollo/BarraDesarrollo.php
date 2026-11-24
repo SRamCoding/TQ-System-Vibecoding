@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Nucleo\Filament\Desarrollo;
 
+use App\Modules\Nucleo\Desarrollo\BasesDeDatos;
+use App\Modules\Nucleo\Desarrollo\DatosDemo;
 use App\Modules\Nucleo\Desarrollo\ModoDesarrollo;
 use App\Modules\Nucleo\Desarrollo\Piezas\EstacionDelInicio;
 use App\Modules\Nucleo\Desarrollo\Piezas\GranMomentoDeFecha;
@@ -116,6 +118,20 @@ final class BarraDesarrollo extends Component
         }
 
         ModoDesarrollo::elegir(EstacionDelInicio::CLAVE, $estacion);
+        $this->recargar();
+    }
+
+    /** Observación 9.8: «Datos de demo» encendidos o apagados (cambia la base de la sesión; no borra nada). */
+    public function alternarDemo(): void
+    {
+        DatosDemo::encendidos() ? DatosDemo::apagar() : DatosDemo::prender();
+        $this->js('window.location.href = "/"');
+    }
+
+    /** Observación 9.8: crea (o rehace) la base limpia, con la misma configuración y lo real del OECE. */
+    public function crearBaseLimpia(): void
+    {
+        app(BasesDeDatos::class)->crearLimpia();
         $this->recargar();
     }
 

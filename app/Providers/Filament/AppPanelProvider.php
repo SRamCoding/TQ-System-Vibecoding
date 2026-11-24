@@ -24,6 +24,7 @@ use App\Modules\Nucleo\Http\Controllers\MostrarFoto;
 use App\Modules\Nucleo\Http\Controllers\MostrarImagen;
 use App\Modules\Nucleo\Http\ExigirClaveRenovada;
 use App\Modules\Nucleo\Http\ExigirGerenteGeneral;
+use App\Modules\Nucleo\Http\UsarBaseDeDatos;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Navegacion\BarraLateral;
 use App\Modules\Nucleo\Navegacion\ClimaDelEntorno;
@@ -174,6 +175,8 @@ final class AppPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                // Observación 9.8: la base de la sesión (datos de demo encendidos o apagados), antes de leer al usuario.
+                UsarBaseDeDatos::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,

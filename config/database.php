@@ -103,6 +103,23 @@ return [
             'timezone' => env('DB_TIMEZONE', env('APP_TIMEZONE', 'America/Lima')),
         ],
 
+        // Observación 9.8 (MV-102): la base limpia del interruptor «Datos de demo» del modo desarrollo: la misma
+        // configuración que la de demo (se copia sola), sin nada inventado; solo lo leído del OECE.
+        'pgsql_limpia' => [
+            'driver' => 'pgsql',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'database' => env('DB_DATABASE_LIMPIA', env('DB_DATABASE', 'laravel').'_limpia'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'timezone' => env('DB_TIMEZONE', env('APP_TIMEZONE', 'America/Lima')),
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

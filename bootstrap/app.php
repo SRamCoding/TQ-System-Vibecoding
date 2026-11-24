@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Nucleo\Http\UsarBaseDeDatos;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Observación 9.3: la entrada de la landing llega de otro sitio; la protegen su clave, la trampa y el límite.
         $middleware->validateCsrfTokens(except: ['entrada/leads']);
+        // Observación 9.8: el interruptor «Datos de demo» elige la base de la petición (después de la sesión).
+        $middleware->web(append: [UsarBaseDeDatos::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Regla 10 (plan 1.3b): un QueryException trae el SQL con sus valores y el DETAIL de PostgreSQL (nombres,

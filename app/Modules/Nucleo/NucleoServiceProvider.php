@@ -383,9 +383,11 @@ use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Client\Factory as Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -1258,6 +1260,21 @@ final class NucleoServiceProvider extends ServiceProvider
      */
     private function registrarMacroAuditoria(): void
     {
+        // Observación 9.8: «migrate» también migra la base sin datos de demo, si existe (solo en local).
+        Event::listen(MigrationsEnded::class, function (): void {
+            static $migrando = false;
+
+            if ($migrando || ! $this->app->environment('local') || ! $this->app->runningInConsole() || ! Desarrollo\DatosDemo::limpiaLista()
+                || in_array(Desarrollo\DatosDemo::CONEXION_LIMPIA, (array) ($_SERVER['argv'] ?? []), true) || str_contains(implode(' ', (array) ($_SERVER['argv'] ?? [])), 'pgsql_limpia')
+                || str_contains(implode(' ', (array) ($_SERVER['argv'] ?? [])), 'base-limpia')) {
+                return;
+            }
+
+            $migrando = true;
+            Artisan::call('migrate', ['--database' => Desarrollo\DatosDemo::CONEXION_LIMPIA, '--force' => true]);
+            $migrando = false;
+        });
+
         Blueprint::macro('auditoria', function (): void {
             /** @var Blueprint $this */
             $this->foreignId('created_by')->index()->constrained('users');

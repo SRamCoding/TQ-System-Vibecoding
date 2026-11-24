@@ -1,7 +1,7 @@
 # Ficha · Datos de demostración
 
 - **Estado:** aprobada (MV-009)
-- **Versión:** v4
+- **Versión:** v5
 - **Tramo de la ruta:** T0
 - **Aprobada (v4):** 2026-11-20 · etiqueta `aprobado/t0-datos-demo-v4`
 - **Aprobada (v3):** 2026-11-19 · etiqueta `aprobado/t0-datos-demo-v3`
@@ -21,6 +21,8 @@ sistema) vea cada pantalla con datos sin cargar nada a mano.
 
 ## Decisiones de Sebastián
 
+- **MV-102** (cruza módulos) · «Datos de demo» apagados = la sesión usa la base limpia (`techquk_limpia`): misma configuración (copiada en los dos sentidos), sin datos de trabajo inventados, con lo real del OECE. La barra de desarrollo dice siempre «Demo: encendido/apagado · base …».
+
 - **MV-001** (ficha) · La cartera son los nueve proyectos del plan viejo tal cual: montos, partidas, márgenes, fechas
   2024–2026 y estados.
 - **MV-002** (ficha) · El hospital es inventado («Hospital Regional de Valle Norte»): ningún nombre real en la demo.
@@ -31,6 +33,8 @@ sistema) vea cada pantalla con datos sin cargar nada a mano.
   distintos estados.
 
 ## Pantallas y navegación
+
+- **Barra de desarrollo** (MV-102): «Demo: encendido · base techquk» o «Demo: apagado · base techquk_limpia» (en dorado), y «Apagar / Encender los datos de demo»; si la base limpia no existe, «Crear la base sin demo». Al cambiar, vuelve al Inicio.
 
 No agrega pantallas: llena las existentes. Para recorrerlo (con `php artisan serve --port=8001`):
 
@@ -78,6 +82,8 @@ No agrega estados. Recorre los existentes:
 
 ## Reglas y números
 
+- **Dos bases** (MV-102): la sesión sigue en la base de siempre; después de la sesión, la petición usa la base que diga el interruptor. Configuración = los 22 catálogos, usuarios (con sus personas y la ficha de la empresa y sus sedes), unidades y puestos, roles y permisos, parámetros, preferencias y estado de la interfaz, aplicaciones del muelle, motivos, estados y transiciones, reglas de aprobación, la búsqueda del SEACE (líneas, rubros, sugerencias, historial). Al terminar cada petición que cambia algo se compara la huella de esas tablas y las que cambiaron se copian enteras a la otra base (≈ 80 ms). `seace:leer` lee el OECE en las dos; `php artisan migrate` migra las dos; `techquk:base-limpia` crea o rehace la limpia.
+
 **Lo vendido** de un proyecto (mientras no exista Contratos) es el total sin IGV de la cotización aceptada de la
 oportunidad de la que nació (ficha `t1-puente-erp`). **Margen
 previsto** = vendido − presupuestado; **margen proyectado** = vendido − proyección al cierre (cálculo que ya existía).
@@ -106,6 +112,8 @@ La cartera (soles; «presupuestado» es el del árbol: costo directo + gastos ge
 
 ## Supuestos sin confirmar
 
+- **Base limpia nace de la de demo:** sus convocatorias reales llegan sin responsable ni licitación (las registradas vuelven a «nueva»).
+
 - **Nombres sin santos:** «Santa Rosa del Valle» del plan viejo se cambió por «Los Laureles» (P3) por la regla de no
   usar santos; el proyecto P3 se llama «… Municipalidad de Los Laureles».
 - **La aprobación por margen** se arma como en el plan viejo (D5): unidad «Gerencia General», puesto ocupado por el
@@ -118,6 +126,9 @@ La cartera (soles; «presupuestado» es el del árbol: costo directo + gastos ge
 - Los contactos decisores, proveedores de los gastos y cargos son inventados.
 
 ## Atajos tomados
+
+- **Copia de configuración** con las claves foráneas apagadas en la sesión (`session_replication_role = replica`, usuario de Postgres con permiso de superusuario) y la tabla entera reemplazada; si se crea lo mismo en las dos bases a la vez, gana la última.
+- **Cola de trabajos:** lo que se encola con la demo apagada (IA) queda en la base limpia y el trabajador de la otra no lo ve.
 
 - **Gasto de demostración** (`gastos_demo`): documento sin estados, sin permisos, sin pantalla y sin numeración del
   núcleo (el número sale del id). Solo lo usa el seeder. En el repo original no existe: el costo entra por órdenes,
@@ -133,6 +144,8 @@ La cartera (soles; «presupuestado» es el del árbol: costo directo + gastos ge
   `database/migrations/2026_11_19_000001_crear_gastos_demo.php` del módulo.
 
 ## Cambios desde la versión anterior
+
+- **MV-102:** interruptor «Datos de demo» con dos bases.
 
 v2 (2026-11-19), por la ficha `t1-puente-erp` (MV-006 a MV-008):
 
