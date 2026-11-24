@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Oportunidades\Filament;
 
+use App\Modules\Crm\Campanias\Filament\Resources\Leads\LeadResource;
+use App\Modules\Crm\Licitaciones\Filament\Resources\Licitaciones\LicitacionResource;
+use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\VerOportunidad;
+use App\Modules\Crm\Oportunidades\Services\ResumenOportunidad;
+use Filament\Actions\ActionGroup;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\View;
 use Livewire\Attributes\Locked;
 
@@ -50,5 +56,26 @@ trait MuestraLasVistas
             'pestanas' => VistasDeOportunidades::pestanas(static::vista()),
             'cifras' => $this->cifras,
         ]);
+    }
+
+    /**
+     * Observación 9.2: un solo botón «+ Nuevo» en las vistas de Oportunidades, con lo que hoy eran dos botones:
+     * la oportunidad (entra como Prospecto), el contacto por calificar (un lead) y la licitación a mano.
+     */
+    protected function getHeaderActions(): array
+    {
+        return [
+            ActionGroup::make([
+                PanelesOportunidad::nueva(null, function (mixed $resultado): void {
+                    Notification::make()->success()->title('Oportunidad creada.')->send();
+
+                    if ($resultado instanceof ResumenOportunidad) {
+                        $this->redirect(VerOportunidad::getUrl(['record' => $resultado->id]), navigate: true);
+                    }
+                })->label('Oportunidad')->icon('heroicon-o-briefcase'),
+                LeadResource::accionNuevo()->label('Contacto por calificar')->icon('heroicon-o-user-plus'),
+                LicitacionResource::accionRegistrar()->label('Licitación a mano')->icon('heroicon-o-building-library'),
+            ])->label('Nuevo')->icon('heroicon-o-plus')->button()->color('primary')->dropdownPlacement('bottom-end'),
+        ];
     }
 }

@@ -9,7 +9,6 @@ use App\Modules\Crm\Oportunidades\Enums\TallaDeGema;
 use App\Modules\Crm\Oportunidades\Filament\DecideLoPorCalificar;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLaFicha;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLasVistas;
-use App\Modules\Crm\Oportunidades\Filament\PanelesOportunidad;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\OportunidadResource;
 use App\Modules\Crm\Oportunidades\Filament\VistasDeOportunidades;
 use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
@@ -17,7 +16,6 @@ use App\Modules\Crm\Oportunidades\Services\FiltrosOportunidades;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
 use App\Modules\Crm\Oportunidades\Services\ProximaAccionDeOportunidades;
-use App\Modules\Crm\Oportunidades\Services\ResumenOportunidad;
 use App\Modules\Crm\Oportunidades\Services\TableroDeBotonera;
 use App\Modules\Crm\Oportunidades\Services\TableroDeGemas;
 use App\Modules\Nucleo\Excepciones\ErrorDeNegocio;
@@ -276,19 +274,6 @@ final class TableroOportunidades extends Page
     /**
      * @return list<Action>
      */
-    protected function getHeaderActions(): array
-    {
-        return [
-            PanelesOportunidad::nueva(null, function (mixed $resultado): void {
-                Notification::make()->success()->title('Oportunidad creada.')->send();
-
-                if ($resultado instanceof ResumenOportunidad) {
-                    $this->redirect(VerOportunidad::getUrl(['record' => $resultado->id]), navigate: true);
-                }
-            }),
-        ];
-    }
-
     public function content(Schema $schema): Schema
     {
         return $schema->components([

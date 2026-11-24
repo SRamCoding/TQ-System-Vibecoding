@@ -1184,3 +1184,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (Oportunidades; Convocatorias del SEACE)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.1: el ancho normal de Proyectos»
+
+### MV-096 · 2026-11-24 · Un solo botón «+ Nuevo» en Oportunidades
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-9, punto 2) «Se juntan en un solo botón «+ Nuevo» con menú: Oportunidad (la principal) … Contacto por calificar … Licitación a mano … Lo que hace cada opción no cambia. Igual en las tres vistas de Oportunidades».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (Oportunidades)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.2: un solo botón «+ Nuevo»»

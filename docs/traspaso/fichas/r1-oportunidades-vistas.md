@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v10
+- **Versión:** v11
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -14,6 +14,8 @@ pestañas de portada: los leads y las licitaciones por decidir son la primera et
 misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Decisiones de Sebastián
+
+- **MV-096** (ficha) · Un solo botón «+ Nuevo» (Oportunidad · Contacto por calificar · Licitación a mano) en Mis oportunidades, Embudo y Línea de tiempo; reemplaza «Nueva oportunidad» y el menú «Por calificar».
 
 - **MV-095** (ficha) · Mis oportunidades, Embudo y Convocatorias usan el ancho normal de las páginas (como Proyectos); Línea de tiempo y Campañas siguen a todo lo ancho, con paso suave entre anchos.
 
@@ -33,6 +35,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 - **MV-057** (ficha) · Mis oportunidades por defecto; Embudo de oportunidades; sin Lista ni Faja 3D.
 
 ## Pantallas y navegación
+
+- **«+ Nuevo»** (v11, MV-096): botón principal a la derecha de las pestañas de las vistas; menú con Oportunidad (panel de Nueva oportunidad, entra como Prospecto), Contacto por calificar (el panel de Nuevo lead) y Licitación a mano (el panel de Registrar convocatoria).
 
 - **v9 · Cabecera de las vistas** (MV-083): ninguna de las tres vistas muestra título de página (tampoco al entrar por enlace ni al navegar sin recargar). Los botones de la página («+ Nueva oportunidad» y, en Mis oportunidades, «Por calificar») van a la derecha en la fila de las pestañas de vistas; la Línea de tiempo también tiene «+ Nueva oportunidad». En pantallas angostas, arriba de las pestañas.
 
@@ -177,6 +181,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v11** (MV-096): un solo botón «+ Nuevo».
 
 - **v10** (MV-095): ancho normal en Mis oportunidades y Embudo.
 

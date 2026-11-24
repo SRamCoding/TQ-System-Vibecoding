@@ -13,7 +13,6 @@ use App\Modules\Crm\Oportunidades\Filament\DecideLoPorCalificar;
 use App\Modules\Crm\Oportunidades\Filament\DibujoDeLinea;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLaFicha;
 use App\Modules\Crm\Oportunidades\Filament\MuestraLasVistas;
-use App\Modules\Crm\Oportunidades\Filament\PanelesOportunidad;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\OportunidadResource;
 use App\Modules\Crm\Oportunidades\Filament\VistasDeOportunidades;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
@@ -21,12 +20,9 @@ use App\Modules\Crm\Oportunidades\OportunidadesServiceProvider;
 use App\Modules\Crm\Oportunidades\Services\FiltrosOportunidades;
 use App\Modules\Crm\Oportunidades\Services\FotoOportunidadService;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
-use App\Modules\Crm\Oportunidades\Services\ResumenOportunidad;
 use App\Modules\Nucleo\Models\LineaSolucion;
 use App\Modules\Nucleo\Services\EstadoInterfazService;
 use Carbon\CarbonImmutable;
-use Filament\Actions\ActionGroup;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
@@ -208,23 +204,6 @@ final class TarjetasOportunidades extends Page
         };
 
         return ['texto' => "{$hito['etapa']} {$cuando}", 'urgente' => $d < self::DIAS_URGENTE, 'titulo' => $hito['etapa'].': '.$hito['fecha']->format('d/m/Y')];
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            PanelesOportunidad::nueva(null, function (mixed $resultado): void {
-                Notification::make()->success()->title('Oportunidad creada.')->send();
-
-                if ($resultado instanceof ResumenOportunidad) {
-                    $this->redirect(VerOportunidad::getUrl(['record' => $resultado->id]), navigate: true);
-                }
-            }),
-            ActionGroup::make([
-                LeadResource::accionNuevo(),
-                LicitacionResource::accionRegistrar(),
-            ])->label('Por calificar')->icon('heroicon-o-inbox-arrow-down')->button()->color('gray'),
-        ];
     }
 
     /** @return array<string, mixed> lo que dibuja una tarjeta */
