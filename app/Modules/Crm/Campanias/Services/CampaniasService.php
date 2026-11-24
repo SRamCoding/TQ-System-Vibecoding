@@ -7,6 +7,7 @@ namespace App\Modules\Crm\Campanias\Services;
 use App\Modules\Crm\Actividades\Services\ActividadesService;
 use App\Modules\Crm\Campanias\Models\Campania;
 use App\Modules\Crm\Campanias\Models\Lead;
+use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
 use App\Modules\Erp\Presupuestos\Services\DineroDelProyecto;
 use App\Modules\Erp\Presupuestos\Services\PresupuestoEmpresaService;
 use App\Modules\Erp\Proyectos\Services\VentaDelProyecto;
@@ -14,6 +15,7 @@ use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -133,13 +135,115 @@ final readonly class CampaniasService
     }
 
     /** Un gasto real: gasto directo del centro de costo Comercial, vinculado a la campaña. */
-    public function registrarGasto(int $campaniaId, ?int $sedeId, CarbonImmutable $fecha, string $monto, string $descripcion, string $proveedor, ?string $motivo): void
+    public function registrarGasto(int $campaniaId, ?int $sedeId, CarbonImmutable $fecha, string $monto, string $descripcion, string $proveedor, ?string $motivo, ?int $centroCostoId = null, ?string $comprobante = null): void
     {
-        DB::transaction(function () use ($campaniaId, $sedeId, $fecha, $monto, $descripcion, $proveedor, $motivo): void {
-            $centro = (int) DB::table('centros_costo')->where('codigo', self::CENTRO_COSTO)->value('id');
+        DB::transaction(function () use ($campaniaId, $sedeId, $fecha, $monto, $descripcion, $proveedor, $motivo, $centroCostoId, $comprobante): void {
+            // Observación 9.10: el centro de costo que eligió el selector de imputación (por omisión, Comercial).
+            $centro = $centroCostoId ?? (int) DB::table('centros_costo')->where('codigo', self::CENTRO_COSTO)->value('id');
             $gasto = app(PresupuestoEmpresaService::class)->gastoDirecto($sedeId, self::RUBRO, $centro, $fecha, $monto, $monto, $descripcion, $proveedor, $motivo);
-            DB::table('campania_gastos')->insert(['campania_id' => $campaniaId, 'gasto_id' => $gasto->id, 'created_at' => now(), 'updated_at' => now()]);
+            DB::table('campania_gastos')->insert(['campania_id' => $campaniaId, 'gasto_id' => $gasto->id, 'comprobante_ruta' => $comprobante, 'registrado_por' => auth()->id(), 'created_at' => now(), 'updated_at' => now()]);
         });
+    }
+
+    /** Observación 9.10: planificada (antes de empezar), en curso o terminada (pasó su fin o se desactivó). */
+    public function estado(Campania $c): string
+    {
+        $hoy = Calendario::hoy();
+
+        return match (true) {
+            ! $c->es_activa || ($c->hasta !== null && $c->hasta->toDateString() < $hoy) => 'terminada',
+            $c->desde !== null && $c->desde->toDateString() > $hoy => 'planificada',
+            default => 'en_curso',
+        };
+    }
+
+    /**
+     * Observación 9.10: todos los que llegaron (leads y llegadas unidas), con nuevo o ya registrado, a quién se unió,
+     * fecha y en qué quedó.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function contactosLista(int $campaniaId): array
+    {
+        $partyDe = DB::table('cuentas')->pluck('party_id', 'id');
+        $leads = Lead::query()->where('campania_id', $campaniaId)->orderByDesc('created_at')->get()->map(fn (Lead $l): array => [
+            'nombre' => $l->nombre_contacto, 'organizacion' => $l->organizacion, 'telefono' => $l->telefono, 'email' => $l->email, 'fecha' => $l->created_at->format('d/m/Y'),
+            'nuevo' => ! $l->ya_registrado, 'como' => $l->ya_registrado ? (LeadsService::REGISTRADO_COMO[$l->registrado_como] ?? 'ya registrado') : null,
+            'quedo' => $l->oportunidad_id !== null ? 'oportunidad' : ($l->estado === 'descartado' ? 'descartado' : 'por calificar'),
+            'url' => $l->oportunidad_id !== null ? '/oportunidades/'.$l->oportunidad_id : ($l->cuenta_id !== null && isset($partyDe[$l->cuenta_id]) ? '/personas/'.$partyDe[$l->cuenta_id] : '/oportunidades?etapa[0]=por_calificar&q='.urlencode($l->nombre_contacto)),
+        ]);
+        $llegadas = DB::table('lead_llegadas')->where('campania_id', $campaniaId)->orderByDesc('created_at')->get()->map(fn (object $l): array => [
+            'nombre' => $l->nombre, 'organizacion' => $l->organizacion, 'telefono' => null, 'email' => null, 'fecha' => CarbonImmutable::parse($l->created_at)->format('d/m/Y'),
+            'nuevo' => false, 'como' => (LeadsService::REGISTRADO_COMO[$l->registrado_como] ?? 'ya registrado').' (se unió, sin duplicar)',
+            'quedo' => $l->oportunidad_id !== null ? 'oportunidad' : 'por calificar',
+            'url' => $l->oportunidad_id !== null ? '/oportunidades/'.$l->oportunidad_id : ($l->cuenta_id !== null && isset($partyDe[$l->cuenta_id]) ? '/personas/'.$partyDe[$l->cuenta_id] : null),
+        ]);
+
+        return $leads->concat($llegadas)->values()->all();
+    }
+
+    /**
+     * Observación 9.10: las oportunidades nacidas de la campaña (o solo las ganadas), con etapa, monto, margen y responsable.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function oportunidadesLista(int $campaniaId, bool $soloGanadas = false): array
+    {
+        $ids = Lead::query()->where('campania_id', $campaniaId)->whereNotNull('oportunidad_id')->pluck('oportunidad_id')->all();
+        $ops = DB::table('oportunidades as o')->join('estados as e', 'e.id', '=', 'o.estado_id')->leftJoin('users as u', 'u.id', '=', 'o.ejecutivo_user_id')
+            ->whereIn('o.id', $ids ?: [0])->when($soloGanadas, fn ($q) => $q->where('e.codigo', 'ganada'))->orderByDesc('o.monto_estimado')
+            ->get(['o.id', 'o.nombre', 'o.monto_estimado', 'e.codigo', 'e.nombre as etapa', 'u.name as responsable']);
+        $previstos = app(PortadaOportunidades::class)->margenes($ops->pluck('id')->all());
+
+        return $ops->map(function (object $o) use ($previstos): array {
+            $m = $o->codigo === 'ganada' ? $this->margenDeOportunidad((int) $o->id) : ['monto' => $previstos[$o->id]['monto'] ?? null, 'previsto' => true];
+
+            return ['id' => (int) $o->id, 'nombre' => $o->nombre, 'etapa' => $o->etapa, 'codigo' => $o->codigo, 'monto' => (string) $o->monto_estimado,
+                'margen' => $m['monto'], 'margenPrevisto' => $m['previsto'], 'responsable' => $o->responsable, 'url' => '/oportunidades/'.$o->id];
+        })->values()->all();
+    }
+
+    /**
+     * Observación 9.10: cada gasto con fecha, concepto, monto, imputación y comprobante, y la suma contra el presupuesto.
+     *
+     * @return array{gastos: list<array<string, mixed>>, total: string, presupuesto: string, queda: string, sePaso: bool}
+     */
+    public function gastosLista(int $campaniaId): array
+    {
+        $c = Campania::query()->findOrFail($campaniaId);
+        $gastos = DB::table('campania_gastos as cg')->join('gastos_demo as g', 'g.id', '=', 'cg.gasto_id')->leftJoin('centros_costo as cc', 'cc.id', '=', 'g.centro_costo_id')
+            ->where('cg.campania_id', $campaniaId)->orderByDesc('g.fecha')->orderByDesc('g.id')
+            ->get(['g.numero', 'g.fecha', 'g.descripcion', 'g.proveedor', 'g.monto', 'g.rubro', 'cc.codigo as centro', 'cc.nombre as centro_nombre', 'cg.comprobante_ruta'])
+            ->map(fn (object $g): array => ['numero' => $g->numero, 'fecha' => CarbonImmutable::parse($g->fecha)->format('d/m/Y'), 'concepto' => $g->descripcion, 'proveedor' => $g->proveedor,
+                'monto' => (string) $g->monto, 'imputacion' => 'Gasto directo · '.($g->centro_nombre ?? $g->centro).' · '.$g->rubro,
+                'comprobante' => $g->comprobante_ruta === null ? null : Storage::disk('public')->url($g->comprobante_ruta)])->values()->all();
+        $total = bcadd((string) array_reduce($gastos, fn (string $t, array $g): string => bcadd($t, $g['monto'], 2), '0'), '0', 2);
+        $presupuesto = $c->presupuesto === null ? '0.00' : (string) $c->presupuesto;
+
+        return ['gastos' => $gastos, 'total' => $total, 'presupuesto' => $presupuesto, 'queda' => bcsub($presupuesto, $total, 2), 'sePaso' => bccomp($total, $presupuesto, 2) > 0 && bccomp($presupuesto, '0', 2) > 0];
+    }
+
+    /**
+     * Observación 9.10: la actividad de la campaña: quién la creó, la editó y registró gastos.
+     *
+     * @return list<array{cuando: string, texto: string}>
+     */
+    public function actividad(Campania $c): array
+    {
+        $nombre = fn (?int $id): string => $id === null ? 'El sistema' : (string) (DB::table('users')->where('id', $id)->value('name') ?? 'Alguien');
+        $items = [['t' => $c->created_at, 'texto' => $nombre($c->created_by).' creó la campaña']];
+
+        if ($c->updated_at !== null && $c->updated_by !== null && $c->updated_at->gt($c->created_at)) {
+            $items[] = ['t' => $c->updated_at, 'texto' => $nombre($c->updated_by).' la editó'];
+        }
+
+        foreach (DB::table('campania_gastos as cg')->join('gastos_demo as g', 'g.id', '=', 'cg.gasto_id')->where('cg.campania_id', $c->id)->get(['cg.created_at', 'cg.registrado_por', 'g.created_by', 'g.descripcion', 'g.monto']) as $g) {
+            $items[] = ['t' => CarbonImmutable::parse($g->created_at), 'texto' => $nombre($g->registrado_por ?? $g->created_by).' registró el gasto «'.$g->descripcion.'» por S/ '.number_format((float) $g->monto, 2)];
+        }
+
+        usort($items, fn (array $a, array $b): int => $b['t'] <=> $a['t']);
+
+        return array_map(fn (array $i): array => ['cuando' => CarbonImmutable::parse($i['t'])->setTimezone('America/Lima')->format('d/m/Y H:i'), 'texto' => $i['texto']], $items);
     }
 
     /** El enlace público del formulario (se crea la primera vez). */

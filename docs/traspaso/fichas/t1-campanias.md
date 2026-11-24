@@ -1,7 +1,7 @@
 # Ficha · Campañas y leads (CRM-07)
 
-- **Estado:** en curso (v6, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v6
+- **Estado:** en curso (v7, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v7
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-campanias-v1`
 - **Fuentes del diseño (v3):** `docs/vibe/pedidos/observaciones-7.md` (punto 6) y `lienzos/campanias/` (`Main.dc.html`,
@@ -20,6 +20,8 @@ módulo es el último del CRM.
 
 ## Decisiones de Sebastián
 
+- **MV-104** (ficha) · Clic en la tarjeta abre la ficha de la campaña (cabecera, cifras en grande, pestañas Contactos · Oportunidades · Gastos · Seguimiento · Actividad); los atajos de la tarjeta y «Registrar gasto» se abren en una ventana al medio.
+
 - **MV-103** (ficha) · Cada contacto que llega es nuevo o ya registrado (teléfono, correo o RUC); el ya registrado no se duplica. Tarjetas de Campañas y Canales: contactos sin barra, oportunidades «N de X» y ganadas «N de X» con barra.
 
 - **MV-098** (ficha) · Sección «Canales» en Campañas: una tarjeta por canal con leads, calificados, ganados, ganado, margen, gasto, costo por lead y retorno del periodo (mes, trimestre o año); clic lleva a Mis oportunidades filtrado por Por calificar y ese canal.
@@ -35,6 +37,10 @@ módulo es el último del CRM.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **Ficha de la campaña** (v7, MV-104): «← Volver a Campañas» (a la sección donde se estaba); cabecera con nombre, estado (planificada, en curso, terminada), tipo, canal con ícono, fechas, responsable, objetivo y el retorno; botones Formulario y QR, Registrar gasto, Editar. Cifras: invertido / presupuesto, contactos (nuevos y ya registrados), oportunidades (N de X), ganadas y ganado, margen, costo por contacto y por contacto nuevo. Pestañas: Contactos (nombre, organización, teléfono, correo, nuevo o ya registrado y qué era, fecha, en qué quedó; clic abre su oportunidad o su ficha de persona), Oportunidades (etapa con su gema, monto, margen, responsable), Gastos (fecha, concepto, imputación, comprobante, monto; gastado, presupuesto y lo que queda o se pasó), Seguimiento (campañas a clientes) y Actividad (quién creó, editó y registró gastos).
+- **Tarjeta** (v7): «N contactos llegaron», «3 de 15», «1 de 3» y «Gastado / presupuesto» son enlaces (subrayados al pasar el puntero) que abren su lista en una ventana al medio («Oportunidades de Expo Seguridad Norte · 3»; × o Esc cierran); clic en el resto de la tarjeta abre la ficha. «Ver contactos» abre el atajo de contactos.
+- **Registrar gasto** (v7): ventana al medio con fecha, concepto, monto, proveedor, sede, comprobante (PDF o imagen, opcional), el selector de imputación (por omisión, gasto directo sin proyecto · centro de costo Comercial) y motivo del exceso. Al guardar, la tarjeta y la ficha se redibujan sin recargar.
 
 - **Embudo de la tarjeta** (v6, MV-103): «15 contactos llegaron · 11 nuevos · 4 ya registrados» (al pasar el puntero por «ya registrados», la lista con nombre y qué era: ya era cliente, contacto de un cliente, ya había escrito antes, ya tenía una oportunidad abierta); «Oportunidades» con barra y «3 de 15»; «Ganadas» con barra y «1 de 3». En Canales, igual con «Calificados». Al pasar el puntero por «Gastado», el costo por contacto nuevo. Al registrar un contacto con «+ Nuevo», el aviso dice si ya lo conocíamos.
 
@@ -130,6 +136,9 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Supuestos sin confirmar
 
+- **v7 · Imputación de una campaña:** solo gasto directo a un centro de costo (si se elige «Proyecto › partida», avisa y no guarda).
+- **v7 · Actividad** se arma con la creación, la última edición y los gastos registrados (sin la bitácora campo por campo).
+
 - **v6 · Oportunidades de la campaña:** solo las que nacieron de sus leads; una llegada a una oportunidad que ya existía cuenta como contacto ya registrado, no como oportunidad nueva.
 - **v6 · Demo:** en la feria, 5 clientes ya conocidos y 3 contactos con oportunidad abierta; en Facebook, 3 que ya habían escrito.
 
@@ -157,6 +166,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Atajos tomados
 
+- **v7 · Comprobante** guardado en el disco público (`campanias/comprobantes`) con su ruta en `campania_gastos`, sin pasar por los adjuntos del núcleo.
+
 - **v6 · Reconocimiento** con consultas directas a las tablas de contactos y cuentas desde el servicio de leads (sin pasar por los servicios del Directorio).
 
 - **v5 · Canales se calcula al mirar** recorriendo los leads del periodo y el margen de cada ganada (sin consulta agregada ni caché).
@@ -179,6 +190,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 `Filament/Resources/Leads` y `Filament/Resources/Campanias`); datos en `DemoSeeder::campanias()`.
 
 ## Cambios desde la versión anterior
+
+- **v7** (MV-104): ficha de la campaña, atajos y gasto al medio.
 
 - **v6** (MV-103): contactos nuevos o ya registrados y barras N de X.
 

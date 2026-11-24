@@ -32,6 +32,8 @@
         .tq-camp-embudo .barra span { display: block; height: 10px; border-radius: 99px; background: var(--c-turquesa); }
         .tq-camp-llegaron { font-size: 13px; }
         .tq-camp-llegaron b { font-size: 15px; }
+        .tq-camp-atajo { cursor: pointer; border-radius: 4px; }
+        .tq-camp-atajo:hover, .tq-camp-atajo:focus-visible { text-decoration: underline; text-underline-offset: 3px; color: var(--c-azul); outline: none; }
         .tq-camp-ya { text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
         .tq-camp-fila { display: flex; justify-content: space-between; font-size: 13px; font-variant-numeric: tabular-nums; }
         .tq-camp-fila span:first-child { color: var(--c-suave); }
@@ -60,15 +62,17 @@
         <div class="tq-camp-grid">
             @foreach ($retorno['tarjetas'] as $t)
                 @php $max = max(1, $t['contactos']); @endphp
-                <article class="tq-camp-card tq-camp-tarjeta" wire:key="camp-{{ $t['id'] }}">
+                {{-- Observación 9.10: clic en la tarjeta → su ficha; los atajos (enlaces) abren su ventana al medio. --}}
+                <article class="tq-camp-card tq-camp-tarjeta" wire:key="camp-{{ $t['id'] }}" style="cursor: pointer"
+                    x-on:click="if (! $event.target.closest('a, button, [data-atajo], input')) Livewire.navigate({{ \Illuminate\Support\Js::from(\App\Modules\Crm\Campanias\Filament\Resources\Campanias\Pages\VerCampania::getUrl(['record' => $t['id']])) }})">
                     <div style="display: flex; align-items: center; gap: 8px">
                         <div style="flex: 1; min-width: 0"><div style="font-weight: 700">{{ $t['nombre'] }}</div><span class="tq-camp-tag">{{ $t['tipo'] }}</span></div>
                         <div style="text-align: right"><div style="font-size: 11px; color: var(--c-suave)">Retorno</div>
                             <div style="font-size: 20px; font-weight: 700; color: {{ $t['retorno'] === null ? 'var(--c-suave)' : ((float) $t['retorno'] >= 1 ? 'var(--c-verde)' : 'var(--c-coral)') }}">{{ $veces($t['retorno']) }}</div></div>
                     </div>
-                    @include('campanias::embudo-contactos', ['t' => $t])
+                    @include('campanias::embudo-contactos', ['t' => $t, 'campaniaId' => $t['id']])
                     <div style="display: flex; flex-direction: column; gap: 4px">
-                        <div class="tq-camp-fila" title="{{ $t['porContactoNuevo'] === null ? 'Sin contactos nuevos o sin gasto' : 'Costo por contacto nuevo: '.$soles($t['porContactoNuevo']).' (lo que la campaña de verdad consiguió)' }}"><span>Gastado / presupuesto</span><span @if ($t['sePaso']) style="color: var(--c-coral); font-weight: 600" @endif>{{ $soles($t['gastado']) }} / {{ $soles($t['presupuesto']) }}</span></div>
+                        <div class="tq-camp-fila" title="{{ $t['porContactoNuevo'] === null ? 'Sin contactos nuevos o sin gasto' : 'Costo por contacto nuevo: '.$soles($t['porContactoNuevo']).' (lo que la campaña de verdad consiguió)' }}"><span>Gastado / presupuesto</span><span data-atajo role="button" tabindex="0" class="tq-camp-atajo" wire:click="verAtajo('gastos', {{ $t['id'] }})" @if ($t['sePaso']) style="color: var(--c-coral); font-weight: 600" @endif>{{ $soles($t['gastado']) }} / {{ $soles($t['presupuesto']) }}</span></div>
                         <div class="tq-camp-fila"><span>Ganado</span><span>{{ $soles($t['ganado']) }}</span></div>
                         <div class="tq-camp-fila"><span>Margen de lo ganado{{ $t['margenPrevisto'] ? ' (previsto)' : '' }}</span><span>{{ $soles($t['margen']) }}</span></div>
                         @if ($t['sinAtender'] > 0)<div class="tq-camp-fila"><span style="color: var(--c-coral)">{{ $t['sinAtender'] }} sin atender hace 3 días</span><span></span></div>@endif
@@ -77,7 +81,7 @@
                     <div class="tq-camp-acciones">
                         <x-filament::button size="sm" color="gray" wire:click="sobre('formulario', {{ $t['id'] }})">Formulario y QR</x-filament::button>
                         @if ($puede)<x-filament::button size="sm" color="gray" wire:click="sobre('registrarGasto', {{ $t['id'] }})">Registrar gasto</x-filament::button>@endif
-                        <x-filament::button size="sm" color="gray" tag="a" :href="\App\Modules\Crm\Campanias\Filament\Resources\Campanias\Pages\VerCampania::getUrl(['record' => $t['id']])">Ver contactos</x-filament::button>
+                        <x-filament::button size="sm" color="gray" wire:click="verAtajo('contactos', {{ $t['id'] }})">Ver contactos</x-filament::button>
                     </div>
                 </article>
             @endforeach
@@ -111,4 +115,5 @@
             </section>
         @endif
     @endif
+    @include('campanias::atajo', ['atajo' => $atajo])
 </div>

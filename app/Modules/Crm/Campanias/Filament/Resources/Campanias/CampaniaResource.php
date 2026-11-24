@@ -6,16 +6,12 @@ namespace App\Modules\Crm\Campanias\Filament\Resources\Campanias;
 
 use App\Modules\Crm\Campanias\Filament\Resources\Campanias\Pages\ListarCampanias;
 use App\Modules\Crm\Campanias\Filament\Resources\Campanias\Pages\VerCampania;
-use App\Modules\Crm\Campanias\Filament\Resources\Campanias\RelationManagers\LeadsRelationManager;
 use App\Modules\Crm\Campanias\Filament\Resources\Leads\LeadResource;
 use App\Modules\Crm\Campanias\Models\Campania;
-use App\Modules\Crm\Campanias\Services\CampaniasService;
 use App\Modules\Crm\Campanias\Services\LeadsService;
 use App\Modules\Nucleo\Filament\EtiquetasEnEspanol;
 use BackedEnum;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -85,32 +81,16 @@ final class CampaniaResource extends Resource
 
     public static function infolist(Schema $schema): Schema
     {
-        $cifra = fn (string $campo) => fn (Campania $record): string => (string) app(LeadsService::class)->cifras($record->id)[$campo];
-
+        // Observación 9.10: la ficha completa (cabecera, cifras y pestañas) la dibuja su vista.
         return $schema->components([
-            Section::make('La campaña')->columns(4)->schema([
-                TextEntry::make('tipo')->label('Tipo')->formatStateUsing(fn (string $state): string => Campania::TIPOS[$state] ?? $state),
-                TextEntry::make('desde')->label('Desde')->date('d/m/Y'),
-                TextEntry::make('hasta')->label('Hasta')->date('d/m/Y')->placeholder('sin fin'),
-                TextEntry::make('presupuesto')->label('Presupuesto')->fontFamily('mono')->formatStateUsing(fn ($state): string => $state === null ? '—' : 'S/ '.number_format((float) $state, 2)),
-                TextEntry::make('objetivo')->label('Objetivo')->columnSpanFull()->placeholder('—'),
-            ]),
-            Section::make('Resultado')->columns(5)->schema([
-                TextEntry::make('c_leads')->label('Leads')->state($cifra('leads')),
-                TextEntry::make('c_conv')->label('Convertidos')->state($cifra('convertidos')),
-                TextEntry::make('c_tasa')->label('Tasa de conversión')->state(fn (Campania $record): string => app(LeadsService::class)->cifras($record->id)['tasa'].' %'),
-                TextEntry::make('c_monto')->label('En oportunidades')->fontFamily('mono')->state(fn (Campania $record): string => 'S/ '.number_format((float) app(LeadsService::class)->cifras($record->id)['monto'], 2)),
-                TextEntry::make('c_cpl')->label('Costo por lead')->fontFamily('mono')->state(fn (Campania $record): string => ($v = app(LeadsService::class)->cifras($record->id)['costo_por_lead']) === null ? '—' : 'S/ '.number_format((float) $v, 2)),
-            ]),
-            // Observación 7.6: el retorno (gasto real y margen de lo ganado) y, en las campañas a clientes, su seguimiento.
-            View::make('campanias::ficha')->columnSpanFull()
-                ->viewData(fn (Campania $record): array => app(CampaniasService::class)->ficha($record)),
+            View::make('campanias::ficha-completa')->columnSpanFull()->viewData(fn ($livewire): array => $livewire->datosFicha()),
         ]);
     }
 
     public static function getRelations(): array
     {
-        return [LeadsRelationManager::class];
+        // Observación 9.10: los contactos van en la pestaña «Contactos» de la ficha.
+        return [];
     }
 
     public static function getPages(): array

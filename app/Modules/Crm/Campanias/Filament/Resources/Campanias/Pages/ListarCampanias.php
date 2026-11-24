@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Campanias\Filament\Resources\Campanias\Pages;
 
+use App\Modules\Crm\Campanias\Filament\AtajosDeCampania;
 use App\Modules\Crm\Campanias\Filament\Resources\Campanias\CampaniaResource;
 use App\Modules\Crm\Campanias\Filament\Resources\Leads\LeadResource;
 use App\Modules\Crm\Campanias\Models\Campania;
 use App\Modules\Crm\Campanias\Services\CampaniasService;
 use App\Modules\Crm\Campanias\Services\LeadsService;
-use App\Modules\Erp\Presupuestos\Services\PresupuestoEmpresaService;
 use App\Modules\Nucleo\Models\User;
-use App\Modules\Nucleo\Services\ParametrosService;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
-use chillerlan\QRCode\QRCode;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -39,6 +37,8 @@ use RuntimeException;
  */
 final class ListarCampanias extends Page
 {
+    use AtajosDeCampania;
+
     protected static string $resource = CampaniaResource::class;
 
     protected static ?string $title = 'Campañas';
@@ -59,8 +59,6 @@ final class ListarCampanias extends Page
 
     /** Los clientes marcados de ese grupo (cuenta => incluido). */
     public array $incluidos = [];
-
-    public ?int $campaniaId = null;
 
     public function getMaxContentWidth(): Width
     {
@@ -96,12 +94,6 @@ final class ListarCampanias extends Page
         }
     }
 
-    public function sobre(string $accion, int $campaniaId): void
-    {
-        $this->campaniaId = $campaniaId;
-        $this->mountAction($accion);
-    }
-
     public function crearDesde(string $grupo): void
     {
         if ($this->grupo !== $grupo) {
@@ -128,54 +120,6 @@ final class ListarCampanias extends Page
                 ])
                 ->action(fn (array $data) => $this->redirect(VerCampania::getUrl(['record' => Campania::query()->create([...$data, 'es_activa' => true])]))),
         ];
-    }
-
-    /** Un gasto real, con el centro de costo Comercial y el rubro «Publicidad y ferias». */
-    public function registrarGastoAction(): Action
-    {
-        return Action::make('registrarGasto')->label('Registrar gasto')->visible(self::puede(...))->slideOver()
-            ->modalHeading(fn (): string => 'Registrar gasto · '.Campania::query()->whereKey($this->campaniaId)->value('nombre'))
-            ->modalDescription('Un gasto directo de la empresa: centro de costo Comercial, rubro «Publicidad y ferias», vinculado a esta campaña. Se compara con el saldo de la sede en el mes.')
-            ->fillForm(fn (): array => ['fecha' => Calendario::hoy()])
-            ->schema([
-                Select::make('sede')->label('Sede')->required()->options(fn (): array => app(PresupuestoEmpresaService::class)->sedes()),
-                TextInput::make('descripcion')->label('Descripción')->required()->maxLength(200),
-                TextInput::make('proveedor')->label('Proveedor')->required()->maxLength(150),
-                DatePicker::make('fecha')->label('Fecha')->required()->format('Y-m-d'),
-                TextInput::make('monto')->label('Monto (S/)')->numeric()->required()->minValue(0.01),
-                TextInput::make('motivo')->label('Motivo del exceso (si pasa el saldo)')->maxLength(300),
-            ])
-            ->action(function (array $data, Action $action): void {
-                try {
-                    app(CampaniasService::class)->registrarGasto((int) $this->campaniaId, $data['sede'] === 'empresa' ? null : (int) $data['sede'], CarbonImmutable::parse($data['fecha']),
-                        number_format((float) $data['monto'], 2, '.', ''), $data['descripcion'], $data['proveedor'], $data['motivo'] ?? null);
-                } catch (RuntimeException $e) {
-                    Notification::make()->danger()->title($e->getMessage())->send();
-                    $action->halt();
-
-                    return;
-                }
-
-                Notification::make()->success()->title('Gasto registrado.')->send();
-            });
-    }
-
-    /** El enlace público, su QR para imprimir y el enlace de WhatsApp. */
-    public function formularioAction(): Action
-    {
-        return Action::make('formulario')->label('Formulario y QR')->modalSubmitAction(false)->modalCancelActionLabel('Cerrar')
-            ->modalHeading(fn (): string => 'Formulario y QR · '.Campania::query()->whereKey($this->campaniaId)->value('nombre'))
-            ->schema(fn (): array => [View::make('campanias::qr')->viewData($this->datosQr())]);
-    }
-
-    /** @return array<string, string> */
-    private function datosQr(): array
-    {
-        $c = Campania::query()->findOrFail($this->campaniaId);
-        $url = url('/c/'.app(CampaniasService::class)->token($c->id));
-        $numero = preg_replace('/\D/', '', app(ParametrosService::class)->texto('crm.whatsapp_comercial'));
-
-        return ['url' => $url, 'qr' => (new QRCode)->render($url), 'whatsapp' => 'https://wa.me/'.$numero.'?text='.rawurlencode("Hola, vengo de {$c->nombre}")];
     }
 
     /** «Crear campaña» desde un grupo de Mis clientes: con los marcados y el seguimiento editable. */
@@ -225,6 +169,7 @@ final class ListarCampanias extends Page
                     array_key_exists($this->ordenCanales, CampaniasService::ORDENES_CANALES) ? $this->ordenCanales : 'leads',
                 ) : null,
                 'puede' => self::puede(),
+                'atajo' => $this->datosAtajo(),
             ]),
         ]);
     }

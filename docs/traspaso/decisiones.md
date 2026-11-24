@@ -1256,3 +1256,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (Campañas); el reconocimiento toca Directorio (contactos y cuentas)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.9: contactos nuevos o ya registrados y barras N de X»
+
+### MV-104 · 2026-11-24 · Campañas: ficha de cada campaña, atajos de la tarjeta y «Registrar gasto» al medio
+
+- **Ficha:** `fichas/t1-campanias.md`
+- **Dijo Sebastián:** (observaciones-9, punto 10) «Clic en la tarjeta → la ficha de la campaña … Cabecera … Las cifras de la tarjeta en grande … Pestañas: Contactos … Oportunidades … Gastos … Seguimiento … Actividad … Atajos en cada tarjeta … cada uno abre una ventana al medio (no un panel lateral; decisión de Sebastián) … Contactos … Oportunidades … Ganadas … Presupuesto y gasto … Los atajos se ven como enlaces … «Registrar gasto» en una ventana al medio … con fecha, concepto, monto, comprobante (archivo opcional) y el selector de imputación que ya existe … Al guardar, la tarjeta y la ficha se actualizan sin recargar».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (Campañas)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.10: ficha de la campaña, atajos y gasto al medio»
