@@ -71,6 +71,8 @@ use App\Modules\Nucleo\Enums\TipoParametro;
 use App\Modules\Nucleo\Estados\MotivoInicial;
 use App\Modules\Nucleo\Estados\RegistroDocumentos;
 use App\Modules\Nucleo\Imagenes\RegistroImagenes;
+use App\Modules\Nucleo\Mien\RegistroPendientesMien;
+use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Navegacion\AnimacionCaja;
 use App\Modules\Nucleo\Navegacion\AreaModulo;
 use App\Modules\Nucleo\Navegacion\CajaModulo;
@@ -142,6 +144,16 @@ final class OportunidadesServiceProvider extends ServiceProvider
     {
         Relation::morphMap(['oportunidad' => Oportunidad::class, 'oportunidad_competidor' => OportunidadCompetidor::class, 'oportunidad_en_tablero' => OportunidadEnTablero::class]);
         $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+
+        // Observación 9.5 (6): al responsable, «N días sin respuesta desde que se envió la propuesta».
+        $this->app->make(RegistroPendientesMien::class)->registrar('propuestas-sin-respuesta', function (User $u): array {
+            $dias = app(Services\PortadaOportunidades::class)->propuestasSinRespuesta();
+            $mias = Oportunidad::query()->whereKey(array_keys($dias))->where('ejecutivo_user_id', $u->id)->get(['id', 'nombre']);
+            $items = $mias->map(fn (Oportunidad $o): array => ['texto' => "{$dias[$o->id]} días sin respuesta desde que se envió la propuesta: {$o->nombre}", 'nota' => 'Registrar llamada',
+                'url' => Filament\Resources\Oportunidades\Pages\VerOportunidad::getUrl(['record' => $o->id]), 'tono' => 'danger'])->values()->all();
+
+            return ['cantidad' => count($items), 'texto' => count($items) === 1 ? 'propuesta sin respuesta' : 'propuestas sin respuesta', 'grupos' => [['titulo' => 'Propuestas sin respuesta', 'items' => $items]]];
+        });
         $this->loadViewsFrom(__DIR__.'/resources/views', 'oportunidades');
         // Plan 2.0, D5: lo escrito en el origen «Otro».
         $this->app->make(RegistroOtrosDeCatalogo::class)->registrar(Catalogo::OrigenesComerciales, OtrosDeOrigenDeOportunidades::class);
@@ -276,6 +288,10 @@ final class OportunidadesServiceProvider extends ServiceProvider
                     validador: ValidadorDiasMaximos::class),
             );
         }
+
+        // Observación 9.5 (6): la propuesta enviada sin respuesta.
+        $parametros->declarar(new DefinicionParametro('crm', 'dias_propuesta_sin_respuesta', TipoParametro::Entero, 7,
+            'Días en «Propuesta enviada» sin ninguna actividad registrada para que la tarjeta y Mien avisen «N días sin respuesta».'));
 
         $parametros->declarar(new DefinicionParametro('crm', 'tablero_cierre_periodo', TipoParametro::Texto, 'mes',
             'Qué ganadas y perdidas muestra la columna «Cierre» del tablero: las del «mes», el «trimestre» o el «anio» en curso. Las demás, en la lista.',

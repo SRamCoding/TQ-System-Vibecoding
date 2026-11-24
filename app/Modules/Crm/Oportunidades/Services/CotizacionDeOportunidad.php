@@ -19,4 +19,13 @@ interface CotizacionDeOportunidad
      * @return list<VersionDeCotizacion>
      */
     public function versiones(int $oportunidadId): array;
+
+    /**
+     * Observación 9.5 (1): el margen previsto de cada oportunidad, de su cotización vigente (la aceptada o, si no, la
+     * última versión sin anular ni reemplazar), con el mínimo del parámetro de hoy. Sin cotización, no aparece.
+     *
+     * @param  list<int>  $oportunidadIds
+     * @return array<int, array{porcentaje: ?string, monto: string, minimo: string, porAprobar: bool, cotizacion: string}>
+     */
+    public function margenes(array $oportunidadIds): array;
 }

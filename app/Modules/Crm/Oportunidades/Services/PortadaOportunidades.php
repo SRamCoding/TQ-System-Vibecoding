@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Oportunidades\Services;
 
+use App\Modules\Crm\Actividades\Services\ActividadesService;
 use App\Modules\Crm\Campanias\Services\LeadsService;
 use App\Modules\Crm\Cuentas\Services\CuentasService;
 use App\Modules\Crm\Cuentas\Services\ResumenCuenta;
@@ -542,5 +543,48 @@ final readonly class PortadaOportunidades
     private function canalesDeOportunidades(): array
     {
         return once(fn (): array => app(LeadsService::class)->canalesDeOportunidades());
+    }
+
+    /** Observación 9.5 (6): días en «Propuesta enviada» sin ninguna actividad para que la tarjeta y Mien avisen. */
+    public const string PARAMETRO_DIAS_SIN_RESPUESTA = 'crm.dias_propuesta_sin_respuesta';
+
+    /**
+     * Observación 9.5 (6): las oportunidades en «Propuesta enviada» que llevan los días del parámetro o más sin ninguna
+     * actividad registrada desde que se envió la propuesta (id → días).
+     *
+     * @param  list<int>|null  $soloEstas  null: todas
+     * @return array<int, int>
+     */
+    public function propuestasSinRespuesta(?array $soloEstas = null): array
+    {
+        $limite = (int) app(ParametrosService::class)->entero(self::PARAMETRO_DIAS_SIN_RESPUESTA);
+        $hoy = CarbonImmutable::parse(Calendario::hoy());
+        $ops = $this->enEstado(Oportunidad::query(), EtapaAbierta::PropuestaEnviada->value)
+            ->when($soloEstas !== null, fn (Builder $q) => $q->whereKey($soloEstas))->get(['id', 'en_etapa_desde']);
+        $ultimas = app(ActividadesService::class)->ultimaRegistrada($ops->pluck('id')->all());
+        $resultado = [];
+
+        foreach ($ops as $o) {
+            $desde = CarbonImmutable::parse($o->en_etapa_desde)->startOfDay();
+            $ultima = $ultimas[$o->id] ?? null;
+            $dias = (int) $desde->diffInDays($hoy);
+
+            if ($dias >= $limite && ($ultima === null || $ultima->lt($desde))) {
+                $resultado[$o->id] = $dias;
+            }
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * Observación 9.5 (1): el margen previsto de cada oportunidad, de su cotización (el mismo cálculo de la cotización).
+     *
+     * @param  list<int>  $ids
+     * @return array<int, array{porcentaje: ?string, monto: string, minimo: string, porAprobar: bool, cotizacion: string}>
+     */
+    public function margenes(array $ids): array
+    {
+        return app(CotizacionDeOportunidad::class)->margenes($ids);
     }
 }

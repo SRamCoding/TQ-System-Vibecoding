@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Crm\Cotizaciones\Condiciones;
 
 use App\Modules\Crm\Cotizaciones\CotizacionesServiceProvider;
+use App\Modules\Crm\Cotizaciones\Estados\DefinicionCotizacion;
 use App\Modules\Crm\Cotizaciones\Models\Cotizacion;
 use App\Modules\Nucleo\Estados\CondicionTransicion;
 use App\Modules\Nucleo\Models\TransicionEstado;
@@ -35,7 +36,10 @@ final readonly class MargenPideAprobacion implements CondicionTransicion
 
     public static function minimo(Cotizacion $cotizacion): string
     {
-        return (string) ($cotizacion->margen_minimo ?? app(ParametrosService::class)->decimal(CotizacionesServiceProvider::PARAMETRO_MARGEN_MINIMO));
+        // Observación 9.5: mientras se arma (borrador o por aprobar) vale el mínimo de hoy; ya emitida, con el que se midió.
+        $enCurso = in_array($cotizacion->estado?->codigo, [DefinicionCotizacion::BORRADOR, DefinicionCotizacion::POR_APROBAR], true);
+
+        return (string) ($enCurso ? app(ParametrosService::class)->decimal(CotizacionesServiceProvider::PARAMETRO_MARGEN_MINIMO) : ($cotizacion->margen_minimo ?? app(ParametrosService::class)->decimal(CotizacionesServiceProvider::PARAMETRO_MARGEN_MINIMO)));
     }
 
     /** «19.4 %», con un decimal, como en pantalla (D14). */

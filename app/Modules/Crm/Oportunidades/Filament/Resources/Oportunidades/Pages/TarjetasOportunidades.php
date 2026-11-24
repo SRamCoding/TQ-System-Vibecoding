@@ -174,12 +174,18 @@ final class TarjetasOportunidades extends Page
         $porCalificar = $pagina->currentPage() === 1 ? $portada->porCalificar($filtros) : [];
         usort($porCalificar, fn (array $a, array $b): int => [$a['fecha'] === null ? 1 : 0, $a['fecha']?->getTimestamp() ?? 0, $a['desde']->getTimestamp()] <=> [$b['fecha'] === null ? 1 : 0, $b['fecha']?->getTimestamp() ?? 0, $b['desde']->getTimestamp()]);
 
+        // Observación 9.5 (1 y 6): el margen previsto de su cotización y la propuesta sin respuesta.
+        $ids = array_map(fn (Oportunidad $o): int => $o->id, $oportunidades);
+        $margenes = $portada->margenes($ids);
+        $sinRespuesta = $portada->propuestasSinRespuesta($ids);
+
         return [
             'pagina' => $pagina,
             'porCalificar' => array_map(fn (array $t): array => [...$t, 'plazo' => self::plazo($t['hito']), 'montoTexto' => $t['monto'] === null ? null : 'S/ '.number_format((float) $t['monto'], 2)], $porCalificar),
             'puedeLeads' => LeadResource::puede(LeadsService::PERMISO_GESTIONAR),
             'puedeLicitaciones' => LicitacionResource::puede(LicitacionesService::PERMISO_GESTIONAR),
-            'tarjetas' => array_map(fn (Oportunidad $o): array => [...self::tarjeta($o, $cuentas[$o->cuenta_id] ?? '—', $lineas->get($o->linea_solucion_id)), 'plazo' => in_array($o->estado->codigo, ['ganada', 'perdida'], true) ? null : self::plazo($licitaciones[$o->id]['hito'] ?? null), 'licitacion' => isset($licitaciones[$o->id])], $oportunidades),
+            'tarjetas' => array_map(fn (Oportunidad $o): array => [...self::tarjeta($o, $cuentas[$o->cuenta_id] ?? '—', $lineas->get($o->linea_solucion_id)), 'plazo' => in_array($o->estado->codigo, ['ganada', 'perdida'], true) ? null : self::plazo($licitaciones[$o->id]['hito'] ?? null), 'licitacion' => isset($licitaciones[$o->id]),
+                'margen' => $o->estado->codigo === 'perdida' ? null : self::margen($margenes[$o->id] ?? null), 'sinRespuesta' => $sinRespuesta[$o->id] ?? null], $oportunidades),
             'opciones' => $portada->opcionesVitrina($filtros),
             'ordenes' => FiltrosOportunidades::ORDENES,
             'conFiltros' => $this->buscar !== '' || $this->atencion !== [] || $this->etapas !== [] || $this->ejecutivos !== [] || $this->lineas !== [] || $this->clientes !== [] || $this->tipos !== [],
@@ -209,6 +215,28 @@ final class TarjetasOportunidades extends Page
         };
 
         return ['texto' => "{$hito['etapa']} {$cuando}", 'urgente' => $d < self::DIAS_URGENTE, 'titulo' => $hito['etapa'].': '.$hito['fecha']->format('d/m/Y')];
+    }
+
+    /**
+     * Observación 9.5 (1): la etiqueta del margen: verde con soles y % si pasa el mínimo, coral «margen bajo» si no, gris
+     * «margen por calcular» sin cotización. Sin barrita.
+     *
+     * @param  array{porcentaje: ?string, monto: string, minimo: string, porAprobar: bool, cotizacion: string}|null  $m
+     * @return array{texto: string, tono: string, titulo: string}
+     */
+    private static function margen(?array $m): array
+    {
+        if ($m === null || $m['porcentaje'] === null) {
+            return ['texto' => 'margen por calcular', 'tono' => 'gris', 'titulo' => 'Todavía sin cotización con costos'];
+        }
+
+        $pct = rtrim(rtrim(number_format((float) $m['porcentaje'], 1, '.', ''), '0'), '.');
+        $minimo = rtrim(rtrim(number_format((float) $m['minimo'], 1, '.', ''), '0'), '.');
+        $bajo = bccomp($m['porcentaje'], $m['minimo'], 2) < 0;
+
+        return $bajo
+            ? ['texto' => "margen bajo · {$pct} %", 'tono' => 'coral', 'titulo' => "Bajo el mínimo de {$minimo} %".($m['porAprobar'] ? ' · la cotización espera aprobación' : ' · la cotización necesita aprobación')." ({$m['cotizacion']})"]
+            : ['texto' => 'margen S/ '.number_format((float) $m['monto'], 0).' · '.$pct.' %', 'tono' => 'verde', 'titulo' => "Margen previsto de {$m['cotizacion']} (mínimo {$minimo} %)"];
     }
 
     /** @return array<string, mixed> lo que dibuja una tarjeta */

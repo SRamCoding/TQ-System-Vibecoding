@@ -240,4 +240,20 @@ final readonly class ActividadesService
 
         return $resultado;
     }
+
+    /**
+     * Observación 9.5 (6): cuándo se registró la última actividad de cada oportunidad (cualquier tipo, hecha o no).
+     *
+     * @param  list<int>  $oportunidadIds
+     * @return array<int, CarbonImmutable>
+     */
+    public function ultimaRegistrada(array $oportunidadIds): array
+    {
+        if ($oportunidadIds === []) {
+            return [];
+        }
+
+        return Actividad::query()->whereIn('oportunidad_id', $oportunidadIds)->groupBy('oportunidad_id')->selectRaw('oportunidad_id, max(created_at) as ultima')
+            ->pluck('ultima', 'oportunidad_id')->map(fn (mixed $f): CarbonImmutable => CarbonImmutable::parse((string) $f))->all();
+    }
 }

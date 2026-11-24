@@ -84,6 +84,9 @@ final class CotizacionesServiceProvider extends ServiceProvider
 
     public const string PARAMETRO_MARGEN_MINIMO = 'crm.cotizacion_margen_minimo';
 
+    /** Observación 9.5: el margen mínimo de Techquk y todo lo que lo usa (cambia sin tocar código). */
+    public const string DESCRIPCION_MARGEN_MINIMO = 'Margen mínimo (%) de Techquk. Bajo él: la etiqueta de margen de las tarjetas de Oportunidades sale en coral, una cotización pide aprobación antes de emitirse (Configuración → Aprobaciones) y «¿Cuánto bajar?» de la postulación marca en coral.';
+
     public const string PARAMETRO_EXIGIR_EMITIDA = 'crm.cotizacion_exigir_emitida_para_propuesta';
 
     public const string PARAMETRO_EXIGIR_ACEPTADA = 'crm.cotizacion_exigir_aceptada_para_ganar';
@@ -211,8 +214,8 @@ final class CotizacionesServiceProvider extends ServiceProvider
             new DefinicionParametro('crm', 'cotizacion_margen_objetivo', TipoParametro::Decimal, '25.00',
                 'Margen (%) al que apunta una cotización. Solo se muestra como referencia.',
                 esSensible: true, validador: ValidadorPorcentajeMargen::class),
-            new DefinicionParametro('crm', 'cotizacion_margen_minimo', TipoParametro::Decimal, '22.00',
-                'Margen (%) bajo el cual una cotización no se emite sin la aprobación registrada que dicen las reglas de Configuración → Aprobaciones.',
+            new DefinicionParametro('crm', 'cotizacion_margen_minimo', TipoParametro::Decimal, '12.00',
+                self::DESCRIPCION_MARGEN_MINIMO,
                 esSensible: true, validador: ValidadorPorcentajeMargen::class),
             new DefinicionParametro('crm', 'cotizacion_exigir_emitida_para_propuesta', TipoParametro::Booleano, true,
                 'Si una oportunidad pasa a «Propuesta enviada» solo con alguna cotización emitida.'),

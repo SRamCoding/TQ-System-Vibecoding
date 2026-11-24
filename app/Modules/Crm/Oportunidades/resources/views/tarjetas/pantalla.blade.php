@@ -40,6 +40,13 @@
         .tq-op-barra { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
         .tq-op-barra .tq-op-buscar { flex: 1 1 16rem; }
         /* Observación 8.1: 3 columnas como máximo (3 en anchas, 2 en medianas, 1 en angostas); las tarjetas crecen. */
+        .tq-margen { display: inline-flex; align-items: center; padding: 0.1rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+        .tq-margen-verde { background: color-mix(in oklab, #2F7D4F 13%, var(--tq-superficie, white)); color: color-mix(in oklch, #2F7D4F calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #2F7D4F)); }
+        .tq-margen-coral { background: color-mix(in oklab, #D9534A 13%, var(--tq-superficie, white)); color: color-mix(in oklch, #C2453C calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #C2453C)); }
+        .tq-margen-gris { background: var(--gray-100); color: var(--gray-500); }
+        .dark .tq-margen-verde { color: #8FD3A5; } .dark .tq-margen-coral { color: #FF8A75; } .dark .tq-margen-gris { background: var(--gray-800); color: var(--gray-400); }
+        .tq-sin-respuesta { display: flex; gap: 0.4rem; align-items: flex-start; padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.75rem; line-height: 1.35; background: color-mix(in oklab, #D9534A 9%, var(--tq-superficie, white)); color: color-mix(in oklch, #B0423A calc(100% - var(--tq-tinte-leve, 0%)), var(--tq-tinte, #B0423A)); }
+        .dark .tq-sin-respuesta { color: #FF8A75; }
         .tq-canal { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; line-height: 1.4; background: var(--tq-superficie, white); border: 1px solid var(--tq-borde, var(--gray-200)); color: var(--gray-700); white-space: nowrap; }
         .dark .tq-canal { color: var(--gray-200); }
         .tq-op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; }
@@ -203,6 +210,14 @@
                         </span>
                         <span class="tq-op-cuerpo">
                             <span class="tq-op-monto">{{ $t['monto'] }}@if ($t['ponderado'] !== null)<small>pond. {{ $t['ponderado'] }}</small>@endif</span>
+                            @if ($t['margen'] !== null)
+                                {{-- Observación 9.5 (1): el margen previsto de su cotización, como etiqueta (sin barrita). --}}
+                                <span><span class="tq-margen tq-margen-{{ $t['margen']['tono'] }}" title="{{ $t['margen']['titulo'] }}">{{ $t['margen']['texto'] }}</span></span>
+                            @endif
+                            @if ($t['sinRespuesta'] !== null)
+                                {{-- Observación 9.5 (6): la propuesta enviada sin respuesta. --}}
+                                <span class="tq-sin-respuesta"><x-filament::icon icon="heroicon-o-clock" class="h-4 w-4" style="flex: none" /><span>{{ $t['sinRespuesta'] }} días sin respuesta desde que se envió la propuesta · <u>Registrar llamada</u></span></span>
+                            @endif
                             <span class="tq-op-etl">
                                 @if ($t['dias'] !== null)
                                     @if ($t['plazo'] !== null)

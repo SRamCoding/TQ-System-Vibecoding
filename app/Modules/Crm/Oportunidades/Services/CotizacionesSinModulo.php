@@ -16,4 +16,9 @@ final class CotizacionesSinModulo implements CotizacionDeOportunidad
     {
         return [];
     }
+
+    public function margenes(array $oportunidadIds): array
+    {
+        return [];
+    }
 }
