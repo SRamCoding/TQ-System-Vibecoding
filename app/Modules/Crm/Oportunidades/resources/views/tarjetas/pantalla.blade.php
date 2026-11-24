@@ -40,7 +40,7 @@
         .tq-op-barra { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
         .tq-op-barra .tq-op-buscar { flex: 1 1 16rem; }
         /* Observación 8.1: 3 columnas como máximo (3 en anchas, 2 en medianas, 1 en angostas); las tarjetas crecen. */
-        .tq-op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(17.5rem, calc((100% - 2rem) / 3)), 1fr)); gap: 1rem; }
+        .tq-op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; }
         .tq-op-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 0.75rem; background: var(--tq-superficie, white); box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); outline: 1px solid rgb(3 7 18 / 0.06); text-align: start; cursor: pointer; transition: box-shadow 160ms ease, transform 160ms ease; }
         .dark .tq-op-card { background: var(--tq-superficie, var(--gray-900)); outline-color: rgb(255 255 255 / 0.08); }
         .tq-op-card:hover, .tq-op-card:focus-visible { box-shadow: 0 8px 20px -6px color-mix(in oklab, var(--primary-600) 35%, transparent); transform: translateY(-2px); }

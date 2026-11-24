@@ -1175,3 +1175,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (apariencia de todas las pantallas)
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.14: las pantallas nuevas siguen al ambiente»
+
+### MV-095 · 2026-11-24 · Mis oportunidades, el Embudo y Convocatorias con el ancho normal de Proyectos
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-9, punto 1) «Que se vea como la portada de Proyectos … Las vistas Mis oportunidades y Embudo de oportunidades dejan de forzar el ancho completo … Convocatorias del SEACE también pasa al ancho normal … No cambian la Línea de tiempo ni Campañas … el paso de un ancho a otro es suave».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (Oportunidades; Convocatorias del SEACE)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.1: el ancho normal de Proyectos»

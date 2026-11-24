@@ -31,7 +31,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
-use Filament\Support\Enums\Width;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -272,11 +271,6 @@ final class TableroOportunidades extends Page
         $usuario = Filament::auth()->user();
 
         return $usuario instanceof User ? $usuario : throw new AuthorizationException;
-    }
-
-    public function getMaxContentWidth(): Width
-    {
-        return Width::Full;
     }
 
     /**

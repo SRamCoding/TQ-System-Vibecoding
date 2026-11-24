@@ -14,7 +14,7 @@
             .fi-page-header-main-ctn:has(.tq-vistas) > .fi-header { position: absolute; top: 0.15rem; right: 0; z-index: 2; }
             .tq-vistas-pestanas { padding-inline-end: 22rem; }
         }
-        .tq-vistas-cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; }
+        .tq-vistas-cifras { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 0.75rem; }
         .tq-vistas-cifra-valor { font-size: 1.375rem; font-weight: 600; line-height: 1.875rem; font-variant-numeric: tabular-nums; }
         .tq-vistas-cifra-alerta { color: var(--warning-700); }
         .dark .tq-vistas-cifra-alerta { color: var(--warning-400); }

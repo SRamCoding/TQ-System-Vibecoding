@@ -30,7 +30,6 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
-use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Pagination\Paginator;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
@@ -123,11 +122,6 @@ final class TarjetasOportunidades extends Page
         $this->abiertos = (array) app(EstadoInterfazService::class)->leer((int) auth()->id(), self::CLAVE_ABIERTOS, self::ABIERTOS);
         $this->calcularCifras();
         $this->abrirFichaDeLaDireccion();
-    }
-
-    public function getMaxContentWidth(): Width
-    {
-        return Width::Full;
     }
 
     public function updated(string $propiedad): void

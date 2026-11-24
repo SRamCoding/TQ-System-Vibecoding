@@ -21,7 +21,6 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
-use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
 use RuntimeException;
@@ -83,11 +82,6 @@ final class BandejaConvocatorias extends Page
         $u = Filament::auth()->user();
 
         return $u instanceof User && $u->can(LicitacionesService::PERMISO_VER);
-    }
-
-    public function getMaxContentWidth(): Width
-    {
-        return Width::Full;
     }
 
     /** Sin encabezado propio: el nombre ya lo dice la barra del proceso. */

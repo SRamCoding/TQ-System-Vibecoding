@@ -76,4 +76,21 @@
         // Los grupos de filtros abiertos (Mis oportunidades): el servidor avisa al guardarlos.
         window.addEventListener('tq-filtros-abiertos-guardados', (e) => window.tqEntrePestanas.enviar('filtros-abiertos', { abiertos: e.detail?.abiertos ?? [] }))
     })()
+
+    // Observación 9.1: al pasar de una página a todo lo ancho (Línea de tiempo, Campañas) a una de ancho normal, o al revés,
+    // el contenido cambia de ancho con suavidad en vez de saltar.
+    ;(() => {
+        if (window.tqAnchoSuave) return
+        window.tqAnchoSuave = true
+        let antes = null
+        document.addEventListener('livewire:navigating', () => { const m = document.querySelector('.fi-main'); antes = m ? m.getBoundingClientRect().width : null })
+        document.addEventListener('livewire:navigated', () => {
+            const m = document.querySelector('.fi-main'), de = antes
+            antes = null
+            if (! m || ! de || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+            const a = m.getBoundingClientRect().width
+            if (Math.abs(a - de) < 24) return
+            m.animate([{ maxWidth: de + 'px', width: de + 'px' }, { maxWidth: a + 'px', width: a + 'px' }], { duration: 320, easing: 'cubic-bezier(.2, .7, .2, 1)' })
+        })
+    })()
 </script>

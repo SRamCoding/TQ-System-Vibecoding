@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v9
+- **Versión:** v10
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -14,6 +14,8 @@ pestañas de portada: los leads y las licitaciones por decidir son la primera et
 misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Decisiones de Sebastián
+
+- **MV-095** (ficha) · Mis oportunidades, Embudo y Convocatorias usan el ancho normal de las páginas (como Proyectos); Línea de tiempo y Campañas siguen a todo lo ancho, con paso suave entre anchos.
 
 - **MV-083** (ficha) · Sin título de página en las tres vistas; «+ Nueva oportunidad» a la derecha en la fila de las pestañas.
 
@@ -108,6 +110,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Supuestos sin confirmar
 
+- **v10 · Espacio del muelle:** se reserva en todas las páginas (también Proyectos) cuando el muelle está en el borde derecho, para que las dos sigan iguales. El paso suave entre anchos dura 320 ms y se apaga con «reducir movimiento».
+
 - **v8 · Lo abierto o plegado** se guarda en la base por persona (tabla `estado_interfaz_usuario`, clave `oportunidades.filtros_abiertos`), no en «Mis preferencias». En pantallas angostas el panel no se pega ni se recorta.
 
 - **v7 · «Cuánto lleva esperando»** se cuenta desde que se registró el lead o la licitación.
@@ -173,6 +177,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v10** (MV-095): ancho normal en Mis oportunidades y Embudo.
 
 - **v9** (MV-083): sin título de página; botones en la fila de las pestañas.
 

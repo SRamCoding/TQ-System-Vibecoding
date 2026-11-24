@@ -26,6 +26,11 @@
         /* MV-062: el muelle, por defecto, un poco más arriba que antes: nunca encima del asistente (que ocupa hasta 110 px
            desde abajo). */
         .tq-apps-muelle { bottom: 7.75rem !important; }
+        /* Observación 9.1: con el muelle en el borde derecho, el contenido le deja su espacio (solo lo que falte entre
+           el ancho normal de la página y el borde), para que no tape columnas ni botones. */
+        @media (min-width: 1024px) {
+            html:not(.tq-muelle-izquierda):not(.tq-muelle-horizontal) .fi-main { padding-inline-end: max(2rem, calc(5.25rem - (100vw - 100rem) / 2)); }
+        }
         /* MV-062: el muelle se arrastra desde cualquier parte que no sea un ícono (o su agarre) y se pega al borde más
            cercano; en los bordes de arriba y abajo se pone horizontal. Su lugar va en variables de <html> (Livewire no las
            pisa al redibujar el panel). */

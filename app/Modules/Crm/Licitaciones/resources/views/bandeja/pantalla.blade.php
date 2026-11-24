@@ -54,10 +54,10 @@
         .tq-band-chip .n { font-size: 11px; font-weight: 600; color: var(--b-suave); background: var(--b-gris-fondo); border-radius: 999px; padding: 1px 7px; }
         .tq-band-chip[aria-pressed="true"] { background: var(--b-azul-fondo); border-color: var(--b-azul-borde); color: var(--b-azul); font-weight: 600; }
         .tq-band-chip[aria-pressed="true"] .n { background: var(--b-sup); color: var(--b-azul); }
-        .tq-band-cuerpo { display: grid; grid-template-columns: 430px minmax(0, 1fr); gap: 16px; align-items: start; }
+        .tq-band-cuerpo { display: grid; grid-template-columns: minmax(19rem, 23rem) minmax(0, 1fr); gap: 16px; align-items: start; }
         @media (max-width: 1023px) { .tq-band-cuerpo { grid-template-columns: minmax(0, 1fr); } }
         .tq-band-lista { background: var(--b-sup); border: 1px solid var(--b-borde); border-radius: 14px; overflow: hidden; max-height: calc(100vh - 8rem); display: flex; flex-direction: column; position: sticky; top: 5rem; }
-        .tq-band-lista-cab { padding: 10px 14px; font-size: 12px; color: var(--b-suave); border-bottom: 1px solid var(--b-linea); display: flex; align-items: center; gap: 8px; }
+        .tq-band-lista-cab { padding: 10px 12px; font-size: 12px; white-space: nowrap; color: var(--b-suave); border-bottom: 1px solid var(--b-linea); display: flex; align-items: center; gap: 8px; }
         .tq-band-lista-cab select { border: 0; background: transparent; font-size: 12px; color: var(--b-suave); padding: 0 1.5rem 0 0; }
         .tq-band-filas { overflow-y: auto; }
         .tq-band-fila { display: flex; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--b-linea); width: 100%; text-align: start; transition: background-color .3s ease; }
@@ -79,16 +79,17 @@
         .tq-band-sub { font-size: 12px; color: var(--b-suave); }
         .tq-band-crono { display: flex; position: relative; }
         .tq-band-crono-linea { position: absolute; left: 8%; right: 8%; top: 6px; height: 2px; }
-        .tq-band-hito { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; text-align: center; }
+        .tq-band-hito { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; text-align: center; padding: 0 2px; }
+        .tq-band-hito .nombre { font-size: 11.5px !important; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; }
         .tq-band-hito .p { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--b-turquesa); background: var(--b-sup); z-index: 1; }
         .tq-band-hito[data-pasado] .p { background: var(--b-turquesa); }
         .tq-band-hito[data-clave] .p { border-color: var(--b-coral); }
         .tq-band-hito[data-clave] .nombre { color: var(--b-coral); }
-        .tq-band-gan { display: grid; grid-template-columns: 2.2fr 1.4fr 1fr .8fr; font-size: 13px; border: 1px solid var(--b-linea); border-radius: 10px; overflow: hidden; }
-        .tq-band-gan > div { padding: 8px 12px; border-top: 1px solid var(--b-linea); }
+        .tq-band-gan { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1.3fr) auto auto; font-size: 12.5px; border: 1px solid var(--b-linea); border-radius: 10px; overflow: hidden; }
+        .tq-band-gan > div { padding: 6px 10px; border-top: 1px solid var(--b-linea); }
         .tq-band-gan > div:nth-child(4n+3), .tq-band-gan > div:nth-child(4n) { white-space: nowrap; }
         .tq-band-gan > div.cab { background: var(--b-fondo-suave); color: var(--b-suave); font-weight: 600; border-top: 0; }
-        .tq-band-acciones { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--b-linea); padding-top: 14px; align-items: center; }
+        .tq-band-acciones { margin-top: auto; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid var(--b-linea); padding-top: 14px; align-items: center; }
         .tq-band-conf h4 { font-size: 15px; font-weight: 700; }
         .tq-band-palabra { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 8px; border-radius: 999px; background: var(--b-gris-fondo); }
         .tq-band-palabra.neg { background: var(--b-coral-fondo); color: var(--b-coral); }
