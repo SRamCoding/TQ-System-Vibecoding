@@ -35,7 +35,7 @@ enum GrupoCatalogo: string
     public function catalogos(): array
     {
         return match ($this) {
-            self::ComercioYPagos => [Catalogo::Monedas, Catalogo::FormasPago, Catalogo::TiposDocumento, Catalogo::CentrosCosto, Catalogo::OrigenesComerciales],
+            self::ComercioYPagos => [Catalogo::Monedas, Catalogo::FormasPago, Catalogo::TiposDocumento, Catalogo::CentrosCosto, Catalogo::OrigenesComerciales, Catalogo::CanalesLead],
             self::PersonasYLugares => [Catalogo::TiposDocumentoIdentidad, Catalogo::RolesParty, Catalogo::Rubros, Catalogo::NivelesGobierno, Catalogo::RedesSociales, Catalogo::Ubigeos],
             self::ProyectosYObras => [Catalogo::LineasSolucion, Catalogo::Cubso, Catalogo::UnidadesMedida, Catalogo::TiposTrabajo, Catalogo::TiposPenalidad],
             self::DocumentosYArchivos => [Catalogo::TiposAdjunto, Catalogo::Aplicaciones],

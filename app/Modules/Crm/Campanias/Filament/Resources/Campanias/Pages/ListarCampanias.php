@@ -111,6 +111,9 @@ final class ListarCampanias extends Page
                 ->schema([
                     TextInput::make('nombre')->label('Nombre')->required()->maxLength(150),
                     Select::make('tipo')->label('Tipo')->required()->options(Campania::TIPOS),
+                    // Observación 9.3: el canal de la campaña; sus contactos llegan con ese canal.
+                    Select::make('canal_lead_id')->label('Canal')->required()
+                        ->options(fn (): array => array_map(fn (array $c): string => $c['nombre'], app(LeadsService::class)->canales(soloActivos: true))),
                     DatePicker::make('desde')->label('Desde')->required(),
                     DatePicker::make('hasta')->label('Hasta'),
                     TextInput::make('presupuesto')->label('Presupuesto (S/)')->numeric()->minValue(0),

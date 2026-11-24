@@ -26,6 +26,7 @@ final readonly class FiltrosOportunidades
      * @param  list<int>  $lineas  líneas de solución
      * @param  list<string>  $clientes  `privado` o `nivel:<id>` (nivel de gobierno), de la cuenta
      * @param  list<string>  $tipos  claves de TIPOS
+     * @param  list<string>  $origenes  códigos del canal del lead (observación 9.3)
      */
     public function __construct(
         public string $texto = '',
@@ -36,5 +37,6 @@ final readonly class FiltrosOportunidades
         public array $clientes = [],
         public string $orden = 'monto',
         public array $tipos = [],
+        public array $origenes = [],
     ) {}
 }

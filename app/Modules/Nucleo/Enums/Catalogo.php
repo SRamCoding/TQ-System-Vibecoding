@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Nucleo\Enums;
 
 use App\Modules\Nucleo\Models\Aplicacion;
+use App\Modules\Nucleo\Models\CanalLead;
 use App\Modules\Nucleo\Models\CategoriaFrase;
 use App\Modules\Nucleo\Models\CentroCosto;
 use App\Modules\Nucleo\Models\Concerns\ElementoCatalogo;
@@ -71,6 +72,8 @@ enum Catalogo: string
     case Aplicaciones = 'aplicaciones';
     /** Plan 2.20a, N3: de dónde llega una cuenta, un lead o una oportunidad. */
     case OrigenesComerciales = 'origenes_comerciales';
+    /** Observación 9.3: por dónde llega un lead (Página web, WhatsApp, Instagram…), con su ícono. */
+    case CanalesLead = 'canales_lead';
     case NivelesGobierno = 'niveles_gobierno';
     /** Las 21 secciones de la CIIU Rev. 4: cerrado (plan 2.20a, N2). */
     case Rubros = 'rubros';
@@ -100,6 +103,7 @@ enum Catalogo: string
             self::RedesSociales => RedSocial::class,
             self::Aplicaciones => Aplicacion::class,
             self::OrigenesComerciales => OrigenComercial::class,
+            self::CanalesLead => CanalLead::class,
             self::NivelesGobierno => NivelGobierno::class,
             self::Rubros => Rubro::class,
         };
@@ -129,6 +133,7 @@ enum Catalogo: string
             self::RedesSociales => 'redes sociales',
             self::Aplicaciones => 'aplicaciones del panel',
             self::OrigenesComerciales => 'orígenes comerciales',
+            self::CanalesLead => 'canales de los leads',
             self::NivelesGobierno => 'niveles de gobierno',
             self::Rubros => 'rubros',
         };
@@ -163,6 +168,7 @@ enum Catalogo: string
             self::RedesSociales => 'tq-redes-sociales',
             self::Aplicaciones => 'heroicon-o-rectangle-group',
             self::OrigenesComerciales => 'heroicon-o-inbox-arrow-down',
+            self::CanalesLead => 'heroicon-o-signal',
             self::NivelesGobierno => 'heroicon-o-globe-americas',
             self::Rubros => 'heroicon-o-view-columns',
         };
@@ -191,6 +197,7 @@ enum Catalogo: string
             self::RedesSociales => 'LinkedIn, Facebook, sitio web… con su ícono',
             self::Aplicaciones => 'Word, Excel, PowerPoint… del panel de aplicaciones de todos',
             self::OrigenesComerciales => 'De dónde llegan las cuentas, los leads y las oportunidades',
+            self::CanalesLead => 'Por dónde llega cada lead: página web, WhatsApp, redes, referido…',
             self::NivelesGobierno => 'Gobierno local, regional o nacional de una entidad pública',
             self::Rubros => 'A qué se dedica una empresa: secciones de la CIIU Rev. 4 (SUNAT)',
         };
@@ -240,7 +247,7 @@ enum Catalogo: string
             self::RolesParty, self::CategoriasFrase => Campo::texto('codigo', 'Código', maximo: 20)->conReglas('regex:/^[a-z][a-z0-9_]*$/'),
             self::FrasesSaludo => Campo::texto('codigo', 'Código', maximo: 40)->conReglas('regex:/^[a-z0-9][a-z0-9-]*$/'),
             self::Feriados => Campo::texto('codigo', 'Fecha (AAAA-MM-DD)', maximo: 10)->conReglas('regex:/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/'),
-            self::TiposAdjunto, self::RedesSociales, self::Aplicaciones => Campo::texto('codigo', 'Código', maximo: 20)->conReglas('regex:/^[a-z][a-z0-9_]*$/'),
+            self::TiposAdjunto, self::RedesSociales, self::Aplicaciones, self::CanalesLead => Campo::texto('codigo', 'Código', maximo: 20)->conReglas('regex:/^[a-z][a-z0-9_]*$/'),
             self::CentrosCosto => Campo::texto('codigo', 'Código (mayúsculas, como ADM)', maximo: 20)->conReglas('regex:/^[A-Z][A-Z0-9]*$/'),
             self::OrigenesComerciales, self::NivelesGobierno => Campo::texto('codigo', 'Código (mayúsculas, como FERIA)', maximo: 20)->conReglas('regex:/^[A-Z][A-Z0-9_]*$/'),
             self::Rubros => Campo::texto('codigo', 'Sección CIIU (A a U)', maximo: 1)->conReglas('regex:/^[A-U]$/'),
@@ -278,7 +285,7 @@ enum Catalogo: string
             self::Monedas, self::UnidadesMedida, self::Ubigeos, self::TiposDocumento, self::Cubso,
             self::TiposDocumentoIdentidad, self::Feriados, self::Rubros => null,
             self::CentrosCosto => strtoupper(str_replace(' ', '', $palabras)),
-            self::RolesParty, self::CategoriasFrase, self::TiposAdjunto, self::RedesSociales, self::Aplicaciones => str_replace(' ', '_', $palabras),
+            self::RolesParty, self::CategoriasFrase, self::TiposAdjunto, self::RedesSociales, self::Aplicaciones, self::CanalesLead => str_replace(' ', '_', $palabras),
             self::FrasesSaludo => str_replace(' ', '-', $palabras),
             default => strtoupper(str_replace(' ', '_', $palabras)),
         };
@@ -396,6 +403,10 @@ enum Catalogo: string
                 Campo::texto('nombre', 'Nombre', maximo: 40),
                 Campo::texto('dominios', 'Dominios, separados por comas (vacío: cualquiera, como un sitio web)', maximo: 200)->opcional()->conReglas('present', 'regex:/^[a-z0-9-]+(\\.[a-z0-9-]+)+(,[a-z0-9-]+(\\.[a-z0-9-]+)+)*$/'),
                 Campo::opcion('icono', 'Ícono', IconoRed::class),
+            ],
+            self::CanalesLead => [
+                Campo::texto('nombre', 'Nombre', maximo: 60),
+                Campo::opcion('icono', 'Ícono', IconoCanal::class),
             ],
             // Plan 1.4p: solo `https://`, como exige la base. El orden es el de la cuadrícula y, sin uso, el del muelle (D5).
             self::Aplicaciones => [

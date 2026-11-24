@@ -84,6 +84,10 @@ final class TarjetasOportunidades extends Page
     #[Url(as: 'tipo', except: [])]
     public array $tipos = [];
 
+    /** @var list<string> Observación 9.3: el canal del lead (Página web, WhatsApp…). */
+    #[Url(as: 'origen', except: [])]
+    public array $origenes = [];
+
     #[Url(as: 'orden', except: 'monto')]
     public string $orden = 'monto';
 
@@ -127,7 +131,7 @@ final class TarjetasOportunidades extends Page
 
     public function quitarFiltros(): void
     {
-        $this->reset('buscar', 'atencion', 'etapas', 'ejecutivos', 'lineas', 'clientes', 'tipos');
+        $this->reset('buscar', 'atencion', 'etapas', 'ejecutivos', 'lineas', 'clientes', 'tipos', 'origenes');
         $this->resetPage();
     }
 
@@ -142,6 +146,7 @@ final class TarjetasOportunidades extends Page
             clientes: array_map(strval(...), $this->clientes),
             orden: array_key_exists($this->orden, FiltrosOportunidades::ORDENES) ? $this->orden : 'monto',
             tipos: array_values(array_intersect(array_map(strval(...), $this->tipos), array_keys(FiltrosOportunidades::TIPOS))),
+            origenes: array_values(array_map(strval(...), $this->origenes)),
         );
     }
 

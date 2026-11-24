@@ -235,6 +235,11 @@ final readonly class PortadaOportunidades
             $this->enTipos($consulta, $filtros->tipos);
         }
 
+        // Observación 9.3: por el canal del lead del que nació la oportunidad.
+        if ($salvo !== 'origenes' && $filtros->origenes !== []) {
+            $consulta->whereIn('oportunidades.id', array_keys(array_filter($this->canalesDeOportunidades(), fn (string $c): bool => in_array($c, $filtros->origenes, true))));
+        }
+
         if ($salvo !== 'atencion') {
             foreach ($filtros->atencion as $clave) {
                 $this->enAtencion($consulta, $clave);
@@ -282,7 +287,7 @@ final readonly class PortadaOportunidades
      */
     public function opcionesVitrina(FiltrosOportunidades $filtros): array
     {
-        $opciones = ['atencion' => [], 'tipos' => [], 'etapas' => [], 'ejecutivos' => [], 'lineas' => [], 'clientes' => []];
+        $opciones = ['atencion' => [], 'tipos' => [], 'etapas' => [], 'ejecutivos' => [], 'lineas' => [], 'clientes' => [], 'origenes' => []];
 
         // Observación 7.1: los números junto a cada filtro también cuentan las tarjetas por calificar.
         foreach (FiltrosOportunidades::ATENCION as $clave => $etiqueta) {
@@ -342,6 +347,20 @@ final readonly class PortadaOportunidades
             $opciones['clientes'][$tipo] = ['etiqueta' => $etiqueta, 'cantidad' => $cantidad];
         }
 
+        // Observación 9.3: «Origen», el canal de cada lead (y de la oportunidad que nació de uno). Solo los que tienen algo.
+        $porCalificarSinOrigen = $this->porCalificar($filtros, 'origenes');
+        $deOportunidades = $this->canalesDeOportunidades();
+        $idsVisibles = $this->filtrarVitrina($filtros, 'origenes')->pluck('oportunidades.id')->all();
+
+        foreach (app(LeadsService::class)->canales() as $canal) {
+            $cantidad = count(array_filter($porCalificarSinOrigen, fn (array $t): bool => ($t['canal']['codigo'] ?? null) === $canal['codigo']))
+                + count(array_filter($idsVisibles, fn (int $id): bool => ($deOportunidades[$id] ?? null) === $canal['codigo']));
+
+            if ($cantidad > 0 || in_array($canal['codigo'], $filtros->origenes, true)) {
+                $opciones['origenes'][$canal['codigo']] = ['etiqueta' => $canal['nombre'], 'cantidad' => $cantidad, 'icono' => $canal['icono']];
+            }
+        }
+
         return $opciones;
     }
 
@@ -383,7 +402,7 @@ final readonly class PortadaOportunidades
                     'origenEtiqueta' => $l['campania'] === null ? $l['origen'] : "Campaña {$l['campania']}",
                     'detalle' => $l['mensaje'], 'monto' => null, 'montoEtiqueta' => null, 'tipo' => 'privada', 'hito' => null, 'desde' => $l['desde'],
                     'dias' => $l['dias'], 'sinAtender' => $l['sinAtender'], 'ejecutivo' => $l['asignado'], 'linea' => null, 'cliente' => null,
-                    'atencion' => $l['sinAtender'] ? ['atascadas'] : [], 'fecha' => null,
+                    'atencion' => $l['sinAtender'] ? ['atascadas'] : [], 'fecha' => null, 'canal' => $l['canal'] ?? null,
                 ];
             }
 
@@ -409,6 +428,9 @@ final readonly class PortadaOportunidades
                 return false;
             }
             if ($salvo !== 'atencion' && array_diff($filtros->atencion, $t['atencion']) !== []) {
+                return false;
+            }
+            if ($salvo !== 'origenes' && $filtros->origenes !== [] && ! in_array($t['canal']['codigo'] ?? null, $filtros->origenes, true)) {
                 return false;
             }
 
@@ -514,5 +536,11 @@ final readonly class PortadaOportunidades
     private function estados(array $codigos): Builder
     {
         return Estado::query()->select('id')->where('documento_type', (new DefinicionOportunidad)->tipo())->whereIn('codigo', $codigos);
+    }
+
+    /** @return array<int, string> id de la oportunidad → código del canal de su lead (observación 9.3) */
+    private function canalesDeOportunidades(): array
+    {
+        return once(fn (): array => app(LeadsService::class)->canalesDeOportunidades());
     }
 }

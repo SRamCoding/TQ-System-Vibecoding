@@ -10,6 +10,7 @@ use App\Modules\Nucleo\Enums\IconoRed;
 use App\Modules\Nucleo\Enums\OrigenUbigeo;
 use App\Modules\Nucleo\Enums\ProgramaEscritorio;
 use App\Modules\Nucleo\Models\Aplicacion;
+use App\Modules\Nucleo\Models\CanalLead;
 use App\Modules\Nucleo\Models\CategoriaFrase;
 use App\Modules\Nucleo\Models\CentroCosto;
 use App\Modules\Nucleo\Models\FormaPago;
@@ -118,6 +119,12 @@ final class CatalogosSeeder extends Seeder
                 // Plan 2.0, D5: con detalle obligatorio en el registro que lo usa.
                 ['codigo' => 'OTRO', 'nombre' => 'Otro'],
             ]);
+
+            // Observación 9.3: los canales por los que llega un lead, con su ícono (el código es el del ícono).
+            $this->crearFaltantes(CanalLead::class, array_map(fn (string $codigo, string $nombre): array => ['codigo' => $codigo, 'nombre' => $nombre, 'icono' => $codigo], ...[array_keys($c = [
+                'sitio_web' => 'Página web', 'whatsapp' => 'WhatsApp', 'instagram' => 'Instagram', 'facebook' => 'Facebook', 'tiktok' => 'TikTok', 'linkedin' => 'LinkedIn',
+                'referido' => 'Referido', 'feria' => 'Feria o evento', 'llamada' => 'Llamada', 'correo' => 'Correo', 'otro' => 'Otro',
+            ]), array_values($c)]));
 
             $this->crearFaltantes(NivelGobierno::class, [
                 ['codigo' => 'LOCAL', 'nombre' => 'Gobierno local'],

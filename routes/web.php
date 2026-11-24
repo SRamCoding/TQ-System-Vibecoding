@@ -3,6 +3,7 @@
 declare(strict_types=1);
 use App\Modules\Crm\Campanias\Models\Campania;
 use App\Modules\Crm\Campanias\Services\CampaniasService;
+use App\Modules\Crm\Campanias\Services\LeadsService;
 use App\Modules\Nucleo\Navegacion\Proceso;
 use App\Modules\Nucleo\Services\AsistenteService;
 use App\Modules\Nucleo\Services\NavegacionService;
@@ -50,3 +51,43 @@ Route::middleware(['web', 'throttle:5,10'])->match(['get', 'post'], 'c/{token}',
 
     return view('campanias::formulario', ['campania' => $campania, 'enviado' => $enviado]);
 })->name('campania.formulario');
+
+// Observación 9.3 (ficha t1-campanias): la entrada de leads desde la landing de Techquk (docs/vibe/conectar-landing.md).
+// Sin sesión ni CSRF (llega de otro sitio): la protegen la clave compartida, la casilla trampa oculta y el límite de
+// envíos por minuto y dirección. Lo rechazado no crea nada. Punto de extensión: los formularios de anuncios de Meta y
+// TikTok pueden llegar aquí con su `utm_source`.
+Route::post('entrada/leads', function (Request $r) {
+    $clave = (string) config('services.entrada_leads.clave');
+    $enviada = (string) ($r->header('X-Techquk-Clave') ?? $r->input('clave', ''));
+    $responder = fn (int $codigo, string $mensaje) => $r->expectsJson() || ! $r->filled('volver')
+        ? response()->json(['ok' => $codigo === 201, 'mensaje' => $mensaje], $codigo)
+        : redirect()->away($r->input('volver').(str_contains((string) $r->input('volver'), '?') ? '&' : '?').($codigo === 201 ? 'enviado=1' : 'error=1'));
+
+    if ($clave === '' || ! hash_equals($clave, $enviada)) {
+        return $responder(403, 'Clave incorrecta.');
+    }
+
+    // La casilla trampa: oculta para las personas; un robot la llena.
+    if (trim((string) $r->input('sitio_web', '')) !== '') {
+        return $responder(422, 'No se pudo registrar.');
+    }
+
+    $v = validator($r->all(), [
+        'nombre' => 'required|string|max:150', 'organizacion' => 'nullable|string|max:200', 'telefono' => 'nullable|string|max:30',
+        'correo' => 'nullable|email|max:150', 'mensaje' => 'nullable|string|max:2000', 'cargo' => 'nullable|string|max:120', 'ruc' => 'nullable|digits:11',
+        'volver' => 'nullable|url|max:500',
+    ]);
+
+    if ($v->fails() || (! $r->filled('telefono') && ! $r->filled('correo'))) {
+        return $responder(422, $v->fails() ? $v->errors()->first() : 'Falta un teléfono o un correo.');
+    }
+
+    $lead = app(LeadsService::class)->recibirDeLaWeb($v->validated(), $r->input('utm_source'), $r->input('campania') ?? $r->input('utm_campaign'));
+
+    return $responder(201, 'Gracias, te contactaremos pronto. (lead '.$lead->id.')');
+})->middleware('throttle:entrada-leads')->name('entrada.leads');
+
+// Observación 9.3: una página de prueba que envía un formulario de ejemplo a la entrada, como lo haría la landing.
+Route::middleware(['web'])->get('entrada/prueba', fn (Request $r) => $r->user() === null ? redirect('/login') : view('campanias::entrada-prueba', [
+    'clave' => (string) config('services.entrada_leads.clave'), 'enviado' => $r->boolean('enviado'), 'error' => $r->boolean('error'),
+]))->name('entrada.prueba');

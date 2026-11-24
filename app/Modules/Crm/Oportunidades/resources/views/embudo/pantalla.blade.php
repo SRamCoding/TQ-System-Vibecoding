@@ -118,7 +118,13 @@
                             <x-oportunidades::gema talla="en_roca" :tamano="22" decorativa />
                             <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
                                 <span class="tq-embudo-corta" style="font-size: 14px; font-weight: 600">{{ $p['nombre'] }}</span>
-                                <span class="tq-embudo-corta" style="font-size: 12px; color: var(--tq-e-suave)">{{ $p['entidad'] }} · {{ $p['origenEtiqueta'] }}</span>
+                                <span class="tq-embudo-corta" style="font-size: 12px; color: var(--tq-e-suave); display: flex; align-items: center; gap: 6px">
+                                    @if (($p['canal'] ?? null) !== null)
+                                        {{-- Observación 9.3: el canal del lead, con su ícono. --}}
+                                        <span title="Canal: {{ $p['canal']['nombre'] }}" style="display: inline-flex; align-items: center; gap: 3px; padding: 0 7px; border-radius: 999px; border: 1px solid var(--tq-borde, #E5E0D6); font-weight: 600; flex: none"><x-filament::icon :icon="$p['canal']['icono']" class="h-3 w-3" />{{ $p['canal']['nombre'] }}</span>
+                                    @endif
+                                    <span class="tq-embudo-corta">{{ $p['entidad'] }} · {{ $p['origenEtiqueta'] }}</span>
+                                </span>
                                 <span style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap">
                                     @if ($p['clase'] === 'lead')
                                         <x-filament::button size="xs" color="success" wire:click="decidir('calificarLead', {{ $p['id'] }})">Calificar</x-filament::button>

@@ -1193,3 +1193,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (Oportunidades)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.2: un solo botón «+ Nuevo»»
+
+### MV-097 · 2026-11-24 · El canal de cada lead y la landing de Techquk como fuente
+
+- **Ficha:** `fichas/t1-campanias.md`
+- **Dijo Sebastián:** (observaciones-9, punto 3) «Todo lead … lleva su canal: Página web, WhatsApp, Instagram, Facebook, TikTok, LinkedIn, Referido, Feria o evento, Llamada, Correo, Otro. Es un catálogo … con su ícono … canal y campaña no son lo mismo … un grupo nuevo «Origen» … Los formularios de contacto de la página web de Techquk crean el lead solo … Protección contra spam: una clave secreta compartida con la landing, una verificación invisible (casilla trampa oculta) y un límite de envíos por minuto … una nota corta de cómo conectarla … una página de prueba … Aviso en Mien».
+- **Decisión:** lo dicho.
+- **Alcance:** cruza módulos (Oportunidades, Campañas, Directorio y catálogos)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.3: el canal de cada lead y la entrada desde la landing»

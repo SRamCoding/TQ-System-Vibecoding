@@ -49,4 +49,11 @@ return [
         'ocds_url' => env('OECE_OCDS_URL'),
     ],
 
+    // Observación 9.3: la clave que comparte la landing de Techquk para crear leads en `POST /entrada/leads`. Vacía en
+    // un equipo local, vale la de prueba (`clave-local-de-prueba`); vacía en el servidor, la entrada queda cerrada.
+    'entrada_leads' => [
+        'clave' => env('TECHQUK_ENTRADA_LEADS_CLAVE') ?: (env('APP_ENV') === 'local' ? 'clave-local-de-prueba' : null),
+        'por_minuto' => (int) env('TECHQUK_ENTRADA_LEADS_POR_MINUTO', 10),
+    ],
+
 ];

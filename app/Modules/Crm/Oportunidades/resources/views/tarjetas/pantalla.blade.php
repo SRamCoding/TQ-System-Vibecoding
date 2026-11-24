@@ -7,7 +7,7 @@
     Colores del sistema por nombre: el anillo en el morado del CRM, verde ganada, rojo perdida.
 --}}
 @php
-    $grupos = ['atencion' => 'Atención', 'tipos' => 'Tipo', 'etapas' => 'Etapa', 'ejecutivos' => 'Ejecutivo', 'lineas' => 'Línea de solución', 'clientes' => 'Cliente'];
+    $grupos = ['atencion' => 'Atención', 'tipos' => 'Tipo', 'etapas' => 'Etapa', 'origenes' => 'Origen', 'ejecutivos' => 'Ejecutivo', 'lineas' => 'Línea de solución', 'clientes' => 'Cliente'];
     $anillo = function (array $t): string {
         $p = $t['probabilidad'] / 100;
         $r = 21;
@@ -40,6 +40,8 @@
         .tq-op-barra { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-bottom: 1rem; }
         .tq-op-barra .tq-op-buscar { flex: 1 1 16rem; }
         /* Observación 8.1: 3 columnas como máximo (3 en anchas, 2 en medianas, 1 en angostas); las tarjetas crecen. */
+        .tq-canal { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.05rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; line-height: 1.4; background: var(--tq-superficie, white); border: 1px solid var(--tq-borde, var(--gray-200)); color: var(--gray-700); white-space: nowrap; }
+        .dark .tq-canal { color: var(--gray-200); }
         .tq-op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; }
         .tq-op-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 0.75rem; background: var(--tq-superficie, white); box-shadow: 0 1px 2px rgb(0 0 0 / 0.06); outline: 1px solid rgb(3 7 18 / 0.06); text-align: start; cursor: pointer; transition: box-shadow 160ms ease, transform 160ms ease; }
         .dark .tq-op-card { background: var(--tq-superficie, var(--gray-900)); outline-color: rgb(255 255 255 / 0.08); }
@@ -105,7 +107,7 @@
                         @foreach ($orden as $valor => $op)
                             <label @class(['tq-op-opcion', 'tq-cero' => $op['cantidad'] === 0])
                                 @if ($muchas) x-show="q !== '' ? {{ \Illuminate\Support\Js::from(mb_strtolower($op['etiqueta'])) }}.includes(q.toLowerCase()) : (todos || {{ $loop->index < 6 || in_array((string) $valor, array_map('strval', (array) $this->{$grupo}), true) ? 'true' : 'false' }})" @endif>
-                                <x-filament::input.checkbox wire:model.live="{{ $grupo }}" value="{{ $valor }}" />{{ $op['etiqueta'] }}<span class="tq-n">{{ $op['cantidad'] }}</span>
+                                <x-filament::input.checkbox wire:model.live="{{ $grupo }}" value="{{ $valor }}" />@if (isset($op['icono']))<x-filament::icon :icon="$op['icono']" class="h-4 w-4" style="color: var(--gray-500); flex: none" />@endif{{ $op['etiqueta'] }}<span class="tq-n">{{ $op['cantidad'] }}</span>
                             </label>
                         @endforeach
                         @if ($muchas)
@@ -154,6 +156,10 @@
                             @endif
                             @if ($p['detalle'] !== null)
                                 <span class="tq-pc-detalle">«{{ $p['detalle'] }}»</span>
+                            @endif
+                            @if (($p['canal'] ?? null) !== null)
+                                {{-- Observación 9.3: el canal del lead, con su ícono. --}}
+                                <span><span class="tq-canal" title="Canal por el que llegó"><x-filament::icon :icon="$p['canal']['icono']" class="h-3.5 w-3.5" />{{ $p['canal']['nombre'] }}</span></span>
                             @endif
                             <span class="tq-op-etl">
                                 <span>{{ $p['origen'] }}</span>

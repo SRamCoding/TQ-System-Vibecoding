@@ -20,7 +20,10 @@ use App\Modules\Nucleo\Navegacion\RegistroPantallas;
 use App\Modules\Nucleo\RegistroParametros\DefinicionParametro;
 use App\Modules\Nucleo\RegistroParametros\RegistroParametros;
 use App\Modules\Nucleo\Seguridad\RegistroPermisos;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 /** MVP rápido (ficha t1-campanias): Campañas y leads (CRM-07). */
@@ -50,6 +53,20 @@ final class CampaniasServiceProvider extends ServiceProvider
             $items = app(CampaniasService::class)->avisos();
 
             return ['cantidad' => count($items), 'texto' => 'campañas con contactos sin atender', 'grupos' => [['titulo' => 'Campañas', 'items' => $items]]];
+        });
+
+        // Observación 9.3: la entrada de la landing, con su límite de envíos por minuto y dirección.
+        RateLimiter::for('entrada-leads', fn (Request $r) => Limit::perMinute(max(1, (int) config('services.entrada_leads.por_minuto', 10)))->by((string) $r->ip()));
+
+        // Observación 9.3: «Nuevo contacto desde la página web: [nombre] · [organización]».
+        $this->app->make(RegistroPendientesMien::class)->registrar('leads-web', function (User $u): array {
+            if (! $u->can(LeadsService::PERMISO_GESTIONAR)) {
+                return ['cantidad' => 0, 'texto' => ''];
+            }
+
+            $items = app(LeadsService::class)->avisosDeLaWeb();
+
+            return ['cantidad' => count($items), 'texto' => count($items) === 1 ? 'contacto nuevo de la página web' : 'contactos nuevos de la página web', 'grupos' => [['titulo' => 'Desde la página web', 'items' => $items]]];
         });
 
         $permisos = $this->app->make(RegistroPermisos::class);

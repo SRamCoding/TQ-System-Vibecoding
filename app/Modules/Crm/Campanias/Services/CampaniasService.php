@@ -159,6 +159,8 @@ final readonly class CampaniasService
 
         Lead::query()->create([
             'campania_id' => $c->id, 'origen_comercial_id' => (int) DB::table('origenes_comerciales')->where('codigo', $origen)->value('id'),
+            // Observación 9.3: el canal de la campaña (sin canal, Página web).
+            'canal_lead_id' => $c->canal_lead_id ?? DB::table('canales_lead')->where('codigo', 'sitio_web')->value('id'),
             'nombre_contacto' => mb_substr($nombre, 0, 150), 'organizacion' => $organizacion === null ? null : mb_substr($organizacion, 0, 200),
             'telefono' => $telefono === null ? null : mb_substr($telefono, 0, 30), 'email' => $correo === null ? null : mb_substr($correo, 0, 150),
             'mensaje' => $necesita, 'estado' => 'nuevo',

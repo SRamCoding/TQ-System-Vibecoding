@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Campanias\Services;
 
+use App\Modules\Crm\Campanias\Models\Campania;
 use App\Modules\Crm\Campanias\Models\Lead;
 use App\Modules\Crm\Cuentas\Services\CuentasService;
 use App\Modules\Crm\Cuentas\Services\DatosCuenta;
 use App\Modules\Crm\Oportunidades\Services\DatosOportunidad;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
+use App\Modules\Nucleo\Enums\IconoCanal;
 use App\Modules\Nucleo\Models\User;
+use App\Modules\Nucleo\Services\ContextoAuditoria;
+use App\Modules\Nucleo\Services\UsuarioSistema;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +33,94 @@ final readonly class LeadsService
 
     /** Días desde los que un lead nuevo cuenta como «sin atender». */
     public const int DIAS_SIN_ATENDER = 3;
+
+    /** Observación 9.3: el origen comercial que toma un lead según su canal (pasa a la cuenta y a la oportunidad). */
+    public const array ORIGEN_DEL_CANAL = ['feria' => 'FERIA', 'referido' => 'REFERENCIA', 'llamada' => 'VISITA_FRIO'];
+
+    /** Observación 9.3: lo que suele venir en `utm_source` y el canal al que corresponde. */
+    public const array CANAL_DE_UTM = [
+        'web' => 'sitio_web', 'sitio' => 'sitio_web', 'google' => 'sitio_web', 'landing' => 'sitio_web',
+        'whatsapp' => 'whatsapp', 'wa' => 'whatsapp', 'instagram' => 'instagram', 'ig' => 'instagram',
+        'facebook' => 'facebook', 'fb' => 'facebook', 'meta' => 'facebook', 'tiktok' => 'tiktok', 'tt' => 'tiktok',
+        'linkedin' => 'linkedin', 'li' => 'linkedin', 'correo' => 'correo', 'email' => 'correo', 'mail' => 'correo', 'newsletter' => 'correo',
+        'referido' => 'referido', 'feria' => 'feria', 'evento' => 'feria',
+    ];
+
+    /**
+     * Observación 9.3: los canales del catálogo, con su ícono.
+     *
+     * @return array<int, array{codigo: string, nombre: string, icono: string}>
+     */
+    public function canales(bool $soloActivos = false): array
+    {
+        return DB::table('canales_lead')->when($soloActivos, fn ($q) => $q->where('es_activo', true))->orderBy('id')->get(['id', 'codigo', 'nombre', 'icono'])
+            ->mapWithKeys(fn (object $c): array => [(int) $c->id => ['codigo' => $c->codigo, 'nombre' => $c->nombre, 'icono' => (IconoCanal::tryFrom($c->icono) ?? IconoCanal::Otro)->componente()]])->all();
+    }
+
+    public function canalPorCodigo(string $codigo): ?int
+    {
+        $id = DB::table('canales_lead')->where('codigo', $codigo)->value('id');
+
+        return $id === null ? null : (int) $id;
+    }
+
+    /** El origen comercial que corresponde a un canal (SITIO_WEB si no tiene uno propio). */
+    public function origenDelCanal(?int $canalId): int
+    {
+        $codigo = $canalId === null ? null : DB::table('canales_lead')->where('id', $canalId)->value('codigo');
+
+        return (int) DB::table('origenes_comerciales')->where('codigo', self::ORIGEN_DEL_CANAL[$codigo] ?? 'SITIO_WEB')->value('id');
+    }
+
+    /**
+     * Observación 9.3: un contacto que llega del formulario de la página web de Techquk. Si el enlace traía campaña
+     * (`campania` con su código o nombre, o `utm_campaign`), queda en esa campaña; el canal sale de `utm_source` y, sin
+     * él, de la campaña o «Página web». Crea el lead en Por calificar; el aviso en Mien sale solo (canal Página web).
+     *
+     * @param  array{nombre: string, organizacion?: ?string, telefono?: ?string, correo?: ?string, mensaje?: ?string, cargo?: ?string, ruc?: ?string}  $d
+     */
+    public function recibirDeLaWeb(array $d, ?string $utmSource = null, ?string $campania = null): Lead
+    {
+        $c = null;
+
+        if ($campania !== null && trim($campania) !== '') {
+            $clave = trim($campania);
+            $c = Campania::query()->where('token', $clave)->first()
+                ?? Campania::query()->whereRaw('lower(nombre) = lower(?)', [str_replace(['-', '_'], ' ', $clave)])->first();
+        }
+
+        $fuente = strtolower(trim((string) $utmSource));
+        $canalId = isset(self::CANAL_DE_UTM[$fuente]) ? $this->canalPorCodigo(self::CANAL_DE_UTM[$fuente]) : null;
+        $canalId ??= $c?->canal_lead_id ?? $this->canalPorCodigo('sitio_web');
+        $corta = fn (?string $v, int $n): ?string => $v === null || trim($v) === '' ? null : mb_substr(trim($v), 0, $n);
+
+        // Llega sin sesión: lo registra el usuario de sistema.
+        $sistema = User::query()->findOrFail(app(UsuarioSistema::class)->id());
+
+        return app(ContextoAuditoria::class)->comoUsuario($sistema, fn (): Lead => Lead::query()->create([
+            'campania_id' => $c?->id, 'canal_lead_id' => $canalId, 'origen_comercial_id' => $this->origenDelCanal($canalId),
+            'nombre_contacto' => mb_substr(trim($d['nombre']), 0, 150), 'organizacion' => $corta($d['organizacion'] ?? null, 200),
+            'cargo' => $corta($d['cargo'] ?? null, 120), 'ruc' => $corta($d['ruc'] ?? null, 11),
+            'telefono' => $corta($d['telefono'] ?? null, 30), 'email' => $corta($d['correo'] ?? null, 150), 'mensaje' => $corta($d['mensaje'] ?? null, 2000),
+            'estado' => 'nuevo',
+        ]));
+    }
+
+    /**
+     * Observación 9.3: «Nuevo contacto desde la página web: [nombre] · [organización]» (los de los últimos 3 días que
+     * siguen sin atender).
+     *
+     * @return list<array{texto: string, nota: ?string, url: string, tono: ?string}>
+     */
+    public function avisosDeLaWeb(): array
+    {
+        $web = $this->canalPorCodigo('sitio_web');
+
+        return Lead::query()->where('canal_lead_id', $web)->where('estado', 'nuevo')->where('created_at', '>=', Calendario::ahora()->subDays(self::DIAS_SIN_ATENDER))
+            ->orderByDesc('created_at')->limit(20)->get()
+            ->map(fn (Lead $l): array => ['texto' => 'Nuevo contacto desde la página web: '.$l->nombre_contacto.($l->organizacion ? ' · '.$l->organizacion : ''),
+                'nota' => $l->created_at->locale('es')->diffForHumans(), 'url' => '/oportunidades?etapa[0]=por_calificar', 'tono' => null])->values()->all();
+    }
 
     /**
      * Las cuentas con las que podría ser la misma organización: por RUC (exacta) y por nombre parecido.
@@ -73,6 +165,7 @@ final readonly class LeadsService
     {
         $hoy = Calendario::ahora();
         $origenes = DB::table('origenes_comerciales')->pluck('nombre', 'id');
+        $canales = $this->canales();
 
         return Lead::query()->with('campania:id,nombre')->whereIn('estado', ['nuevo', 'contactado'])->orderBy('created_at')->get()
             ->map(fn (Lead $l): array => [
@@ -80,7 +173,7 @@ final readonly class LeadsService
                 'origen' => (string) ($origenes[$l->origen_comercial_id] ?? 'Lead'), 'campania' => $l->campania?->nombre,
                 'mensaje' => $l->mensaje, 'telefono' => $l->telefono, 'desde' => CarbonImmutable::instance($l->created_at),
                 'dias' => (int) $l->created_at->diffInDays($hoy), 'sinAtender' => $l->estado === 'nuevo' && $l->created_at->lt($hoy->subDays(self::DIAS_SIN_ATENDER)),
-                'asignado' => $l->asignado_user_id,
+                'asignado' => $l->asignado_user_id, 'canal' => $canales[$l->canal_lead_id] ?? null,
             ])->values()->all();
     }
 
@@ -150,5 +243,16 @@ final readonly class LeadsService
             'monto' => bcadd($monto, '0', 2),
             'costo_por_lead' => $presupuesto === null || $leads === 0 ? null : bcdiv((string) $presupuesto, (string) $leads, 2),
         ];
+    }
+
+    /**
+     * Observación 9.3: el canal de cada oportunidad que nació de un lead (id de la oportunidad → código del canal).
+     *
+     * @return array<int, string>
+     */
+    public function canalesDeOportunidades(): array
+    {
+        return DB::table('leads')->join('canales_lead as c', 'c.id', '=', 'leads.canal_lead_id')->whereNotNull('leads.oportunidad_id')
+            ->pluck('c.codigo', 'leads.oportunidad_id')->map(fn (mixed $c): string => (string) $c)->all();
     }
 }

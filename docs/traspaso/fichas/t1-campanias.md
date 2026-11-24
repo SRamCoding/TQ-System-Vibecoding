@@ -1,7 +1,7 @@
 # Ficha · Campañas y leads (CRM-07)
 
-- **Estado:** en curso (v3, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v3
+- **Estado:** en curso (v4, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v4
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-campanias-v1`
 - **Fuentes del diseño (v3):** `docs/vibe/pedidos/observaciones-7.md` (punto 6) y `lienzos/campanias/` (`Main.dc.html`,
@@ -20,6 +20,8 @@ módulo es el último del CRM.
 
 ## Decisiones de Sebastián
 
+- **MV-097** (cruza módulos) · Cada lead lleva su canal (catálogo «Canales de los leads» con ícono); la campaña también. Filtro «Origen» en Mis oportunidades. La landing crea leads en `POST /entrada/leads` con clave, casilla trampa y límite por minuto; aviso en Mien.
+
 - **MV-079** (cruza módulos) · Campañas con su retorno (gasto real, margen de lo ganado, formulario y QR) y Mis clientes
   (tres grupos y campañas a clientes con su seguimiento como tareas). Radar del PAC: primero investigar y avisar.
 - **MV-074** (cruza módulos) · Los leads son tarjetas «Por calificar» en la lista de Oportunidades (Calificar /
@@ -29,6 +31,9 @@ módulo es el último del CRM.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **Canal** (v4, MV-097): «+ Nuevo → Contacto por calificar» y «Nueva campaña» piden el canal (el origen comercial del lead sale de él y se puede cambiar). En las tarjetas de Por calificar y en el panel de Por calificar del Embudo, el canal como etiqueta con su ícono. Mis oportunidades tiene el grupo de filtros «Origen» (plegable), con los canales que tienen algo: filtra los leads por su canal y las oportunidades por el canal del lead del que nacieron.
+- **Entrada de la landing** (v4, MV-097): `POST /entrada/leads` (campos y respuestas en `docs/vibe/conectar-landing.md`); `/entrada/prueba` es la página de prueba (con sesión) que envía un formulario de ejemplo. Mien: «Nuevo contacto desde la página web: [nombre] · [organización]» (los de los últimos 3 días sin atender).
 
 - **v3 · Campañas** `/campanias` (MV-079): chips **Campañas · Mis clientes** (el Radar del PAC no se muestra hasta que
   Sebastián decida; el calendario, más adelante). «Nueva campaña» arriba.
@@ -85,6 +90,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Reglas y números
 
+- **Canal del lead** (v4, MV-097): de `utm_source` (ig → Instagram, fb/meta → Facebook, google/web → Página web…), si no de su campaña, si no «Página web». La campaña sale de `campania` (su código o nombre) o `utm_campaign`. Origen comercial según el canal: Feria → FERIA, Referido → REFERENCIA, Llamada → VISITA_FRIO, los demás → SITIO_WEB. Los leads ya cargados tomaron el canal de su campaña o, sin campaña, de su origen. Límite: 10 envíos por minuto por dirección (`TECHQUK_ENTRADA_LEADS_POR_MINUTO`); se exige teléfono o correo.
+
 - **v3 · Retorno** = margen de lo ganado ÷ gastado (una decimal). **Gastado** = suma de los gastos reales de la campaña
   (gasto directo, centro de costo Comercial, rubro «Publicidad y ferias», con su sede; si pasa el saldo de la sede en
   el mes, pide motivo). **Margen de lo ganado** = por cada oportunidad ganada de sus contactos, el margen real del cierre
@@ -111,6 +118,10 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Supuestos sin confirmar
 
+- **v4 · Origen comercial y canal conviven:** el lead sigue teniendo su origen comercial (pasa a la cuenta y a la oportunidad, plan 2.20a); se llena solo desde el canal y se puede cambiar.
+- **v4 · Clave en local:** sin `TECHQUK_ENTRADA_LEADS_CLAVE`, en un equipo local vale `clave-local-de-prueba`; en el servidor, sin clave, la entrada queda cerrada.
+- **v4 · Ícono de WhatsApp:** dibujo propio (globo con auricular), no el logotipo oficial.
+
 - **v3 · Radar del PAC** no se construye todavía (pedido: investigar y avisar). Lo investigado: el OECE publica el PAC
   como un Excel anual (`PAC{año}_0.xlsx`, ~8–17 MB, actualizado cada mes) con entidad y RUC, procedimiento, objeto,
   descripción del ítem, cantidad, ubicación y **mes previsto**, pero **sin valor estimado**; la API OCDS no trae el PAC.
@@ -128,6 +139,9 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Atajos tomados
 
+- **v4 · Entrada de leads sin más defensa:** clave compartida (visible si la landing es solo HTML), casilla trampa y límite por dirección; sin CAPTCHA ni firma de cada envío. Lo crea el usuario de sistema. La ruta está fuera de CSRF y con CORS solo para ella.
+- **v4 · Canal de una oportunidad:** se busca por el lead que la creó (`leads.oportunidad_id`), sin columna propia en la oportunidad.
+
 - **v3:** el formulario público solo se protege con un límite por dirección (5 envíos cada 10 minutos) y un campo
   trampa. Mis clientes y el margen leen proyectos, series y cierres con consultas directas. Los proyectos antiguos de la
   demo se insertaron directo en la base. Los gastos de campaña se enlazan en una tabla propia.
@@ -143,6 +157,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 `Filament/Resources/Leads` y `Filament/Resources/Campanias`); datos en `DemoSeeder::campanias()`.
 
 ## Cambios desde la versión anterior
+
+- **v4** (MV-097): canal de cada lead, filtro «Origen» y entrada desde la landing.
 
 - **v3** (MV-079): Campañas con retorno y gasto real, formulario y QR, Mis clientes y campañas a clientes con su
   seguimiento; avisos en Mien.

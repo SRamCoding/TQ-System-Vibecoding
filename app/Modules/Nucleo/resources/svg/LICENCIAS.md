@@ -34,3 +34,5 @@ Los que se sumaron con la 1.4x (2026-10-29), también en `../aplicaciones/`:
 
 Son marcas de sus dueños (Anthropic, Meta, Google y LinkedIn): se usan solo para señalar el enlace a ese producto, como piden sus guías de marca. (La 1.4x
 corría un poco el de PowerPoint en la pantalla; la 1.4z lo quitó: el descentrado venía de cómo se acomodaba el enlace.)
+
+- `red-whatsapp.svg`: dibujo propio (globo de conversación con auricular), sin marca registrada copiada; observación 9.3.

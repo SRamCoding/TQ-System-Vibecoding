@@ -202,7 +202,11 @@ final class LeadResource extends Resource
                 TextInput::make('ruc')->label('RUC')->maxLength(11),
                 TextInput::make('email')->label('Correo')->email()->maxLength(150),
                 TextInput::make('telefono')->label('Teléfono')->maxLength(30),
-                Select::make('origen_comercial_id')->label('Origen')->required()->options(fn (): array => DB::table('origenes_comerciales')->orderBy('nombre')->pluck('nombre', 'id')->all()),
+                // Observación 9.3: el canal por el que llegó; el origen comercial sale de él (se puede cambiar).
+                Select::make('canal_lead_id')->label('Canal')->required()->live()
+                    ->options(fn (): array => array_map(fn (array $c): string => $c['nombre'], app(LeadsService::class)->canales(soloActivos: true)))
+                    ->afterStateUpdated(fn (mixed $state, callable $set) => $set('origen_comercial_id', app(LeadsService::class)->origenDelCanal(is_numeric($state) ? (int) $state : null))),
+                Select::make('origen_comercial_id')->label('Origen comercial')->required()->options(fn (): array => DB::table('origenes_comerciales')->orderBy('nombre')->pluck('nombre', 'id')->all()),
                 Select::make('campania_id')->label('Campaña')->options(fn (): array => Campania::query()->where('es_activa', true)->pluck('nombre', 'id')->all()),
                 Textarea::make('mensaje')->label('Qué pidió')->rows(3),
             ])

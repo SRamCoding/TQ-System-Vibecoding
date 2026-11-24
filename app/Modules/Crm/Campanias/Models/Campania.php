@@ -17,7 +17,7 @@ class Campania extends Model
 
     protected $table = 'campanias';
 
-    protected $fillable = ['nombre', 'tipo', 'desde', 'hasta', 'presupuesto', 'objetivo', 'es_activa', 'token', 'responsable_user_id', 'grupo', 'seguimiento'];
+    protected $fillable = ['nombre', 'tipo', 'canal_lead_id', 'desde', 'hasta', 'presupuesto', 'objetivo', 'es_activa', 'token', 'responsable_user_id', 'grupo', 'seguimiento'];
 
     protected function casts(): array
     {
