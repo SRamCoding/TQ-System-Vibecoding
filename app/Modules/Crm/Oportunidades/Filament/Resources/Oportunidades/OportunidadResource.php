@@ -32,6 +32,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
@@ -237,6 +238,12 @@ final class OportunidadResource extends Resource
             Tabs::make('ficha')->columnSpanFull()->tabs([
                 // D10: el Resumen va primero: recorrido, compuerta, negociación, línea de tiempo y atención.
                 Tab::make('Resumen')->icon('heroicon-o-window')->schema([
+                    // Observación 9.5 (10, 8 y 9): arriba el resumen y el siguiente paso sugeridos; quién decide y competidores.
+                    Livewire::make(ResumenSugeridoDeOportunidad::class, fn (Oportunidad $record): array => ['oportunidadId' => $record->id])->key('resumen-sugerido'),
+                    Grid::make(['default' => 1, 'lg' => 2])->schema([
+                        Livewire::make(QuienDecideDeOportunidad::class, fn (Oportunidad $record): array => ['oportunidadId' => $record->id])->key('quien-decide'),
+                        Livewire::make(CompetidoresDeOportunidad::class, fn (Oportunidad $record): array => ['oportunidadId' => $record->id])->key('competidores-resumen'),
+                    ]),
                     View::make('oportunidades::ficha.resumen')->viewData(fn (Oportunidad $record): array => [
                         'r' => app(ResumenDeLaFicha::class)->resumen($record, self::usuario() ?? throw new AuthorizationException),
                         'oportunidadId' => $record->id,
@@ -304,6 +311,8 @@ final class OportunidadResource extends Resource
             'index' => TarjetasOportunidades::route('/'),
             'embudo' => TableroOportunidades::route('/embudo'),
             'linea-de-tiempo' => LineaDeTiempoOportunidades::route('/linea-de-tiempo'),
+            // Observación 9.5: la cuarta vista.
+            'resultados' => Pages\VistaResultados::route('/resultados'),
             'view' => VerOportunidad::route('/{record}'),
         ];
     }

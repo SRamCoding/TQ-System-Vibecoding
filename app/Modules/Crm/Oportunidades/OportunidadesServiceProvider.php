@@ -225,8 +225,9 @@ final class OportunidadesServiceProvider extends ServiceProvider
         // comercial»): por ahora solo «Otro».
         $clave = DefinicionOportunidad::CLAVE;
         $documentos->familiaDeMotivos("{$clave}.perder", 'Perder · oportunidad', [
-            new MotivoInicial('precio', 'Precio'), new MotivoInicial('plazo', 'Plazo'),
-            new MotivoInicial('especificaciones', 'Especificaciones'), new MotivoInicial('presupuesto_cancelado', 'Presupuesto cancelado'),
+            // Observación 9.5 (3): Precio, Plazo, Experiencia, Sin presupuesto, Técnica, Otro (lista ampliable).
+            new MotivoInicial('precio', 'Precio'), new MotivoInicial('plazo', 'Plazo'), new MotivoInicial('experiencia', 'Experiencia'),
+            new MotivoInicial('presupuesto_cancelado', 'Sin presupuesto'), new MotivoInicial('especificaciones', 'Técnica'),
             new MotivoInicial('no_respondio', 'No respondió'), new MotivoInicial('decision_interna', 'Decisión interna'),
             new MotivoInicial('proceso_desierto', 'Proceso desierto'),
         ]);

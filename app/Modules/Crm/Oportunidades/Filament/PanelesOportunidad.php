@@ -219,7 +219,21 @@ final class PanelesOportunidad
                     )),
                 'ganador_party_id' => fn (): Field => SelectoresParty::party('ganador_party_id')->visible($si)
                     ->helperText('Una ficha de Personas y empresas; recibe el tipo «Competidor».'),
-                'precio' => fn (): Field => TextInput::make('precio')->numeric()->visible($conPrecio),
+                // Observación 9.5 (3): «a qué precio aproximado», con cuánto menos que nosotros.
+                'precio' => fn (): Field => TextInput::make('precio')->label('A qué precio (aprox.)')->numeric()->visible($conPrecio)->live(onBlur: true)
+                    ->helperText(function (Get $get, mixed $state): ?string {
+                        $nuestro = is_numeric($get('oportunidad_id')) ? Oportunidad::query()->whereKey((int) $get('oportunidad_id'))->value('monto_estimado') : null;
+
+                        if (! is_numeric($state) || $nuestro === null || (float) $nuestro <= 0) {
+                            return 'Lo que se sabe, aunque no esté confirmado.';
+                        }
+
+                        $diferencia = ((float) $nuestro - (float) $state) * 100 / (float) $nuestro;
+
+                        return $diferencia >= 0
+                            ? number_format($diferencia, 1).' % menos que nosotros (ofertamos '.self::dinero((string) $nuestro, 'S/').')'
+                            : number_format(-$diferencia, 1).' % más que nosotros (ofertamos '.self::dinero((string) $nuestro, 'S/').')';
+                    }),
                 'moneda_id' => fn (): Field => AccionFilament::campo($clave, 'moneda_id')->visible($conPrecio),
                 'precio_desconocido' => fn (): Field => Toggle::make('precio_desconocido')->live()->visible($si),
             ],

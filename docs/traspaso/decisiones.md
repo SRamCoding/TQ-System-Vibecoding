@@ -1211,3 +1211,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (Campañas)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.4: la vista Canales en Campañas»
+
+### MV-099 · 2026-11-24 · Oportunidades: diez mejoras para ganar con margen y no perder negocios
+
+- **Ficha:** `fichas/r1-oportunidades-vistas.md`
+- **Dijo Sebastián:** (observaciones-9, punto 5) «Margen previsto … una etiqueta … verde … coral … Sin barrita … El mínimo es un parámetro (crm.margen_minimo, 12 %) … Propuesta sin respuesta: 7 días … Aprobación de descuentos … Esperando aprobación … el permiso nuevo crm.cotizaciones.aprobar-margen … ¿Ya existe? … Por qué se perdió … Resumen y siguiente paso (IA) … Quién decide … Competidores … la vista nueva «Resultados» … ¿Por qué perdemos? … Pronóstico de cierres … Metas por ejecutivo».
+- **Decisión:** lo dicho; el mínimo es el parámetro que ya existía (`crm.cotizacion_margen_minimo`), ahora en 12 %.
+- **Alcance:** cruza módulos (Oportunidades, Cotizaciones, Mien, Directorio y catálogos)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.5 (parte 4): pérdidas, quién decide, resumen sugerido y Resultados»

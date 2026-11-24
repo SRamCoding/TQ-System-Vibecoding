@@ -7,6 +7,7 @@ namespace App\Modules\Crm\Oportunidades\Filament;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\LineaDeTiempoOportunidades;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TableroOportunidades;
 use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\TarjetasOportunidades;
+use App\Modules\Crm\Oportunidades\Filament\Resources\Oportunidades\Pages\VistaResultados;
 use App\Modules\Crm\Oportunidades\Services\EmbudoEnSoles;
 use App\Modules\Crm\Oportunidades\Services\TableroDeGemas;
 use App\Modules\Nucleo\Models\Moneda;
@@ -25,6 +26,9 @@ final class VistasDeOportunidades
 
     public const string LINEA_DE_TIEMPO = 'linea-de-tiempo';
 
+    /** Observación 9.5: lo que mira todo junto (por qué perdemos, pronóstico y metas). */
+    public const string RESULTADOS = 'resultados';
+
     /**
      * Las pestañas, en su orden, con la activa marcada.
      *
@@ -37,6 +41,7 @@ final class VistasDeOportunidades
             self::TARJETAS => ['Mis oportunidades', TarjetasOportunidades::class],
             self::TABLERO => ['Embudo de oportunidades', TableroOportunidades::class],
             self::LINEA_DE_TIEMPO => ['Línea de tiempo', LineaDeTiempoOportunidades::class],
+            self::RESULTADOS => ['Resultados', VistaResultados::class],
         ];
         $pestanas = [];
 

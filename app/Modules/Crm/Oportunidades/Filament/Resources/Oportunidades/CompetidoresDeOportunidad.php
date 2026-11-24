@@ -71,7 +71,7 @@ final class CompetidoresDeOportunidad extends Component implements HasActions, H
             ->columns([
                 TextColumn::make('party.razon_social')->label('Empresa')->wrap()
                     ->description(fn (OportunidadCompetidor $record): ?string => $record->es_ganador ? 'Ganó' : null),
-                TextColumn::make('precio')->label('Precio')->alignEnd()->placeholder('—')
+                TextColumn::make('precio')->label('Precio aproximado')->tooltip('Lo que se sabe, no confirmado')->alignEnd()->placeholder('—')
                     ->state(fn (OportunidadCompetidor $record): ?string => match (true) {
                         $record->precio_desconocido => 'Precio desconocido',
                         $record->precio === null => null,

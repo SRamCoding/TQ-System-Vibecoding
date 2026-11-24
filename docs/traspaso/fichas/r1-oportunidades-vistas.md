@@ -1,7 +1,7 @@
 # Ficha · Las vistas de Oportunidades
 
 - **Estado:** en curso (ronda de cambios; espera su «así me gusta»)
-- **Versión:** v11
+- **Versión:** v12
 - **Tramo de la ruta:** observaciones de Sebastián, quinta tanda
 - **Fuentes del diseño:** `docs/vibe/pedidos/observaciones-5.md` (puntos 3, 4 y 6) y sus lienzos copiados en
   `docs/vibe/pedidos/lienzos/` (`embudo/`, `linea-de-tiempo/`); las vistas del repo original (planes 2.21b a 2.21d).
@@ -14,6 +14,8 @@ pestañas de portada: los leads y las licitaciones por decidir son la primera et
 misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Decisiones de Sebastián
+
+- **MV-099** (cruza módulos) · Margen en la tarjeta (etiqueta, sin barrita) con el mínimo como parámetro (12 %); propuesta sin respuesta (7 días); aprobación de descuentos con motivo y «Por aprobar» en Mien; ¿ya existe? al crear; motivos y ganador al perder; quién decide, competidores y resumen sugerido en la ficha; vista «Resultados» (por qué perdemos, pronóstico, metas).
 
 - **MV-096** (ficha) · Un solo botón «+ Nuevo» (Oportunidad · Contacto por calificar · Licitación a mano) en Mis oportunidades, Embudo y Línea de tiempo; reemplaza «Nueva oportunidad» y el menú «Por calificar».
 
@@ -35,6 +37,13 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 - **MV-057** (ficha) · Mis oportunidades por defecto; Embudo de oportunidades; sin Lista ni Faja 3D.
 
 ## Pantallas y navegación
+
+- **Tarjeta** (v12, MV-099): etiqueta «margen S/ 167,800 · 30.2 %» (verde), «margen bajo · 7.8 %» (coral, con el motivo al pasar el puntero) o «margen por calcular» (gris); en Propuesta enviada sin actividades desde hace 7 días, «N días sin respuesta desde que se envió la propuesta · Registrar llamada» (la tarjeta lleva a la ficha). Mien avisa al responsable.
+- **Cotización** (v12): con el margen bajo el mínimo, un recuadro «Necesita aprobación» / «Esperando aprobación» con costo, precio sin IGV, descuento, margen, mínimo, quién la pidió y su motivo. «Solicitar aprobación» pide el motivo (obligatorio). Mien → tarjeta «Por aprobar» con Aprobar y Rechazar (con motivo, vuelve a borrador).
+- **Nueva oportunidad** (v12): bajo el nombre, aviso ámbar «¿Ya existe?» con «Ver esa» y «Es otra, seguir».
+- **Perdida** (v12): motivos Precio, Plazo, Experiencia, Sin presupuesto, Técnica, Otro (más los que ya había); «A qué precio (aprox.)» dice «N % menos que nosotros».
+- **Ficha, pestaña Resumen** (v12): arriba el resumen y el siguiente paso sugeridos («Programar el paso» crea la llamada para mañana 10:00; «Volver a sugerir» llama a la IA si está configurada); debajo, «Quién decide» (+ Persona: contacto del cliente o nombre nuevo, papel, postura, nota) junto a Competidores (precio aproximado).
+- **Resultados** (v12, cuarta vista): Este mes · Trimestre · Año; ¿Por qué perdemos? (barras por motivo y tabla contra quién), Metas del periodo (botón «Metas»: persona, trimestre, monto) y Pronóstico de cierres de 6 meses (ponderado sobre «si se ganara todo»).
 
 - **«+ Nuevo»** (v11, MV-096): botón principal a la derecha de las pestañas de las vistas; menú con Oportunidad (panel de Nueva oportunidad, entra como Prospecto), Contacto por calificar (el panel de Nuevo lead) y Licitación a mano (el panel de Registrar convocatoria).
 
@@ -114,6 +123,12 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Supuestos sin confirmar
 
+- **v12 · Mínimo:** se usó el parámetro existente `crm.cotizacion_margen_minimo` (bajó de 22 a 12 %) en vez de crear `crm.margen_minimo`.
+- **v12 · Quién aprueba:** además de la jefatura de la regla de aprobación, puede firmar quien tenga `crm.cotizaciones.aprobar-margen` (registro nuevo del núcleo, PermisosQueFirman).
+- **v12 · Persona nueva en Quién decide** se guarda solo en el negocio (no crea un contacto en el Directorio).
+- **v12 · Ganador del OECE** al perder una licitación: no se llena solo todavía.
+- **v12 · Demo:** dos ganadas del trimestre pasaron a Diego Salazar y Andrea Vílchez para que las metas digan algo; diez perdidas nuevas del año con ganadores de la lista de competidores.
+
 - **v10 · Espacio del muelle:** se reserva en todas las páginas (también Proyectos) cuando el muelle está en el borde derecho, para que las dos sigan iguales. El paso suave entre anchos dura 320 ms y se apaga con «reducir movimiento».
 
 - **v8 · Lo abierto o plegado** se guarda en la base por persona (tabla `estado_interfaz_usuario`, clave `oportunidades.filtros_abiertos`), no en «Mis preferencias». En pantallas angostas el panel no se pega ni se recorta.
@@ -155,6 +170,9 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 
 ## Atajos tomados
 
+- **v12 · Quién decide** se escribe con consultas directas desde su servicio, sin acción registrada ni bloqueo optimista; Resultados y el margen se calculan al mirar.
+- **v12 · Resumen sugerido:** la IA se llama directo con ClienteAnthropic (como el asistente), sin el proceso de IA del núcleo ni su registro de costos.
+
 - **v9:** los botones de la página se llevan a la fila de pestañas con CSS (la cabecera de Filament queda encima, alineada a la derecha).
 
 - **v7:** las acciones de calificar viven en un rasgo (`DecideLoPorCalificar`) que usan Mis oportunidades y el Embudo.
@@ -181,6 +199,8 @@ misma lista, y un filtro **TIPO** separa lo privado de las licitaciones.
 `OportunidadesServiceProvider::register`.
 
 ## Cambios desde la versión anterior
+
+- **v12** (MV-099): las diez mejoras de Oportunidades y la vista Resultados.
 
 - **v11** (MV-096): un solo botón «+ Nuevo».
 
