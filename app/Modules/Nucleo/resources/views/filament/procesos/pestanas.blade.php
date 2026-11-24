@@ -17,12 +17,15 @@
      le borraba la marca de la caja elegida; la marca la pone `tqMarcarProceso` según la ruta. --}}
 <div x-persist="tq-proceso-{{ $proceso->value }}" wire:ignore>
 <nav class="tq-proceso" data-area="{{ $datos['caja']->area->value }}" aria-label="{{ $proceso->nombre() }}"
+    {{-- Observación 8.13: el orden que la persona cambió en otra pestaña llega aquí y las cajas se deslizan a su lugar. --}}
+    x-on:tq-remoto-orden-cajas.window="if ($event.detail.proceso === @js($proceso->value) && Array.isArray($event.detail.claves)) { const antes = new Map(cajas().map((el) => [el, el.getBoundingClientRect()])); claves = $event.detail.claves.filter((c) => claves.includes(c)); ordenarDom(); animarDesde(antes) }"
     x-data="{
         claves: @js(array_map(fn ($c) => $c->clave, $datos['internas'])),
         arrastre: null,
         sinClicHasta: 0,
         sinMovimiento() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('tq-sin-animaciones') },
         guardar() {
+            window.tqEntrePestanas?.enviar('orden-cajas', { proceso: @js($proceso->value), claves: [...this.claves] })
             fetch(@js('/procesos/'.$proceso->value.'/orden'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': @js(csrf_token()), 'Accept': 'application/json' }, body: JSON.stringify({ claves: this.claves }) })
         },
         cajas() { return this.claves.map((c) => this.$refs.cuerpo.querySelector(`[data-caja='${c}']`)) },

@@ -114,6 +114,8 @@ final class TarjetasOportunidades extends Page
     {
         $this->abiertos = in_array($grupo, $this->abiertos, true) ? array_values(array_diff($this->abiertos, [$grupo])) : [...$this->abiertos, $grupo];
         app(EstadoInterfazService::class)->guardar((int) auth()->id(), self::CLAVE_ABIERTOS, $this->abiertos);
+        // Observación 8.13: las demás pestañas de la persona pliegan o abren lo mismo.
+        $this->dispatch('tq-filtros-abiertos-guardados', abiertos: $this->abiertos);
     }
 
     public function mount(): void

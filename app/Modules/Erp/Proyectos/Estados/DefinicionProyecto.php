@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Erp\Proyectos\Estados;
 
 use App\Modules\Erp\Proyectos\Condiciones\ProyectoSinImputaciones;
+use App\Modules\Erp\Proyectos\Condiciones\ProyectoSinPendientes;
 use App\Modules\Erp\Proyectos\Models\Proyecto;
 use App\Modules\Nucleo\Enums\TonoEstado;
 use App\Modules\Nucleo\Estados\DefinicionDocumento;
@@ -69,7 +70,7 @@ final class DefinicionProyecto extends DefinicionDocumento
     {
         return [
             new TransicionDefinida('iniciar_ejecucion', 'Iniciar ejecución', self::EN_PREPARACION, self::EN_EJECUCION, esDelSistema: true),
-            new TransicionDefinida('cerrar', 'Cerrar', self::EN_EJECUCION, self::CERRADO, condiciones: [\App\Modules\Erp\Proyectos\Condiciones\ProyectoSinPendientes::class], efectos: ['erp.proyectos.avisar-cierre']),
+            new TransicionDefinida('cerrar', 'Cerrar', self::EN_EJECUCION, self::CERRADO, condiciones: [ProyectoSinPendientes::class], efectos: ['erp.proyectos.avisar-cierre']),
             new TransicionDefinida('anular', 'Anular', self::EN_PREPARACION, self::ANULADO, requiereMotivo: true, condiciones: [ProyectoSinImputaciones::class]),
         ];
     }

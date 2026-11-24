@@ -1,7 +1,7 @@
 # Ficha · El inicio por procesos
 
 - **Estado:** en curso (ronda de cambios de Sebastián; espera su «así me gusta»)
-- **Versión:** v31
+- **Versión:** v32
 - **Tramo de la ruta:** ronda de cambios 1 (reorganizar el sistema por procesos)
 - **Fuentes del diseño:** las decisiones de Sebastián del 19 y 20 de noviembre (MV-016 a MV-035); el inicio de cajas de
   siempre (`docs/convenciones/interfaz.md`, «Inicio») y la pantalla de Catálogos para las cajas internas.
@@ -15,6 +15,8 @@ proceso y sus cajas internas (las pantallas de siempre) como barra de navegació
 elegida. Cada persona ve solo los procesos en que puede abrir al menos una pantalla y ordena sus cajas a su gusto.
 
 ## Decisiones de Sebastián
+
+- **MV-093** (cruza módulos) · Tema, preferencias de apariencia, orden de cajas, grupos de filtros, asistente y muelle se aplican al instante en todas las pestañas de la persona en ese navegador.
 
 - **MV-088** (cruza módulos) · El asistente siempre encima de todo (única excepción): ni oscurecido, ni desenfocado, ni escondido; con un panel del costado se corre al otro lado.
 - **MV-086** (cruza módulos) · Paneles y ventanas sólidos; costado oscurece (42 %, 58 % en oscuro), medio desenfoca; el asistente se aparta o se esconde.
@@ -295,6 +297,8 @@ contar solas, porque no coinciden con ningún proceso).
 
 ## Reglas y números
 
+- **Entre pestañas** (v32, MV-093): al cambiar algo de la persona, la pestaña avisa a las demás por `BroadcastChannel('tq-persona')` (respaldo: el evento `storage`) y cada una lo aplica con el evento que ya existe: el tema y las clases de «Mis preferencias» con `tq-apariencia` (sin volver a guardarlos), el orden de cajas deslizándolas (`tq-remoto-orden-cajas`), los grupos de filtros de Mis oportunidades (`tq-remoto-filtros-abiertos`). El asistente (descanso o callado) y el muelle (su lugar) ya se guardan en el navegador y escuchan `storage`. La vista, los filtros puestos y la etapa abierta no se copian. En otro navegador o equipo, el cambio llega al recargar. Probado con dos pestañas: oscuro, sistema, orden de cajas, grupo «Tipo» y letra grande.
+
 - **Paneles y ventanas** (v31, MV-086): reglas en `docs/convenciones/interfaz.md` («Paneles y ventanas»), aplicadas a todos los de Filament desde `nucleo::filament.paneles`. En la configuración de la búsqueda del SEACE: cada línea en su caja con borde y cuadrito de color, «+ agregar» con borde y fondo de campo, montos como `S/ 20,000.00` (al enfocar se escribe el número), fuentes desactivadas con «más adelante» como etiqueta.
 
 - **Caja elegida** (v30, MV-085): se decide por el prefijo de ruta del módulo (todas las rutas de `/oportunidades…` marcan Oportunidades), en el servidor y al navegar sin recargar. Livewire ya no vuelve a dibujar la barra de cajas en cada actualización de la página (antes, al cerrar un panel o filtrar, se borraba la marca de la elegida).
@@ -310,6 +314,8 @@ contar solas, porque no coinciden con ningún proceso).
   motivos, empresa, general) siguen en Configuración.
 
 ## Supuestos sin confirmar
+
+- **v32 · «Apariencia según el día»** (colores del ambiente) se dibuja en el servidor: en las otras pestañas llega al navegar o recargar.
 
 - **v31 · Colores de las líneas** de negocio en la configuración: turquesa, azul, morado, coral, verde y oro, por orden.
 - **v31 · Con un panel del costado abierto** el asistente se corre a la izquierda y vuelve al cerrarlo (MV-088: nunca se esconde).
@@ -388,6 +394,8 @@ frase y la barra), la ruta del orden en `routes/web.php`, el gancho
 `Filament/Resources/Parametros/ParametroNegocioResource.php`, `Mien/RegistroSeccionesMien.php`.
 
 ## Cambios desde la versión anterior
+
+- **v32** (MV-093): los cambios de la persona en todas sus pestañas.
 
 - **v31** (MV-086): paneles y ventanas sólidos; capa de atrás según de dónde salen; asistente apartado.
 

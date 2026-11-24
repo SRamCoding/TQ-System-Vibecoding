@@ -1157,3 +1157,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (la carga toca Sistema)
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.12: ganadores parecidos y el histórico del OECE (sin cargar)»
+
+### MV-093 · 2026-11-23 · Los cambios de la persona se aplican en todas sus pestañas abiertas
+
+- **Ficha:** `fichas/r1-inicio-procesos.md`
+- **Dijo Sebastián:** (observaciones-8, punto 13) «Debe aplicarse al instante en todas las pestañas abiertas de esa persona en ese navegador, sin recargarlas: el tema … las preferencias de «Mis preferencias» … el orden de las cajas de un proceso … y los grupos de filtros abiertos o plegados … el asistente en descanso o callado, y la posición del muelle … Lo que es de la pantalla … no se copia».
+- **Decisión:** lo dicho.
+- **Alcance:** cruza módulos (apariencia y preferencias)
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.13: los cambios en todas las pestañas»

@@ -79,7 +79,7 @@
         .dark .tq-pc-botones { border-top-color: var(--gray-800); }
     </style>
 
-    <aside class="tq-op-filtros" aria-label="Filtros">
+    <aside class="tq-op-filtros" aria-label="Filtros" x-data x-on:tq-remoto-filtros-abiertos.window="$wire.set('abiertos', $event.detail.abiertos ?? [])">
         {{-- Observación 8.3: «Quitar filtros» arriba; grupos plegables (recordados por persona); buscador si hay más de 6. --}}
         @if ($conFiltros)
             <x-filament::link tag="button" wire:click="quitarFiltros" icon="heroicon-o-x-mark">Quitar filtros</x-filament::link>

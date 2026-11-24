@@ -586,6 +586,8 @@
                 aplicar()
             })
             addEventListener('resize', () => aplicar())
+            // Observación 8.13: si la persona lo movió en otra pestaña, aquí también.
+            addEventListener('storage', (e) => { if (e.key === CLAVE) aplicar(true) })
             document.addEventListener('livewire:navigated', () => requestAnimationFrame(() => aplicar()))
             const empezar = () => requestAnimationFrame(() => aplicar())
             document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', empezar) : empezar()

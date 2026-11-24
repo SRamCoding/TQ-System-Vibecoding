@@ -264,6 +264,8 @@
         el.classList.toggle('dormido', modo() === 'descansar' || Date.now() - ultimaActividad > 20 * 60000)
         if (modo() === 'descansar') esquina()
     }
+    // Observación 8.13: si lo mandaron a descansar o lo despertaron en otra pestaña, aquí también.
+    addEventListener('storage', (e) => { if (e.key === 'tq-asis-modo') { ultimaActividad = Date.now(); aplicarModo() } })
 
     // Un clic: lo devuelve a lo normal; si ya estaba normal, abre el chat. Se puede arrastrar.
     let inicio = null
