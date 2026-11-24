@@ -11,8 +11,10 @@ use App\Modules\Crm\Oportunidades\Estados\DefinicionOportunidad;
 use App\Modules\Crm\Oportunidades\Models\Oportunidad;
 use App\Modules\Crm\Oportunidades\Requisitos\RequisitosDeEtapa;
 use App\Modules\Crm\Oportunidades\Services\PortadaOportunidades;
+use App\Modules\Nucleo\Enums\Catalogo;
 use App\Modules\Nucleo\Filament\AccionFilament;
 use App\Modules\Nucleo\Filament\Resources\Parties\SelectoresParty;
+use App\Modules\Nucleo\Filament\SelectorCatalogo;
 use App\Modules\Nucleo\Models\Moneda;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Services\ParametrosService;
@@ -31,6 +33,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\HtmlString;
 
 /**
  * Los paneles deslizantes de Oportunidades (plan 2.21, D11.4, D11.6 y D11.7): Nueva oportunidad, Avanzar y las dos
@@ -73,6 +76,10 @@ final class PanelesOportunidad
                     }),
                 'ejecutivo_user_id' => fn (): Field => SelectoresOportunidad::ejecutivo()
                     ->helperText('Por defecto, el ejecutivo de la cuenta.'),
+                // Observación 9.5 (7): ¿ya existe? Aviso ámbar bajo el nombre (avisa, no impide).
+                'nombre' => fn (): Field => TextInput::make('nombre')->live(onBlur: true)
+                    ->belowContent(fn (Get $get): ?HtmlString => self::avisoDeParecidas($get)),
+                'linea_solucion_id' => fn (): Field => SelectorCatalogo::de(Catalogo::LineasSolucion, 'linea_solucion_id')->live(),
             ],
         )
             ->label('Nueva oportunidad')->icon('heroicon-o-plus')
@@ -222,6 +229,25 @@ final class PanelesOportunidad
             ->slideOver()
             ->modalHeading('Cerrar como perdida')
             ->fillForm(fn (Action $action): array => ['version' => Oportunidad::query()->findOrFail($oportunidadId($action))->version]);
+    }
+
+    /** Observación 9.5 (7): el aviso ámbar con las oportunidades parecidas, «Ver esa» y «Es otra, seguir». */
+    private static function avisoDeParecidas(Get $get): ?HtmlString
+    {
+        $cuenta = $get('cuenta_id');
+        $linea = $get('linea_solucion_id');
+        $parecidas = app(PortadaOportunidades::class)->parecidas(is_numeric($cuenta) ? (int) $cuenta : null, (string) $get('nombre'), is_numeric($linea) ? (int) $linea : null);
+
+        if ($parecidas === []) {
+            return null;
+        }
+
+        $filas = implode('', array_map(fn (array $p): string => '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px">«'.e($p['nombre']).'» · '.e($p['etapa']).' · la lleva '.e($p['responsable'])
+            .' <span style="opacity:.7">('.e($p['por']).')</span> <a href="'.e(Resources\Oportunidades\Pages\VerOportunidad::getUrl(['record' => $p['id']])).'" target="_blank" style="font-weight:600;text-decoration:underline">Ver esa</a></div>', array_slice($parecidas, 0, 3)));
+
+        return new HtmlString('<div x-data="{ fuera: false }" x-show="! fuera" style="border:1px solid color-mix(in oklab, var(--warning-500) 45%, transparent);background:color-mix(in oklab, var(--warning-500) 13%, var(--tq-superficie, transparent));border-radius:10px;padding:8px 12px;font-size:13px">'
+            .'<strong>¿Ya existe?</strong>'.$filas
+            .'<div style="margin-top:6px"><button type="button" x-on:click="fuera = true" style="font-weight:600;text-decoration:underline">Es otra, seguir</button></div></div>');
     }
 
     /** «S/ 24,715.10»: solo para mostrar, con texto decimal (nunca float). */

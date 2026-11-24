@@ -587,4 +587,36 @@ final readonly class PortadaOportunidades
     {
         return app(CotizacionDeOportunidad::class)->margenes($ids);
     }
+
+    /**
+     * Observación 9.5 (7): ¿ya existe? Las oportunidades abiertas del mismo cliente con nombre parecido (alguna palabra
+     * de 4 letras o más en común) o de la misma línea creadas en los últimos 90 días. Avisa, no impide.
+     *
+     * @return list<array{id: int, nombre: string, etapa: string, responsable: string, por: string}>
+     */
+    public function parecidas(?int $cuentaId, string $nombre, ?int $lineaId): array
+    {
+        if ($cuentaId === null || (trim($nombre) === '' && $lineaId === null)) {
+            return [];
+        }
+
+        $palabras = fn (string $t): array => array_values(array_diff(array_filter(preg_split('/[^a-z0-9]+/', strtolower(Str::ascii($t))) ?: [], fn (string $p): bool => strlen($p) >= 4),
+            ['para', 'como', 'segunda', 'primera', 'fase', 'servicio', 'sistema', 'proyecto', 'nuevo', 'nueva', 'del', 'los', 'las']));
+        $mias = $palabras($nombre);
+        $hace90 = CarbonImmutable::parse(Calendario::hoy())->subDays(90);
+        $abiertas = $this->estados(array_map(fn (EtapaAbierta $e): string => $e->value, EtapaAbierta::cases()));
+        $resultado = [];
+
+        foreach (Oportunidad::query()->with(['estado', 'ejecutivo:id,name'])->where('cuenta_id', $cuentaId)->whereIn('estado_id', $abiertas)->get() as $o) {
+            $comunes = array_intersect($mias, $palabras($o->nombre));
+            $mismaLinea = $lineaId !== null && $o->linea_solucion_id === $lineaId && $o->created_at !== null && $o->created_at->gte($hace90);
+
+            if ($comunes !== [] || $mismaLinea) {
+                $resultado[] = ['id' => $o->id, 'nombre' => $o->nombre, 'etapa' => $o->estado->nombre, 'responsable' => $o->ejecutivo->name ?? '—',
+                    'por' => $comunes !== [] ? 'nombre parecido' : 'misma línea en los últimos 90 días'];
+            }
+        }
+
+        return $resultado;
+    }
 }
