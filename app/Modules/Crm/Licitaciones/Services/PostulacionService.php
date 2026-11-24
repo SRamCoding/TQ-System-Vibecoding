@@ -195,6 +195,14 @@ final readonly class PostulacionService
     {
         $historico = app(LicitacionesService::class)->historico($l->cuenta_id, $l->id);
         $porcentajes = array_values(array_filter(array_column($historico['filas'], 'porcentaje'), fn (?string $p): bool => $p !== null));
+        // Observación 8.12: también los ganadores de esa entidad guardados del OECE (lectura diaria e histórico).
+        $ruc = DB::table('cuentas as c')->join('parties as p', 'p.id', '=', 'c.party_id')->where('c.id', $l->cuenta_id)->value('p.numero_documento');
+
+        if ($ruc !== null) {
+            foreach (DB::table('convocatorias_seace')->where('ruc_entidad', $ruc)->whereNotNull('monto_adjudicado')->where('valor_referencial', '>', 0)->limit(50)->get(['monto_adjudicado', 'valor_referencial']) as $g) {
+                $porcentajes[] = number_format((float) $g->monto_adjudicado * 100 / (float) $g->valor_referencial, 1, '.', '');
+            }
+        }
         $descuento = $porcentajes === [] ? null : number_format(100 - array_sum(array_map('floatval', $porcentajes)) / count($porcentajes), 1);
         $vr = $l->valor_referencial === null ? null : (string) $l->valor_referencial;
         $filas = [];

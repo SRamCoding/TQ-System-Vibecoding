@@ -113,7 +113,7 @@ final readonly class FiltroConvocatorias
         $n = 0;
 
         // Las guardadas antes de la observación 7.4 sin su texto completo se quedan como estaban.
-        foreach (DB::table('convocatorias_seace')->whereNotNull('texto')->pluck('id') as $id) {
+        foreach (DB::table('convocatorias_seace')->whereNotNull('texto')->where('es_historico', false)->pluck('id') as $id) {
             $n += $this->aplicar((int) $id) ? 1 : 0;
         }
 

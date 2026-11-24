@@ -203,37 +203,7 @@ final readonly class ConvocatoriasSeaceService
             return null;
         }
 
-        $t = $r['tender'] ?? [];
-        $comprador = collect($r['parties'] ?? [])->firstWhere('id', $r['buyer']['id'] ?? null) ?? [];
-        $ruc = preg_replace('/\D/', '', (string) ($comprador['identifier']['id'] ?? ''));
-        $fecha = fn (?string $f): ?string => $f === null ? null : substr($f, 0, 10);
-        $valor = $t['value']['amount'] ?? null;
-        $award = collect($r['awards'] ?? [])->first(fn (array $a): bool => ($a['status'] ?? 'active') === 'active') ?? ($r['awards'][0] ?? null);
-        $proveedor = $award['suppliers'][0] ?? null;
-        $titulo = trim((string) ($t['title'] ?? ''));
-        $descripcion = trim((string) ($t['description'] ?? ''));
-        $datos = [
-            'nomenclatura' => mb_substr((string) ($t['id'] ?? $r['ocid']), 0, 120), 'entidad' => mb_substr((string) ($r['buyer']['name'] ?? $comprador['name'] ?? 'Entidad'), 0, 250),
-            'ruc_entidad' => strlen($ruc) === 11 ? $ruc : null, 'region' => $comprador['address']['region'] ?? null,
-            // Observación 8.9: la región (departamento) de la entidad; `region` del OECE es la provincia.
-            'departamento' => isset($comprador['address']['department']) ? mb_strtoupper(mb_substr((string) $comprador['address']['department'], 0, 40)) : null,
-            // En el OECE el título suele ser la nomenclatura: el objeto es la descripción si la hay.
-            'objeto' => mb_substr($descripcion !== '' ? $descripcion : $titulo, 0, 600),
-            'texto' => mb_substr(trim($titulo.' '.$descripcion.' '.implode(' ', array_map(fn ($i): string => (string) ($i['description'] ?? ''), $t['items'] ?? []))), 0, 2000),
-            'tipo' => mb_substr((string) ($t['procurementMethodDetails'] ?? 'Por definir'), 0, 30),
-            // El OECE manda 0 cuando el valor no es público.
-            'valor_referencial' => $valor !== null && (float) $valor > 0 ? $valor : null, 'moneda' => $t['value']['currency'] ?? 'PEN', 'publicada' => $fecha($t['datePublished'] ?? $r['date'] ?? null),
-            'consultas_hasta' => $fecha($t['enquiryPeriod']['endDate'] ?? null), 'presentacion' => $fecha($t['tenderPeriod']['endDate'] ?? null), 'buena_pro' => $fecha($t['awardPeriod']['startDate'] ?? null),
-            'url' => mb_substr((string) (collect($t['documents'] ?? [])->first()['url'] ?? ''), 0, 500) ?: null,
-            'estado_ocds' => isset($t['status']) ? mb_substr((string) $t['status'], 0, 30) : null,
-            // Observación 8.10: los enlaces a los documentos del proceso (de la convocatoria y de la adjudicación).
-            'documentos' => json_encode(self::documentosDe($r), JSON_UNESCAPED_UNICODE),
-            'ganador' => $proveedor === null ? null : mb_substr((string) ($proveedor['name'] ?? ''), 0, 250),
-            'ganador_ruc' => $proveedor === null ? null : (strlen($g = preg_replace('/\D/', '', (string) ($proveedor['id'] ?? ''))) === 11 ? $g : null),
-            'monto_adjudicado' => isset($award['value']['amount']) && (float) $award['value']['amount'] > 0 ? $award['value']['amount'] : null,
-            // Con su desfase: así Postgres no la corre de zona horaria y «hasta dónde se leyó» compara bien.
-            'release_fecha' => (isset($r['date']) ? CarbonImmutable::parse($r['date']) : CarbonImmutable::now())->format('Y-m-d\TH:i:s.uP'),
-        ];
+        $datos = $this->datosLivianos($r);
         $guardada = DB::table('convocatorias_seace')->where('ocid', $r['ocid'])->first();
 
         if ($guardada === null) {
@@ -293,6 +263,52 @@ final readonly class ConvocatoriasSeaceService
         }
 
         return array_slice($lista, 0, 15);
+    }
+
+    /**
+     * Lo liviano de un release (observaciones 7.4 y 8.12): lo mismo para la lectura diaria y para el histórico.
+     *
+     * @param  array<string, mixed>  $r
+     * @return array<string, mixed>|null
+     */
+    public function datosLivianos(array $r): ?array
+    {
+        if (! isset($r['ocid'])) {
+            return null;
+        }
+
+        $t = $r['tender'] ?? [];
+        $comprador = collect($r['parties'] ?? [])->firstWhere('id', $r['buyer']['id'] ?? null) ?? [];
+        $ruc = preg_replace('/\D/', '', (string) ($comprador['identifier']['id'] ?? ''));
+        $fecha = fn (?string $f): ?string => $f === null ? null : substr($f, 0, 10);
+        $valor = $t['value']['amount'] ?? null;
+        $award = collect($r['awards'] ?? [])->first(fn (array $a): bool => ($a['status'] ?? 'active') === 'active') ?? ($r['awards'][0] ?? null);
+        $proveedor = $award['suppliers'][0] ?? null;
+        $titulo = trim((string) ($t['title'] ?? ''));
+        $descripcion = trim((string) ($t['description'] ?? ''));
+
+        return [
+            'nomenclatura' => mb_substr((string) ($t['id'] ?? $r['ocid']), 0, 120), 'entidad' => mb_substr((string) ($r['buyer']['name'] ?? $comprador['name'] ?? 'Entidad'), 0, 250),
+            'ruc_entidad' => strlen($ruc) === 11 ? $ruc : null, 'region' => $comprador['address']['region'] ?? null,
+            // Observación 8.9: la región (departamento) de la entidad; `region` del OECE es la provincia.
+            'departamento' => isset($comprador['address']['department']) ? mb_strtoupper(mb_substr((string) $comprador['address']['department'], 0, 40)) : null,
+            // En el OECE el título suele ser la nomenclatura: el objeto es la descripción si la hay.
+            'objeto' => mb_substr($descripcion !== '' ? $descripcion : $titulo, 0, 600),
+            'texto' => mb_substr(trim($titulo.' '.$descripcion.' '.implode(' ', array_map(fn ($i): string => (string) ($i['description'] ?? ''), $t['items'] ?? []))), 0, 2000),
+            'tipo' => mb_substr((string) ($t['procurementMethodDetails'] ?? 'Por definir'), 0, 30),
+            // El OECE manda 0 cuando el valor no es público.
+            'valor_referencial' => $valor !== null && (float) $valor > 0 ? $valor : null, 'moneda' => $t['value']['currency'] ?? 'PEN', 'publicada' => $fecha($t['datePublished'] ?? $r['date'] ?? null),
+            'consultas_hasta' => $fecha($t['enquiryPeriod']['endDate'] ?? null), 'presentacion' => $fecha($t['tenderPeriod']['endDate'] ?? null), 'buena_pro' => $fecha($t['awardPeriod']['startDate'] ?? null),
+            'url' => mb_substr((string) (collect($t['documents'] ?? [])->first()['url'] ?? ''), 0, 500) ?: null,
+            'estado_ocds' => isset($t['status']) ? mb_substr((string) $t['status'], 0, 30) : null,
+            // Observación 8.10: los enlaces a los documentos del proceso (de la convocatoria y de la adjudicación).
+            'documentos' => json_encode(self::documentosDe($r), JSON_UNESCAPED_UNICODE),
+            'ganador' => $proveedor === null ? null : mb_substr((string) ($proveedor['name'] ?? ''), 0, 250),
+            'ganador_ruc' => $proveedor === null ? null : (strlen($g = preg_replace('/\D/', '', (string) ($proveedor['id'] ?? ''))) === 11 ? $g : null),
+            'monto_adjudicado' => isset($award['value']['amount']) && (float) $award['value']['amount'] > 0 ? $award['value']['amount'] : null,
+            // Con su desfase: así Postgres no la corre de zona horaria y «hasta dónde se leyó» compara bien.
+            'release_fecha' => (isset($r['date']) ? CarbonImmutable::parse($r['date']) : CarbonImmutable::now())->format('Y-m-d\TH:i:s.uP'),
+        ];
     }
 
     /** Observación 7.4, reacción «Priorizar»: valor alto (parámetro) o entidad que ya es cuenta. */

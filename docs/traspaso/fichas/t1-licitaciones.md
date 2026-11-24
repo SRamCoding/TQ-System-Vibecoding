@@ -1,7 +1,7 @@
 # Ficha · Licitaciones (CRM-04)
 
-- **Estado:** en curso (v10, ronda de cambios; la v2 quedó aprobada)
-- **Versión:** v10
+- **Estado:** en curso (v11, ronda de cambios; la v2 quedó aprobada)
+- **Versión:** v11
 - **Tramo de la ruta:** T1
 - **Aprobada (v2):** 2026-11-20 · etiqueta `aprobado/t1-licitaciones-v2`
 - **Aprobada (v1):** 2026-11-19 · etiqueta `aprobado/t1-licitaciones-v1`
@@ -22,6 +22,8 @@ adjudica entre el 76.6 % y el 94.5 % del referencial»). Si se pierde o queda de
 perdida con el ganador y su precio.
 
 ## Decisiones de Sebastián
+
+- **MV-092** (ficha) · Ganadores anteriores parecidos; histórico del OECE de 2025 en tus regiones, en silencio, retomable, con ensayo primero, avance en Configuración e índice de texto.
 
 - **MV-091** (ficha) · La estrella de prioritaria dice su motivo al pasar el puntero o tocarla.
 
@@ -45,6 +47,9 @@ perdida con el ganador y su precio.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **v11 · Configuración → Histórico del SEACE** (MV-092): «Histórico 2025 sin importar / Importando histórico 2025 · 62 % / en pausa / importado», las regiones que abarca, los procesos guardados y su barra; **Importar / Reanudar** (lanza el comando en segundo plano), **Pausar** (se detiene al terminar el lote) y, al final, **Verificar** (total guardado contra el que informa el OECE y 5 procesos al azar revisados contra su registro, con enlace a su página). La tabla **Ensayo (sin guardar)** por mes: procesos, en tus regiones, los que ya estaban, peso y el avance de la carga.
+- **v11 · Ganadores anteriores:** solo los procesos pasados **parecidos** de la entidad (misma línea, alguna palabra clave de esa línea o dos palabras largas en común), hasta 6, incluidos los del histórico. «Buscar en todo el SEACE» también busca en el histórico con el índice de texto (hasta 200 resultados).
 
 - **v10 · Estrella de prioritaria** (MV-091): en la lista y en el detalle, al pasar el puntero o tocarla, «Prioritaria: valor referencial alto», «Prioritaria: ya es cliente» o «Prioritaria: valor referencial alto y ya es cliente» (también para el lector de pantalla).
 
@@ -181,6 +186,9 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Reglas y números
 
+- **v11 · Fuente del histórico:** `https://contratacionesabiertas.oece.gob.pe/api/v1/file/seace_v3/json/{año}/{mes}/` (ZIP con un «record package» de una sola línea; enero 2025: 1,314 procesos, 22.5 MB). Comando `php artisan seace:historico 2025 --ensayo` (solo cuenta), `seace:historico 2025` (carga) y `--verificar`. Se recorre proceso por proceso con un lector propio (separa cada objeto del arreglo `records` contando llaves), solo las regiones elegidas en las líneas, por lotes de 500 y sin eventos; cada mes guarda su posición en `seace_cargas` para retomar; si el proceso ya estaba, se actualiza solo si su dato es más nuevo y conserva su estado. Lo histórico (`es_historico`) no entra a la bandeja ni se prioriza ni avisa. Índice GIN en español sin tildes sobre objeto, entidad y nomenclatura.
+- **v11 · ¿Cuánto bajar?** suma a las licitaciones de la entidad los ganadores guardados del OECE (demo: 9.9 % con 6 procesos).
+
 - **v9 · Documentos:** se guardan solo los enlaces (título, tipo, formato y dirección) de la convocatoria, la adjudicación y el contrato, hasta 15; sin título, el tipo se traduce (biddingDocuments → Bases, awardNotice → Acta de buena pro…). Lo guardado antes se completó releyendo las páginas del OECE.
 
 - **v8 · Región:** la del OECE es `address.department` de la entidad convocante (`region` es la provincia); se guarda en `departamento`. Una línea con regiones solo toma convocatorias de esas regiones; sin regiones, todas. Una entidad excluida (por RUC) nunca entra por esa línea. Demo: Videovigilancia y Redes con Lambayeque, Piura, La Libertad, Cajamarca y Amazonas; Software, todas; la demo de «Valle Norte» está en Lambayeque. Caso: AS-SM-12-2026-MDW-1 (cámaras en Cusco) queda fuera por región.
@@ -239,6 +247,10 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Supuestos sin confirmar
 
+- **v11 · Regiones del histórico:** solo las elegidas explícitamente en las líneas (Software con «Todas» no amplía la carga del MVP). La carga de 3 años completos queda para el repo original, en el servidor.
+- **v11 · «Reanudar»** lanza el comando con `nohup` desde la pantalla (atajo del MVP: en el repo original, una tarea en cola). Los archivos bajados quedan en `storage/app/private/seace/historico/` (fuera del repositorio).
+- **v11 · Demo:** cada entidad con convocatorias tiene 2 o 3 procesos anteriores (algunos ganados por Techquk) como históricos; los tres de la Municipalidad Provincial de Valle Norte pasaron a históricos.
+
 - **v9 · Las convocatorias de la demo** tienen códigos OCDS inventados: «Ver en el OECE» abre una página vacía y su único documento lleva al buscador del SEACE.
 
 - **v8 · Lo guardado antes** sin departamento se completó releyendo las páginas del OECE (quedan 3 viejas sin dato: fuera de las líneas con regiones). Una convocatoria sin región no entra a una línea que tiene regiones.
@@ -275,6 +287,8 @@ ofertado, fechas de presentación y resultado, oportunidad única, versión, aud
 
 ## Atajos tomados
 
+- **v11:** el lector del JSON por partes es propio (sin librería); la verificación de los 5 procesos compara el código y el monto adjudicado con `/api/v1/record/{ocid}`.
+
 - **v7:** la bandeja arma la lista en memoria con todo lo guardado; «Con esta entidad» y los RUC de las cuentas se leen
   con consultas directas. El parámetro viejo de palabras clave quedó sin uso (sus palabras pasaron a las líneas).
 
@@ -308,6 +322,8 @@ y `paquete.blade.php`, la migración `2026_11_23_700001_postulacion_por_pasos.ph
 `2026_11_23_900001_bandeja_con_detalle.php` y `Demo/BandejaCasosSeeder.php`.
 
 ## Cambios desde la versión anterior
+
+- **v11** (MV-092): ganadores parecidos, histórico del OECE con ensayo, avance y verificación (sin cargar todavía).
 
 - **v10** (MV-091): la estrella dice por qué es prioritaria.
 

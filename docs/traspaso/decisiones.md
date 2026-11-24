@@ -1148,3 +1148,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha
 - **Estado:** vigente
 - **Commit:** el de «Observación 8.11: la estrella dice por qué»
+
+### MV-092 · 2026-11-23 · Ganadores anteriores parecidos y el histórico del OECE (ensayo primero)
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-8, punto 12) «Ganadores anteriores en esta entidad muestra los procesos pasados parecidos de esa misma entidad … Datos de demo … 2 o 3 procesos anteriores parecidos … Carga del histórico (una vez, con cuidado): las descargas masivas por año … En el MVP, una carga chica: solo 2025 y solo las regiones configuradas … En segundo plano … Leyendo por partes … Sin duplicados y retomable … En silencio … Primero un ensayo que solo cuenta … muéstrame esos números antes de la carga de verdad … Avance visible en la caja Sistema … con pausar y reanudar … Verificación … índice de texto de PostgreSQL (en español, sin importar tildes)».
+- **Decisión:** lo dicho; la carga de verdad espera a que Sebastián vea los números del ensayo.
+- **Alcance:** ficha (la carga toca Sistema)
+- **Estado:** vigente
+- **Commit:** el de «Observación 8.12: ganadores parecidos y el histórico del OECE (sin cargar)»

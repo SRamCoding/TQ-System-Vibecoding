@@ -31,7 +31,7 @@ final class LicitacionesServiceProvider extends ServiceProvider
     public function register(): void
     {
         // Las pantallas se declaran aquí, antes de que el panel se arme (como Cuentas).
-        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [Filament\Pages\BandejaConvocatorias::class], recursos: [LicitacionResource::class]);
+        $this->app->make(RegistroPantallas::class)->registrar('app', paginas: [Filament\Pages\BandejaConvocatorias::class, Filament\Pages\HistoricoSeace::class], recursos: [LicitacionResource::class]);
     }
 
     public function boot(): void

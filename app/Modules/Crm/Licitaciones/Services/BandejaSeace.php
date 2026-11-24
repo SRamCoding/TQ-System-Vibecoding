@@ -31,7 +31,14 @@ final readonly class BandejaSeace
     public function lista(array $f, int $usuarioId): array
     {
         $hoy = CarbonImmutable::parse(Calendario::hoy());
-        $todas = DB::table('convocatorias_seace')->get();
+        // Observación 8.12: lo histórico no entra a la bandeja; con «Buscar en todo el SEACE» se busca con el índice de texto.
+        $todas = DB::table('convocatorias_seace')->where('es_historico', false)->get();
+
+        if ($f['todo'] && trim($f['buscar']) !== '') {
+            $todas = $todas->merge(DB::table('convocatorias_seace')->where('es_historico', true)
+                ->whereRaw("to_tsvector('spanish', tq_sin_tildes(objeto || ' ' || entidad || ' ' || nomenclatura)) @@ plainto_tsquery('spanish', tq_sin_tildes(?))", [trim($f['buscar'])])
+                ->orderByDesc('publicada')->limit(200)->get());
+        }
         $vistas = DB::table('convocatoria_vistas')->where('user_id', $usuarioId)->pluck('convocatoria_id')->flip();
         $lineas = DB::table('seace_lineas')->orderBy('orden')->pluck('nombre', 'id');
         $cuentas = $this->rucsDeCuentas();
@@ -127,8 +134,10 @@ final readonly class BandejaSeace
         $cronograma = array_map(fn (array $h): array => ['nombre' => $h[0], 'fecha' => $h[1], 'pasado' => $h[1] !== null && $h[1]->lte($hoy), 'clave' => $h[0] === 'Presentación'], $hitos);
         $pasados = count(array_filter($cronograma, fn (array $h): bool => $h['pasado']));
 
+        // Observación 8.12: los procesos pasados parecidos de la misma entidad (misma línea, palabras clave de esa línea
+        // o palabras en común), con su ganador; incluye lo cargado del histórico del OECE.
         $ganadores = $c->ruc_entidad === null ? collect() : DB::table('convocatorias_seace')->where('ruc_entidad', $c->ruc_entidad)->where('id', '!=', $c->id)->whereNotNull('ganador')
-            ->orderByDesc('publicada')->limit(6)->get()->map(fn (object $g): array => [
+            ->orderByDesc('publicada')->limit(60)->get()->filter(fn (object $g): bool => $this->esParecido($c, $g))->take(6)->values()->map(fn (object $g): array => [
                 'objeto' => $g->objeto, 'anio' => $g->publicada === null ? null : substr((string) $g->publicada, 0, 4), 'ganador' => $g->ganador,
                 'techquk' => str_contains(FiltroConvocatorias::normal((string) $g->ganador), 'techquk'),
                 'monto' => $g->monto_adjudicado === null ? null : (string) $g->monto_adjudicado,
@@ -143,6 +152,25 @@ final readonly class BandejaSeace
             'conEntidad' => $this->conEntidad($c->ruc_entidad), 'ganadores' => $ganadores->all(), 'motivoDescarte' => $c->motivo_descarte, 'fueraPor' => $c->fuera_por,
             'licitacionId' => $c->licitacion_id === null ? null : (int) $c->licitacion_id, 'motivoPrioridad' => $c->motivo_prioridad,
         ];
+    }
+
+    /** Parecido: la misma línea, alguna palabra clave de su línea, o dos palabras largas en común. */
+    private function esParecido(object $c, object $g): bool
+    {
+        if ($c->linea_id !== null && $g->linea_id === $c->linea_id) {
+            return true;
+        }
+
+        $textoG = FiltroConvocatorias::normal((string) ($g->texto ?: $g->objeto));
+        $linea = $c->linea_id === null ? null : collect(app(FiltroConvocatorias::class)->lineas())->firstWhere('id', (int) $c->linea_id);
+
+        if ($linea !== null && collect($linea['palabras'])->contains(fn (string $p): bool => str_contains($textoG, FiltroConvocatorias::normal($p)))) {
+            return true;
+        }
+
+        $palabras = fn (string $t): array => array_unique(array_filter(preg_split('/[^a-z0-9]+/', FiltroConvocatorias::normal($t)) ?: [], fn (string $p): bool => strlen($p) >= 6));
+
+        return count(array_intersect($palabras((string) $c->objeto), $palabras((string) $g->objeto))) >= 2;
     }
 
     public function marcarVista(int $id, int $usuarioId): void
