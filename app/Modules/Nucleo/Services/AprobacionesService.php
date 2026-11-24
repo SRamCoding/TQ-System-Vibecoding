@@ -8,6 +8,7 @@ use App\Modules\Nucleo\Alertas\AlertasDelNucleo;
 use App\Modules\Nucleo\Aprobaciones\DatoParaAprobar;
 use App\Modules\Nucleo\Aprobaciones\DatosRegla;
 use App\Modules\Nucleo\Aprobaciones\PendienteDeFirma;
+use App\Modules\Nucleo\Aprobaciones\PermisosQueFirman;
 use App\Modules\Nucleo\Aprobaciones\RegistroResumenesAprobacion;
 use App\Modules\Nucleo\Aprobaciones\ReglasDeAprobacion;
 use App\Modules\Nucleo\Aprobaciones\ResolutorDeFirmante;
@@ -61,8 +62,8 @@ final readonly class AprobacionesService
      */
     public function firmar(string $documentoType, int $documentoId, string $transicionCodigo, User $usuario, ?int $versionLeida = null): FirmaAprobacion
     {
-        return $this->conLaFirmaQueSigue($documentoType, $documentoId, $transicionCodigo, $usuario, $versionLeida, function (Model&DocumentoConEstados $documento, RondaAprobacion $ronda, FirmaAprobacion $firma, string $paso) use ($usuario): FirmaAprobacion {
-            if ($this->resolutor->firmante($firma, $ronda)?->id !== $usuario->id) {
+        return $this->conLaFirmaQueSigue($documentoType, $documentoId, $transicionCodigo, $usuario, $versionLeida, function (Model&DocumentoConEstados $documento, RondaAprobacion $ronda, FirmaAprobacion $firma, string $paso) use ($usuario, $documentoType, $transicionCodigo): FirmaAprobacion {
+            if ($this->resolutor->firmante($firma, $ronda)?->id !== $usuario->id && ! app(PermisosQueFirman::class)->permite($usuario, $documentoType, $transicionCodigo)) {
                 throw AprobacionRechazada::noTeToca($paso);
             }
 
@@ -120,11 +121,11 @@ final readonly class AprobacionesService
      */
     public function observar(string $documentoType, int $documentoId, string $transicionCodigo, User $usuario, int $motivoId, string $comentario, ?int $versionLeida = null): FirmaAprobacion
     {
-        return $this->conLaFirmaQueSigue($documentoType, $documentoId, $transicionCodigo, $usuario, $versionLeida, function (Model&DocumentoConEstados $documento, RondaAprobacion $ronda, FirmaAprobacion $firma, string $paso) use ($usuario, $motivoId, $comentario, $transicionCodigo): FirmaAprobacion {
+        return $this->conLaFirmaQueSigue($documentoType, $documentoId, $transicionCodigo, $usuario, $versionLeida, function (Model&DocumentoConEstados $documento, RondaAprobacion $ronda, FirmaAprobacion $firma, string $paso) use ($usuario, $motivoId, $comentario, $transicionCodigo, $documentoType): FirmaAprobacion {
             $definicion = $this->definicionDe($documento);
             $comentario = trim($comentario);
 
-            if ($this->resolutor->firmante($firma, $ronda)?->id !== $usuario->id) {
+            if ($this->resolutor->firmante($firma, $ronda)?->id !== $usuario->id && ! app(PermisosQueFirman::class)->permite($usuario, $documentoType, $transicionCodigo)) {
                 throw AprobacionRechazada::noTeToca($paso);
             }
 

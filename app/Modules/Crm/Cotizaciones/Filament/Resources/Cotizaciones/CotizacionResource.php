@@ -11,6 +11,7 @@ use App\Modules\Crm\Cotizaciones\Filament\Resources\Cotizaciones\Pages\ListarCot
 use App\Modules\Crm\Cotizaciones\Filament\Resources\Cotizaciones\Pages\VerCotizacion;
 use App\Modules\Crm\Cotizaciones\Filament\VersionesDeCotizacion;
 use App\Modules\Crm\Cotizaciones\Models\Cotizacion;
+use App\Modules\Crm\Cotizaciones\Services\CotizacionesService;
 use App\Modules\Crm\Cotizaciones\Services\PortadaCotizaciones;
 use App\Modules\Crm\Cuentas\Services\CuentasService;
 use App\Modules\Crm\Oportunidades\Services\OportunidadesService;
@@ -29,6 +30,7 @@ use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -150,6 +152,10 @@ final class CotizacionResource extends Resource
             ->formatStateUsing(fn (Cotizacion $record, ?string $state): string => self::monto($record->moneda_id, (string) $state));
 
         return $schema->components([
+            // Observación 9.5 (2): el margen bajo el mínimo pide aprobación: costo, precio, descuento, margen y motivo.
+            View::make('cotizaciones::aprobacion-margen')
+                ->viewData(fn (Cotizacion $record): array => ['a' => app(CotizacionesService::class)->aprobacionDeMargen($record->id)])
+                ->columnSpanFull()->visible(fn (Cotizacion $record): bool => self::ve(GrupoSensible::Margen) && app(CotizacionesService::class)->aprobacionDeMargen($record->id) !== null),
             Section::make('Totales')->columns(['default' => 2, 'md' => 3, 'xl' => 6])->compact()
                 ->description(fn (): ?string => self::ve(GrupoSensible::Margen) ? null : 'El costo y el margen se ven con el permiso de ver costos y márgenes.')
                 ->schema([

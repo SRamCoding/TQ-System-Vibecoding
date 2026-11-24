@@ -45,10 +45,13 @@ use App\Modules\Crm\Oportunidades\Pestanas\PestanaOportunidad;
 use App\Modules\Crm\Oportunidades\Pestanas\RegistroPestanasOportunidad;
 use App\Modules\Crm\Oportunidades\Requisitos\RequisitosDeEtapa;
 use App\Modules\Crm\Oportunidades\Services\CotizacionDeOportunidad;
+use App\Modules\Nucleo\Aprobaciones\PermisosQueFirman;
 use App\Modules\Nucleo\Aprobaciones\RegistroResumenesAprobacion;
 use App\Modules\Nucleo\Enums\TipoParametro;
 use App\Modules\Nucleo\Estados\MotivoInicial;
 use App\Modules\Nucleo\Estados\RegistroDocumentos;
+use App\Modules\Nucleo\Mien\RegistroTarjetasMien;
+use App\Modules\Nucleo\Mien\TarjetaMien;
 use App\Modules\Nucleo\Navegacion\AnimacionCaja;
 use App\Modules\Nucleo\Navegacion\AreaModulo;
 use App\Modules\Nucleo\Navegacion\CajaModulo;
@@ -69,6 +72,9 @@ use Illuminate\Support\ServiceProvider;
 final class CotizacionesServiceProvider extends ServiceProvider
 {
     public const string PERMISO_VER = 'crm.cotizaciones.ver';
+
+    /** Observación 9.5 (2). */
+    public const string PERMISO_APROBAR_MARGEN = 'crm.cotizaciones.aprobar-margen';
 
     /** Lista de motivos de la versión nueva (D5): el DBML manda el motivo a catálogo (plan 1.5, D9). */
     public const string FAMILIA_NUEVA_VERSION = 'crm.cotizaciones.nueva-version';
@@ -189,6 +195,11 @@ final class CotizacionesServiceProvider extends ServiceProvider
 
         $permisos = $this->app->make(RegistroPermisos::class);
         $permisos->declarar(CotizacionesService::PERMISO_TODAS, 'Cotizar sobre las oportunidades de cualquier ejecutivo');
+        // Observación 9.5 (2): aprobar o rechazar el descuento de una cotización bajo el margen mínimo (además de la
+        // jefatura que dice la regla) y ver la tarjeta «Por aprobar» de Mien.
+        $permisos->declarar(self::PERMISO_APROBAR_MARGEN, 'Aprobar o rechazar descuentos bajo el margen mínimo');
+        $this->app->make(PermisosQueFirman::class)->registrar('cotizacion', DefinicionCotizacion::APROBAR, self::PERMISO_APROBAR_MARGEN);
+        $this->app->make(RegistroTarjetasMien::class)->registrar(new TarjetaMien('por-aprobar-margen', 'Por aprobar', self::PERMISO_APROBAR_MARGEN, Filament\TarjetaPorAprobarMargen::class, 5));
         $permisos->nombrar(CotizacionesService::PERMISO_CREAR, 'Crear cotizaciones');
         $permisos->nombrar(CotizacionesService::PERMISO_EDITAR, 'Editar el borrador de cotizaciones');
         $permisos->nombrar(CotizacionesService::PERMISO_NUEVA_VERSION, 'Hacer versiones nuevas de cotizaciones');

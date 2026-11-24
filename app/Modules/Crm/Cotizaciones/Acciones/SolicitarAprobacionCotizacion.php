@@ -29,7 +29,8 @@ final class SolicitarAprobacionCotizacion extends Accion
         return [
             Campo::entero('cotizacion_id', 'Cotización')->conReglas('min:1'),
             Campo::entero('version', 'Versión')->deControl(),
-            Campo::texto('comentario', 'Comentario', maximo: 1000)->opcional(),
+            // Observación 9.5 (2): el motivo del descuento es obligatorio (lo ve quien aprueba, en Mien).
+            Campo::texto('comentario', 'Motivo del descuento', maximo: 1000),
         ];
     }
 
@@ -40,6 +41,6 @@ final class SolicitarAprobacionCotizacion extends Accion
 
     public function ejecutar(array $datos, User $usuario): Cotizacion
     {
-        return app(CotizacionesService::class)->solicitarAprobacion($datos['cotizacion_id'], $datos['version'], $datos['comentario'] ?? null, $usuario);
+        return app(CotizacionesService::class)->solicitarAprobacion($datos['cotizacion_id'], $datos['version'], (string) $datos['comentario'], $usuario);
     }
 }

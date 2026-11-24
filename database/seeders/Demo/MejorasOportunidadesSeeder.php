@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders\Demo;
 
+use App\Modules\Crm\Cotizaciones\Models\Cotizacion;
+use App\Modules\Crm\Cotizaciones\Services\CotizacionesService;
+use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\Tiempo\Calendario;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
@@ -19,6 +22,7 @@ final class MejorasOportunidadesSeeder extends Seeder
     {
         DB::transaction(function (): void {
             $this->propuestaSinRespuesta();
+            $this->esperandoAprobacion();
         });
     }
 
@@ -35,5 +39,26 @@ final class MejorasOportunidadesSeeder extends Seeder
         $desde = $hoy->subDays(9)->setTime(10, 0);
         DB::table('oportunidades')->where('id', $o->id)->update(['en_etapa_desde' => $desde]);
         DB::table('actividades')->where('oportunidad_id', $o->id)->where('created_at', '>=', $desde)->update(['created_at' => $desde->subDay()]);
+    }
+
+    /**
+     * (2) La cotización bajo el mínimo que espera aprobación, pedida por el camino de verdad (abre su ronda) con su motivo:
+     * sale en Mien → «Por aprobar».
+     */
+    private function esperandoAprobacion(): void
+    {
+        $c = Cotizacion::query()->whereHas('estado', fn ($q) => $q->where('codigo', 'por_aprobar'))->first();
+
+        if ($c === null || DB::table('rondas_aprobacion')->where('aprobable_type', 'cotizacion')->where('aprobable_id', $c->id)->where('estado', 'abierta')->exists()) {
+            return;
+        }
+
+        $usuario = User::query()->where('email', 'dev@techquk.test')->first() ?? User::query()->where('es_sistema', false)->firstOrFail();
+        auth()->setUser($usuario);
+        $borrador = (int) DB::table('estados')->where('documento_type', 'cotizacion')->where('codigo', 'borrador')->value('id');
+        DB::table('cotizaciones')->where('id', $c->id)->update(['estado_id' => $borrador]);
+        $c->refresh();
+        app(CotizacionesService::class)->solicitarAprobacion($c->id, $c->version,
+            'Competencia fuerte: Redes Andinas ofertó 10 % menos en el proceso anterior de esta municipalidad.', $usuario);
     }
 }

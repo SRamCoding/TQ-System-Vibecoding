@@ -6,6 +6,7 @@ namespace App\Modules\Crm\Cotizaciones\Services;
 
 use App\Modules\Crm\Catalogo\Services\CatalogoRechazado;
 use App\Modules\Crm\Catalogo\Services\CatalogoService;
+use App\Modules\Crm\Cotizaciones\Condiciones\MargenPideAprobacion;
 use App\Modules\Crm\Cotizaciones\CotizacionesServiceProvider;
 use App\Modules\Crm\Cotizaciones\Efectos\PedidoAceptacion;
 use App\Modules\Crm\Cotizaciones\Enums\OrigenLinea;
@@ -30,6 +31,8 @@ use App\Modules\Nucleo\Models\UnidadMedida;
 use App\Modules\Nucleo\Models\User;
 use App\Modules\Nucleo\RegistroAcciones\ArchivoSubido;
 use App\Modules\Nucleo\Services\AdjuntosService;
+use App\Modules\Nucleo\Services\AprobacionesService;
+use App\Modules\Nucleo\Services\MotivosService;
 use App\Modules\Nucleo\Services\ParametrosService;
 use App\Modules\Nucleo\Services\SeguridadService;
 use App\Modules\Nucleo\Services\TransicionesService;
@@ -222,6 +225,10 @@ final readonly class CotizacionesService
     /** Pide la aprobación de Gerencia Comercial (D14): relee el presupuesto, recalcula y deja con qué mínimo se midió. */
     public function solicitarAprobacion(int $cotizacionId, int $versionLeida, ?string $comentario, User $quien): Cotizacion
     {
+        if (trim((string) $comentario) === '') {
+            throw CotizacionRechazada::conMotivo('Escribe el motivo del descuento: lo ve quien aprueba.');
+        }
+
         return $this->transicionarDesdeBorrador($cotizacionId, $versionLeida, DefinicionCotizacion::SOLICITAR_APROBACION, $comentario, $quien);
     }
 
@@ -631,5 +638,72 @@ final readonly class CotizacionesService
         }
 
         return $motivo;
+    }
+
+    /**
+     * Observación 9.5 (2): lo que se muestra al pedir o esperar la aprobación por margen bajo el mínimo: costo, precio
+     * (sin IGV), descuento, margen, mínimo de hoy, y quién la pidió y por qué (del historial). Nulo si no hace falta.
+     *
+     * @return array{estado: string, costo: string, precio: string, descuento: ?string, margen: ?string, minimo: string, motivo: ?string, pide: ?string, pedida: ?string, moneda: string}|null
+     */
+    public function aprobacionDeMargen(int $cotizacionId): ?array
+    {
+        $c = Cotizacion::query()->with('estado')->findOrFail($cotizacionId);
+        $estado = $c->estado->codigo;
+        $bajo = MargenPideAprobacion::bajoElMinimo($c);
+
+        if (! ($estado === DefinicionCotizacion::POR_APROBAR || ($estado === DefinicionCotizacion::BORRADOR && $c->margen_porcentaje !== null && $bajo))) {
+            return null;
+        }
+
+        $precio = bcsub((string) $c->total, (string) $c->igv, 2);
+        $bruto = bcadd($precio, (string) $c->descuento_total, 2);
+        $pedido = DB::table('historial_estados as h')->join('transiciones_estado as t', 't.id', '=', 'h.transicion_id')
+            ->where('h.documentable_type', $c->getMorphClass())->where('h.documentable_id', $c->id)->where('t.codigo', DefinicionCotizacion::SOLICITAR_APROBACION)
+            ->orderByDesc('h.id')->first(['h.comentario', 'h.user_id', 'h.fecha']);
+
+        return [
+            'estado' => $estado, 'costo' => (string) $c->costo_total, 'precio' => $precio,
+            'descuento' => bccomp((string) $c->descuento_total, '0', 2) > 0 && bccomp($bruto, '0', 2) > 0 ? CalculoCotizacion::redondear(bcmul(bcdiv((string) $c->descuento_total, $bruto, 8), '100', 4), 1) : null,
+            'margen' => $c->margen_porcentaje === null ? null : (string) $c->margen_porcentaje,
+            'minimo' => MargenPideAprobacion::minimo($c),
+            'motivo' => $estado === DefinicionCotizacion::POR_APROBAR ? $pedido?->comentario : null,
+            'pide' => $estado === DefinicionCotizacion::POR_APROBAR && $pedido !== null ? (string) User::query()->whereKey($pedido->user_id)->value('name') : null,
+            'pedida' => $pedido === null ? null : CarbonImmutable::parse($pedido->fecha)->format('d/m/Y H:i'),
+            'moneda' => (string) Moneda::query()->whereKey($c->moneda_id)->value('simbolo'),
+        ];
+    }
+
+    /**
+     * Observación 9.5 (2): las cotizaciones que esperan la aprobación del margen, para la tarjeta «Por aprobar» de Mien.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function porAprobarMargen(): array
+    {
+        return Cotizacion::query()->whereHas('estado', fn ($q) => $q->where('codigo', DefinicionCotizacion::POR_APROBAR))->orderBy('updated_at')->get()
+            ->map(function (Cotizacion $c): array {
+                $a = $this->aprobacionDeMargen($c->id);
+
+                return ['id' => $c->id, 'version' => $c->version, 'numero' => "{$c->numero} v{$c->numero_version}", 'cliente' => app(CuentasService::class)->resumen($c->cuenta_id)->etiqueta,
+                    'oportunidad' => app(OportunidadesService::class)->resumen($c->oportunidad_id)->nombre ?? '', ...($a ?? [])];
+            })->values()->all();
+    }
+
+    /** Observación 9.5 (2): aprueba el descuento (firma del paso de la regla); queda en el historial quién, cuándo y con qué margen. */
+    public function aprobarMargen(int $cotizacionId, int $versionLeida, User $quien): void
+    {
+        app(AprobacionesService::class)->firmar('cotizacion', $cotizacionId, DefinicionCotizacion::APROBAR, $quien, $versionLeida);
+    }
+
+    /** Observación 9.5 (2): rechaza el descuento con su motivo: la cotización vuelve a borrador. */
+    public function rechazarMargen(int $cotizacionId, int $versionLeida, string $motivo, User $quien): void
+    {
+        if (trim($motivo) === '') {
+            throw CotizacionRechazada::conMotivo('Escribe por qué rechazas el descuento.');
+        }
+
+        $motivoId = (int) array_key_first(app(MotivosService::class)->opciones(AprobacionesService::FAMILIA_OBSERVAR, null));
+        app(AprobacionesService::class)->observar('cotizacion', $cotizacionId, DefinicionCotizacion::APROBAR, $quien, $motivoId, $motivo, $versionLeida);
     }
 }

@@ -407,6 +407,8 @@ final class NucleoServiceProvider extends ServiceProvider
         $this->app->singleton(RegistroImagenes::class);
         // Plan 2.0, D5: quién guarda detalles de «Otro» de cada catálogo.
         $this->app->singleton(RegistroOtrosDeCatalogo::class);
+        // Observación 9.5 (2): quién más puede firmar una transición, por permiso.
+        $this->app->singleton(Aprobaciones\PermisosQueFirman::class);
         $this->app->singleton(RegistroTarjetasMien::class);
         $this->app->singleton(RegistroSeccionesMien::class);
         $this->app->singleton(RegistroPendientesMien::class);
