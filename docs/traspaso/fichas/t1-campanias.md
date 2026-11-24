@@ -1,7 +1,7 @@
 # Ficha · Campañas y leads (CRM-07)
 
-- **Estado:** en curso (v8, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v8
+- **Estado:** en curso (v9, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v9
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-campanias-v1`
 - **Fuentes del diseño (v3):** `docs/vibe/pedidos/observaciones-7.md` (punto 6) y `lienzos/campanias/` (`Main.dc.html`,
@@ -19,6 +19,8 @@ sus oportunidades y cuánto costó cada lead. Como dice el v4, en Techquk el neg
 módulo es el último del CRM.
 
 ## Decisiones de Sebastián
+
+- **MV-106** (ficha) · La sección «Mis clientes» se llama «Volver a vender» (chips: Campañas · Canales · Volver a vender); la dirección vieja lleva a la nueva.
 
 - **MV-105** (ficha) · Retorno real (margen de lo ganado ÷ gastado; en ejecución, el margen actual del proyecto) en verde o coral y retorno esperado (margen previsto × probabilidad ÷ gastado) en gris; los dos si hay ganadas y abiertas; «sin gasto» sin gasto. Calculado al mirar.
 
@@ -40,6 +42,8 @@ módulo es el último del CRM.
 
 ## Pantallas y navegación
 
+- **Volver a vender** (v9, MV-106): chip y texto «Volver a vender: venderle de nuevo a quien ya nos compró…»; dirección `?seccion=volver-a-vender` (la vieja `?seccion=clientes` lleva ahí). El tipo de campaña que nace de ahí sigue siendo «Campaña a clientes».
+
 - **Retorno** (v8, MV-105): en las tarjetas y cifras de Campañas, en Canales y en la ficha de la campaña: «9.1×» (verde o coral), «6.7× esperado» (gris), «9.1× · + 2.3× esperado» (en la tarjeta y la cifra de arriba, el esperado en una segunda línea) o «sin gasto». Al pasar el puntero: «Por cada S/ 1 invertido volvieron S/ 9.10 de ganancia» y el detalle de lo esperado por oportunidad (etapa, probabilidad, margen previsto y lo que aporta; sin cotización, «monto × margen mínimo»).
 
 - **Ficha de la campaña** (v7, MV-104): «← Volver a Campañas» (a la sección donde se estaba); cabecera con nombre, estado (planificada, en curso, terminada), tipo, canal con ícono, fechas, responsable, objetivo y el retorno; botones Formulario y QR, Registrar gasto, Editar. Cifras: invertido / presupuesto, contactos (nuevos y ya registrados), oportunidades (N de X), ganadas y ganado, margen, costo por contacto y por contacto nuevo. Pestañas: Contactos (nombre, organización, teléfono, correo, nuevo o ya registrado y qué era, fecha, en qué quedó; clic abre su oportunidad o su ficha de persona), Oportunidades (etapa con su gema, monto, margen, responsable), Gastos (fecha, concepto, imputación, comprobante, monto; gastado, presupuesto y lo que queda o se pasó), Seguimiento (campañas a clientes) y Actividad (quién creó, editó y registró gastos).
@@ -48,12 +52,12 @@ módulo es el último del CRM.
 
 - **Embudo de la tarjeta** (v6, MV-103): «15 contactos llegaron · 11 nuevos · 4 ya registrados» (al pasar el puntero por «ya registrados», la lista con nombre y qué era: ya era cliente, contacto de un cliente, ya había escrito antes, ya tenía una oportunidad abierta); «Oportunidades» con barra y «3 de 15»; «Ganadas» con barra y «1 de 3». En Canales, igual con «Calificados». Al pasar el puntero por «Gastado», el costo por contacto nuevo. Al registrar un contacto con «+ Nuevo», el aviso dice si ya lo conocíamos.
 
-- **Canales** (v5, MV-098, lienzo `campanias-vista/Canales.dc.html`): chips Campañas · Canales · Mis clientes. Arriba, cuatro cifras (leads del periodo y de cuántos canales, calificados y %, el canal que trae más, el que rinde más). Selector Este mes · Trimestre · Año y «Ordenar: leads / ganado / retorno». Una tarjeta por canal con leads (solo los canales con leads); retorno en verde (1× o más), coral (menos) o «sin gasto». Clic en la tarjeta: Mis oportunidades con `etapa=por_calificar` y `origen=<canal>`. Enlace «Probar la entrada de la página web» (abre `/entrada/prueba`, observación 9.3).
+- **Canales** (v5, MV-098, lienzo `campanias-vista/Canales.dc.html`): chips Campañas · Canales · Volver a vender. Arriba, cuatro cifras (leads del periodo y de cuántos canales, calificados y %, el canal que trae más, el que rinde más). Selector Este mes · Trimestre · Año y «Ordenar: leads / ganado / retorno». Una tarjeta por canal con leads (solo los canales con leads); retorno en verde (1× o más), coral (menos) o «sin gasto». Clic en la tarjeta: Mis oportunidades con `etapa=por_calificar` y `origen=<canal>`. Enlace «Probar la entrada de la página web» (abre `/entrada/prueba`, observación 9.3).
 
 - **Canal** (v4, MV-097): «+ Nuevo → Contacto por calificar» y «Nueva campaña» piden el canal (el origen comercial del lead sale de él y se puede cambiar). En las tarjetas de Por calificar y en el panel de Por calificar del Embudo, el canal como etiqueta con su ícono. Mis oportunidades tiene el grupo de filtros «Origen» (plegable), con los canales que tienen algo: filtra los leads por su canal y las oportunidades por el canal del lead del que nacieron.
 - **Entrada de la landing** (v4, MV-097): `POST /entrada/leads` (campos y respuestas en `docs/vibe/conectar-landing.md`); `/entrada/prueba` es la página de prueba (con sesión) que envía un formulario de ejemplo. Mien: «Nuevo contacto desde la página web: [nombre] · [organización]» (los de los últimos 3 días sin atender).
 
-- **v3 · Campañas** `/campanias` (MV-079): chips **Campañas · Mis clientes** (el Radar del PAC no se muestra hasta que
+- **v3 · Campañas** `/campanias` (MV-079): chips **Campañas · Volver a vender** (el Radar del PAC no se muestra hasta que
   Sebastián decida; el calendario, más adelante). «Nueva campaña» arriba.
   - **Campañas:** cinco cifras del año: invertido (contra lo presupuestado), contactos (y costo por contacto),
     oportunidades (y % de los contactos), ganado (y cuántos proyectos) y **retorno** (verde desde 1×, coral si no). Una
@@ -62,7 +66,7 @@ módulo es el último del CRM.
     proyecto no cerró); «N sin atender hace 3 días»; en las de clientes, cuántos clientes. Botones **Formulario y QR**
     (enlace público, QR para imprimir o descargar, enlace de WhatsApp «Hola, vengo de [campaña]», con copiar),
     **Registrar gasto** (panel) y **Ver contactos** (la ficha de la campaña).
-  - **Mis clientes:** tres tarjetas con su cantidad y monto estimado: Garantía por vencer en 90 días (ofrecer
+  - **Volver a vender:** tres tarjetas con su cantidad y monto estimado: Garantía por vencer en 90 días (ofrecer
     mantenimiento preventivo), Instalado hace 3 años o más (ofrecer renovación), Solo tienen una línea (ofrecer otra).
     **Ver la lista**: cada cliente con su proyecto y el dato que lo puso ahí («vence en 21 días», coral bajo 30), con su
     casilla para incluirlo o no. **Crear campaña** (panel): nombre, responsable y el seguimiento editable (día, canal,
@@ -124,7 +128,7 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 - **v3 · Demo:** feria 2,631.21 / 2,400.00 (se pasó), ganado 107,793.00, margen 23,944.00 → 9.1×; Facebook 2,411.00 /
   2,500.00, margen 16,153.67 → 6.7×; correo 180.00 → 0×; referidos 3,853.53, margen 54,334.80 (previsto) → 14.1×. Año:
   S/ 9,075.74 invertido, 76 contactos, 14 oportunidades, 4 proyectos, 10.4×.
-- **v3 · Mis clientes:** garantía = series instaladas con la garantía en los próximos 90 días (por proyecto); renovación =
+- **v3 · Volver a vender:** garantía = series instaladas con la garantía en los próximos 90 días (por proyecto); renovación =
   proyectos cerrados que terminaron hace 3 años o más; una línea = cuentas cuyas oportunidades ganadas son todas de la
   misma línea de solución. Estimados: mantenimiento 10 % de lo vendido (S/ 8,400.00 si no se sabe), renovación 60 %
   (S/ 150,000.00 si no se sabe), otra línea S/ 40,000.00 por cliente.
@@ -160,7 +164,7 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 - **v3 · Radar del PAC** no se construye todavía (pedido: investigar y avisar). Lo investigado: el OECE publica el PAC
   como un Excel anual (`PAC{año}_0.xlsx`, ~8–17 MB, actualizado cada mes) con entidad y RUC, procedimiento, objeto,
   descripción del ítem, cantidad, ubicación y **mes previsto**, pero **sin valor estimado**; la API OCDS no trae el PAC.
-- **v3 · Estimados de Mis clientes** (10 %, 60 %, S/ 40,000.00) y que la campaña a clientes no tenga presupuesto.
+- **v3 · Estimados de Volver a vender** (10 %, 60 %, S/ 40,000.00) y que la campaña a clientes no tenga presupuesto.
 - **v3 · Lo que el cliente responda** entra como lead de la campaña (Por calificar) cuando alguien lo registra; el
   envío automático por correo o WhatsApp queda como punto de extensión.
 - **v3 · El número de WhatsApp** es el parámetro `crm.whatsapp_comercial` (inventado en la demo).
@@ -184,7 +188,7 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 - **v4 · Canal de una oportunidad:** se busca por el lead que la creó (`leads.oportunidad_id`), sin columna propia en la oportunidad.
 
 - **v3:** el formulario público solo se protege con un límite por dirección (5 envíos cada 10 minutos) y un campo
-  trampa. Mis clientes y el margen leen proyectos, series y cierres con consultas directas. Los proyectos antiguos de la
+  trampa. Volver a vender y el margen leen proyectos, series y cierres con consultas directas. Los proyectos antiguos de la
   demo se insertaron directo en la base. Los gastos de campaña se enlazan en una tabla propia.
 
 - Sin acciones registradas: los botones llaman al servicio o crean el registro directo.
@@ -199,6 +203,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Cambios desde la versión anterior
 
+- **v9** (MV-106): «Mis clientes» → «Volver a vender».
+
 - **v8** (MV-105): retorno real y esperado.
 
 - **v7** (MV-104): ficha de la campaña, atajos y gasto al medio.
@@ -209,7 +215,7 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 - **v4** (MV-097): canal de cada lead, filtro «Origen» y entrada desde la landing.
 
-- **v3** (MV-079): Campañas con retorno y gasto real, formulario y QR, Mis clientes y campañas a clientes con su
+- **v3** (MV-079): Campañas con retorno y gasto real, formulario y QR, Volver a vender y campañas a clientes con su
   seguimiento; avisos en Mien.
 
 - **v2** (ronda 1, MV-024): la caja «Campañas y leads» pasa a ser **Campañas** (`/campanias`), con columnas nuevas

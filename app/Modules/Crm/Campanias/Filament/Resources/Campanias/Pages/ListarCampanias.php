@@ -31,7 +31,7 @@ use RuntimeException;
 /**
  * Observación 7.6 (MV-079, lienzos `campanias/Main.dc.html` y `Clientes.dc.html`): la caja Campañas con secciones en
  * chips: **Campañas** (cinco cifras del año y una tarjeta por campaña con su mini embudo, gasto real contra presupuesto,
- * lo ganado, el margen de lo ganado y el retorno; Formulario y QR, Registrar gasto, Ver contactos) y **Mis clientes**
+ * lo ganado, el margen de lo ganado y el retorno; Formulario y QR, Registrar gasto, Ver contactos) y **Volver a vender**
  * (tres grupos que arma el sistema, con «Ver la lista» y «Crear campaña»). El Radar del PAC espera la decisión de
  * Sebastián (investigación hecha); el calendario queda para más adelante.
  */
@@ -53,7 +53,7 @@ final class ListarCampanias extends Page
     #[Url(as: 'orden', except: 'leads')]
     public string $ordenCanales = 'leads';
 
-    /** El grupo de Mis clientes abierto en «Ver la lista». */
+    /** El grupo de Volver a vender abierto en «Ver la lista». */
     #[Url(as: 'grupo')]
     public ?string $grupo = null;
 
@@ -77,6 +77,11 @@ final class ListarCampanias extends Page
 
     public function mount(): void
     {
+        // Observación 9.12: la dirección vieja («?seccion=clientes») lleva a «Volver a vender».
+        if ($this->seccion === 'clientes') {
+            $this->seccion = 'volver-a-vender';
+        }
+
         if ($this->grupo !== null) {
             $grupo = $this->grupo;
             $this->grupo = null;
@@ -122,7 +127,7 @@ final class ListarCampanias extends Page
         ];
     }
 
-    /** «Crear campaña» desde un grupo de Mis clientes: con los marcados y el seguimiento editable. */
+    /** «Crear campaña» desde un grupo de Volver a vender: con los marcados y el seguimiento editable. */
     public function crearCampaniaAction(): Action
     {
         return Action::make('crearCampania')->label('Crear campaña')->visible(self::puede(...))->slideOver()

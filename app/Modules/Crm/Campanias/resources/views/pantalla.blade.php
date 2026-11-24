@@ -1,6 +1,6 @@
 {{--
     MV-079 (observación 7.6): la caja Campañas como los lienzos `campanias/Main.dc.html` (campañas con su retorno) y
-    `Clientes.dc.html` (Mis clientes). Chips arriba: Campañas · Mis clientes (el Radar del PAC espera decisión; el
+    `Clientes.dc.html` (Volver a vender, observación 9.12). Chips arriba: Campañas · Canales · Volver a vender (el Radar del PAC espera decisión; el
     calendario, más adelante). Recibe `$retorno`, `$grupos` y `$puede` de `ListarCampanias`.
 --}}
 @php
@@ -46,7 +46,7 @@
     <div class="tq-camp-chips">
         <button type="button" class="tq-camp-chip" aria-pressed="{{ $this->seccion === 'campanias' ? 'true' : 'false' }}" wire:click="$set('seccion', 'campanias')">Campañas</button>
         <button type="button" class="tq-camp-chip" aria-pressed="{{ $this->seccion === 'canales' ? 'true' : 'false' }}" wire:click="$set('seccion', 'canales')">Canales</button>
-        <button type="button" class="tq-camp-chip" aria-pressed="{{ $this->seccion === 'clientes' ? 'true' : 'false' }}" wire:click="$set('seccion', 'clientes')">Mis clientes <span class="n">{{ count(array_filter($grupos, fn ($g) => $g['clientes'] !== [])) }}</span></button>
+        <button type="button" class="tq-camp-chip" aria-pressed="{{ $this->seccion === 'volver-a-vender' ? 'true' : 'false' }}" wire:click="$set('seccion', 'volver-a-vender')">Volver a vender <span class="n">{{ count(array_filter($grupos, fn ($g) => $g['clientes'] !== [])) }}</span></button>
     </div>
 
     @if ($this->seccion === 'campanias' && $retorno !== null)
@@ -89,6 +89,8 @@
     @elseif ($this->seccion === 'canales' && $canales !== null)
         @include('campanias::canales', ['canales' => $canales, 'soles' => $soles, 'veces' => $veces])
     @else
+        {{-- Observación 9.12: «Volver a vender» (antes «Mis clientes»): venderle de nuevo a quien ya compró. --}}
+        <div style="font-size: 14px; color: var(--c-suave)">Volver a vender: venderle de nuevo a quien ya nos compró. El sistema arma los grupos solo; cada uno se vuelve una campaña a clientes.</div>
         <div class="tq-camp-grid" style="grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr))">
             @foreach ($grupos as $clave => $g)
                 <article class="tq-camp-card tq-camp-grupo" wire:key="grupo-{{ $clave }}" @if ($this->grupo === $clave) style="border-color: var(--c-azul-borde); box-shadow: inset 0 0 0 1px var(--c-azul-borde)" @endif>

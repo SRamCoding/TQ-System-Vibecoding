@@ -1274,3 +1274,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** ficha (Campañas); lee Oportunidades y Proyectos por sus servicios
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.11: retorno real y esperado»
+
+### MV-106 · 2026-11-24 · «Mis clientes» pasa a llamarse «Volver a vender»
+
+- **Ficha:** `fichas/t1-campanias.md`
+- **Dijo Sebastián:** (observaciones-9, punto 12) «la sección «Mis clientes» (observación 7.6) se llama «Volver a vender» … Cambia el chip, el título, los textos, la ruta si lleva el nombre (con redirección desde la vieja) y las fichas; el tipo de campaña que nace de ahí se sigue llamando «Clientes». Orden de los chips: Campañas · Canales · Volver a vender».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (Campañas)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.12: «Mis clientes» pasa a «Volver a vender»»

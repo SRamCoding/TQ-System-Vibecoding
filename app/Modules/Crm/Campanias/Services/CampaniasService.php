@@ -34,13 +34,13 @@ final readonly class CampaniasService
 
     public const string CENTRO_COSTO = 'COM';
 
-    /** Mis clientes: la garantía vence en estos días o menos. */
+    /** Volver a vender: la garantía vence en estos días o menos. */
     public const int DIAS_GARANTIA = 90;
 
-    /** Mis clientes: instalado hace estos años o más. */
+    /** Volver a vender: instalado hace estos años o más. */
     public const int ANIOS_RENOVACION = 3;
 
-    /** Estimados de Mis clientes (supuestos): mantenimiento = 10 % de lo vendido; renovación = 60 %; otra línea, fijo. */
+    /** Estimados de Volver a vender (supuestos): mantenimiento = 10 % de lo vendido; renovación = 60 %; otra línea, fijo. */
     public const array ESTIMADOS = ['mantenimiento' => '0.10', 'renovacion' => '0.60', 'otra_linea' => '40000.00', 'sin_venta' => '150000.00'];
 
     /** El seguimiento por defecto de una campaña a clientes (editable). */
@@ -310,7 +310,7 @@ final readonly class CampaniasService
     }
 
     /**
-     * Mis clientes: los tres grupos que el sistema arma solo, con su cantidad y un monto estimado.
+     * Volver a vender: los tres grupos que el sistema arma solo, con su cantidad y un monto estimado.
      *
      * @return array<string, array{titulo: string, oferta: string, clientes: list<array<string, mixed>>, estimado: string}>
      */
