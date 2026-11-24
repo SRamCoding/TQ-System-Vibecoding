@@ -47,15 +47,19 @@ final readonly class FiltroConvocatorias
      * La evaluación completa, línea por línea (para «¿Por qué no entró?»).
      *
      * @param  object{objeto: string, texto?: ?string, valor_referencial: mixed}  $c
+     * @param  list<array<string, mixed>>|null  $lineas  las de `lineas()`, o otras con la misma forma
      * @return array{entra: bool, linea: ?int, coincide: list<string>, motivo: ?string, detalle: list<array{linea: string, coincide: list<string>, negativas: list<string>, bajoMinimo: bool, minimo: string}>}
      */
-    public function evaluar(object $c): array
+    public function evaluar(object $c, ?array $lineas = null): array
     {
+        // Observación 9.6: la vista previa del asistente evalúa con las líneas que se están armando, sin guardarlas.
+        $lineas ??= $this->lineas();
+
         $texto = self::normal((string) (($c->texto ?? null) ?: $c->objeto));
         $detalle = [];
         $mejor = null;
 
-        foreach ($this->lineas() as $l) {
+        foreach ($lineas as $l) {
             $coincide = array_values(array_filter($l['palabras'], fn (string $p): bool => $p !== '' && str_contains($texto, self::normal($p))));
             $negativas = array_values(array_filter($l['negativas'], fn (string $p): bool => $p !== '' && str_contains($texto, self::normal($p))));
             $bajo = $c->valor_referencial !== null && bccomp((string) $c->valor_referencial, $l['minimo'], 2) < 0;
@@ -83,7 +87,7 @@ final readonly class FiltroConvocatorias
             $conPalabra[0]['fueraRegion'] => 'Es de '.self::nombreRegion($conPalabra[0]['departamento'])." y {$conPalabra[0]['linea']} solo busca en ".implode(', ', array_map(self::nombreRegion(...), $conPalabra[0]['regiones'])),
             default => 'Valor referencial bajo el mínimo de '.$conPalabra[0]['linea'].' (S/ '.number_format((float) $conPalabra[0]['minimo'], 2).')',
         };
-        $linea = $conPalabra === [] ? null : collect($this->lineas())->firstWhere('nombre', $conPalabra[0]['linea'])['id'] ?? null;
+        $linea = $conPalabra === [] ? null : collect($lineas)->firstWhere('nombre', $conPalabra[0]['linea'])['id'] ?? null;
 
         return ['entra' => false, 'linea' => $linea, 'coincide' => $conPalabra[0]['coincide'] ?? [], 'motivo' => $motivo, 'detalle' => $detalle];
     }

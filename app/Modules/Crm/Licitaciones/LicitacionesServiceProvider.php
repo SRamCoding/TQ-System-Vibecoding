@@ -54,6 +54,8 @@ final class LicitacionesServiceProvider extends ServiceProvider
         $permisos = $this->app->make(RegistroPermisos::class);
         $permisos->declarar(LicitacionesService::PERMISO_VER, 'Ver licitaciones');
         $permisos->declarar(LicitacionesService::PERMISO_GESTIONAR, 'Registrar y llevar licitaciones');
+        // Observación 9.6: la búsqueda del SEACE es de la empresa; solo quien tiene este permiso la cambia.
+        $permisos->declarar(Services\AsistenteBusquedaSeace::PERMISO_CONFIGURAR, 'Configurar la búsqueda de convocatorias del SEACE');
 
         $this->app->make(RegistroModulos::class)->registrar(new CajaModulo(
             'convocatorias', 'Convocatorias del SEACE', '/convocatorias', permiso: LicitacionesService::PERMISO_VER, area: AreaModulo::Crm,

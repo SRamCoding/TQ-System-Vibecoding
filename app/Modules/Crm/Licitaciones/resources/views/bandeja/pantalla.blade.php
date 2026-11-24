@@ -144,6 +144,16 @@
         @endforeach
     </div>
 
+    @if ($sinLineas)
+        {{-- Observación 9.6: sin ninguna línea configurada, el asistente. --}}
+        <div style="border: 1px solid var(--b-borde); background: var(--b-sup); border-radius: 14px; padding: 28px; text-align: center; display: flex; flex-direction: column; gap: 10px; align-items: center">
+            <x-filament::icon icon="heroicon-o-sparkles" class="h-8 w-8" style="color: var(--b-turquesa)" />
+            <strong style="font-size: 17px">Configura qué convocatorias le interesan a Techquk</strong>
+            <span style="font-size: 14px; color: var(--b-suave)">Rubros, regiones y montos en cinco pasos, con una vista previa de lo que habría entrado.</span>
+            <x-filament::button icon="heroicon-o-arrow-right" x-on:click="$dispatch('tq-abrir-asistente-seace')">Empezar</x-filament::button>
+        </div>
+    @endif
+
     <div class="tq-band-cuerpo">
         {{-- La lista compacta. --}}
         <div class="tq-band-lista">
@@ -296,6 +306,12 @@
     {{-- Configuración de la búsqueda (panel deslizante). --}}
     <x-filament::modal id="tq-busqueda-seace" slide-over width="3xl" heading="Configuración de la búsqueda">
         <div class="tq-band-conf" style="display: flex; flex-direction: column; gap: 18px">
+            {{-- Observación 9.6: el asistente (precarga lo que hay) y, sin el permiso, solo lectura. --}}
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+                <x-filament::button size="sm" color="gray" icon="heroicon-o-sparkles" x-on:click="close(); $dispatch('tq-abrir-asistente-seace')">Volver a configurar con el asistente</x-filament::button>
+                <x-filament::link tag="button" size="sm" x-on:click="close(); $dispatch('tq-abrir-asistente-seace', { desdeCero: true })">Empezar de cero</x-filament::link>
+                @if (! $puedeConfigurar)<span style="font-size: 12px; color: var(--b-suave)">Solo lectura: la búsqueda es de la empresa y la cambia quien tiene el permiso «Configurar la búsqueda».</span>@endif
+            </div>
             <section style="display: flex; flex-direction: column; gap: 12px">
                 <h4>Líneas de negocio</h4>
                 @php $colores = ['#0E8FAE', '#3E63DD', '#8A3FA8', '#C2532F', '#2F7D4F', '#B07A00']; @endphp
@@ -308,15 +324,15 @@
                             <input type="text" inputmode="decimal" class="tq-band-monto" aria-label="Valor mínimo de {{ $l['nombre'] }}" x-data="{ foco: false }"
                                 x-bind:value="foco ? ($wire.get('lineas.{{ $i }}.minimo') ?? '') : 'S/ ' + Number($wire.get('lineas.{{ $i }}.minimo') || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })"
                                 x-on:focus="foco = true" x-on:blur="foco = false; $wire.set('lineas.{{ $i }}.minimo', ($event.target.value || '0').replace(/[^0-9.]/g, ''), false)">
-                            @if ($puede)<button type="button" wire:click="quitarLinea({{ $i }})" class="tq-band-sub" aria-label="Quitar la línea">×</button>@endif
+                            @if ($puedeConfigurar)<button type="button" wire:click="quitarLinea({{ $i }})" class="tq-band-sub" aria-label="Quitar la línea">×</button>@endif
                         </div>
                         @foreach (['palabras' => 'PALABRAS CLAVE', 'negativas' => 'PALABRAS NEGATIVAS'] as $tipo => $titulo)
                             <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
                                 <span style="width: 9.5rem; font-size: 11px; font-weight: 700; letter-spacing: .04em">{{ $titulo }}</span>
                                 @foreach ($l[$tipo] as $j => $p)
-                                    <span @class(['tq-band-palabra', 'neg' => $tipo === 'negativas'])>{{ $p }}@if ($puede)<button type="button" wire:click="quitarPalabra({{ $i }}, '{{ $tipo }}', {{ $j }})" aria-label="Quitar {{ $p }}">×</button>@endif</span>
+                                    <span @class(['tq-band-palabra', 'neg' => $tipo === 'negativas'])>{{ $p }}@if ($puedeConfigurar)<button type="button" wire:click="quitarPalabra({{ $i }}, '{{ $tipo }}', {{ $j }})" aria-label="Quitar {{ $p }}">×</button>@endif</span>
                                 @endforeach
-                                @if ($puede)<input type="text" class="tq-band-agregar" placeholder="+ agregar" wire:model="nuevaPalabra.{{ $i }}-{{ $tipo }}" wire:keydown.enter="agregarPalabra({{ $i }}, '{{ $tipo }}')">@endif
+                                @if ($puedeConfigurar)<input type="text" class="tq-band-agregar" placeholder="+ agregar" wire:model="nuevaPalabra.{{ $i }}-{{ $tipo }}" wire:keydown.enter="agregarPalabra({{ $i }}, '{{ $tipo }}')">@endif
                             </div>
                         @endforeach
                         {{-- Observación 8.9: regiones (ninguna marcada = todas) y entidades que nunca entran. --}}
@@ -330,9 +346,9 @@
                         <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
                             <span style="width: 9.5rem; font-size: 11px; font-weight: 700; letter-spacing: .04em">ENTIDADES EXCLUIDAS</span>
                             @foreach ($l['excluidas'] ?? [] as $e)
-                                <span class="tq-band-palabra neg">{{ $e['nombre'] }}@if ($puede)<button type="button" wire:click="incluirEntidad({{ $i }}, @js($e['ruc']))" aria-label="Quitar {{ $e['nombre'] }}">×</button>@endif</span>
+                                <span class="tq-band-palabra neg">{{ $e['nombre'] }}@if ($puedeConfigurar)<button type="button" wire:click="incluirEntidad({{ $i }}, @js($e['ruc']))" aria-label="Quitar {{ $e['nombre'] }}">×</button>@endif</span>
                             @endforeach
-                            @if ($puede)
+                            @if ($puedeConfigurar)
                                 <span style="position: relative">
                                     <input type="search" class="tq-band-agregar" style="width: 14rem" placeholder="+ excluir entidad (buscar)" wire:model.live.debounce.300ms="buscarEntidad.{{ $i }}">
                                     @if (! empty($sugerenciasEntidad[$i]))
@@ -347,7 +363,7 @@
                         </div>
                     </div>
                 @endforeach
-                @if ($puede)<div><button type="button" class="tq-band-btn" wire:click="nuevaLinea">+ Nueva línea de negocio</button></div>@endif
+                @if ($puedeConfigurar)<div><button type="button" class="tq-band-btn" wire:click="nuevaLinea">+ Nueva línea de negocio</button></div>@endif
             </section>
 
             <section style="display: flex; flex-direction: column; gap: 8px">
@@ -387,7 +403,7 @@
                                     @endif
                                 @endif
                             </div>
-                            @if (! $porQueResultado['enBandeja'] && $puede)
+                            @if (! $porQueResultado['enBandeja'] && $puedeConfigurar)
                                 <div style="display: flex; gap: 8px; flex-wrap: wrap">
                                     <button type="button" class="tq-band-btn p" wire:click="traerIgual({{ $porQueResultado['id'] }})">Traer igual a la bandeja</button>
                                     @isset($conNeg)
@@ -411,18 +427,30 @@
                 <div>{{ $this->importarAction }}</div>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px">
                     <span>Prioritaria desde</span>
-                    <input type="text" inputmode="decimal" class="tq-band-monto" aria-label="Valor desde el que es prioritaria" x-data="{ foco: false }" @disabled(! $puede)
+                    <input type="text" inputmode="decimal" class="tq-band-monto" aria-label="Valor desde el que es prioritaria" x-data="{ foco: false }" @disabled(! $puedeConfigurar)
                         x-bind:value="foco ? ($wire.get('umbral') ?? '') : 'S/ ' + Number($wire.get('umbral') || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })"
                         x-on:focus="foco = true" x-on:blur="foco = false; $wire.set('umbral', ($event.target.value || '0').replace(/[^0-9.]/g, ''), false)">
                     <span>o si la entidad ya es cliente</span>
                 </div>
             </section>
+            {{-- Observación 9.6: cada cambio de la búsqueda, con quién y cuándo. --}}
+            <section style="display: flex; flex-direction: column; gap: 6px">
+                <h4>Historial de cambios</h4>
+                @forelse ($cambios as $c)
+                    <div style="font-size: 12px"><strong>{{ $c['quien'] }}</strong> {{ $c['texto'] }} <span style="color: var(--b-suave)">· {{ $c['cuando'] }}</span></div>
+                @empty
+                    <div style="font-size: 12px; color: var(--b-suave)">Todavía sin cambios registrados.</div>
+                @endforelse
+            </section>
         </div>
-        @if ($puede)
+        @if ($puedeConfigurar)
             <x-slot name="footerActions">
                 <x-filament::button wire:click="guardarBusqueda">Guardar y volver a filtrar</x-filament::button>
                 <x-filament::button color="gray" x-on:click="close">Cancelar</x-filament::button>
             </x-slot>
         @endif
     </x-filament::modal>
+
+    {{-- Observación 9.6: el asistente de configuración inicial. --}}
+    @livewire(\App\Modules\Crm\Licitaciones\Filament\AsistenteBusqueda::class, key('asistente-seace'))
 </div>

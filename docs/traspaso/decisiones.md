@@ -1220,3 +1220,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (Oportunidades, Cotizaciones, Mien, Directorio y catálogos)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.5 (parte 4): pérdidas, quién decide, resumen sugerido y Resultados»
+
+### MV-100 · 2026-11-24 · Convocatorias del SEACE: configuración inicial guiada de la búsqueda
+
+- **Ficha:** `fichas/t1-licitaciones.md`
+- **Dijo Sebastián:** (observaciones-9, punto 6) «Se agrega un asistente de configuración inicial … al entrar … si no hay ninguna línea … y se puede volver a abrir desde «Búsqueda» … ventana al medio … pasos y barra de avance … ¿Qué vende la empresa? … ¿Dónde trabaja? … ¿Desde qué monto? … Vista previa … Guardar … De la empresa, no de cada persona … el permiso nuevo crm.convocatorias.configurar-busqueda … Cada cambio queda registrado … Sugerencias con IA (opcional)».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (t1-licitaciones); permiso nuevo e historial de cambios
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.6: el asistente de configuración de la búsqueda»

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Crm\Licitaciones\Filament\Pages;
 
+use App\Modules\Crm\Licitaciones\Services\AsistenteBusquedaSeace;
 use App\Modules\Crm\Licitaciones\Services\BandejaSeace;
 use App\Modules\Crm\Licitaciones\Services\ConvocatoriasSeaceService;
 use App\Modules\Crm\Licitaciones\Services\FiltroConvocatorias;
@@ -22,6 +23,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use RuntimeException;
 
@@ -89,6 +91,15 @@ final class BandejaConvocatorias extends Page
     {
         return '';
     }
+
+    private static function puedeConfigurar(): bool
+    {
+        return auth()->user()?->can(AsistenteBusquedaSeace::PERMISO_CONFIGURAR) ?? false;
+    }
+
+    /** Observación 9.6: al guardar el asistente, la bandeja se vuelve a dibujar con lo filtrado. */
+    #[On('tq-busqueda-guardada')]
+    public function alGuardarLaBusqueda(): void {}
 
     private static function puede(): bool
     {
@@ -259,7 +270,7 @@ final class BandejaConvocatorias extends Page
 
     public function guardarBusqueda(): void
     {
-        if (! self::puede()) {
+        if (! self::puedeConfigurar()) {
             return;
         }
 
@@ -281,7 +292,7 @@ final class BandejaConvocatorias extends Page
 
     public function agregarRegion(string $linea, string $region): void
     {
-        if (self::puede()) {
+        if (self::puedeConfigurar()) {
             app(ConvocatoriasSeaceService::class)->agregarRegion($linea, $region);
             $this->abrirBusqueda();
             Notification::make()->success()->title('Agregada '.FiltroConvocatorias::nombreRegion($region)." a {$linea}.")->send();
@@ -290,7 +301,7 @@ final class BandejaConvocatorias extends Page
 
     public function quitarExcluida(string $linea, string $ruc): void
     {
-        if (self::puede()) {
+        if (self::puedeConfigurar()) {
             app(ConvocatoriasSeaceService::class)->quitarExcluida($linea, $ruc);
             $this->abrirBusqueda();
             Notification::make()->success()->title("La entidad ya no está excluida de {$linea}.")->send();
@@ -340,7 +351,7 @@ final class BandejaConvocatorias extends Page
 
     public function quitarNegativa(string $linea, string $palabra): void
     {
-        if (self::puede()) {
+        if (self::puedeConfigurar()) {
             app(ConvocatoriasSeaceService::class)->quitarNegativa($linea, $palabra);
             $this->abrirBusqueda();
             Notification::make()->success()->title("Quitada «{$palabra}» de {$linea}.")->send();
@@ -383,6 +394,10 @@ final class BandejaConvocatorias extends Page
             'sugerenciasEntidad' => collect($this->buscarEntidad)->filter(fn ($q): bool => mb_strlen(trim((string) $q)) >= 3)->map(fn ($q): array => DB::table('convocatorias_seace')->whereNotNull('ruc_entidad')
                 ->where('entidad', 'ilike', '%'.trim((string) $q).'%')->distinct()->orderBy('entidad')->limit(8)->pluck('entidad', 'ruc_entidad')->all())->all(),
             'puede' => self::puede(),
+            // Observación 9.6: la configuración es de la empresa; la cambia quien tiene su permiso.
+            'puedeConfigurar' => self::puedeConfigurar(),
+            'cambios' => app(ConvocatoriasSeaceService::class)->cambiosDeLaBusqueda(),
+            'sinLineas' => app(FiltroConvocatorias::class)->lineas() === [],
         ];
     }
 }

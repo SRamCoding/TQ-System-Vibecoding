@@ -460,6 +460,8 @@ final readonly class ConvocatoriasSeaceService
      */
     public function guardarLineas(array $lineas): void
     {
+        $antes = app(FiltroConvocatorias::class)->lineas();
+
         DB::transaction(function () use ($lineas): void {
             $quedan = [];
 
@@ -486,7 +488,64 @@ final readonly class ConvocatoriasSeaceService
             DB::table('seace_lineas')->whereNotIn('id', $quedan === [] ? [0] : $quedan)->delete();
         });
 
+        $this->registrarCambios($antes, app(FiltroConvocatorias::class)->lineas());
         app(FiltroConvocatorias::class)->reaplicar();
+    }
+
+    /**
+     * Observación 9.6: cada cambio de la búsqueda queda anotado (quién, cuándo y qué: línea, palabra, negativa, región,
+     * monto mínimo). La configuración es de la empresa, no de cada persona.
+     *
+     * @param  list<array<string, mixed>>  $antes
+     * @param  list<array<string, mixed>>  $despues
+     */
+    public function registrarCambios(array $antes, array $despues, ?string $extra = null): void
+    {
+        $porNombre = fn (array $ls): array => collect($ls)->keyBy('nombre')->all();
+        [$a, $d] = [$porNombre($antes), $porNombre($despues)];
+        $textos = [];
+
+        foreach (array_diff_key($d, $a) as $n => $_) {
+            $textos[] = "agregó la línea «{$n}»";
+        }
+
+        foreach (array_diff_key($a, $d) as $n => $_) {
+            $textos[] = "quitó la línea «{$n}»";
+        }
+
+        foreach (array_intersect_key($d, $a) as $n => $l) {
+            $v = $a[$n];
+
+            foreach ([['palabras', 'la palabra'], ['negativas', 'la negativa'], ['regiones', 'la región']] as [$campo, $que]) {
+                foreach (array_diff($l[$campo], $v[$campo]) as $x) {
+                    $textos[] = "agregó {$que} «".($campo === 'regiones' ? FiltroConvocatorias::nombreRegion($x) : $x)."» a {$n}";
+                }
+
+                foreach (array_diff($v[$campo], $l[$campo]) as $x) {
+                    $textos[] = "quitó {$que} «".($campo === 'regiones' ? FiltroConvocatorias::nombreRegion($x) : $x)."» de {$n}";
+                }
+            }
+
+            if (bccomp((string) $l['minimo'], (string) $v['minimo'], 2) !== 0) {
+                $textos[] = "cambió el mínimo de {$n} de S/ ".number_format((float) $v['minimo'], 0).' a S/ '.number_format((float) $l['minimo'], 0);
+            }
+        }
+
+        if ($extra !== null) {
+            $textos[] = $extra;
+        }
+
+        foreach (array_chunk($textos, 4) as $grupo) {
+            DB::table('seace_busqueda_cambios')->insert(['user_id' => auth()->id(), 'texto' => mb_substr(implode(' · ', $grupo), 0, 400), 'created_at' => now()]);
+        }
+    }
+
+    /** @return list<array{quien: string, cuando: string, texto: string}> los últimos cambios de la búsqueda */
+    public function cambiosDeLaBusqueda(int $limite = 12): array
+    {
+        return DB::table('seace_busqueda_cambios as c')->leftJoin('users as u', 'u.id', '=', 'c.user_id')->orderByDesc('c.id')->limit($limite)
+            ->get(['u.name', 'c.texto', 'c.created_at'])
+            ->map(fn (object $c): array => ['quien' => $c->name ?? 'El sistema', 'cuando' => CarbonImmutable::parse($c->created_at)->locale('es')->diffForHumans(), 'texto' => $c->texto])->all();
     }
 
     /** @param  list<string>  $palabras @return list<string> */
