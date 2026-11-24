@@ -1102,6 +1102,8 @@ final class DemoSeeder extends Seeder
         $pc = fn (string $codigo): int => (int) DB::table('partidas_control')->where('proyecto_id', $plaza)->where('codigo', $codigo)->value('id');
         $this->en('2026-11-14', function () use ($s, $plaza, $col, $pc, $d): void {
             $t = $s->semana($plaza, $d('2026-11-09'));
+            // MV-069: la semana nueva trae la jornada de cada asignado sin partida; esta demo anota sus horas con partida.
+            DB::table('tareo_lineas')->where('tareo_id', $t->id)->where('de_jornada', true)->whereNull('partida_control_id')->delete();
             $s->tarear($t->id, $col['julio'], $pc('PC-02.03'), ['lu' => '8', 'ma' => '8', 'mi' => '4']);
             $s->tarear($t->id, $col['julio'], $pc('PC-01.02'), ['mi' => '4', 'ju' => '8', 'vi' => '8', 'sa' => '4']);
             $s->tarear($t->id, $col['luis'], $pc('PC-02.03'), ['lu' => '8', 'ma' => '8', 'mi' => '8']);
@@ -1109,6 +1111,8 @@ final class DemoSeeder extends Seeder
         });
         $this->en('2026-11-19', function () use ($s, $plaza, $col, $pc, $d): void {
             $t = $s->semana($plaza, $d('2026-11-16'));
+            // MV-069: la semana nueva trae la jornada de cada asignado sin partida; esta demo anota sus horas con partida.
+            DB::table('tareo_lineas')->where('tareo_id', $t->id)->where('de_jornada', true)->whereNull('partida_control_id')->delete();
             $s->tarear($t->id, $col['julio'], $pc('PC-02.03'), ['lu' => '8', 'ma' => '8', 'mi' => '8']);
             $s->tarear($t->id, $col['luis'], $pc('PC-02.03'), ['lu' => '8', 'ma' => '6', 'mi' => '8']);
         });
