@@ -308,4 +308,90 @@ final readonly class CampaniasService
     {
         return strtr($texto, ['{cliente}' => $cliente, '{oferta}' => $oferta, '{proyecto}' => $proyecto]);
     }
+
+    /** Observación 9.4: los periodos de la vista Canales. */
+    public const array PERIODOS = ['mes' => 'Este mes', 'trimestre' => 'Trimestre', 'anio' => 'Año'];
+
+    /** Observación 9.4: cómo se ordenan las tarjetas de Canales. */
+    public const array ORDENES_CANALES = ['leads' => 'leads', 'ganado' => 'ganado', 'retorno' => 'retorno'];
+
+    /**
+     * Observación 9.4: cómo rinde cada canal en el periodo (desde el inicio del mes, trimestre o año hasta hoy): leads,
+     * calificados (los que pasaron a oportunidad), ganados con su monto y margen (el mismo cálculo de Campañas), lo
+     * gastado (el costo por contacto de la campaña de cada lead), costo por lead y retorno. Solo los canales con leads.
+     *
+     * @return array{cifras: array<string, mixed>, tarjetas: list<array<string, mixed>>, desde: CarbonImmutable}
+     */
+    public function canales(string $periodo = 'mes', string $orden = 'leads'): array
+    {
+        $hoy = CarbonImmutable::parse(Calendario::hoy());
+        $desde = match ($periodo) {
+            'trimestre' => $hoy->startOfQuarter(),
+            'anio' => $hoy->startOfYear(),
+            default => $hoy->startOfMonth(),
+        };
+        $hasta = $hoy->endOfDay();
+        $leads = Lead::query()->whereNotNull('canal_lead_id')->whereBetween('created_at', [$desde, $hasta])->get(['id', 'canal_lead_id', 'oportunidad_id', 'campania_id']);
+        $ganadas = DB::table('oportunidades as o')->join('estados as e', 'e.id', '=', 'o.estado_id')->where('e.codigo', 'ganada')
+            ->whereIn('o.id', $leads->pluck('oportunidad_id')->filter()->all() ?: [0])->pluck('o.monto_estimado', 'o.id');
+        // Lo gastado de un canal en el periodo: cada lead del periodo carga el costo por contacto de su campaña (todo lo
+        // gastado en la campaña ÷ todos sus contactos), así el retorno del canal cuadra con el de sus campañas.
+        $gastoCampania = DB::table('campania_gastos as cg')->join('gastos_demo as g', 'g.id', '=', 'cg.gasto_id')->groupBy('cg.campania_id')->selectRaw('cg.campania_id, sum(g.monto) as total')->pluck('total', 'campania_id');
+        $contactosCampania = Lead::query()->whereNotNull('campania_id')->groupBy('campania_id')->selectRaw('campania_id, count(*) as n')->pluck('n', 'campania_id');
+        $costoLead = fn (?int $campania): string => $campania === null || ! isset($gastoCampania[$campania]) ? '0' : bcdiv((string) $gastoCampania[$campania], (string) max(1, (int) ($contactosCampania[$campania] ?? 1)), 6);
+        $tarjetas = [];
+
+        foreach (app(LeadsService::class)->canales() as $id => $canal) {
+            $suyos = $leads->where('canal_lead_id', $id);
+
+            if ($suyos->isEmpty()) {
+                continue;
+            }
+
+            $calificados = $suyos->whereNotNull('oportunidad_id')->count();
+            $ganado = '0.00';
+            $margen = '0.00';
+            $nGanadas = 0;
+            $previsto = false;
+
+            foreach ($suyos->pluck('oportunidad_id')->filter()->unique() as $op) {
+                if (! $ganadas->has($op)) {
+                    continue;
+                }
+
+                $nGanadas++;
+                $ganado = bcadd($ganado, (string) ($ganadas[$op] ?? '0'), 2);
+                $m = $this->margenDeOportunidad((int) $op);
+                $margen = bcadd($margen, $m['monto'] ?? '0', 2);
+                $previsto = $previsto || $m['previsto'];
+            }
+
+            $gastado = number_format((float) $suyos->reduce(fn (string $t, Lead $l): string => bcadd($t, $costoLead($l->campania_id), 6), '0'), 2, '.', '');
+            $conGasto = bccomp($gastado, '0', 2) > 0;
+            $tarjetas[] = [
+                'id' => $id, 'codigo' => $canal['codigo'], 'nombre' => $canal['nombre'], 'icono' => $canal['icono'],
+                'leads' => $suyos->count(), 'calificados' => $calificados, 'tasa' => (int) round($calificados * 100 / $suyos->count()),
+                'ganadas' => $nGanadas, 'ganado' => $ganado, 'margen' => $margen, 'margenPrevisto' => $previsto,
+                'gastado' => $gastado, 'porLead' => $conGasto ? bcdiv($gastado, (string) $suyos->count(), 2) : null,
+                'retorno' => $conGasto ? number_format((float) $margen / (float) $gastado, 1, '.', '') : null,
+            ];
+        }
+
+        usort($tarjetas, fn (array $a, array $b): int => match ($orden) {
+            'ganado' => bccomp($b['ganado'], $a['ganado'], 2),
+            'retorno' => [(float) ($b['retorno'] ?? -1), $b['leads']] <=> [(float) ($a['retorno'] ?? -1), $a['leads']],
+            default => [$b['leads'], $b['calificados']] <=> [$a['leads'], $a['calificados']],
+        });
+
+        $total = array_sum(array_column($tarjetas, 'leads'));
+        $calificados = array_sum(array_column($tarjetas, 'calificados'));
+        $masLeads = $tarjetas === [] ? null : array_reduce($tarjetas, fn (?array $m, array $t): array => $m === null || $t['leads'] > $m['leads'] ? $t : $m);
+        $conRetorno = array_values(array_filter($tarjetas, fn (array $t): bool => $t['retorno'] !== null));
+        $rinde = $conRetorno === [] ? null : array_reduce($conRetorno, fn (?array $m, array $t): array => $m === null || (float) $t['retorno'] > (float) $m['retorno'] ? $t : $m);
+
+        return ['cifras' => [
+            'leads' => $total, 'canales' => count($tarjetas), 'calificados' => $calificados, 'tasa' => $total === 0 ? 0 : (int) round($calificados * 100 / $total),
+            'masLeads' => $masLeads, 'rinde' => $rinde,
+        ], 'tarjetas' => $tarjetas, 'desde' => $desde];
+    }
 }

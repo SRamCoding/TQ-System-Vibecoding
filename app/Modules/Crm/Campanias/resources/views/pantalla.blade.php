@@ -40,6 +40,7 @@
 
     <div class="tq-camp-chips">
         <button type="button" class="tq-camp-chip" aria-pressed="{{ $this->seccion === 'campanias' ? 'true' : 'false' }}" wire:click="$set('seccion', 'campanias')">Campañas</button>
+        <button type="button" class="tq-camp-chip" aria-pressed="{{ $this->seccion === 'canales' ? 'true' : 'false' }}" wire:click="$set('seccion', 'canales')">Canales</button>
         <button type="button" class="tq-camp-chip" aria-pressed="{{ $this->seccion === 'clientes' ? 'true' : 'false' }}" wire:click="$set('seccion', 'clientes')">Mis clientes <span class="n">{{ count(array_filter($grupos, fn ($g) => $g['clientes'] !== [])) }}</span></button>
     </div>
 
@@ -82,6 +83,8 @@
                 </article>
             @endforeach
         </div>
+    @elseif ($this->seccion === 'canales' && $canales !== null)
+        @include('campanias::canales', ['canales' => $canales, 'soles' => $soles, 'veces' => $veces])
     @else
         <div class="tq-camp-grid" style="grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr))">
             @foreach ($grupos as $clave => $g)

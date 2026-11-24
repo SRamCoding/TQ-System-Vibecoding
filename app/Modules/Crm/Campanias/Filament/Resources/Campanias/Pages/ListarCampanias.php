@@ -46,6 +46,13 @@ final class ListarCampanias extends Page
     #[Url(as: 'seccion', except: 'campanias')]
     public string $seccion = 'campanias';
 
+    /** Observación 9.4: el periodo y el orden de la vista Canales. */
+    #[Url(as: 'periodo', except: 'mes')]
+    public string $periodo = 'mes';
+
+    #[Url(as: 'orden', except: 'leads')]
+    public string $ordenCanales = 'leads';
+
     /** El grupo de Mis clientes abierto en «Ver la lista». */
     #[Url(as: 'grupo')]
     public ?string $grupo = null;
@@ -213,6 +220,10 @@ final class ListarCampanias extends Page
             View::make('campanias::pantalla')->viewData(fn (): array => [
                 'retorno' => $this->seccion === 'campanias' ? app(CampaniasService::class)->retorno(CarbonImmutable::parse(Calendario::hoy())->year) : null,
                 'grupos' => app(CampaniasService::class)->grupos(),
+                'canales' => $this->seccion === 'canales' ? app(CampaniasService::class)->canales(
+                    array_key_exists($this->periodo, CampaniasService::PERIODOS) ? $this->periodo : 'mes',
+                    array_key_exists($this->ordenCanales, CampaniasService::ORDENES_CANALES) ? $this->ordenCanales : 'leads',
+                ) : null,
                 'puede' => self::puede(),
             ]),
         ]);

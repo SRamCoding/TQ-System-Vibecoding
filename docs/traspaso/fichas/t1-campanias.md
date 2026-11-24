@@ -1,7 +1,7 @@
 # Ficha · Campañas y leads (CRM-07)
 
-- **Estado:** en curso (v4, ronda de cambios; la v1 quedó aprobada)
-- **Versión:** v4
+- **Estado:** en curso (v5, ronda de cambios; la v1 quedó aprobada)
+- **Versión:** v5
 - **Tramo de la ruta:** T1
 - **Aprobada:** 2026-11-19 · etiqueta `aprobado/t1-campanias-v1`
 - **Fuentes del diseño (v3):** `docs/vibe/pedidos/observaciones-7.md` (punto 6) y `lienzos/campanias/` (`Main.dc.html`,
@@ -20,6 +20,8 @@ módulo es el último del CRM.
 
 ## Decisiones de Sebastián
 
+- **MV-098** (ficha) · Sección «Canales» en Campañas: una tarjeta por canal con leads, calificados, ganados, ganado, margen, gasto, costo por lead y retorno del periodo (mes, trimestre o año); clic lleva a Mis oportunidades filtrado por Por calificar y ese canal.
+
 - **MV-097** (cruza módulos) · Cada lead lleva su canal (catálogo «Canales de los leads» con ícono); la campaña también. Filtro «Origen» en Mis oportunidades. La landing crea leads en `POST /entrada/leads` con clave, casilla trampa y límite por minuto; aviso en Mien.
 
 - **MV-079** (cruza módulos) · Campañas con su retorno (gasto real, margen de lo ganado, formulario y QR) y Mis clientes
@@ -31,6 +33,8 @@ módulo es el último del CRM.
 - **MV-009** (general) · Aprobada sin revisión, como todas hasta terminar el sistema; los cambios vienen al final.
 
 ## Pantallas y navegación
+
+- **Canales** (v5, MV-098, lienzo `campanias-vista/Canales.dc.html`): chips Campañas · Canales · Mis clientes. Arriba, cuatro cifras (leads del periodo y de cuántos canales, calificados y %, el canal que trae más, el que rinde más). Selector Este mes · Trimestre · Año y «Ordenar: leads / ganado / retorno». Una tarjeta por canal con leads (solo los canales con leads); retorno en verde (1× o más), coral (menos) o «sin gasto». Clic en la tarjeta: Mis oportunidades con `etapa=por_calificar` y `origen=<canal>`. Enlace «Probar la entrada de la página web» (abre `/entrada/prueba`, observación 9.3).
 
 - **Canal** (v4, MV-097): «+ Nuevo → Contacto por calificar» y «Nueva campaña» piden el canal (el origen comercial del lead sale de él y se puede cambiar). En las tarjetas de Por calificar y en el panel de Por calificar del Embudo, el canal como etiqueta con su ícono. Mis oportunidades tiene el grupo de filtros «Origen» (plegable), con los canales que tienen algo: filtra los leads por su canal y las oportunidades por el canal del lead del que nacieron.
 - **Entrada de la landing** (v4, MV-097): `POST /entrada/leads` (campos y respuestas en `docs/vibe/conectar-landing.md`); `/entrada/prueba` es la página de prueba (con sesión) que envía un formulario de ejemplo. Mien: «Nuevo contacto desde la página web: [nombre] · [organización]» (los de los últimos 3 días sin atender).
@@ -90,6 +94,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Reglas y números
 
+- **Cifras de Canales** (v5, MV-098): periodo desde el 1 del mes, trimestre o año hasta hoy, por la fecha de llegada del lead. Calificado: el lead pasó a oportunidad. Ganado y margen: las oportunidades ganadas de esos leads, con el mismo margen de Campañas (real del cierre o previsto del proyecto). Gastado: cada lead del periodo carga el costo por contacto de su campaña (todo lo gastado en la campaña ÷ todos sus contactos); retorno = margen ÷ gastado; costo por lead = gastado ÷ leads. «Rinde más»: el de mayor retorno entre los que tienen gasto.
+
 - **Canal del lead** (v4, MV-097): de `utm_source` (ig → Instagram, fb/meta → Facebook, google/web → Página web…), si no de su campaña, si no «Página web». La campaña sale de `campania` (su código o nombre) o `utm_campaign`. Origen comercial según el canal: Feria → FERIA, Referido → REFERENCIA, Llamada → VISITA_FRIO, los demás → SITIO_WEB. Los leads ya cargados tomaron el canal de su campaña o, sin campaña, de su origen. Límite: 10 envíos por minuto por dirección (`TECHQUK_ENTRADA_LEADS_POR_MINUTO`); se exige teléfono o correo.
 
 - **v3 · Retorno** = margen de lo ganado ÷ gastado (una decimal). **Gastado** = suma de los gastos reales de la campaña
@@ -118,6 +124,9 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Supuestos sin confirmar
 
+- **v5 · Gasto prorrateado por lead:** se eligió así para que el retorno de un canal cuadre con el de sus campañas (un gasto de julio no deja en cero un canal cuyos leads llegaron en noviembre). Los leads sin campaña no cargan gasto.
+- **v5 · Demo:** los calificados de los canales nuevos se unieron a oportunidades que ya existían sin lead; el canal «Página web» tiene una ganada con margen negativo (la del proyecto con pérdida de la demo).
+
 - **v4 · Origen comercial y canal conviven:** el lead sigue teniendo su origen comercial (pasa a la cuenta y a la oportunidad, plan 2.20a); se llena solo desde el canal y se puede cambiar.
 - **v4 · Clave en local:** sin `TECHQUK_ENTRADA_LEADS_CLAVE`, en un equipo local vale `clave-local-de-prueba`; en el servidor, sin clave, la entrada queda cerrada.
 - **v4 · Ícono de WhatsApp:** dibujo propio (globo con auricular), no el logotipo oficial.
@@ -139,6 +148,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 
 ## Atajos tomados
 
+- **v5 · Canales se calcula al mirar** recorriendo los leads del periodo y el margen de cada ganada (sin consulta agregada ni caché).
+
 - **v4 · Entrada de leads sin más defensa:** clave compartida (visible si la landing es solo HTML), casilla trampa y límite por dirección; sin CAPTCHA ni firma de cada envío. Lo crea el usuario de sistema. La ruta está fuera de CSRF y con CORS solo para ella.
 - **v4 · Canal de una oportunidad:** se busca por el lead que la creó (`leads.oportunidad_id`), sin columna propia en la oportunidad.
 
@@ -157,6 +168,8 @@ descarte, asignado, atendido el). El DBML guarda la ficha (`party_id`) del conve
 `Filament/Resources/Leads` y `Filament/Resources/Campanias`); datos en `DemoSeeder::campanias()`.
 
 ## Cambios desde la versión anterior
+
+- **v5** (MV-098): vista Canales.
 
 - **v4** (MV-097): canal de cada lead, filtro «Origen» y entrada desde la landing.
 

@@ -1202,3 +1202,12 @@ confirma, recién entonces se vuelve una decisión con su número.
 - **Alcance:** cruza módulos (Oportunidades, Campañas, Directorio y catálogos)
 - **Estado:** vigente
 - **Commit:** el de «Observación 9.3: el canal de cada lead y la entrada desde la landing»
+
+### MV-098 · 2026-11-24 · La vista «Canales» en Campañas
+
+- **Ficha:** `fichas/t1-campanias.md`
+- **Dijo Sebastián:** (observaciones-9, punto 4) «En la caja Campañas, junto a «Campañas» y «Mis clientes», una sección más: «Canales». Mide cómo rinde cada medio. Una tarjeta por canal … leads, calificados (y %), ganados, monto ganado, margen de lo ganado y, si el canal tiene gasto, costo por lead y retorno, con los mismos cálculos de Campañas … Orden por leads … Clic en una tarjeta: lleva a Oportunidades … con el filtro Etapa = Por calificar y Origen = ese canal … Cifras arriba … Datos de demo … Lo que no se construye todavía … va a ideas-para-despues.md».
+- **Decisión:** lo dicho.
+- **Alcance:** ficha (Campañas)
+- **Estado:** vigente
+- **Commit:** el de «Observación 9.4: la vista Canales en Campañas»
