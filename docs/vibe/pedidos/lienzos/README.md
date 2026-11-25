@@ -46,4 +46,4 @@ Son ilustrativos: se copian los colores, medidas, formas y la disposición, no e
 | 10.1 Almacén | `almacen/` | `Main.dc.html` (portada y kardex), `Movimientos.dc.html`, `Conteo.dc.html`, `Series.dc.html`. **Las series usan las de Postventa**, no se crean otras |
 | 10.2 Abastecer | `abastecer/` | `Main.dc.html`, `Requerimiento.dc.html`, `Proveedor.dc.html`, `Entregas.dc.html`, `Plan.dc.html` |
 | 10.3 Facturación y cobranza | `cobranza/` | `Main.dc.html`, `Documentos.dc.html`, `Cobranzas.dc.html`, `Conciliacion.dc.html`. Las fases del SIAF: primero investigar |
-| 10.4 Postventa | `postventa/` | `Main.dc.html` y las demás pizarras de la carpeta |
+| 10.4 Postventa | `postventa/` | `Main.dc.html` (costo e indicadores), `Preventivo.dc.html`, `Campo.dc.html` (técnico, QR y portal), `Ticket.dc.html` (ticket, RMA y encuesta) |
