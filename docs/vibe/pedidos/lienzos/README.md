@@ -38,3 +38,12 @@ Son ilustrativos: se copian los colores, medidas, formas y la disposición, no e
 |---|---|---|
 | 9.5 Mejoras de Oportunidades | `oportunidades-mejoras/` | Cada pizarra lleva el número de la mejora. **Sin la barrita del margen** de `Main.dc.html`: solo la etiqueta (observación 9.5, punto 1) |
 | 9.4, 9.9 a 9.12 Campañas y Canales | `campanias-vista/` | `Main.dc.html` (Campañas), `Canales.dc.html`, `Clientes.dc.html` («Volver a vender»). **Manda el texto** donde difiere del dibujo: contactos sin barra y «N de X» en oportunidades y ganadas (9.9), retorno esperado (9.11) |
+
+## Décima tanda
+
+| Observación | Carpeta | Archivo que manda |
+|---|---|---|
+| 10.1 Almacén | `almacen/` | `Main.dc.html` (portada y kardex), `Movimientos.dc.html`, `Conteo.dc.html`, `Series.dc.html`. **Las series usan las de Postventa**, no se crean otras |
+| 10.2 Abastecer | `abastecer/` | `Main.dc.html`, `Requerimiento.dc.html`, `Proveedor.dc.html`, `Entregas.dc.html`, `Plan.dc.html` |
+| 10.3 Facturación y cobranza | `cobranza/` | `Main.dc.html`, `Documentos.dc.html`, `Cobranzas.dc.html`, `Conciliacion.dc.html`. Las fases del SIAF: primero investigar |
+| 10.4 Postventa | `postventa/` | `Main.dc.html` y las demás pizarras de la carpeta |
